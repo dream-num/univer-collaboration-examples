@@ -68,7 +68,7 @@ server.use('submit', async (ctx, next) => {
   ctx.request.customData.role = role;
 
   if (role !== 'admin' && role !== 'editor') {
-    ctx.reject(new CollabError('PERMISSION_DENIED', 'Unit is read-only'));
+    throw new CollabError('PERMISSION_DENIED', 'Unit is read-only');
   }
 
   ctx.request.metadata.operator = ctx.session.userId;

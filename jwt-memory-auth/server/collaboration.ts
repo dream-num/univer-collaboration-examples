@@ -24,7 +24,7 @@ export function createCollaboration(
     const role = access.getRole(ctx.session.userId, ctx.request.unitKey);
     ctx.request.customData.role = role;
     if (!canRead(role)) {
-      ctx.reject(new CollabError("PERMISSION_DENIED", "Cannot read this unit"));
+      throw new CollabError("PERMISSION_DENIED", "Cannot read this unit");
     }
     await next();
   });
@@ -37,7 +37,7 @@ export function createCollaboration(
     ctx.request.customData.role = role;
 
     if (!canEdit(role)) {
-      ctx.reject(new CollabError("PERMISSION_DENIED", "Unit is read-only"));
+      throw new CollabError("PERMISSION_DENIED", "Unit is read-only");
     }
 
     ctx.request.metadata.operator = ctx.session.userId;
@@ -49,7 +49,10 @@ export function createCollaboration(
     const role = access.getRole(ctx.session.userId, ctx.request.unitKey);
     ctx.request.customData.role = role;
     if (!canEdit(role)) {
-      ctx.reject(new CollabError("PERMISSION_DENIED", "Edit permission was revoked"));
+      throw new CollabError(
+        "PERMISSION_DENIED",
+        "Edit permission was revoked"
+      );
     }
 
     // 真实系统可在这里检查保护范围或禁止某类 mutation。
@@ -66,7 +69,7 @@ export function createCollaboration(
 
   server.use("receivePresence", async (ctx, next) => {
     if (!canRead(access.getRole(ctx.session.userId, ctx.request.unitKey))) {
-      ctx.reject(new CollabError("PERMISSION_DENIED", "Cannot send presence"));
+      throw new CollabError("PERMISSION_DENIED", "Cannot send presence");
     }
     await next();
   });

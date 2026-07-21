@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import express from "express";
-import type { IDatabaseAdapter } from "@univerjs/collaboration-server";
+import {
+  CollabError,
+  type IDatabaseAdapter,
+} from "@univerjs/collaboration-server";
 import { createNodeCollabTransport } from "@univerjs/collaboration-server-node";
 import type {
   AuthenticatedUser,
@@ -33,7 +36,14 @@ const transport = createNodeCollabTransport({
 // 每个协同 HTTP 请求或 WebSocket upgrade 执行一次。
 // 应用认证用户并提供 SessionInit；Core 生成可信 memberId。
 transport.use(async (ctx, next) => {
-  const user = await auth.requireUser(ctx.incomingMessage);
+  let user: AuthenticatedUser;
+  try {
+    user = await auth.requireUser(ctx.incomingMessage);
+  } catch (cause) {
+    throw new CollabError("UNAUTHENTICATED", "Authentication required", {
+      cause,
+    });
+  }
 
   ctx.namespace = NAMESPACE;
   ctx.userId = user.userId;
