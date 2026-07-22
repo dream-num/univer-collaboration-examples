@@ -9,14 +9,11 @@ import { createNodeCollabTransport } from "@univerjs/collaboration-server-node";
 import type {
   AuthenticatedUser,
   DocumentRole,
-  UnitKey,
 } from "./model";
 import { canAdmin } from "./model";
 import { AuthService } from "./auth";
 import { createCollaboration } from "./collaboration";
 import { MemoryDocumentAccessStore, MemoryUserStore } from "./memory-stores";
-
-const NAMESPACE = "demo-workspace";
 
 const users = new MemoryUserStore();
 const access = new MemoryDocumentAccessStore();
@@ -45,7 +42,6 @@ transport.use(async (ctx, next) => {
     });
   }
 
-  ctx.namespace = NAMESPACE;
   ctx.userId = user.userId;
   ctx.customData.user = user;
 
@@ -84,28 +80,24 @@ app.use("/api", async (request, response, next) => {
 // 创建 unit；创建者自动获得 admin 角色。
 app.post("/api/units", async (request, response) => {
   const user = response.locals.user as AuthenticatedUser;
-  const unitId = randomUUID();
-  const key: UnitKey = { namespace: NAMESPACE, unitId };
+  const unitID = randomUUID();
 
-  access.grant(user.userId, key, "admin");
+  access.grant(user.userId, unitID, "admin");
   try {
     const session = await collaboration.openSession({
-      namespace: NAMESPACE,
       userId: user.userId,
       initialCustomData: { user },
     });
     try {
       await session.createUnit({
-        unitId,
-        type: 2,
-        data: createEmptyWorkbookData(unitId),
+        snapshot: createEmptyWorkbookSnapshot(unitID),
       });
     } finally {
       await session.close();
     }
-    response.status(201).json({ unitId });
+    response.status(201).json({ unitID });
   } catch (error) {
-    access.revoke(user.userId, key);
+    access.revoke(user.userId, unitID);
     throw error;
   }
 });
@@ -113,11 +105,8 @@ app.post("/api/units", async (request, response) => {
 // 前端读取自己的角色，用于配置 viewer 只读 UI。
 app.get("/api/units/:unitId/access", async (request, response) => {
   const user = response.locals.user as AuthenticatedUser;
-  const key: UnitKey = {
-    namespace: NAMESPACE,
-    unitId: request.params.unitId,
-  };
-  const role = access.getRole(user.userId, key);
+  const unitID = request.params.unitId;
+  const role = access.getRole(user.userId, unitID);
 
   if (!role) {
     response.status(403).json({ error: "Cannot read this unit" });
@@ -132,18 +121,15 @@ app.put(
   "/api/units/:unitId/members/:userId",
   async (request, response) => {
     const user = response.locals.user as AuthenticatedUser;
-    const key: UnitKey = {
-      namespace: NAMESPACE,
-      unitId: request.params.unitId,
-    };
+    const unitID = request.params.unitId;
 
-    if (!canAdmin(access.getRole(user.userId, key))) {
+    if (!canAdmin(access.getRole(user.userId, unitID))) {
       response.status(403).json({ error: "Only admins can manage members" });
       return;
     }
 
     const { role } = request.body as { role: DocumentRole };
-    access.grant(request.params.userId, key, role);
+    access.grant(request.params.userId, unitID, role);
     response.status(204).end();
   }
 );
@@ -188,4 +174,6 @@ async function bootstrap(): Promise<void> {
 void bootstrap();
 
 // 为突出集成边界，省略错误处理中间件和空 Workbook 构造函数。
-declare function createEmptyWorkbookData(unitId: string): unknown;
+declare function createEmptyWorkbookSnapshot(
+  unitID: string
+): import("@univerjs/protocol").ISnapshot;

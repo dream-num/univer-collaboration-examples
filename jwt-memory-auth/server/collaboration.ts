@@ -21,7 +21,7 @@ export function createCollaboration(
 
   // viewer/editor/admin 都可以加载 snapshot、changesets 和 blocks。
   server.use("read", async (ctx, next) => {
-    const role = access.getRole(ctx.session.userId, ctx.request.unitKey);
+    const role = access.getRole(ctx.session.userId, ctx.request.unitID);
     ctx.request.customData.role = role;
     if (!canRead(role)) {
       throw new CollabError("PERMISSION_DENIED", "Cannot read this unit");
@@ -33,20 +33,19 @@ export function createCollaboration(
   server.use("submit", async (ctx, next) => {
     ctx.request.customData.traceId = randomUUID();
 
-    const role = access.getRole(ctx.session.userId, ctx.request.unitKey);
+    const role = access.getRole(ctx.session.userId, ctx.request.changeset.unitID);
     ctx.request.customData.role = role;
 
     if (!canEdit(role)) {
       throw new CollabError("PERMISSION_DENIED", "Unit is read-only");
     }
 
-    ctx.request.metadata.operator = ctx.session.userId;
     await next();
   });
 
   // apply 在 OT 后再次查询角色，并可检查最终 mutations。
   server.use("apply", async (ctx, next) => {
-    const role = access.getRole(ctx.session.userId, ctx.request.unitKey);
+    const role = access.getRole(ctx.session.userId, ctx.request.changeset.unitID);
     ctx.request.customData.role = role;
     if (!canEdit(role)) {
       throw new CollabError(
@@ -60,15 +59,14 @@ export function createCollaboration(
     await next();
   });
 
-  // commit 只做应用后校验和最终 metadata，不产生外部副作用。
+  // commit 只做应用后校验，不产生外部副作用。
   server.use("commit", async (ctx, next) => {
-    ctx.request.metadata.roleCheckedAt = Date.now();
     // validateUpdatedUnit(ctx.unit);
     await next();
   });
 
   server.use("receivePresence", async (ctx, next) => {
-    if (!canRead(access.getRole(ctx.session.userId, ctx.request.unitKey))) {
+    if (!canRead(access.getRole(ctx.session.userId, ctx.request.unitID))) {
       throw new CollabError("PERMISSION_DENIED", "Cannot send presence");
     }
     await next();
@@ -77,9 +75,9 @@ export function createCollaboration(
   // 数据库成功提交后再做审计；listener 失败不能回滚 changeset。
   server.on("afterWrite", (event) => {
     console.info("changeset committed", {
-      unit: event.changeset.key,
+      unitID: event.changeset.unitID,
       revision: event.changeset.revision,
-      user: event.changeset.userId,
+      userID: event.changeset.userID,
       traceId: event.request.customData.traceId,
     });
   });

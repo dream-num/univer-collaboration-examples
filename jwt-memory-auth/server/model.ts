@@ -1,10 +1,5 @@
 export type DocumentRole = "admin" | "editor" | "viewer";
 
-export interface UnitKey {
-  namespace: string;
-  unitId: string;
-}
-
 export interface UserRecord {
   userId: string;
   username: string;

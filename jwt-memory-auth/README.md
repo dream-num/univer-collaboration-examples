@@ -17,7 +17,7 @@ interface CreateUserInput {
 ```ts
 interface DocumentGrant {
   userId: string;
-  unitKey: UnitKey;
+  unitID: string;
   role: 'admin' | 'editor' | 'viewer';
 }
 ```
@@ -43,7 +43,6 @@ Node Transport 创建 ingress context 和 customData。应用只补充字段：
 transport.use(async (ctx, next) => {
   const user = await auth.requireUser(ctx.incomingMessage);
 
-  ctx.namespace = NAMESPACE;
   ctx.userId = user.userId;
   ctx.customData.user = user;
 
@@ -63,7 +62,7 @@ server.use('submit', async (ctx, next) => {
 
   const role = access.getRole(
     ctx.session.userId,
-    ctx.request.unitKey
+    ctx.request.changeset.unitID
   );
   ctx.request.customData.role = role;
 
@@ -71,7 +70,6 @@ server.use('submit', async (ctx, next) => {
     throw new CollabError('PERMISSION_DENIED', 'Unit is read-only');
   }
 
-  ctx.request.metadata.operator = ctx.session.userId;
   await next();
 });
 ```
@@ -84,16 +82,13 @@ server.use('submit', async (ctx, next) => {
 
 ```ts
 const session = await collaboration.openSession({
-  namespace: NAMESPACE,
   userId: user.userId,
   initialCustomData: { user },
 });
 
 try {
   await session.createUnit({
-    unitId,
-    type,
-    data,
+    snapshot,
   });
 } finally {
   await session.close();
@@ -111,7 +106,7 @@ request.customData              当前 Request 独占
 
 - 用户信息和认证方式适合 Session customData。
 - trace、ACL 结果和请求缓存适合 Request customData。
-- customData 不自动持久化；持久化审计字段写入 Request metadata。
+- customData 不自动持久化；持久化审计数据写入应用自己的业务存储。
 
 ## 前端集成
 

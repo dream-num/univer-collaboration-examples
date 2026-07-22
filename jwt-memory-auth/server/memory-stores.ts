@@ -3,7 +3,6 @@ import type {
   AuthenticatedUser,
   CreateUserInput,
   DocumentRole,
-  UnitKey,
   UserRecord,
 } from "./model";
 
@@ -44,23 +43,23 @@ export class MemoryUserStore {
   }
 }
 
-function grantKey(userId: string, unit: UnitKey): string {
-  return `${unit.namespace}\u0000${unit.unitId}\u0000${userId}`;
+function grantKey(userId: string, unitID: string): string {
+  return `${unitID}\u0000${userId}`;
 }
 
-/** Demo ACL：一个用户在一个 UnitKey 上只有一个角色。 */
+/** Demo ACL：一个用户在一个 unitID 上只有一个角色。 */
 export class MemoryDocumentAccessStore {
   private readonly grants = new Map<string, DocumentRole>();
 
-  getRole(userId: string, unit: UnitKey): DocumentRole | undefined {
-    return this.grants.get(grantKey(userId, unit));
+  getRole(userId: string, unitID: string): DocumentRole | undefined {
+    return this.grants.get(grantKey(userId, unitID));
   }
 
-  grant(userId: string, unit: UnitKey, role: DocumentRole): void {
-    this.grants.set(grantKey(userId, unit), role);
+  grant(userId: string, unitID: string, role: DocumentRole): void {
+    this.grants.set(grantKey(userId, unitID), role);
   }
 
-  revoke(userId: string, unit: UnitKey): void {
-    this.grants.delete(grantKey(userId, unit));
+  revoke(userId: string, unitID: string): void {
+    this.grants.delete(grantKey(userId, unitID));
   }
 }
