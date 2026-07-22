@@ -29,6 +29,14 @@ const collabService = createCollabService(database, access);
 const endpoint = new UniverCollabEndpoint(collabService);
 const transport = createNodeTransport();
 
+endpoint.use("connect", async (ctx, next) => {
+  const user = ctx.session.customData.user as
+    | AuthenticatedUser
+    | undefined;
+  ctx.member.name = user?.username ?? ctx.session.userId;
+  await next();
+});
+
 endpoint.use("joinUnit", async (ctx, next) => {
   const role = access.getRole(ctx.session.userId, ctx.unitID);
   if (!role) {
@@ -59,6 +67,17 @@ transport.use(async (ctx, next) => {
 transport.use(endpoint);
 
 const app = express();
+
+// 协同请求必须在 Express body parser 消费原始请求流之前交给 Transport。
+app.use((request, response, next) => {
+  if (!request.path.startsWith("/universer-api/")) {
+    next();
+    return;
+  }
+
+  transport.handleRequest(request, response);
+});
+
 app.use(express.json());
 
 // 登录成功后 JWT 被写入 HttpOnly Cookie。
@@ -143,16 +162,6 @@ app.put(
     response.status(204).end();
   }
 );
-
-// Express 只是宿主框架：将协同路径交给只依赖 Node HTTP 的 Transport。
-app.use((request, response, next) => {
-  if (!request.path.startsWith("/universer-api/")) {
-    next();
-    return;
-  }
-
-  transport.handleRequest(request, response);
-});
 
 const httpServer = createServer(app);
 

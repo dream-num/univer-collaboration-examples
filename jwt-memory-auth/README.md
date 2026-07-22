@@ -56,6 +56,16 @@ transport.use(new UniverCollabEndpoint(collabService));
 
 Transport 不理解 Univer 协议。Endpoint 签发/消费 ticket、创建 WebSocket Session 和 `memberId`，再调用 Service。
 
+应用可以在 Endpoint connect 生命周期中补充协议成员展示信息，而不修改 `CollabSession`：
+
+```ts
+endpoint.use('connect', async (ctx, next) => {
+  const user = ctx.session.customData.user as AuthenticatedUser;
+  ctx.member.name = user.username;
+  await next();
+});
+```
+
 ### 3. Request 权限 middleware
 
 Endpoint 或直接调用方把 Session、Input 和本次 customData 传给 Service；Service 创建 Request：
