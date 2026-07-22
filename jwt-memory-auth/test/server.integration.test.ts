@@ -53,6 +53,13 @@ describe("JWT memory auth collaboration example", () => {
       userId: "user-alice",
       username: "alice",
     });
+
+    const unknownCollaborationRoute = await fetch(
+      `${origin}/universer-api/unknown`,
+      { headers: { cookie: alice.cookie } }
+    );
+    expect(unknownCollaborationRoute.status).toBe(404);
+    await expect(unknownCollaborationRoute.text()).resolves.toBe("Not Found");
   });
 
   it("creates a real Sheet snapshot and enforces admin/editor/viewer ACL", async () => {

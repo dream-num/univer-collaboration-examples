@@ -89,6 +89,20 @@ export async function createDemoApplication(
     await next();
   });
   transport.use(endpoint);
+  transport.use(async (ctx, next) => {
+    if (ctx.kind === "http") {
+      if (!ctx.response.writableEnded) {
+        ctx.response.statusCode = 404;
+        ctx.response.end("Not Found");
+      }
+      return;
+    }
+    if (ctx.kind === "websocket-open") {
+      ctx.connection.close(1008, "Unknown collaboration endpoint");
+      return;
+    }
+    await next();
+  });
 
   const app = express();
 
@@ -252,6 +266,7 @@ export async function createDemoApplication(
       await transport.dispose();
       await closeServer(httpServer);
       await collabService.dispose();
+      await database.dispose();
     },
   };
 }
