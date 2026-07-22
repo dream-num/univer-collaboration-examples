@@ -112,4 +112,6 @@ pnpm --filter @univerjs/collaboration-example-jwt-memory-auth test
 
 集成测试覆盖错误/成功登录、HttpOnly Cookie、未认证协同请求、创建真实 Sheet snapshot、admin/editor/viewer ACL、viewer 服务端拒绝和 session ticket。
 
+全栈协议 E2E 使用真实 `@univerjs-pro/collaboration-client` codec 建立两个 WebSocket Session，覆盖并发编辑 OT 收敛、ACK/广播、Presence 成员事件、断线后的 fetch-missing、网络层 viewer 拒绝，以及 revision 5 同步 snapshot 中的最终单元格数据。测试通过临时本机端口运行，不依赖外部服务。
+
 本示例只适合本地演示。生产环境应替换 JWT secret、Memory stores 和 Memory Adapter，并配置 HTTPS、CSRF、防暴力破解及按部署方式选择 Cookie `SameSite/Secure`。
