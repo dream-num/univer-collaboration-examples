@@ -1,79 +1,78 @@
-# JWT + 内存用户与文档权限集成示例
+# JWT + Memory ACL 可运行协同示例
 
-这个示例只展示关键集成代码，不要求直接运行。协同框架本身不依赖 Express；Express 只是宿主应用。
+这是一个完全本地运行的最小协同应用：Express 承载业务 API 和静态页面，JWT 放在 HttpOnly Cookie，协同数据使用 Memory Adapter，浏览器使用真实 Univer 前端协同 SDK。
 
-## 数据模型
+## 启动
 
-```ts
-interface CreateUserInput {
-  userId: string;   // 稳定业务主键
-  username: string; // 登录名
-  password: string; // 存储前进行哈希
-}
+在仓库根目录执行：
+
+```bash
+pnpm install
+pnpm example:jwt-memory-auth
 ```
 
-文档权限使用稳定 `userId`，不使用可修改的 `username`：
+打开 <http://localhost:3010>。默认监听 `127.0.0.1:3010`；可用 `PORT`、`HOST` 环境变量修改。
 
-```ts
-interface DocumentGrant {
-  userId: string;
-  unitID: string;
-  role: 'admin' | 'editor' | 'viewer';
-}
-```
+演示账号：
 
-登录提交 `username/password`。验证成功后 JWT `sub` 写入 `userId`；Session、ACL 和 confirmed changeset 作者都使用 `userId`。
+| username | password | userId |
+|---|---|---|
+| alice | alice-password | user-alice |
+| bob | bob-password | user-bob |
+| carol | carol-password | user-carol |
 
-## 后端集成
+进程重启后用户之外的 Unit、ACL 和协同数据都会清空。
 
-### 1. 登录与 JWT
+## 双客户端验证
+
+1. 在第一个浏览器会话登录 Alice，点击“创建 Sheet”。
+2. 复制页面上的 `unitID`，给 Bob 分配 `editor`。
+3. 在无痕窗口登录 Bob，输入相同 `unitID` 并打开。
+4. 两端应显示 `sync: synced` 和在线成员 `alice, bob`。
+5. 任一端修改单元格，另一端会收到 confirmed changeset。
+6. 给 Carol 分配 `viewer` 后用第三个会话打开；UI 为只读，Service middleware 仍是权限安全边界。
+
+浏览器断线重连后会通过 revision 和 fetch-missing 补齐漏掉的 changeset。为了调试，页面把当前 Facade API 暴露为 `window.univerAPI`。
+
+## 集成边界
 
 ```text
-POST /api/login { username, password }
-  → MemoryUserStore 验证密码哈希
-  → JWT sub = userId
-  → Set-Cookie: collab_token=<jwt>; HttpOnly
+Express application
+├── /api/login、Unit 和成员管理 API
+└── Node Transport
+    └── UniverCollabEndpoint
+        └── UniverCollabService
+            └── MemoryDatabaseAdapter
 ```
 
-### 2. Transport 认证
+- Express 不是协同框架依赖，只是这个示例的宿主。
+- Transport middleware 认证 HTTP 请求，把可信 `userId` 和用户对象放入 event `customData`。
+- Endpoint 签发一次性 ticket，并在 WebSocket open 时创建 Session/member。
+- Service middleware 在 read/create/submit/apply 生命周期查询 ACL。
+- `admin/editor/viewer` 使用稳定 `userId` 关联，不使用可修改的 `username`。
+- viewer 前端只读是 UX；伪造网络提交仍由后端 `submitChangeset/applyChangeset` 拒绝。
 
-Node Transport 为每个网络事件创建 context 和 customData。应用只认证 HTTP 请求；WebSocket open 使用 Endpoint 的一次性 ticket：
+## 认证与 Session
+
+登录验证 `username/password` 后，JWT `sub` 保存 `userId`，token 只写入 HttpOnly Cookie。前端不读取 JWT。
 
 ```ts
 transport.use(async (ctx, next) => {
   if (ctx.kind === 'http') {
     const user = await auth.requireUser(ctx.incomingMessage);
-
     ctx.userId = user.userId;
     ctx.customData.user = user;
   }
-
-  await next();
-});
-
-transport.use(new UniverCollabEndpoint(collabService));
-```
-
-Transport 不理解 Univer 协议。Endpoint 签发/消费 ticket、创建 WebSocket Session 和 `memberId`，再调用 Service。
-
-应用可以在 Endpoint connect 生命周期中补充协议成员展示信息，而不修改 `CollabSession`：
-
-```ts
-endpoint.use('connect', async (ctx, next) => {
-  const user = ctx.session.customData.user as AuthenticatedUser;
-  ctx.member.name = user.username;
   await next();
 });
 ```
 
-### 3. Request 权限 middleware
+请求 session-ticket 时，Endpoint 保存这次认证产生的 `userId/customData`。WebSocket 使用 ticket 建连后，Endpoint 创建长期 Session；普通 snapshot HTTP read 则使用短生命周期调用 Session。
 
-Endpoint 或直接调用方把 Session、Input 和本次 customData 传给 Service；Service 创建 Request：
+## 权限 middleware
 
 ```ts
 collabService.use('submitChangeset', async (ctx, next) => {
-  ctx.request.customData.traceId = randomUUID();
-
   const role = access.getRole(
     ctx.session.userId,
     ctx.request.changeset.unitID
@@ -83,72 +82,34 @@ collabService.use('submitChangeset', async (ctx, next) => {
   if (role !== 'admin' && role !== 'editor') {
     throw new CollabError('PERMISSION_DENIED', 'Unit is read-only');
   }
-
   await next();
 });
 ```
 
-同一个 SubmitChangesetRequest 继续进入 `applyChangeset/commitChangeset/Database/changesetCommitted`。这些阶段看到同一个 Session、Request 和 request customData 引用。
+同一个 SubmitChangesetRequest 继续进入 `applyChangeset/commitChangeset/Database/changesetCommitted`，并始终保留相同的 Session、Request 和 `request.customData` 引用。
 
-### 4. Express 业务 API
-
-普通 `/api/*` 使用应用自己的 Express 认证 middleware。直接调用 Service 时由应用提供 Session：
-
-```ts
-const session = {
-  memberId: randomUUID(),
-  userId: user.userId,
-  customData: { user },
-};
-
-await collabService.createUnit(
-  {
-    snapshot,
-  },
-  {
-    session,
-    customData: { traceId: randomUUID() },
-  }
-);
-```
-
-Service 不创建或关闭 Session。传入的调用级 `customData` 直接成为 `request.customData`。
-
-## 两级 customData
-
-```text
-session.customData              Session 内所有 Request 共享
-request.customData              当前 Request 独占
-```
-
-- 用户信息和认证方式适合 Session customData。
-- trace、ACL 结果和请求缓存适合 Request customData。
-- customData 不自动持久化；持久化审计数据写入应用自己的业务存储。
-
-## 前端集成
-
-1. 调用应用 `/api/login`。
-2. 注册 Univer 协同插件。
-3. 加载协同 Unit；HTTP 和 WebSocket 自动携带 Cookie。
-4. 成员管理 API 使用目标 `userId`。
-5. viewer 在前端设置只读 UI，后端 middleware 保持真正安全边界。
-
-前端不读取 JWT，也不能提供可信 Session/Request customData 或身份；Endpoint 根据认证结果创建 Session，并覆盖网络 payload 中不可信的身份字段。
-
-## 目录
+## 关键目录
 
 ```text
 server/
-├── model.ts            userId/username/password、角色
-├── memory-stores.ts    内存用户与 userId 文档 ACL
-├── auth.ts             密码验证、JWT 和 Cookie
-├── collaboration.ts    Service middleware
-└── express-server.ts   登录、Endpoint、Transport 和业务 API
+├── express-server.ts   可测试的应用装配、业务 API 与 shutdown
+├── auth.ts             JWT、HttpOnly Cookie 和用户解析
+├── memory-stores.ts    bcrypt 密码哈希和 userId ACL
+├── collaboration.ts    Service/Endpoint 权限 middleware
+└── sheet-snapshot.ts   Workbook data → Univer protocol snapshot
 
 client/
-├── auth.ts             登录与按 userId 管理成员
-├── main.ts             前端集成顺序
-└── univer.ts           协同插件、Unit 加载和 viewer UI
+├── main.ts             登录、创建、授权和页面交互
+├── auth.ts             应用业务 API
+└── univer.ts           Preset、协同 plugins、loadSheetAsync 和 viewer 只读
 ```
 
-跨域部署还需要 credential CORS 和 `SameSite=None; Secure`，本示例只展示同源集成。
+## 测试
+
+```bash
+pnpm --filter @univerjs/collaboration-example-jwt-memory-auth test
+```
+
+集成测试覆盖错误/成功登录、HttpOnly Cookie、未认证协同请求、创建真实 Sheet snapshot、admin/editor/viewer ACL、viewer 服务端拒绝和 session ticket。
+
+本示例只适合本地演示。生产环境应替换 JWT secret、Memory stores 和 Memory Adapter，并配置 HTTPS、CSRF、防暴力破解及按部署方式选择 Cookie `SameSite/Secure`。

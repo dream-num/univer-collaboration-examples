@@ -4,14 +4,28 @@ import {
   UniverCollabService,
   type IDatabaseAdapter,
 } from "@univerjs/collaboration-service";
-import { canEdit, canRead } from "./model";
-import type { MemoryDocumentAccessStore } from "./memory-stores";
+import { canAdmin, canEdit, canRead } from "./model.js";
+import type { MemoryDocumentAccessStore } from "./memory-stores.js";
 
 export function createCollabService(
   database: IDatabaseAdapter,
   access: MemoryDocumentAccessStore
 ) {
   const collabService = new UniverCollabService({ dbAdapter: database });
+
+  collabService.use("createUnit", async (ctx, next) => {
+    const role = access.getRole(
+      ctx.session.userId,
+      ctx.request.snapshot.unitID
+    );
+    if (!canAdmin(role)) {
+      throw new CollabError(
+        "PERMISSION_DENIED",
+        "Only an admin can create this unit"
+      );
+    }
+    await next();
+  });
 
   collabService.use("readUnitData", async (ctx, next) => {
     const role = access.getRole(ctx.session.userId, ctx.request.unitID);

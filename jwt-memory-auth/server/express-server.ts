@@ -1,198 +1,291 @@
 import { randomUUID } from "node:crypto";
-import { createServer } from "node:http";
-import express from "express";
-import {
-  CollabError,
-  type IDatabaseAdapter,
-} from "@univerjs/collaboration-service";
+import { createServer, type Server } from "node:http";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import express, { type NextFunction, type Request, type Response } from "express";
+import { ErrorCode, UniverType } from "@univerjs/protocol";
+import { CollabError } from "@univerjs/collaboration-service";
+import { MemoryDatabaseAdapter } from "@univerjs/collaboration-database-memory";
 import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
 import { createNodeTransport } from "@univerjs/collaboration-transport-node";
-import type {
-  AuthenticatedUser,
-  DocumentRole,
-} from "./model";
-import { canAdmin } from "./model";
-import { AuthService } from "./auth";
-import { createCollabService } from "./collaboration";
-import { MemoryDocumentAccessStore, MemoryUserStore } from "./memory-stores";
+import { AuthService } from "./auth.js";
+import { createCollabService } from "./collaboration.js";
+import { MemoryDocumentAccessStore, MemoryUserStore } from "./memory-stores.js";
+import type { AuthenticatedUser, DocumentRole } from "./model.js";
+import { canAdmin } from "./model.js";
+import { createEmptyWorkbook } from "./sheet-snapshot.js";
 
-const users = new MemoryUserStore();
-const access = new MemoryDocumentAccessStore();
-const auth = new AuthService(
-  users,
-  new TextEncoder().encode("replace-with-32-byte-secret")
-);
+const DEMO_USERS = [
+  { userId: "user-alice", username: "alice", password: "alice-password" },
+  { userId: "user-bob", username: "bob", password: "bob-password" },
+  { userId: "user-carol", username: "carol", password: "carol-password" },
+] as const;
 
-// 代表任意 IDatabaseAdapter 实现。
-declare const database: IDatabaseAdapter;
-const collabService = createCollabService(database, access);
-const endpoint = new UniverCollabEndpoint(collabService);
-const transport = createNodeTransport();
+export interface DemoApplicationOptions {
+  readonly jwtSecret?: string;
+  readonly serveClient?: boolean;
+}
 
-endpoint.use("connect", async (ctx, next) => {
-  const user = ctx.session.customData.user as
-    | AuthenticatedUser
-    | undefined;
-  ctx.member.name = user?.username ?? ctx.session.userId;
-  await next();
-});
+export interface DemoApplication {
+  readonly app: express.Express;
+  readonly httpServer: Server;
+  readonly users: MemoryUserStore;
+  readonly access: MemoryDocumentAccessStore;
+  readonly database: MemoryDatabaseAdapter;
+  readonly collabService: ReturnType<typeof createCollabService>;
+  listen(port?: number, host?: string): Promise<number>;
+  close(): Promise<void>;
+}
 
-endpoint.use("joinUnit", async (ctx, next) => {
-  const role = access.getRole(ctx.session.userId, ctx.unitID);
-  if (!role) {
-    throw new CollabError("PERMISSION_DENIED", "Cannot join this unit");
-  }
-  await next();
-});
+export async function createDemoApplication(
+  options: DemoApplicationOptions = {}
+): Promise<DemoApplication> {
+  const users = new MemoryUserStore();
+  const access = new MemoryDocumentAccessStore();
+  for (const user of DEMO_USERS) await users.create(user);
 
-// HTTP 认证由应用提供；WebSocket open 由 Endpoint 消费 ticket 认证。
-transport.use(async (ctx, next) => {
-  if (ctx.kind === "http") {
-    let user: AuthenticatedUser;
-    try {
-      user = await auth.requireUser(ctx.incomingMessage);
-    } catch (cause) {
-      throw new CollabError("UNAUTHENTICATED", "Authentication required", {
-        cause,
-      });
+  const secret = new TextEncoder().encode(
+    options.jwtSecret ?? "local-demo-secret-change-before-production"
+  );
+  const auth = new AuthService(users, secret);
+  const database = new MemoryDatabaseAdapter();
+  const collabService = createCollabService(database, access);
+  const endpoint = new UniverCollabEndpoint(collabService);
+  const transport = createNodeTransport();
+
+  endpoint.use("connect", async (ctx, next) => {
+    const user = ctx.session.customData.user as AuthenticatedUser | undefined;
+    ctx.member.name = user?.username ?? ctx.session.userId;
+    await next();
+  });
+
+  endpoint.use("joinUnit", async (ctx, next) => {
+    if (!access.getRole(ctx.session.userId, ctx.unitID)) {
+      throw new CollabError("PERMISSION_DENIED", "Cannot join this unit");
     }
+    await next();
+  });
 
-    ctx.userId = user.userId;
-    ctx.customData.user = user;
-  }
+  // The host authenticates HTTP. A WebSocket open is authenticated by the
+  // one-time ticket that Endpoint issued for a previous authenticated request.
+  transport.use(async (ctx, next) => {
+    if (ctx.kind === "http") {
+      try {
+        const user = await auth.requireUser(ctx.incomingMessage);
+        ctx.userId = user.userId;
+        ctx.customData.user = user;
+      } catch {
+        ctx.response.statusCode = 401;
+        ctx.response.setHeader("content-type", "application/json; charset=utf-8");
+        ctx.response.end(JSON.stringify({
+          error: {
+            code: ErrorCode.UNAUTHENTICATED,
+            message: "Authentication required",
+          },
+        }));
+        return;
+      }
+    }
+    await next();
+  });
+  transport.use(endpoint);
 
-  await next();
-});
+  const app = express();
 
-transport.use(endpoint);
+  // Transport must see the raw stream before express.json() consumes it.
+  app.use((request, response, next) => {
+    if (!request.path.startsWith("/universer-api/")) {
+      next();
+      return;
+    }
+    transport.handleRequest(request, response);
+  });
 
-const app = express();
+  app.use(express.json());
 
-// 协同请求必须在 Express body parser 消费原始请求流之前交给 Transport。
-app.use((request, response, next) => {
-  if (!request.path.startsWith("/universer-api/")) {
-    next();
-    return;
-  }
+  app.post("/api/login", async (request, response) => {
+    const { username, password } = request.body as Partial<{
+      username: string;
+      password: string;
+    }>;
+    if (typeof username !== "string" || typeof password !== "string") {
+      response.status(400).json({ error: "username and password are required" });
+      return;
+    }
+    try {
+      const { token, user } = await auth.login(username, password);
+      auth.setLoginCookie(response, token);
+      response.json(user);
+    } catch {
+      response.status(401).json({ error: "Invalid username or password" });
+    }
+  });
 
-  transport.handleRequest(request, response);
-});
+  app.use("/api", async (request, response, next) => {
+    try {
+      response.locals.user = await auth.requireUser(request);
+      next();
+    } catch {
+      response.status(401).json({ error: "Please sign in" });
+    }
+  });
 
-app.use(express.json());
+  app.get("/api/me", (_request, response) => {
+    response.json(response.locals.user as AuthenticatedUser);
+  });
 
-// 登录成功后 JWT 被写入 HttpOnly Cookie。
-app.post("/api/login", async (request, response) => {
-  const { username, password } = request.body as {
-    username: string;
-    password: string;
-  };
+  app.post("/api/logout", (_request, response) => {
+    auth.clearLoginCookie(response);
+    response.status(204).end();
+  });
 
-  try {
-    const { token, user } = await auth.login(username, password);
-    auth.setLoginCookie(response, token);
-    response.json(user);
-  } catch {
-    response.status(401).json({ error: "Invalid username or password" });
-  }
-});
+  app.get("/api/users", (_request, response) => {
+    response.json({ users: users.list() });
+  });
 
-// 普通业务 API 继续使用应用自己的 Express 认证 middleware。
-app.use("/api", async (request, response, next) => {
-  try {
-    response.locals.user = await auth.requireUser(request);
-    next();
-  } catch {
-    response.status(401).json({ error: "Please sign in" });
-  }
-});
-
-// 创建 unit；创建者自动获得 admin 角色。
-app.post("/api/units", async (request, response) => {
-  const user = response.locals.user as AuthenticatedUser;
-  const unitID = randomUUID();
-
-  access.grant(user.userId, unitID, "admin");
-  try {
-    const session = {
-      memberId: randomUUID(),
-      userId: user.userId,
-      customData: { user },
-    };
-    await collabService.createUnit(
-      {
-        snapshot: createEmptyWorkbookSnapshot(unitID),
-      },
-      { session, customData: { traceId: randomUUID() } }
-    );
-    response.status(201).json({ unitID });
-  } catch (error) {
-    access.revoke(user.userId, unitID);
-    throw error;
-  }
-});
-
-// 前端读取自己的角色，用于配置 viewer 只读 UI。
-app.get("/api/units/:unitId/access", async (request, response) => {
-  const user = response.locals.user as AuthenticatedUser;
-  const unitID = request.params.unitId;
-  const role = access.getRole(user.userId, unitID);
-
-  if (!role) {
-    response.status(403).json({ error: "Cannot read this unit" });
-    return;
-  }
-
-  response.json({ role });
-});
-
-// 只有 admin 可以为其他用户分配文档角色。
-app.put(
-  "/api/units/:unitId/members/:userId",
-  async (request, response) => {
+  app.post("/api/units", async (request, response) => {
     const user = response.locals.user as AuthenticatedUser;
-    const unitID = request.params.unitId;
+    const unitID = randomUUID();
+    const name =
+      typeof request.body?.name === "string" && request.body.name.trim()
+        ? request.body.name.trim()
+        : "Collaborative Sheet";
+    access.grant(user.userId, unitID, "admin");
+    try {
+      const initial = await createEmptyWorkbook(unitID, name);
+      await collabService.createUnit(initial, {
+        session: applicationSession(user),
+        customData: { traceId: randomUUID() },
+      });
+      response.status(201).json({
+        unitID,
+        type: UniverType.UNIVER_SHEET,
+        role: "admin",
+      });
+    } catch (error) {
+      access.revoke(user.userId, unitID);
+      throw error;
+    }
+  });
 
+  app.get("/api/units/:unitID/access", (request, response) => {
+    const user = response.locals.user as AuthenticatedUser;
+    const unitID = request.params.unitID as string;
+    const role = access.getRole(user.userId, unitID);
+    if (!role) {
+      response.status(403).json({ error: "Cannot read this unit" });
+      return;
+    }
+    response.json({ role });
+  });
+
+  app.put("/api/units/:unitID/members/:userId", (request, response) => {
+    const user = response.locals.user as AuthenticatedUser;
+    const unitID = request.params.unitID as string;
     if (!canAdmin(access.getRole(user.userId, unitID))) {
       response.status(403).json({ error: "Only admins can manage members" });
       return;
     }
-
-    const { role } = request.body as { role: DocumentRole };
-    access.grant(request.params.userId, unitID, role);
+    const targetUserId = request.params.userId as string;
+    const role = request.body?.role as unknown;
+    if (!users.getById(targetUserId)) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+    if (!isDocumentRole(role)) {
+      response.status(400).json({ error: "Invalid role" });
+      return;
+    }
+    access.grant(targetUserId, unitID, role);
     response.status(204).end();
-  }
-);
-
-const httpServer = createServer(app);
-
-// WebSocket upgrade 不经过 Express，由同一个 Node Transport 处理。
-httpServer.on("upgrade", (request, socket, head) => {
-  if (!request.url?.startsWith("/universer-api/")) {
-    return;
-  }
-
-  transport.handleUpgrade(request, socket, head);
-});
-
-async function bootstrap(): Promise<void> {
-  // Demo 账号；真实服务不应在源码中保存密码。
-  await users.create({
-    userId: "user-alice",
-    username: "alice",
-    password: "alice-password",
-  });
-  await users.create({
-    userId: "user-bob",
-    username: "bob",
-    password: "bob-password",
   });
 
-  httpServer.listen(3010);
+  if (options.serveClient !== false) {
+    const clientDirectory = join(
+      dirname(fileURLToPath(import.meta.url)),
+      "../dist/client"
+    );
+    app.use(express.static(clientDirectory));
+    app.get("/{*path}", (_request, response) => {
+      response.sendFile(join(clientDirectory, "index.html"));
+    });
+  }
+
+  app.use(
+    (error: unknown, _request: Request, response: Response, next: NextFunction) => {
+      if (response.headersSent) {
+        next(error);
+        return;
+      }
+      if (error instanceof CollabError) {
+        response.status(error.code === "PERMISSION_DENIED" ? 403 : 400).json({
+          error: error.message,
+        });
+        return;
+      }
+      console.error(error);
+      response.status(500).json({ error: "Internal server error" });
+    }
+  );
+
+  const httpServer = createServer(app);
+  httpServer.on("upgrade", (request, socket, head) => {
+    if (!request.url?.startsWith("/universer-api/")) {
+      socket.destroy();
+      return;
+    }
+    transport.handleUpgrade(request, socket, head);
+  });
+
+  let closed = false;
+  return {
+    app,
+    httpServer,
+    users,
+    access,
+    database,
+    collabService,
+    listen: (port = 3010, host = "127.0.0.1") => listen(httpServer, port, host),
+    close: async () => {
+      if (closed) return;
+      closed = true;
+      await transport.dispose();
+      await closeServer(httpServer);
+      await collabService.dispose();
+    },
+  };
 }
 
-void bootstrap();
+function applicationSession(user: AuthenticatedUser) {
+  return {
+    memberId: `http-${randomUUID()}`,
+    userId: user.userId,
+    customData: { user },
+  };
+}
 
-// 为突出集成边界，省略错误处理中间件和空 Workbook 构造函数。
-declare function createEmptyWorkbookSnapshot(
-  unitID: string
-): import("@univerjs/protocol").ISnapshot;
+function isDocumentRole(value: unknown): value is DocumentRole {
+  return value === "admin" || value === "editor" || value === "viewer";
+}
+
+function listen(server: Server, port: number, host: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, host, () => {
+      server.off("error", reject);
+      const address = server.address();
+      if (!address || typeof address === "string") {
+        reject(new Error("Server did not expose a TCP address"));
+        return;
+      }
+      resolve(address.port);
+    });
+  });
+}
+
+function closeServer(server: Server): Promise<void> {
+  if (!server.listening) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
+}

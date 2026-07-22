@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Univer Collaboration Demo</title>
+  </head>
+  <body>
+    <section id="login-panel" class="card login-panel">
+      <h1>Univer 协同示例</h1>
+      <p>使用两个无痕窗口登录不同账号，即可验证实时协同。</p>
+      <form id="login-form">
+        <label>用户名 <input id="username" value="alice" autocomplete="username" /></label>
+        <label>密码 <input id="password" type="password" value="alice-password" autocomplete="current-password" /></label>
+        <button type="submit">登录</button>
+      </form>
+      <p class="hint">alice / alice-password · bob / bob-password · carol / carol-password</p>
+      <p id="login-error" class="error"></p>
+    </section>
+
+    <main id="application" hidden>
+      <header class="toolbar">
+        <strong id="current-user"></strong>
+        <button id="create-unit">创建 Sheet</button>
+        <input id="unit-id" placeholder="unitID" />
+        <button id="open-unit">打开</button>
+        <span id="unit-role"></span>
+        <span id="sync-status"></span>
+      </header>
+      <section class="sharing">
+        <span>授权：</span>
+        <select id="target-user">
+          <option value="user-bob">Bob</option>
+          <option value="user-carol">Carol</option>
+        </select>
+        <select id="target-role">
+          <option value="editor">editor</option>
+          <option value="viewer">viewer</option>
+          <option value="admin">admin</option>
+        </select>
+        <button id="grant-role">保存角色</button>
+        <span id="members"></span>
+      </section>
+      <div id="univer-container"></div>
+      <pre id="activity"></pre>
+    </main>
+
+    <script type="module" src="/client/main.ts"></script>
+  </body>
+</html>

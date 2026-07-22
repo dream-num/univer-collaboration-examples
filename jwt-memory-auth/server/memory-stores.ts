@@ -1,10 +1,10 @@
-import { hash, verify } from "argon2";
+import { compare, hash } from "bcryptjs";
 import type {
   AuthenticatedUser,
   CreateUserInput,
   DocumentRole,
   UserRecord,
-} from "./model";
+} from "./model.js";
 
 /** Demo 用户库。只存在于当前 Node 进程，重启后清空。 */
 export class MemoryUserStore {
@@ -22,7 +22,7 @@ export class MemoryUserStore {
     this.usersById.set(input.userId, {
       userId: input.userId,
       username: input.username,
-      passwordHash: await hash(input.password),
+      passwordHash: await hash(input.password, 10),
     });
     this.userIdByUsername.set(input.username, input.userId);
   }
@@ -33,13 +33,20 @@ export class MemoryUserStore {
   ): Promise<AuthenticatedUser | null> {
     const userId = this.userIdByUsername.get(username);
     const user = userId ? this.usersById.get(userId) : undefined;
-    if (!user || !(await verify(user.passwordHash, password))) return null;
+    if (!user || !(await compare(password, user.passwordHash))) return null;
     return { userId: user.userId, username: user.username };
   }
 
   getById(userId: string): AuthenticatedUser | null {
     const user = this.usersById.get(userId);
     return user ? { userId: user.userId, username: user.username } : null;
+  }
+
+  list(): readonly AuthenticatedUser[] {
+    return [...this.usersById.values()].map(({ userId, username }) => ({
+      userId,
+      username,
+    }));
   }
 }
 

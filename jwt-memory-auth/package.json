@@ -1,0 +1,39 @@
+{
+  "name": "@univerjs/collaboration-example-jwt-memory-auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.server.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "start": "node --import tsx server/main.ts",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@univerjs-pro/collaboration": "1.0.0-alpha.6",
+    "@univerjs-pro/collaboration-client": "1.0.0-alpha.6",
+    "@univerjs-pro/collaboration-client-ui": "1.0.0-alpha.6",
+    "@univerjs/collaboration-database-memory": "workspace:*",
+    "@univerjs/collaboration-endpoint": "workspace:*",
+    "@univerjs/collaboration-service": "workspace:*",
+    "@univerjs/collaboration-transport-node": "workspace:*",
+    "@univerjs/core": "1.0.0-alpha.6",
+    "@univerjs/preset-sheets-core": "1.0.0-alpha.6",
+    "@univerjs/presets": "1.0.0-alpha.6",
+    "@univerjs/protocol": "1.0.0-alpha.6",
+    "@univerjs/sheets": "1.0.0-alpha.6",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jose": "^6.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "tsx": "^4.20.0",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0"
+  }
+}

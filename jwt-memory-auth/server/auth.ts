@@ -1,10 +1,12 @@
 import type { IncomingMessage } from "node:http";
 import type { Response } from "express";
 import { SignJWT, jwtVerify } from "jose";
-import type { AuthenticatedUser } from "./model";
-import type { MemoryUserStore } from "./memory-stores";
+import type { AuthenticatedUser } from "./model.js";
+import type { MemoryUserStore } from "./memory-stores.js";
 
 const COOKIE_NAME = "collab_token";
+
+export const LOGIN_COOKIE_NAME = COOKIE_NAME;
 
 export class AuthService {
   constructor(
@@ -52,11 +54,19 @@ export class AuthService {
       path: "/",
     });
   }
+
+  clearLoginCookie(response: Response): void {
+    response.clearCookie(COOKIE_NAME, { path: "/" });
+  }
 }
 
 function readCookie(header: string | undefined, name: string): string | undefined {
-  return header
-    ?.split(";")
-    .map((part) => part.trim().split("="))
-    .find(([key]) => key === name)?.[1];
+  for (const part of header?.split(";") ?? []) {
+    const separator = part.indexOf("=");
+    if (separator < 0) continue;
+    if (part.slice(0, separator).trim() === name) {
+      return decodeURIComponent(part.slice(separator + 1).trim());
+    }
+  }
+  return undefined;
 }
