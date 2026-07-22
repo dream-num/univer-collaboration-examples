@@ -37,27 +37,31 @@ POST /api/login { username, password }
 
 ### 2. Transport 认证
 
-Node Transport 创建 ingress context 和 customData。应用只补充字段：
+Node Transport 为每个网络事件创建 context 和 customData。应用只认证 HTTP 请求；WebSocket open 使用 Endpoint 的一次性 ticket：
 
 ```ts
 transport.use(async (ctx, next) => {
-  const user = await auth.requireUser(ctx.incomingMessage);
+  if (ctx.kind === 'http') {
+    const user = await auth.requireUser(ctx.incomingMessage);
 
-  ctx.userId = user.userId;
-  ctx.customData.user = user;
+    ctx.userId = user.userId;
+    ctx.customData.user = user;
+  }
 
   await next();
 });
+
+transport.use(new UniverCollabEndpoint(collabService));
 ```
 
-Transport 验证 identity 后调用 Core。Core 创建 Session 和最终 `session.customData`，并复制 ingress customData 字段。`memberId` 由 Core 生成。
+Transport 不理解 Univer 协议。Endpoint 签发/消费 ticket、创建 WebSocket Session 和 `memberId`，再调用 Service。
 
 ### 3. Request 权限 middleware
 
-Session 方法只接收 Input；Core 为每次调用创建 Request 和独立 customData：
+Endpoint 或直接调用方把 Session、Input 和本次 customData 传给 Service；Service 创建 Request：
 
 ```ts
-server.use('submit', async (ctx, next) => {
+collabService.use('submitChangeset', async (ctx, next) => {
   ctx.request.customData.traceId = randomUUID();
 
   const role = access.getRole(
@@ -74,28 +78,31 @@ server.use('submit', async (ctx, next) => {
 });
 ```
 
-同一个 SubmitRequest 继续进入 `apply/commit/Database/afterWrite`。这些阶段看到同一个 Request 和 customData 引用。
+同一个 SubmitChangesetRequest 继续进入 `applyChangeset/commitChangeset/Database/changesetCommitted`。这些阶段看到同一个 Session、Request 和 request customData 引用。
 
 ### 4. Express 业务 API
 
-普通 `/api/*` 使用应用自己的 Express 认证 middleware。直接调用 Core 时先打开短期 Session：
+普通 `/api/*` 使用应用自己的 Express 认证 middleware。直接调用 Service 时由应用提供 Session：
 
 ```ts
-const session = await collaboration.openSession({
+const session = {
+  memberId: randomUUID(),
   userId: user.userId,
-  initialCustomData: { user },
-});
+  customData: { user },
+};
 
-try {
-  await session.createUnit({
+await collabService.createUnit(
+  {
     snapshot,
-  });
-} finally {
-  await session.close();
-}
+  },
+  {
+    session,
+    customData: { traceId: randomUUID() },
+  }
+);
 ```
 
-`initialCustomData` 只是初始字段。Core 创建自己的 customData 对象并复制字段，不采用调用者提供的顶层引用。
+Service 不创建或关闭 Session。传入的调用级 `customData` 直接成为 `request.customData`。
 
 ## 两级 customData
 
@@ -116,7 +123,7 @@ request.customData              当前 Request 独占
 4. 成员管理 API 使用目标 `userId`。
 5. viewer 在前端设置只读 UI，后端 middleware 保持真正安全边界。
 
-前端不读取 JWT，也不能提供 Session/Request customData 或可信 `userId/memberId`。
+前端不读取 JWT，也不能提供可信 Session/Request customData 或身份；Endpoint 根据认证结果创建 Session，并覆盖网络 payload 中不可信的身份字段。
 
 ## 目录
 
@@ -125,8 +132,8 @@ server/
 ├── model.ts            userId/username/password、角色
 ├── memory-stores.ts    内存用户与 userId 文档 ACL
 ├── auth.ts             密码验证、JWT 和 Cookie
-├── collaboration.ts    Session/Request middleware
-└── express-server.ts   登录、业务 API 和 Node Transport 接入
+├── collaboration.ts    Service middleware
+└── express-server.ts   登录、Endpoint、Transport 和业务 API
 
 client/
 ├── auth.ts             登录与按 userId 管理成员

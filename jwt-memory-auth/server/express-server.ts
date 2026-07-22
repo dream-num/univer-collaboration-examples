@@ -4,15 +4,16 @@ import express from "express";
 import {
   CollabError,
   type IDatabaseAdapter,
-} from "@univerjs/collaboration-server";
-import { createNodeCollabTransport } from "@univerjs/collaboration-server-node";
+} from "@univerjs/collaboration-service";
+import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
+import { createNodeTransport } from "@univerjs/collaboration-transport-node";
 import type {
   AuthenticatedUser,
   DocumentRole,
 } from "./model";
 import { canAdmin } from "./model";
 import { AuthService } from "./auth";
-import { createCollaboration } from "./collaboration";
+import { createCollabService } from "./collaboration";
 import { MemoryDocumentAccessStore, MemoryUserStore } from "./memory-stores";
 
 const users = new MemoryUserStore();
@@ -24,29 +25,38 @@ const auth = new AuthService(
 
 // 代表任意 IDatabaseAdapter 实现。
 declare const database: IDatabaseAdapter;
-const collaboration = createCollaboration(database, access);
+const collabService = createCollabService(database, access);
+const endpoint = new UniverCollabEndpoint(collabService);
+const transport = createNodeTransport();
 
-const transport = createNodeCollabTransport({
-  server: collaboration,
+endpoint.use("joinUnit", async (ctx, next) => {
+  const role = access.getRole(ctx.session.userId, ctx.unitID);
+  if (!role) {
+    throw new CollabError("PERMISSION_DENIED", "Cannot join this unit");
+  }
+  await next();
 });
 
-// 每个协同 HTTP 请求或 WebSocket upgrade 执行一次。
-// 应用认证用户并提供 SessionInit；Core 生成可信 memberId。
+// HTTP 认证由应用提供；WebSocket open 由 Endpoint 消费 ticket 认证。
 transport.use(async (ctx, next) => {
-  let user: AuthenticatedUser;
-  try {
-    user = await auth.requireUser(ctx.incomingMessage);
-  } catch (cause) {
-    throw new CollabError("UNAUTHENTICATED", "Authentication required", {
-      cause,
-    });
-  }
+  if (ctx.kind === "http") {
+    let user: AuthenticatedUser;
+    try {
+      user = await auth.requireUser(ctx.incomingMessage);
+    } catch (cause) {
+      throw new CollabError("UNAUTHENTICATED", "Authentication required", {
+        cause,
+      });
+    }
 
-  ctx.userId = user.userId;
-  ctx.customData.user = user;
+    ctx.userId = user.userId;
+    ctx.customData.user = user;
+  }
 
   await next();
 });
+
+transport.use(endpoint);
 
 const app = express();
 app.use(express.json());
@@ -84,17 +94,17 @@ app.post("/api/units", async (request, response) => {
 
   access.grant(user.userId, unitID, "admin");
   try {
-    const session = await collaboration.openSession({
+    const session = {
+      memberId: randomUUID(),
       userId: user.userId,
-      initialCustomData: { user },
-    });
-    try {
-      await session.createUnit({
+      customData: { user },
+    };
+    await collabService.createUnit(
+      {
         snapshot: createEmptyWorkbookSnapshot(unitID),
-      });
-    } finally {
-      await session.close();
-    }
+      },
+      { session, customData: { traceId: randomUUID() } }
+    );
     response.status(201).json({ unitID });
   } catch (error) {
     access.revoke(user.userId, unitID);
