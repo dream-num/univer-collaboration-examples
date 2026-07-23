@@ -10,7 +10,9 @@
 
 三个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、启动和修改该示例。
 
-本文记录已经确认的需求与实施顺序。阶段 0 和 `basic-sheets` 已完成；后两个产品化示例仍是需求，不描述为已实现能力。
+本文记录已经确认的需求与实施顺序。阶段 0 和 `basic-sheets` 已完成；
+`univer-suite-demo` 已有 Sheet、Doc、Slide 文件空间 spike，其余产品化能力仍是
+需求，不描述为已实现能力。
 
 ## 2. 共同原则
 
@@ -391,12 +393,18 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 
 ### 阶段 4：`univer-suite-demo` 文件空间
 
+状态：Spike 已完成账号、个人空间中的资源列表、创建、软删除和恢复；共享空间、
+文件夹树与分享仍未实现。
+
 - 实现账号、个人空间、共享工作空间和资源树 schema。
 - 实现资源 CRUD、名称搜索、最近使用、与我共享和回收站。
 - 实现个人文档分享、空间成员权限和快捷方式。
 - 完成文件空间、错误页和访问申请页。
 
 ### 阶段 5：`univer-suite-demo` 多类型编辑器
+
+状态：Spike 已接入 Sheet、Doc、Slide。Board / Base 创建受 alpha.6 transformer
+export 限制，非 Sheet 历史 UI 受 alpha.6 viewer 限制，见 `docs/issues`。
 
 - 分别接入 Sheet、Doc、Slide、Base 和 Board。
 - 实现统一编辑器产品头部、连接状态、在线成员和权限只读体验。
