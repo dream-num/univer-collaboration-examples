@@ -5,8 +5,9 @@
 - 当前 example：`univer-collaboration/examples/basic-sheets`
 - 参考实现：`univer-pro/examples/src/sheets`
 
-这些内容是待逐项评审的客户端差异，不自动等同于 issue。只有确认属于缺陷后，
-才按照仓库规则归入 `docs/issues/known-issues` 或 `docs/issues/new-issues`。
+这些内容是待逐项评审的客户端差异，不自动等同于 issue。只有确认属于缺陷、决定延后
+处理并得到用户显式记录确认后，才按照仓库规则归入 `docs/issues/known-issues`
+或 `docs/issues/new-issues`。
 
 ## 已对齐的协同主链路
 
