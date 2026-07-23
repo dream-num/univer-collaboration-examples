@@ -530,6 +530,12 @@ button {
   margin-left: auto;
 }
 
+.new-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  box-shadow: none;
+}
+
 .new-menu {
   position: absolute;
   z-index: 20;
@@ -557,6 +563,21 @@ button {
 
 .new-menu button:hover {
   background: #f5f6f8;
+}
+
+.new-menu-divider {
+  height: 1px;
+  margin: 4px 7px;
+  background: #edf0f4;
+}
+
+.folder-menu-icon {
+  color: #d08b28;
+  background: #fff5df;
+}
+
+.folder-menu-icon .icon {
+  width: 18px;
 }
 
 .menu-icon {
@@ -600,6 +621,99 @@ button {
 
 .main-nav .icon {
   width: 19px;
+}
+
+.team-nav {
+  min-height: 0;
+  margin-top: 24px;
+}
+
+.team-nav-heading {
+  display: flex;
+  height: 28px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px 0 13px;
+  color: #8f959e;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.team-nav-heading button {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  color: #8f959e;
+  place-items: center;
+  background: transparent;
+}
+
+.team-nav-heading button:hover {
+  color: #245bdb;
+  background: #edf2ff;
+}
+
+.team-nav-heading .icon {
+  width: 15px;
+}
+
+.team-nav nav {
+  display: grid;
+  max-height: min(28vh, 260px);
+  gap: 3px;
+  overflow-y: auto;
+}
+
+.team-nav nav a {
+  display: flex;
+  height: 38px;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: #4e5969;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.team-nav nav a:hover {
+  background: #f0f2f5;
+}
+
+.team-nav nav a.active {
+  color: #245bdb;
+  font-weight: 550;
+  background: #eaf0ff;
+}
+
+.team-nav nav a i {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 7px;
+  color: #465a85;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  background: #e8edfa;
+}
+
+.team-nav nav a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-nav nav > p {
+  margin: 7px 13px;
+  color: #b0b5bd;
+  font-size: 11px;
 }
 
 .sidebar-footer {
@@ -671,6 +785,85 @@ button {
   margin: 9px 0 0;
   color: #8f959e;
   font-size: 14px;
+}
+
+.directory-heading {
+  align-items: flex-end;
+}
+
+.directory-breadcrumbs {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.directory-breadcrumbs a {
+  max-width: 180px;
+  overflow: hidden;
+  color: #646a73;
+  font-size: 12px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.directory-breadcrumbs a:hover {
+  color: #245bdb;
+}
+
+.directory-breadcrumbs span {
+  display: grid;
+  color: #b8bdc5;
+  place-items: center;
+}
+
+.directory-breadcrumbs .icon {
+  width: 13px;
+}
+
+.directory-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.secondary-button {
+  display: inline-flex;
+  height: 36px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid #dce1e8;
+  border-radius: 8px;
+  color: #4e5969;
+  font-size: 12px;
+  font-weight: 550;
+  background: #fff;
+}
+
+.secondary-button:hover {
+  border-color: #b8c8eb;
+  color: #245bdb;
+  background: #f8faff;
+}
+
+.secondary-button .icon,
+.permission-note .icon {
+  width: 15px;
+}
+
+.permission-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #8f959e;
+  font-size: 11px;
+}
+
+.directory-section-heading {
+  margin-bottom: 14px;
 }
 
 .home-heading {
@@ -969,6 +1162,10 @@ button {
   background: #f8faff;
 }
 
+.resource-row-static {
+  cursor: default;
+}
+
 .resource-name {
   display: flex;
   min-width: 0;
@@ -987,6 +1184,21 @@ button {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
+}
+
+.folder-node-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  color: #c78122;
+  place-items: center;
+  border-radius: 7px;
+  background: #fff4dd;
+}
+
+.folder-node-icon .icon {
+  width: 19px;
 }
 
 .resource-name strong {
@@ -1514,6 +1726,10 @@ button {
   width: 14px;
 }
 
+.team-member-dialog .share-dialog-footer p {
+  line-height: 1.45;
+}
+
 .share-copy-button {
   display: inline-flex;
   height: 34px;
@@ -1780,7 +1996,8 @@ button {
   }
 
   .new-area,
-  .sidebar-footer {
+  .sidebar-footer,
+  .team-nav {
     display: none;
   }
 
@@ -1810,6 +2027,11 @@ button {
     align-items: flex-start;
     flex-direction: column;
     margin-bottom: 28px;
+  }
+
+  .directory-heading-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .resource-table-head {

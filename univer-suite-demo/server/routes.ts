@@ -13,7 +13,12 @@ import type {
   ProductStore,
   ResourceAccessRole,
   ResourceMemberRole,
+  SpaceAccessRole,
+  SpaceMemberRole,
+  SuiteFolder,
+  SuiteNode,
   SuiteResource,
+  SuiteSpace,
 } from "./product-store.js";
 import {
   CREATABLE_UNIT_TYPES,
@@ -37,9 +42,14 @@ export function createApplicationRouter(
   router.use(json({ limit: "1mb" }));
 
   router.post("/auth/register", async (request, response) => {
-    const username = stringValue(request.body?.username);
-    const password = stringValue(request.body?.password);
-    const result = await dependencies.authService.register(username, password);
+    const result = await dependencies.authService.register(
+      stringValue(request.body?.username),
+      stringValue(request.body?.password)
+    );
+    dependencies.productStore.ensurePersonalSpace(
+      result.user.userId,
+      result.user.name
+    );
     dependencies.authService.setCookie(response, result.token);
     response.status(201).json({ user: result.user });
   });
@@ -48,6 +58,10 @@ export function createApplicationRouter(
     const result = await dependencies.authService.login(
       stringValue(request.body?.username),
       stringValue(request.body?.password)
+    );
+    dependencies.productStore.ensurePersonalSpace(
+      result.user.userId,
+      result.user.name
     );
     dependencies.authService.setCookie(response, result.token);
     response.json({ user: result.user });
@@ -59,11 +73,15 @@ export function createApplicationRouter(
   });
 
   router.get("/auth/me", (request, response) => {
-    response.json({ user: dependencies.authService.requireUser(request) });
+    const user = dependencies.authService.requireUser(request);
+    dependencies.productStore.ensurePersonalSpace(user.userId, user.name);
+    response.json({ user });
   });
 
   router.use((request, response, next) => {
-    response.locals.user = dependencies.authService.requireUser(request);
+    const user = dependencies.authService.requireUser(request);
+    dependencies.productStore.ensurePersonalSpace(user.userId, user.name);
+    response.locals.user = user;
     next();
   });
 
@@ -92,6 +110,240 @@ export function createApplicationRouter(
     });
   });
 
+  router.get("/spaces", (_request, response) => {
+    const user = currentUser(response);
+    response.json({
+      spaces: dependencies.productStore
+        .listSpaces(user.userId)
+        .map(({ space, role }) =>
+          spaceResponse(space, role, dependencies.userStore)
+        ),
+    });
+  });
+
+  router.post("/spaces", (request, response) => {
+    const user = currentUser(response);
+    const space = dependencies.productStore.createTeam({
+      id: randomUUID(),
+      name: requiredName(request.body?.name, "团队空间名称不能为空"),
+      ownerUserId: user.userId,
+    });
+    response
+      .status(201)
+      .json({ space: spaceResponse(space, "owner", dependencies.userStore) });
+  });
+
+  router.get("/spaces/:spaceID/nodes", (request, response) => {
+    const user = currentUser(response);
+    const { space, role } = requireBrowsableSpace(
+      dependencies.productStore,
+      request.params.spaceID,
+      user.userId
+    );
+    const parentID = optionalID(request.query.parentID);
+    const breadcrumbs = dependencies.productStore.getBreadcrumbs(
+      space.id,
+      parentID
+    );
+    response.json({
+      space: spaceResponse(space, role, dependencies.userStore),
+      breadcrumbs: breadcrumbs.map(folderResponse),
+      nodes: dependencies.productStore
+        .listChildren(space.id, parentID)
+        .map((node) =>
+          nodeResponse(node, role, dependencies.userStore)
+        ),
+    });
+  });
+
+  router.get("/spaces/:spaceID/trash", (request, response) => {
+    const user = currentUser(response);
+    const { space, role } = requireBrowsableSpace(
+      dependencies.productStore,
+      request.params.spaceID,
+      user.userId
+    );
+    if (!canDelete(role, space.type)) {
+      throw new CollabError("PERMISSION_DENIED", "无权管理此空间的回收站");
+    }
+    response.json({
+      space: spaceResponse(space, role, dependencies.userStore),
+      nodes: dependencies.productStore
+        .listTrash(space.id)
+        .map((node) => nodeResponse(node, role, dependencies.userStore)),
+    });
+  });
+
+  router.post("/spaces/:spaceID/folders", (request, response) => {
+    const user = currentUser(response);
+    const { space, role } = requireBrowsableSpace(
+      dependencies.productStore,
+      request.params.spaceID,
+      user.userId
+    );
+    requireContentEditor(role, space.type);
+    const folder = dependencies.productStore.createFolder({
+      id: randomUUID(),
+      spaceID: space.id,
+      parentID: optionalID(request.body?.parentID),
+      name: requiredName(request.body?.name, "文件夹名称不能为空"),
+      createdBy: user.userId,
+    });
+    response.status(201).json({ folder: folderResponse(folder) });
+  });
+
+  router.patch("/folders/:folderID", (request, response) => {
+    const user = currentUser(response);
+    const folder = requireActiveFolder(
+      dependencies.productStore,
+      request.params.folderID
+    );
+    const space = dependencies.productStore.getSpace(folder.spaceID)!;
+    const role = dependencies.productStore.getSpaceRole(space.id, user.userId);
+    requireContentEditor(role, space.type);
+    const renamed = dependencies.productStore.renameFolder(
+      folder.id,
+      requiredName(request.body?.name, "文件夹名称不能为空")
+    );
+    response.json({ folder: folderResponse(renamed!) });
+  });
+
+  router.delete("/nodes/:nodeID", (request, response) => {
+    const user = currentUser(response);
+    const node = requireExistingNode(
+      dependencies.productStore,
+      request.params.nodeID
+    );
+    const space = dependencies.productStore.getSpace(node.spaceID)!;
+    const role = dependencies.productStore.getSpaceRole(space.id, user.userId);
+    if (!role || !canDelete(role, space.type)) {
+      throw new CollabError("PERMISSION_DENIED", "无权删除此内容");
+    }
+    if (!dependencies.productStore.softDeleteNode(node.id)) {
+      throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
+    }
+    response.status(204).end();
+  });
+
+  router.post("/nodes/:nodeID/restore", (request, response) => {
+    const user = currentUser(response);
+    const node = requireExistingNode(
+      dependencies.productStore,
+      request.params.nodeID
+    );
+    const space = dependencies.productStore.getSpace(node.spaceID)!;
+    const role = dependencies.productStore.getSpaceRole(space.id, user.userId);
+    if (!role || !canDelete(role, space.type)) {
+      throw new CollabError("PERMISSION_DENIED", "无权恢复此内容");
+    }
+    if (!dependencies.productStore.restoreNode(node.id)) {
+      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
+    }
+    response.status(204).end();
+  });
+
+  router.get("/spaces/:spaceID/members", (request, response) => {
+    const user = currentUser(response);
+    const { space, role } = requireTeamSpace(
+      dependencies.productStore,
+      request.params.spaceID,
+      user.userId
+    );
+    response.json({
+      space: spaceResponse(space, role, dependencies.userStore),
+      members: teamMembers(space, dependencies.productStore, dependencies.userStore),
+    });
+  });
+
+  router.post("/spaces/:spaceID/members", (request, response) => {
+    const actor = currentUser(response);
+    const { space, role: actorRole } = requireTeamSpace(
+      dependencies.productStore,
+      request.params.spaceID,
+      actor.userId
+    );
+    requireMemberManager(actorRole);
+    const target = dependencies.userStore.getById(
+      stringValue(request.body?.userId)
+    );
+    const role = teamMemberRole(request.body?.role);
+    if (!target || target.userId === space.ownerUserId) {
+      throw new CollabError("INVALID_REQUEST", "无法添加该用户");
+    }
+    assertAssignableRole(actorRole, role);
+    dependencies.productStore.setSpaceMember({
+      spaceID: space.id,
+      userId: target.userId,
+      role,
+      invitedBy: actor.userId,
+    });
+    response.status(201).json({ member: { user: target, role } });
+  });
+
+  router.patch(
+    "/spaces/:spaceID/members/:userID",
+    (request, response) => {
+      const actor = currentUser(response);
+      const { space, role: actorRole } = requireTeamSpace(
+        dependencies.productStore,
+        request.params.spaceID,
+        actor.userId
+      );
+      requireMemberManager(actorRole);
+      const existing = dependencies.productStore.getSpaceMember(
+        space.id,
+        request.params.userID
+      );
+      if (!existing) {
+        throw new CollabError("UNIT_NOT_FOUND", "团队成员不存在");
+      }
+      if (actorRole === "admin" && existing.role === "admin") {
+        throw new CollabError(
+          "PERMISSION_DENIED",
+          "管理员不能修改其他管理员"
+        );
+      }
+      const role = teamMemberRole(request.body?.role);
+      assertAssignableRole(actorRole, role);
+      const target = dependencies.userStore.getById(existing.userId)!;
+      dependencies.productStore.setSpaceMember({
+        spaceID: space.id,
+        userId: target.userId,
+        role,
+        invitedBy: actor.userId,
+      });
+      response.json({ member: { user: target, role } });
+    }
+  );
+
+  router.delete(
+    "/spaces/:spaceID/members/:userID",
+    (request, response) => {
+      const actor = currentUser(response);
+      const { space, role: actorRole } = requireTeamSpace(
+        dependencies.productStore,
+        request.params.spaceID,
+        actor.userId
+      );
+      requireMemberManager(actorRole);
+      const existing = dependencies.productStore.getSpaceMember(
+        space.id,
+        request.params.userID
+      );
+      if (!existing) {
+        throw new CollabError("UNIT_NOT_FOUND", "团队成员不存在");
+      }
+      if (actorRole === "admin" && existing.role === "admin") {
+        throw new CollabError(
+          "PERMISSION_DENIED",
+          "管理员不能移除其他管理员"
+        );
+      }
+      dependencies.productStore.removeSpaceMember(space.id, existing.userId);
+      response.status(204).end();
+    }
+  );
+
   router.get("/units", (request, response) => {
     const user = currentUser(response);
     if (request.query.scope === "recent") {
@@ -119,23 +371,17 @@ export function createApplicationRouter(
       });
       return;
     }
-
-    const status = request.query.status === "deleted" ? "deleted" : "active";
-    response.json({
-      resources: dependencies.productStore
-        .list(status, user.userId)
-        .map((resource) =>
-          resourceResponse(resource, "owner", dependencies.userStore)
-        ),
-    });
+    throw new CollabError(
+      "INVALID_REQUEST",
+      "Units must be listed through a space directory"
+    );
   });
 
   router.get("/units/:resourceID", (request, response) => {
-    const user = currentUser(response);
     const { resource, role } = requireReadableActiveResource(
       dependencies.productStore,
       request.params.resourceID,
-      user.userId
+      currentUser(response).userId
     );
     response.json({
       resource: resourceResponse(resource, role, dependencies.userStore),
@@ -165,12 +411,12 @@ export function createApplicationRouter(
 
   router.patch("/units/:resourceID", async (request, response) => {
     const user = currentUser(response);
-    const resource = requireEditableActiveResource(
+    const { resource } = requireEditableActiveResource(
       dependencies.productStore,
       request.params.resourceID,
       user.userId
     );
-    const name = renameName(request.body?.name);
+    const name = requiredName(request.body?.name, "名称不能为空");
     const session = applicationSession(user);
     const current = await dependencies.collabService.getUnit(
       {
@@ -221,6 +467,7 @@ export function createApplicationRouter(
   });
 
   router.post("/units", async (request, response) => {
+    const user = currentUser(response);
     const type = request.body?.type as unknown;
     if (!isCreatableUnitType(type)) {
       throw new CollabError(
@@ -228,22 +475,29 @@ export function createApplicationRouter(
         "This Unit type is not currently creatable"
       );
     }
-    const name = normalizeName(request.body?.name);
+    const { space, role } = requireBrowsableSpace(
+      dependencies.productStore,
+      stringValue(request.body?.spaceID),
+      user.userId
+    );
+    requireContentEditor(role, space.type);
     const resourceID = randomUUID();
     const unitID = randomUUID();
     dependencies.productStore.createPending({
       id: resourceID,
       unitID,
       type,
-      name,
-      ownerUserId: currentUser(response).userId,
+      name: optionalName(request.body?.name),
+      spaceID: space.id,
+      parentID: optionalID(request.body?.parentID),
+      createdBy: user.userId,
     });
 
     try {
       await dependencies.collabService.createUnitFromData(
-        createInitialUnitData(type, unitID, name),
+        createInitialUnitData(type, unitID, optionalName(request.body?.name)),
         {
-          session: applicationSession(currentUser(response)),
+          session: applicationSession(user),
           customData: { resourceID },
         }
       );
@@ -251,7 +505,10 @@ export function createApplicationRouter(
       response.status(201).json({
         resource: resourceResponse(
           resource,
-          "owner",
+          dependencies.productStore.getAccessRoleByID(
+            resource.id,
+            user.userId
+          )!,
           dependencies.userStore
         ),
       });
@@ -262,43 +519,53 @@ export function createApplicationRouter(
   });
 
   router.delete("/units/:resourceID", (request, response) => {
-    const existing = dependencies.productStore.getByID(
+    const user = currentUser(response);
+    const resource = dependencies.productStore.getByID(
       request.params.resourceID
     );
-    const resource =
-      existing?.ownerUserId === currentUser(response).userId
-        ? dependencies.productStore.softDelete(request.params.resourceID)
-        : null;
-    if (!resource) {
-      throw new CollabError(
-        "UNIT_NOT_FOUND",
-        "Active resource does not exist"
-      );
+    if (!resource || resource.status !== "active") {
+      throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
     }
+    const role = dependencies.productStore.getAccessRoleByID(
+      resource.id,
+      user.userId
+    );
+    if (!role || !canDelete(role, resource.spaceType)) {
+      throw new CollabError("PERMISSION_DENIED", "无权删除此内容");
+    }
+    dependencies.productStore.softDeleteNode(resource.id);
     response.status(204).end();
   });
 
   router.post("/units/:resourceID/restore", (request, response) => {
-    const existing = dependencies.productStore.getByID(
+    const user = currentUser(response);
+    const resource = dependencies.productStore.getByID(
       request.params.resourceID
     );
-    const resource =
-      existing?.ownerUserId === currentUser(response).userId
-        ? dependencies.productStore.restore(request.params.resourceID)
-        : null;
-    if (!resource) {
-      throw new CollabError(
-        "UNIT_NOT_FOUND",
-        "Deleted resource does not exist"
-      );
+    if (!resource || resource.status !== "deleted") {
+      throw new CollabError("UNIT_NOT_FOUND", "Deleted resource does not exist");
+    }
+    const role = dependencies.productStore.getSpaceRole(
+      resource.spaceID,
+      user.userId
+    );
+    if (!role || !canDelete(role, resource.spaceType)) {
+      throw new CollabError("PERMISSION_DENIED", "无权恢复此内容");
+    }
+    if (!dependencies.productStore.restoreNode(resource.id)) {
+      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
     }
     response.json({
-      resource: resourceResponse(resource, "owner", dependencies.userStore),
+      resource: resourceResponse(
+        dependencies.productStore.getByID(resource.id)!,
+        role,
+        dependencies.userStore
+      ),
     });
   });
 
   router.get("/units/:resourceID/members", (request, response) => {
-    const resource = requireOwnedActiveResource(
+    const resource = requireOwnedPersonalResource(
       dependencies.productStore,
       request.params.resourceID,
       currentUser(response).userId
@@ -307,32 +574,35 @@ export function createApplicationRouter(
     response.json({
       members: [
         ...(owner ? [{ user: owner, role: "owner" as const }] : []),
-        ...dependencies.productStore.listMembers(resource.id).flatMap((member) => {
-          const user = dependencies.userStore.getById(member.userId);
-          return user ? [{ user, role: member.role }] : [];
-        }),
+        ...dependencies.productStore
+          .listResourceMembers(resource.id)
+          .flatMap((member) => {
+            const user = dependencies.userStore.getById(member.userId);
+            return user ? [{ user, role: member.role }] : [];
+          }),
       ],
     });
   });
 
   router.post("/units/:resourceID/members", (request, response) => {
     const owner = currentUser(response);
-    const resource = requireOwnedActiveResource(
+    const resource = requireOwnedPersonalResource(
       dependencies.productStore,
       request.params.resourceID,
       owner.userId
     );
-    const targetUserId = stringValue(request.body?.userId);
-    const role = memberRole(request.body?.role);
-    const target = dependencies.userStore.getById(targetUserId);
+    const target = dependencies.userStore.getById(
+      stringValue(request.body?.userId)
+    );
+    const role = resourceMemberRole(request.body?.role);
     if (!target || target.userId === resource.ownerUserId) {
       throw new CollabError("INVALID_REQUEST", "无法添加该用户");
     }
-    dependencies.productStore.setMember({
+    dependencies.productStore.setResourceMember({
       resourceID: resource.id,
       userId: target.userId,
       role,
-      createdBy: owner.userId,
+      invitedBy: owner.userId,
     });
     response.status(201).json({ member: { user: target, role } });
   });
@@ -341,7 +611,7 @@ export function createApplicationRouter(
     "/units/:resourceID/members/:userID",
     (request, response) => {
       const owner = currentUser(response);
-      const resource = requireOwnedActiveResource(
+      const resource = requireOwnedPersonalResource(
         dependencies.productStore,
         request.params.resourceID,
         owner.userId
@@ -349,16 +619,19 @@ export function createApplicationRouter(
       const target = dependencies.userStore.getById(request.params.userID);
       if (
         !target ||
-        !dependencies.productStore.getMember(resource.id, target.userId)
+        !dependencies.productStore.getResourceMember(
+          resource.id,
+          target.userId
+        )
       ) {
         throw new CollabError("UNIT_NOT_FOUND", "成员不存在");
       }
-      const role = memberRole(request.body?.role);
-      dependencies.productStore.setMember({
+      const role = resourceMemberRole(request.body?.role);
+      dependencies.productStore.setResourceMember({
         resourceID: resource.id,
         userId: target.userId,
         role,
-        createdBy: owner.userId,
+        invitedBy: owner.userId,
       });
       response.json({ member: { user: target, role } });
     }
@@ -367,13 +640,13 @@ export function createApplicationRouter(
   router.delete(
     "/units/:resourceID/members/:userID",
     (request, response) => {
-      const resource = requireOwnedActiveResource(
+      const resource = requireOwnedPersonalResource(
         dependencies.productStore,
         request.params.resourceID,
         currentUser(response).userId
       );
       if (
-        !dependencies.productStore.removeMember(
+        !dependencies.productStore.removeResourceMember(
           resource.id,
           request.params.userID
         )
@@ -407,10 +680,7 @@ export function createProtocolCompatibilityRouter(dependencies: {
       const user = dependencies.authService.requireUser(request);
       const requests = request.body?.requests as unknown;
       if (!Array.isArray(requests)) {
-        throw new CollabError(
-          "INVALID_REQUEST",
-          "requests must be an array"
-        );
+        throw new CollabError("INVALID_REQUEST", "requests must be an array");
       }
       response.json({
         error: OK_ERROR,
@@ -452,15 +722,15 @@ export function createProtocolCompatibilityRouter(dependencies: {
   return router;
 }
 
-function normalizeName(value: unknown): string {
+function optionalName(value: unknown): string {
   return typeof value === "string" && value.trim()
     ? value.trim().slice(0, 120)
     : "Untitled";
 }
 
-function renameName(value: unknown): string {
+function requiredName(value: unknown, message: string): string {
   if (typeof value !== "string" || !value.trim()) {
-    throw new CollabError("INVALID_REQUEST", "名称不能为空");
+    throw new CollabError("INVALID_REQUEST", message);
   }
   return value.trim().slice(0, 120);
 }
@@ -469,7 +739,18 @@ function stringValue(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
-function memberRole(value: unknown): ResourceMemberRole {
+function optionalID(value: unknown): string | null {
+  return typeof value === "string" && value ? value : null;
+}
+
+function teamMemberRole(value: unknown): SpaceMemberRole {
+  if (value === "admin" || value === "editor" || value === "viewer") {
+    return value;
+  }
+  throw new CollabError("INVALID_REQUEST", "团队成员权限无效");
+}
+
+function resourceMemberRole(value: unknown): ResourceMemberRole {
   if (value === "editor" || value === "viewer") return value;
   throw new CollabError("INVALID_REQUEST", "成员权限无效");
 }
@@ -488,38 +769,99 @@ function applicationSession(user: DemoUser): CollabSession {
   };
 }
 
-function requireOwnedActiveResource(
+function requireBrowsableSpace(
   productStore: ProductStore,
-  resourceID: string,
+  spaceID: string,
   userId: string
-): SuiteResource {
-  const resource = productStore.getByID(resourceID);
-  if (
-    !resource ||
-    resource.status !== "active" ||
-    resource.ownerUserId !== userId
-  ) {
-    throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
+): { space: SuiteSpace; role: SpaceAccessRole } {
+  const space = productStore.getSpace(spaceID);
+  const role = space ? productStore.getSpaceRole(space.id, userId) : null;
+  if (!space || !role || (space.type === "personal" && role !== "owner")) {
+    throw new CollabError("UNIT_NOT_FOUND", "Space does not exist");
   }
-  return resource;
+  return { space, role };
+}
+
+function requireTeamSpace(
+  productStore: ProductStore,
+  spaceID: string,
+  userId: string
+): { space: SuiteSpace; role: SpaceAccessRole } {
+  const access = requireBrowsableSpace(productStore, spaceID, userId);
+  if (access.space.type !== "team") {
+    throw new CollabError("UNIT_NOT_FOUND", "Team space does not exist");
+  }
+  return access;
+}
+
+function requireContentEditor(
+  role: SpaceAccessRole | null,
+  spaceType: SuiteSpace["type"]
+): void {
+  const allowed =
+    role === "owner" ||
+    (spaceType === "team" && (role === "admin" || role === "editor"));
+  if (!allowed) {
+    throw new CollabError("PERMISSION_DENIED", "此空间为只读");
+  }
+}
+
+function canDelete(
+  role: ResourceAccessRole,
+  spaceType: SuiteSpace["type"]
+): boolean {
+  return role === "owner" || (spaceType === "team" && role === "admin");
+}
+
+function requireMemberManager(role: SpaceAccessRole): void {
+  if (role !== "owner" && role !== "admin") {
+    throw new CollabError("PERMISSION_DENIED", "无权管理团队成员");
+  }
+}
+
+function assertAssignableRole(
+  actorRole: SpaceAccessRole,
+  targetRole: SpaceMemberRole
+): void {
+  if (actorRole === "admin" && targetRole === "admin") {
+    throw new CollabError("PERMISSION_DENIED", "只有所有者可以设置管理员");
+  }
+}
+
+function requireActiveFolder(
+  productStore: ProductStore,
+  folderID: string
+): SuiteFolder {
+  const folder = productStore.getFolder(folderID);
+  if (!folder || folder.status !== "active") {
+    throw new CollabError("UNIT_NOT_FOUND", "文件夹不存在");
+  }
+  return folder;
+}
+
+function requireExistingNode(
+  productStore: ProductStore,
+  nodeID: string
+): SuiteNode {
+  const node = productStore.getFolder(nodeID) ?? productStore.getByID(nodeID);
+  if (!node) throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
+  return node;
 }
 
 function requireEditableActiveResource(
   productStore: ProductStore,
   resourceID: string,
   userId: string
-): SuiteResource {
-  const resource = productStore.getByID(resourceID);
-  const role = resource
-    ? productStore.getAccessRoleByID(resource.id, userId)
-    : null;
-  if (!resource || resource.status !== "active" || !role) {
-    throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
-  }
-  if (role === "viewer") {
+): { resource: SuiteResource; role: ResourceAccessRole } {
+  const access = requireReadableActiveResource(
+    productStore,
+    resourceID,
+    userId
+  );
+  if (access.role === "viewer") {
     throw new CollabError("PERMISSION_DENIED", "Resource is read-only");
   }
-  return resource;
+  return access;
 }
 
 function requireReadableActiveResource(
@@ -535,6 +877,23 @@ function requireReadableActiveResource(
     throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
   }
   return { resource, role };
+}
+
+function requireOwnedPersonalResource(
+  productStore: ProductStore,
+  resourceID: string,
+  userId: string
+): SuiteResource {
+  const resource = productStore.getByID(resourceID);
+  if (
+    !resource ||
+    resource.status !== "active" ||
+    resource.spaceType !== "personal" ||
+    resource.ownerUserId !== userId
+  ) {
+    throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
+  }
+  return resource;
 }
 
 function renameMutationID(type: UniverType): string {
@@ -553,6 +912,50 @@ function renameMutationID(type: UniverType): string {
   }
 }
 
+function spaceResponse(
+  space: SuiteSpace,
+  accessRole: SpaceAccessRole,
+  userStore: UserStore
+) {
+  const owner = userStore.getById(space.ownerUserId);
+  return {
+    id: space.id,
+    type: space.type,
+    name: space.name,
+    accessRole,
+    createdAt: space.createdAt,
+    updatedAt: space.updatedAt,
+    owner: owner ?? {
+      userId: space.ownerUserId,
+      username: "",
+      name: "Unknown",
+    },
+  };
+}
+
+function folderResponse(folder: SuiteFolder) {
+  return {
+    kind: "folder" as const,
+    id: folder.id,
+    spaceID: folder.spaceID,
+    parentID: folder.parentID,
+    name: folder.name,
+    status: folder.status,
+    createdAt: folder.createdAt,
+    updatedAt: folder.updatedAt,
+  };
+}
+
+function nodeResponse(
+  node: SuiteNode,
+  role: SpaceAccessRole,
+  userStore: UserStore
+) {
+  return node.kind === "folder"
+    ? { ...folderResponse(node), accessRole: role }
+    : resourceResponse(node, role, userStore);
+}
+
 function resourceResponse(
   resource: SuiteResource,
   accessRole: ResourceAccessRole,
@@ -561,7 +964,10 @@ function resourceResponse(
 ) {
   const owner = userStore.getById(resource.ownerUserId);
   return {
+    kind: "unit" as const,
     id: resource.id,
+    spaceID: resource.spaceID,
+    parentID: resource.parentID,
     unitID: resource.unitID,
     type: resource.type,
     name: resource.name,
@@ -570,18 +976,32 @@ function resourceResponse(
     updatedAt: resource.updatedAt,
     ...(lastOpenedAt === undefined ? {} : { lastOpenedAt }),
     accessRole,
-    owner: owner
-      ? {
-          userId: owner.userId,
-          username: owner.username,
-          name: owner.name,
-        }
-      : {
-          userId: resource.ownerUserId,
-          username: "",
-          name: "Unknown",
-        },
+    space: {
+      id: resource.spaceID,
+      type: resource.spaceType,
+      name: resource.spaceName,
+    },
+    owner: owner ?? {
+      userId: resource.ownerUserId,
+      username: "",
+      name: "Unknown",
+    },
   };
+}
+
+function teamMembers(
+  space: SuiteSpace,
+  productStore: ProductStore,
+  userStore: UserStore
+) {
+  const owner = userStore.getById(space.ownerUserId);
+  return [
+    ...(owner ? [{ user: owner, role: "owner" as const }] : []),
+    ...productStore.listSpaceMembers(space.id).flatMap((member) => {
+      const user = userStore.getById(member.userId);
+      return user ? [{ user, role: member.role }] : [];
+    }),
+  ];
 }
 
 function isUnitActionAllowed(
@@ -589,11 +1009,11 @@ function isUnitActionAllowed(
   action: unknown
 ): boolean {
   if (!role || typeof action !== "number") return false;
-  if (role === "owner") return true;
+  if (action === UnitAction.Share) return false;
+  if (role === "owner" || role === "admin") return true;
   if (role === "editor") {
     return ![
       UnitAction.ManageCollaborator,
-      UnitAction.Share,
       UnitAction.Delete,
     ].includes(action);
   }

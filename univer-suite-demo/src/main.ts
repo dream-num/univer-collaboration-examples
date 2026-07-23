@@ -208,7 +208,12 @@ async function renderEditor(
 
   const app = requireApp();
   document.documentElement.dataset.accessRole = access.resource.accessRole;
-  const isOwner = access.resource.accessRole === "owner";
+  const isPersonalOwner =
+    access.resource.space.type === "personal" &&
+    access.resource.accessRole === "owner";
+  const canManageTeam =
+    access.resource.space.type === "team" &&
+    ["owner", "admin"].includes(access.resource.accessRole);
   const canRename = access.resource.accessRole !== "viewer";
   app.innerHTML = `
     <div class="editor-shell">
@@ -227,11 +232,15 @@ async function renderEditor(
         }
         <span class="editor-status">${accessRoleName(access.resource.accessRole)}</span>
         ${
-          isOwner
+          isPersonalOwner
             ? `<button id="share-button" class="editor-share-button" type="button">
                 ${icon("share")}分享
               </button>`
-            : `<span class="editor-owner">来自 ${escapeHtml(access.resource.owner.name)}</span>`
+            : canManageTeam
+              ? `<button id="team-members-button" class="editor-share-button" type="button">
+                  ${icon("users")}团队成员
+                </button>`
+              : `<span class="editor-owner">${escapeHtml(access.resource.space.name)}</span>`
         }
       </header>
       <main id="univer-container"></main>
@@ -240,6 +249,14 @@ async function renderEditor(
   document.querySelector("#share-button")?.addEventListener("click", () => {
     void openShareDialog(access.resource);
   });
+  document
+    .querySelector("#team-members-button")
+    ?.addEventListener("click", () => {
+      void openTeamMembersDialog({
+        ...access.resource.space,
+        accessRole: access.resource.accessRole,
+      });
+    });
   document.querySelector("#editor-title")?.addEventListener("click", () => {
     if (!canRename) return;
     openRenameDialog(access.resource, (renamed) => {
@@ -324,110 +341,159 @@ function renderEditorError(
 
 async function renderWorkspace(user: CurrentUser): Promise<void> {
   const app = requireApp();
+  let spaces = (
+    await api<{ spaces: SpaceRecord[] }>("/api/spaces")
+  ).spaces;
+  const foundPersonalSpace = spaces.find(({ type }) => type === "personal");
+  if (!foundPersonalSpace) throw new Error("个人空间不存在");
+  const personalSpace: SpaceRecord = foundPersonalSpace;
+
   let resources: ResourceRecord[] = [];
-  let view = viewFromHash();
+  let nodes: DirectoryNode[] = [];
+  let directory: DirectoryPayload | null = null;
+  let route = workspaceRoute(personalSpace.id);
   let query = "";
 
-  app.innerHTML = `
-    <div class="suite-shell">
-      <header class="topbar">
-        <a class="topbar-brand" href="#home">
-          ${logoIcon()}
-          <span>Univer</span>
-        </a>
-        <label class="global-search">
-          ${icon("search")}
-          <input type="search" placeholder="搜索文档" aria-label="搜索文档" />
-          <kbd>⌘ K</kbd>
-        </label>
-        <div class="account">
-          <button class="icon-button" type="button" aria-label="帮助">${icon("help")}</button>
-          <button class="avatar-button" type="button" aria-label="账号菜单">
-            ${escapeHtml(initials(user.name))}
-          </button>
-          <div class="account-menu" hidden>
-            <strong>${escapeHtml(user.name)}</strong>
-            <small>@${escapeHtml(user.username)}</small>
-            <button id="logout-button" type="button">${icon("logout")}退出登录</button>
+  function renderShell(): void {
+    const teamSpaces = spaces.filter(({ type }) => type === "team");
+    app.innerHTML = `
+      <div class="suite-shell">
+        <header class="topbar">
+          <a class="topbar-brand" href="#home">
+            ${logoIcon()}
+            <span>Univer</span>
+          </a>
+          <label class="global-search">
+            ${icon("search")}
+            <input type="search" placeholder="搜索当前页面" aria-label="搜索当前页面" />
+            <kbd>⌘ K</kbd>
+          </label>
+          <div class="account">
+            <button class="icon-button" type="button" aria-label="帮助">${icon("help")}</button>
+            <button class="avatar-button" type="button" aria-label="账号菜单">
+              ${escapeHtml(initials(user.name))}
+            </button>
+            <div class="account-menu" hidden>
+              <strong>${escapeHtml(user.name)}</strong>
+              <small>@${escapeHtml(user.username)}</small>
+              <button id="logout-button" type="button">${icon("logout")}退出登录</button>
+            </div>
           </div>
-        </div>
-      </header>
-      <aside class="sidebar">
-        <div class="new-area">
-          <button id="new-button" class="new-button" type="button">
-            ${icon("plus")}<span>新建</span>${icon("chevron")}
-          </button>
-          <div id="new-menu" class="new-menu" hidden>
-            ${createMenuItem(UniverInstanceType.UNIVER_SHEET, "空白表格", "sheet")}
-            ${createMenuItem(UniverInstanceType.UNIVER_DOC, "空白文档", "doc")}
-            ${createMenuItem(UniverInstanceType.UNIVER_SLIDE, "空白幻灯片", "slide")}
+        </header>
+        <aside class="sidebar">
+          <div class="new-area">
+            <button id="new-button" class="new-button" type="button">
+              ${icon("plus")}<span>新建</span>${icon("chevron")}
+            </button>
+            <div id="new-menu" class="new-menu" hidden>
+              <button type="button" data-create-folder>
+                <span class="menu-icon folder-menu-icon">${icon("folder")}</span>新建文件夹
+              </button>
+              <span class="new-menu-divider"></span>
+              ${createMenuItem(UniverInstanceType.UNIVER_SHEET, "空白表格", "sheet")}
+              ${createMenuItem(UniverInstanceType.UNIVER_DOC, "空白文档", "doc")}
+              ${createMenuItem(UniverInstanceType.UNIVER_SLIDE, "空白幻灯片", "slide")}
+            </div>
           </div>
-        </div>
-        <nav class="main-nav" aria-label="主要导航">
-          ${navButton("home", "首页", "home")}
-          ${navButton("recent", "最近使用", "clock")}
-          ${navButton("space", "个人空间", "folder")}
-          ${navButton("shared", "与我共享", "share")}
-          ${navButton("trash", "回收站", "trash")}
-        </nav>
-        <div class="sidebar-footer">
-          <span>${icon("sparkles")}</span>
-          <p><strong>协同已启用</strong><small>Sheet、Doc、Slide</small></p>
-        </div>
-      </aside>
-      <main id="workspace-content" class="workspace-content" tabindex="-1"></main>
-    </div>
-  `;
+          <nav class="main-nav" aria-label="主要导航">
+            ${navButton("home", "首页", "home")}
+            ${navButton("recent", "最近使用", "clock")}
+            <a href="#space/${personalSpace.id}" data-space="${personalSpace.id}">
+              ${icon("folder")}<span>个人空间</span>
+            </a>
+            ${navButton("shared", "与我共享", "share")}
+            ${navButton("trash", "回收站", "trash")}
+          </nav>
+          <div class="team-nav">
+            <div class="team-nav-heading">
+              <span>团队空间</span>
+              <button id="create-team-button" type="button" aria-label="创建团队空间">${icon("plus")}</button>
+            </div>
+            <nav aria-label="团队空间">
+              ${
+                teamSpaces.length
+                  ? teamSpaces
+                      .map(
+                        (space) => `
+                          <a href="#space/${space.id}" data-space="${space.id}">
+                            <i>${escapeHtml(initials(space.name))}</i>
+                            <span>${escapeHtml(space.name)}</span>
+                          </a>`
+                      )
+                      .join("")
+                  : `<p>还没有团队空间</p>`
+              }
+            </nav>
+          </div>
+          <div class="sidebar-footer">
+            <span>${icon("sparkles")}</span>
+            <p><strong>协同已启用</strong><small>个人与团队目录</small></p>
+          </div>
+        </aside>
+        <main id="workspace-content" class="workspace-content" tabindex="-1"></main>
+      </div>
+    `;
 
-  const accountButton = document.querySelector<HTMLButtonElement>(".avatar-button");
-  const accountMenu = document.querySelector<HTMLElement>(".account-menu");
-  accountButton?.addEventListener("click", () => {
-    if (accountMenu) accountMenu.hidden = !accountMenu.hidden;
-  });
-  document.querySelector("#logout-button")?.addEventListener("click", async () => {
-    await api("/api/auth/logout", { method: "POST" });
-    window.location.href = "/";
-  });
-
-  const newButton = document.querySelector<HTMLButtonElement>("#new-button");
-  const newMenu = document.querySelector<HTMLElement>("#new-menu");
-  newButton?.addEventListener("click", () => {
-    if (newMenu) newMenu.hidden = !newMenu.hidden;
-  });
-  document
-    .querySelectorAll<HTMLButtonElement>("[data-create]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        if (newMenu) newMenu.hidden = true;
-        void createResource(Number(button.dataset.create), button);
+    const accountButton =
+      document.querySelector<HTMLButtonElement>(".avatar-button");
+    const accountMenu = document.querySelector<HTMLElement>(".account-menu");
+    accountButton?.addEventListener("click", () => {
+      if (accountMenu) accountMenu.hidden = !accountMenu.hidden;
+    });
+    document
+      .querySelector("#logout-button")
+      ?.addEventListener("click", async () => {
+        await api("/api/auth/logout", { method: "POST" });
+        window.location.href = "/";
       });
-    });
 
-  document.querySelectorAll<HTMLAnchorElement>("[data-view]").forEach((link) => {
-    link.addEventListener("click", () => {
-      view = (link.dataset.view as WorkspaceView) ?? "home";
-      void loadAndRender();
+    const newButton = document.querySelector<HTMLButtonElement>("#new-button");
+    const newMenu = document.querySelector<HTMLElement>("#new-menu");
+    newButton?.addEventListener("click", () => {
+      if (newMenu) newMenu.hidden = !newMenu.hidden;
     });
-  });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-create]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          if (newMenu) newMenu.hidden = true;
+          void createResource(Number(button.dataset.create), button);
+        });
+      });
+    document
+      .querySelector<HTMLButtonElement>("[data-create-folder]")
+      ?.addEventListener("click", () => {
+        if (newMenu) newMenu.hidden = true;
+        const target = createTarget();
+        openCreateFolderDialog(target, () => void loadAndRender());
+      });
+    document
+      .querySelector("#create-team-button")
+      ?.addEventListener("click", () => {
+        openCreateTeamDialog(async (space) => {
+          spaces = (
+            await api<{ spaces: SpaceRecord[] }>("/api/spaces")
+          ).spaces;
+          renderShell();
+          window.location.hash = `space/${space.id}`;
+        });
+      });
 
-  const search = document.querySelector<HTMLInputElement>(".global-search input");
-  search?.addEventListener("input", () => {
-    query = search.value.trim().toLocaleLowerCase();
-    renderCurrentView();
-  });
-  window.addEventListener("keydown", (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-      event.preventDefault();
-      search?.focus();
-    }
-  });
-  window.addEventListener("hashchange", () => {
-    view = viewFromHash();
-    void loadAndRender();
-  });
+    const search =
+      document.querySelector<HTMLInputElement>(".global-search input");
+    search?.addEventListener("input", () => {
+      query = search.value.trim().toLocaleLowerCase();
+      renderCurrentView();
+    });
+  }
 
   async function loadAndRender(): Promise<void> {
-    if (view === "home" || view === "recent") {
+    const currentRoute = workspaceRoute(personalSpace.id);
+    route = currentRoute;
+    directory = null;
+    nodes = [];
+    resources = [];
+    if (currentRoute.view === "home" || currentRoute.view === "recent") {
       const result = await api<{ resources: ResourceRecord[] }>(
         "/api/units?scope=recent"
       );
@@ -435,7 +501,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       renderCurrentView();
       return;
     }
-    if (view === "shared") {
+    if (currentRoute.view === "shared") {
       const result = await api<{ resources: ResourceRecord[] }>(
         "/api/units?scope=shared"
       );
@@ -443,28 +509,83 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       renderCurrentView();
       return;
     }
-    const status = view === "trash" ? "deleted" : "active";
-    const result = await api<{ resources: ResourceRecord[] }>(
-      `/api/units?status=${status}`
+    if (currentRoute.view === "trash") {
+      const manageable = spaces.filter(
+        (space) =>
+          space.accessRole === "owner" ||
+          (space.type === "team" && space.accessRole === "admin")
+      );
+      const trash = await Promise.all(
+        manageable.map(async (space) => {
+          const result = await api<{ nodes: DirectoryNode[] }>(
+            `/api/spaces/${encodeURIComponent(space.id)}/trash`
+          );
+          return result.nodes.map((node) => ({ ...node, space }));
+        })
+      );
+      nodes = trash.flat();
+      renderCurrentView();
+      return;
+    }
+    if (currentRoute.view !== "space") return;
+    directory = await api<DirectoryPayload>(
+      `/api/spaces/${encodeURIComponent(currentRoute.spaceID)}/nodes${
+        currentRoute.folderID
+          ? `?parentID=${encodeURIComponent(currentRoute.folderID)}`
+          : ""
+      }`
     );
-    resources = result.resources;
+    nodes = directory.nodes.map((node) => ({
+      ...node,
+      space: directory!.space,
+    }));
     renderCurrentView();
   }
 
   function renderCurrentView(): void {
+    const currentRoute = route;
     document.querySelectorAll<HTMLElement>("[data-view]").forEach((item) => {
-      item.classList.toggle("active", item.dataset.view === view);
+      item.classList.toggle("active", item.dataset.view === currentRoute.view);
     });
-    const filtered = resources.filter((resource) =>
+    document.querySelectorAll<HTMLElement>("[data-space]").forEach((item) => {
+      item.classList.toggle(
+        "active",
+        currentRoute.view === "space" &&
+          item.dataset.space === currentRoute.spaceID
+      );
+    });
+    const filteredResources = resources.filter((resource) =>
       resource.name.toLocaleLowerCase().includes(query)
+    );
+    const filteredNodes = nodes.filter((node) =>
+      node.name.toLocaleLowerCase().includes(query)
     );
     const content = document.querySelector<HTMLElement>("#workspace-content");
     if (!content) return;
-    if (view === "home") {
-      content.innerHTML = homeView(user, filtered);
+    if (currentRoute.view === "home") {
+      content.innerHTML = homeView(user, filteredResources);
+    } else if (currentRoute.view === "space" && directory) {
+      content.innerHTML = directoryView(directory, filteredNodes, query);
+    } else if (currentRoute.view === "trash") {
+      content.innerHTML = trashView(filteredNodes, query);
+    } else if (
+      currentRoute.view === "recent" ||
+      currentRoute.view === "shared"
+    ) {
+      content.innerHTML = listView(
+        currentRoute.view,
+        filteredResources,
+        query
+      );
     } else {
-      content.innerHTML = listView(view, filtered, query);
+      return;
     }
+    const currentSpace =
+      currentRoute.view === "space"
+        ? spaces.find(({ id }) => id === currentRoute.spaceID)
+        : personalSpace;
+    const newButton = document.querySelector<HTMLButtonElement>("#new-button");
+    if (newButton) newButton.disabled = currentSpace?.accessRole === "viewer";
     wireContentActions();
   }
 
@@ -473,7 +594,11 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       .querySelectorAll<HTMLButtonElement>("[data-quick-create]")
       .forEach((button) => {
         button.addEventListener("click", () =>
-          void createResource(Number(button.dataset.quickCreate), button)
+          void createResource(
+            Number(button.dataset.quickCreate),
+            button,
+            { spaceID: personalSpace.id, parentID: null }
+          )
         );
       });
     document.querySelectorAll<HTMLElement>("[data-open]").forEach((item) => {
@@ -481,8 +606,30 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
         if ((event.target as HTMLElement).closest("[data-resource-action]")) {
           return;
         }
-        const resource = resources.find(({ id }) => id === item.dataset.open);
+        const resource =
+          resources.find(({ id }) => id === item.dataset.open) ??
+          nodes.find(
+            (node): node is ResourceRecord =>
+              node.kind === "unit" && node.id === item.dataset.open
+          );
         if (resource) openResource(resource);
+      });
+      item.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") item.click();
+      });
+      });
+    document.querySelectorAll<HTMLElement>("[data-folder]").forEach((item) => {
+      item.addEventListener("click", (event) => {
+        if ((event.target as HTMLElement).closest("[data-resource-action]")) {
+          return;
+        }
+        const folder = nodes.find(
+          (node) =>
+            node.kind === "folder" && node.id === item.dataset.folder
+        );
+        if (folder) {
+          window.location.hash = `space/${folder.spaceID}/${folder.id}`;
+        }
       });
       item.addEventListener("keydown", (event) => {
         if (event.key === "Enter") item.click();
@@ -492,9 +639,12 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       .querySelectorAll<HTMLButtonElement>("[data-rename]")
       .forEach((button) => {
         button.addEventListener("click", () => {
-          const resource = resources.find(
-            ({ id }) => id === button.dataset.rename
-          );
+          const resource =
+            resources.find(({ id }) => id === button.dataset.rename) ??
+            nodes.find(
+              (node): node is ResourceRecord =>
+                node.kind === "unit" && node.id === button.dataset.rename
+            );
           if (!resource) return;
           openRenameDialog(resource, (renamed) => {
             resources = resources.map((item) =>
@@ -505,42 +655,66 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
         });
       });
     document
-      .querySelectorAll<HTMLButtonElement>("[data-delete]")
+      .querySelectorAll<HTMLButtonElement>("[data-rename-folder]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const folder = nodes.find(
+            (node) =>
+              node.kind === "folder" &&
+              node.id === button.dataset.renameFolder
+          );
+          if (!folder || folder.kind !== "folder") return;
+          openRenameFolderDialog(folder, () => void loadAndRender());
+        });
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-delete-node]")
       .forEach((button) => {
         button.addEventListener("click", async () => {
           button.disabled = true;
-          await api(`/api/units/${encodeURIComponent(button.dataset.delete!)}`, {
+          await api(`/api/nodes/${encodeURIComponent(button.dataset.deleteNode!)}`, {
             method: "DELETE",
           });
           await loadAndRender();
         });
       });
     document
-      .querySelectorAll<HTMLButtonElement>("[data-restore]")
+      .querySelectorAll<HTMLButtonElement>("[data-restore-node]")
       .forEach((button) => {
         button.addEventListener("click", async () => {
           button.disabled = true;
           await api(
-            `/api/units/${encodeURIComponent(button.dataset.restore!)}/restore`,
+            `/api/nodes/${encodeURIComponent(button.dataset.restoreNode!)}/restore`,
             { method: "POST" }
           );
           await loadAndRender();
         });
       });
+    document
+      .querySelector("#manage-team-members")
+      ?.addEventListener("click", () => {
+        if (directory?.space.type === "team") {
+          void openTeamMembersDialog(directory.space);
+        }
+      });
   }
 
   async function createResource(
     createType: number,
-    button: HTMLButtonElement
+    button: HTMLButtonElement,
+    explicitTarget?: CreateTarget
   ): Promise<void> {
     button.disabled = true;
     try {
+      const target = explicitTarget ?? createTarget();
       const result = await api<{ resource: ResourceRecord }>("/api/units", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           type: createType,
           name: defaultName(createType),
+          spaceID: target.spaceID,
+          parentID: target.parentID,
         }),
       });
       openResource(result.resource);
@@ -550,6 +724,26 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     }
   }
 
+  function createTarget(): CreateTarget {
+    if (route.view === "space") {
+      return {
+        spaceID: route.spaceID,
+        parentID: route.folderID,
+      };
+    }
+    return { spaceID: personalSpace.id, parentID: null };
+  }
+
+  renderShell();
+  window.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      document
+        .querySelector<HTMLInputElement>(".global-search input")
+        ?.focus();
+    }
+  });
+  window.addEventListener("hashchange", () => void loadAndRender());
   await loadAndRender();
 }
 
@@ -597,8 +791,199 @@ function homeView(user: CurrentUser, resources: ResourceRecord[]): string {
   `;
 }
 
+function directoryView(
+  directory: DirectoryPayload,
+  nodes: DirectoryNode[],
+  query: string
+): string {
+  const canManageMembers =
+    directory.space.type === "team";
+  const canCreate = directory.space.accessRole !== "viewer";
+  const breadcrumbs = [
+    `<a href="#space/${directory.space.id}">${escapeHtml(
+      directory.space.type === "personal"
+        ? "个人空间"
+        : directory.space.name
+    )}</a>`,
+    ...directory.breadcrumbs.map(
+      (folder) =>
+        `<span>${icon("chevron")}</span><a href="#space/${directory.space.id}/${folder.id}">${escapeHtml(folder.name)}</a>`
+    ),
+  ].join("");
+  const currentName =
+    directory.breadcrumbs.at(-1)?.name ??
+    (directory.space.type === "personal"
+      ? "个人空间"
+      : directory.space.name);
+  return `
+    <section class="page-heading directory-heading">
+      <div>
+        <nav class="directory-breadcrumbs" aria-label="当前位置">
+          ${breadcrumbs}
+        </nav>
+        <h1>${escapeHtml(currentName)}</h1>
+        <p>${
+          directory.space.type === "personal"
+            ? "仅属于你的目录，可以对单个文档邀请协作者。"
+            : `${accessRoleName(directory.space.accessRole)} · 所有内容继承团队权限`
+        }</p>
+      </div>
+      <div class="directory-heading-actions">
+        ${
+          canManageMembers
+            ? `<button id="manage-team-members" class="secondary-button" type="button">
+                ${icon("users")}团队成员
+              </button>`
+            : ""
+        }
+        ${
+          canCreate
+            ? `<span class="permission-note">${icon("lock")}内部成员访问</span>`
+            : `<span class="access-badge access-viewer">仅查看</span>`
+        }
+      </div>
+    </section>
+    <section class="content-section list-section">
+      <div class="section-heading directory-section-heading">
+        <h2>内容</h2>
+        <span class="resource-count">${nodes.length} 项</span>
+      </div>
+      ${
+        nodes.length
+          ? nodeTable(nodes, "directory")
+          : emptyState(
+              query ? "没有匹配的内容" : "这个文件夹是空的",
+              query
+                ? "试试其他关键词。"
+                : canCreate
+                  ? "使用左侧“新建”创建文件夹或文档。"
+                  : "团队成员还没有在这里创建内容。"
+            )
+      }
+    </section>
+  `;
+}
+
+function trashView(nodes: DirectoryNode[], query: string): string {
+  return `
+    <section class="page-heading">
+      <div>
+        <p class="breadcrumb">回收站</p>
+        <h1>已删除内容</h1>
+        <p>展示你有管理权限的个人和团队空间内容。</p>
+      </div>
+      <span class="resource-count">${nodes.length} 项</span>
+    </section>
+    <section class="content-section list-section">
+      ${
+        nodes.length
+          ? nodeTable(nodes, "trash")
+          : emptyState(
+              query ? "没有匹配的内容" : "回收站为空",
+              query ? "试试其他关键词。" : "删除的内容会显示在这里。"
+            )
+      }
+    </section>
+  `;
+}
+
+function nodeTable(
+  nodes: DirectoryNode[],
+  mode: "directory" | "trash"
+): string {
+  return `
+    <div class="resource-table directory-table">
+      <div class="resource-table-head">
+        <span>名称</span><span>类型</span><span>${
+          mode === "trash" ? "所在空间" : "最近活动"
+        }</span><span></span>
+      </div>
+      ${nodes
+        .map((node) => {
+          const canRename =
+            mode === "directory" && node.accessRole !== "viewer";
+          const canDelete =
+            mode === "directory" &&
+            (node.accessRole === "owner" ||
+              (node.space.type === "team" &&
+                node.accessRole === "admin"));
+          const rowTarget =
+            mode === "trash"
+              ? ""
+              : node.kind === "folder"
+                ? `data-folder="${node.id}"`
+                : `data-open="${node.id}"`;
+          return `
+            <div class="resource-row${mode === "trash" ? " resource-row-static" : ""}" ${rowTarget}${
+              mode === "trash" ? "" : ' tabindex="0"'
+            }>
+              <span class="resource-name">
+                ${
+                  node.kind === "folder"
+                    ? `<i class="folder-node-icon">${icon("folder")}</i>`
+                    : unitIcon(node.type)
+                }
+                <strong>${escapeHtml(node.name)}</strong>
+              </span>
+              <span class="resource-meta">${
+                node.kind === "folder" ? "文件夹" : typeName(node.type)
+              }</span>
+              <span class="resource-meta">${
+                mode === "trash"
+                  ? escapeHtml(node.space.name)
+                  : formatRelativeTime(node.updatedAt)
+              }</span>
+              <span class="row-actions">
+                ${
+                  canRename
+                    ? `<button
+                        class="row-action"
+                        type="button"
+                        data-resource-action
+                        data-${
+                          node.kind === "folder"
+                            ? "rename-folder"
+                            : "rename"
+                        }="${node.id}"
+                        aria-label="重命名"
+                        title="重命名"
+                      >${icon("edit")}</button>`
+                    : ""
+                }
+                ${
+                  canDelete
+                    ? `<button
+                        class="row-action"
+                        type="button"
+                        data-resource-action
+                        data-delete-node="${node.id}"
+                        aria-label="移到回收站"
+                        title="移到回收站"
+                      >${icon("trash")}</button>`
+                    : ""
+                }
+                ${
+                  mode === "trash"
+                    ? `<button
+                        class="row-action"
+                        type="button"
+                        data-resource-action
+                        data-restore-node="${node.id}"
+                        aria-label="恢复"
+                        title="恢复"
+                      >${icon("restore")}</button>`
+                    : ""
+                }
+              </span>
+            </div>`;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function listView(
-  view: Exclude<WorkspaceView, "home">,
+  view: Exclude<WorkspaceView, "home" | "space" | "trash">,
   resources: ResourceRecord[],
   query: string
 ): string {
@@ -607,16 +992,6 @@ function listView(
       eyebrow: "最近使用",
       title: "最近文件",
       description: "按照你的最近打开时间查看内容。",
-    },
-    space: {
-      eyebrow: "个人空间",
-      title: "我的内容",
-      description: "你创建的所有 Sheet、Doc 和 Slide。",
-    },
-    trash: {
-      eyebrow: "回收站",
-      title: "已删除",
-      description: "删除的内容仍保留协同数据，可以随时恢复。",
     },
     shared: {
       eyebrow: "与我共享",
@@ -636,31 +1011,18 @@ function listView(
     <section class="content-section list-section">
       ${
         resources.length
-          ? resourceTable(
-              resources,
-              view === "trash"
-                ? "deleted"
-                : view === "shared"
-                  ? "shared"
-                  : view === "recent"
-                    ? "recent"
-                    : "active"
-            )
+          ? resourceTable(resources, view === "shared" ? "shared" : "recent")
           : emptyState(
               query
                 ? "没有匹配的内容"
-                : view === "trash"
-                  ? "回收站为空"
-                  : view === "shared"
+                : view === "shared"
                     ? "暂时没有共享内容"
                     : view === "recent"
                       ? "最近没有打开内容"
                     : "还没有内容",
               query
                 ? "试试其他关键词。"
-                : view === "trash"
-                  ? "移到回收站的内容会显示在这里。"
-                  : view === "shared"
+                : view === "shared"
                     ? "其他用户分享给你的内容会显示在这里。"
                     : view === "recent"
                       ? "打开个人空间或共享给你的内容后，它会显示在这里。"
@@ -673,7 +1035,7 @@ function listView(
 
 function resourceTable(
   resources: ResourceRecord[],
-  mode: "active" | "deleted" | "shared" | "recent"
+  mode: "shared" | "recent"
 ): string {
   const shared = mode === "shared";
   const recent = mode === "recent";
@@ -684,13 +1046,12 @@ function resourceTable(
       </div>
       ${resources
         .map((resource) => {
-          const canRename =
-            mode !== "deleted" && resource.accessRole !== "viewer";
+          const canRename = resource.accessRole !== "viewer";
           const canDelete =
-            (mode === "active" || mode === "recent") &&
-            resource.accessRole === "owner";
-          const canRestore =
-            mode === "deleted" && resource.accessRole === "owner";
+            mode === "recent" &&
+            (resource.accessRole === "owner" ||
+              (resource.space.type === "team" &&
+                resource.accessRole === "admin"));
           return `
             <div class="resource-row" data-open="${resource.id}" tabindex="0">
               <span class="resource-name">
@@ -724,24 +1085,13 @@ function resourceTable(
                         class="row-action"
                         type="button"
                         data-resource-action
-                        data-delete="${resource.id}"
+                        data-delete-node="${resource.id}"
                         aria-label="移到回收站"
                         title="移到回收站"
                       >
                         ${icon("trash")}
                       </button>`
-                    : canRestore
-                      ? `<button
-                          class="row-action"
-                          type="button"
-                          data-resource-action
-                          data-restore="${resource.id}"
-                          aria-label="恢复"
-                          title="恢复"
-                        >
-                          ${icon("restore")}
-                        </button>`
-                      : ""
+                    : ""
                 }
               </span>
             </div>`;
@@ -816,6 +1166,158 @@ function openResource(resource: ResourceRecord): void {
   next.searchParams.set("resource", resource.id);
   next.searchParams.set("type", String(resource.type));
   window.location.href = next.toString();
+}
+
+function openCreateTeamDialog(
+  onCreated: (space: SpaceRecord) => void
+): void {
+  openTextDialog({
+    eyebrow: "团队空间",
+    title: "创建团队空间",
+    label: "团队名称",
+    placeholder: "例如：产品团队",
+    submitLabel: "创建",
+    async submit(name) {
+      const result = await api<{ space: SpaceRecord }>("/api/spaces", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      onCreated(result.space);
+      showToast("团队空间已创建");
+    },
+  });
+}
+
+function openCreateFolderDialog(
+  target: CreateTarget,
+  onCreated: () => void
+): void {
+  openTextDialog({
+    eyebrow: "目录",
+    title: "新建文件夹",
+    label: "文件夹名称",
+    placeholder: "未命名文件夹",
+    submitLabel: "创建",
+    async submit(name) {
+      await api(`/api/spaces/${encodeURIComponent(target.spaceID)}/folders`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name, parentID: target.parentID }),
+      });
+      onCreated();
+      showToast("文件夹已创建");
+    },
+  });
+}
+
+function openRenameFolderDialog(
+  folder: FolderRecord,
+  onRenamed: () => void
+): void {
+  openTextDialog({
+    eyebrow: "文件夹名称",
+    title: "重命名",
+    label: "名称",
+    initialValue: folder.name,
+    submitLabel: "保存",
+    async submit(name) {
+      await api(`/api/folders/${encodeURIComponent(folder.id)}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      onRenamed();
+      showToast("文件夹名称已更新");
+    },
+  });
+}
+
+function openTextDialog(options: {
+  readonly eyebrow: string;
+  readonly title: string;
+  readonly label: string;
+  readonly initialValue?: string;
+  readonly placeholder?: string;
+  readonly submitLabel: string;
+  readonly submit: (value: string) => Promise<void>;
+}): void {
+  document.querySelector(".rename-dialog-backdrop")?.remove();
+  const backdrop = document.createElement("div");
+  backdrop.className = "share-dialog-backdrop rename-dialog-backdrop";
+  backdrop.innerHTML = `
+    <form class="rename-dialog" role="dialog" aria-modal="true">
+      <header>
+        <div>
+          <p>${escapeHtml(options.eyebrow)}</p>
+          <h2>${escapeHtml(options.title)}</h2>
+        </div>
+        <button class="share-dialog-close" type="button" aria-label="关闭">${icon("close")}</button>
+      </header>
+      <label>
+        <span>${escapeHtml(options.label)}</span>
+        <input
+          name="name"
+          value="${escapeHtml(options.initialValue ?? "")}"
+          placeholder="${escapeHtml(options.placeholder ?? "")}"
+          maxlength="120"
+          required
+        />
+      </label>
+      <p class="form-error rename-error" role="alert" hidden></p>
+      <footer>
+        <button class="rename-cancel-button" type="button">取消</button>
+        <button class="primary-button rename-submit-button" type="submit">${escapeHtml(options.submitLabel)}</button>
+      </footer>
+    </form>
+  `;
+  document.body.append(backdrop);
+
+  const form = backdrop.querySelector<HTMLFormElement>("form")!;
+  const input = form.querySelector<HTMLInputElement>("input")!;
+  const error = form.querySelector<HTMLElement>(".rename-error");
+  const close = () => {
+    document.removeEventListener("keydown", onKeydown);
+    backdrop.remove();
+  };
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") close();
+  };
+  document.addEventListener("keydown", onKeydown);
+  backdrop
+    .querySelector(".share-dialog-close")
+    ?.addEventListener("click", close);
+  backdrop
+    .querySelector(".rename-cancel-button")
+    ?.addEventListener("click", close);
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) close();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const value = input.value.trim();
+    if (!value) {
+      showInlineError(error, "名称不能为空");
+      return;
+    }
+    input.disabled = true;
+    const submit = form.querySelector<HTMLButtonElement>("[type=submit]");
+    if (submit) submit.disabled = true;
+    try {
+      await options.submit(value);
+      close();
+    } catch (caught) {
+      showInlineError(
+        error,
+        caught instanceof Error ? caught.message : String(caught)
+      );
+      input.disabled = false;
+      if (submit) submit.disabled = false;
+      input.focus();
+    }
+  });
+  input.focus();
+  input.select();
 }
 
 function openRenameDialog(
@@ -932,8 +1434,7 @@ async function openShareDialog(resource: {
         </div>
       </div>
       <footer class="share-dialog-footer">
-        <p>${icon("lock")}仅受邀用户可以通过链接访问</p>
-        <button class="share-copy-button" type="button">${icon("link")}复制链接</button>
+        <p>${icon("lock")}仅受邀用户可以访问，不提供链接分享</p>
       </footer>
     </section>
   `;
@@ -1103,17 +1604,6 @@ async function openShareDialog(resource: {
     }
   });
 
-  backdrop
-    .querySelector(".share-copy-button")
-    ?.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        showToast("链接已复制，仅受邀用户可访问");
-      } catch {
-        showToast("复制失败，请从地址栏复制链接");
-      }
-    });
-
   try {
     const result = await api<{ members: ShareMember[] }>(
       `/api/units/${encodeURIComponent(resource.id)}/members`
@@ -1121,6 +1611,240 @@ async function openShareDialog(resource: {
     members = result.members;
     renderMembers();
     search.focus();
+  } catch (caught) {
+    memberList.innerHTML = `<p class="share-load-error">${escapeHtml(caught instanceof Error ? caught.message : String(caught))}</p>`;
+  }
+}
+
+async function openTeamMembersDialog(
+  space: Pick<SpaceRecord, "id" | "name" | "type" | "accessRole">
+): Promise<void> {
+  document.querySelector(".share-dialog-backdrop")?.remove();
+  const canManage =
+    space.accessRole === "owner" || space.accessRole === "admin";
+  const canAssignAdmin = space.accessRole === "owner";
+  const backdrop = document.createElement("div");
+  backdrop.className = "share-dialog-backdrop";
+  backdrop.innerHTML = `
+    <section class="share-dialog team-member-dialog" role="dialog" aria-modal="true" aria-labelledby="team-member-title">
+      <header class="share-dialog-header">
+        <div>
+          <p>团队空间</p>
+          <h2 id="team-member-title">${escapeHtml(space.name)}</h2>
+        </div>
+        <button class="share-dialog-close" type="button" aria-label="关闭">${icon("close")}</button>
+      </header>
+      <div class="share-dialog-body">
+        ${
+          canManage
+            ? `<label class="share-search">
+                ${icon("search")}
+                <input type="search" placeholder="邀请团队成员" aria-label="搜索用户" autocomplete="off" />
+              </label>
+              <div class="share-search-results" hidden></div>`
+            : ""
+        }
+        <p class="share-section-title">团队成员</p>
+        <div class="share-member-list" aria-live="polite">
+          <div class="share-loading"><span class="editor-route-spinner"></span>正在加载…</div>
+        </div>
+      </div>
+      <footer class="share-dialog-footer">
+        <p>${icon("lock")}团队内容仅对成员开放，权限由空间角色统一继承</p>
+      </footer>
+    </section>
+  `;
+  document.body.append(backdrop);
+
+  const close = () => {
+    document.removeEventListener("keydown", onKeydown);
+    backdrop.remove();
+  };
+  const onKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") close();
+  };
+  document.addEventListener("keydown", onKeydown);
+  backdrop
+    .querySelector(".share-dialog-close")
+    ?.addEventListener("click", close);
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) close();
+  });
+
+  const memberList =
+    backdrop.querySelector<HTMLElement>(".share-member-list")!;
+  const resultList =
+    backdrop.querySelector<HTMLElement>(".share-search-results");
+  const search =
+    backdrop.querySelector<HTMLInputElement>(".share-search input");
+  let members: TeamMember[] = [];
+  let searchSequence = 0;
+
+  const renderMembers = () => {
+    memberList.innerHTML = members
+      .map(({ user, role }) => {
+        const canEditMember =
+          canManage &&
+          role !== "owner" &&
+          !(space.accessRole === "admin" && role === "admin");
+        const options = canAssignAdmin
+          ? [
+              ["admin", "管理员"],
+              ["editor", "编辑者"],
+              ["viewer", "查看者"],
+            ]
+          : [
+              ["editor", "编辑者"],
+              ["viewer", "查看者"],
+            ];
+        return `
+          <div class="share-member">
+            <span class="share-avatar">${escapeHtml(initials(user.name))}</span>
+            <span class="share-member-copy">
+              <strong>${escapeHtml(user.name)}</strong>
+              <small>@${escapeHtml(user.username)}</small>
+            </span>
+            ${
+              canEditMember
+                ? `<select data-team-member-role="${escapeHtml(user.userId)}" aria-label="${escapeHtml(user.name)}的团队角色">
+                    ${options
+                      .map(
+                        ([value, label]) =>
+                          `<option value="${value}"${role === value ? " selected" : ""}>${label}</option>`
+                      )
+                      .join("")}
+                  </select>
+                  <button class="share-remove-button" data-remove-team-member="${escapeHtml(user.userId)}" type="button" aria-label="移除 ${escapeHtml(user.name)}">${icon("close")}</button>`
+                : `<span class="share-owner-role">${accessRoleName(role)}</span>`
+            }
+          </div>`;
+      })
+      .join("");
+
+    memberList
+      .querySelectorAll<HTMLSelectElement>("[data-team-member-role]")
+      .forEach((select) => {
+        select.addEventListener("change", async () => {
+          select.disabled = true;
+          try {
+            const result = await api<{ member: TeamMember }>(
+              `/api/spaces/${encodeURIComponent(space.id)}/members/${encodeURIComponent(select.dataset.teamMemberRole!)}`,
+              {
+                method: "PATCH",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ role: select.value }),
+              }
+            );
+            members = members.map((member) =>
+              member.user.userId === result.member.user.userId
+                ? result.member
+                : member
+            );
+            renderMembers();
+            showToast("团队角色已更新");
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            renderMembers();
+          }
+        });
+      });
+    memberList
+      .querySelectorAll<HTMLButtonElement>("[data-remove-team-member]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await api(
+              `/api/spaces/${encodeURIComponent(space.id)}/members/${encodeURIComponent(button.dataset.removeTeamMember!)}`,
+              { method: "DELETE" }
+            );
+            members = members.filter(
+              ({ user }) => user.userId !== button.dataset.removeTeamMember
+            );
+            renderMembers();
+            showToast("成员已移出团队");
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            button.disabled = false;
+          }
+        });
+      });
+  };
+
+  const renderSearchResults = (users: CurrentUser[]) => {
+    if (!resultList) return;
+    const memberIDs = new Set(members.map(({ user }) => user.userId));
+    const available = users.filter(({ userId }) => !memberIDs.has(userId));
+    resultList.hidden = false;
+    resultList.innerHTML = available.length
+      ? available
+          .map(
+            (user) => `
+              <button type="button" data-add-team-member="${escapeHtml(user.userId)}">
+                <span class="share-avatar">${escapeHtml(initials(user.name))}</span>
+                <span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}</small></span>
+                <i>邀请</i>
+              </button>`
+          )
+          .join("")
+      : `<p>没有可邀请的用户</p>`;
+    resultList
+      .querySelectorAll<HTMLButtonElement>("[data-add-team-member]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            const result = await api<{ member: TeamMember }>(
+              `/api/spaces/${encodeURIComponent(space.id)}/members`,
+              {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                  userId: button.dataset.addTeamMember,
+                  role: "editor",
+                }),
+              }
+            );
+            members = [...members, result.member];
+            renderMembers();
+            if (search) search.value = "";
+            resultList.hidden = true;
+            showToast(`已邀请 ${result.member.user.name}`);
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            button.disabled = false;
+          }
+        });
+      });
+  };
+
+  search?.addEventListener("input", async () => {
+    const query = search.value.trim();
+    const sequence = ++searchSequence;
+    if (!query) {
+      if (resultList) resultList.hidden = true;
+      return;
+    }
+    try {
+      const result = await api<{ users: CurrentUser[] }>(
+        `/api/users?query=${encodeURIComponent(query)}`
+      );
+      if (sequence === searchSequence) renderSearchResults(result.users);
+    } catch (caught) {
+      if (sequence === searchSequence && resultList) {
+        resultList.hidden = false;
+        resultList.innerHTML = `<p>${escapeHtml(caught instanceof Error ? caught.message : String(caught))}</p>`;
+      }
+    }
+  });
+
+  try {
+    const result = await api<{ members: TeamMember[] }>(
+      `/api/spaces/${encodeURIComponent(space.id)}/members`
+    );
+    members = result.members;
+    renderMembers();
+    search?.focus();
   } catch (caught) {
     memberList.innerHTML = `<p class="share-load-error">${escapeHtml(caught instanceof Error ? caught.message : String(caught))}</p>`;
   }
@@ -1178,15 +1902,28 @@ function showToast(message: string): void {
 
 function accessRoleName(role: AccessRole): string {
   if (role === "owner") return "所有者";
+  if (role === "admin") return "管理员";
   if (role === "editor") return "可编辑";
   return "仅查看";
 }
 
-function viewFromHash(): WorkspaceView {
-  const candidate = window.location.hash.slice(1);
-  return ["home", "recent", "space", "shared", "trash"].includes(candidate)
-    ? (candidate as WorkspaceView)
-    : "home";
+function workspaceRoute(personalSpaceID: string): WorkspaceRoute {
+  const parts = window.location.hash
+    .slice(1)
+    .split("/")
+    .filter(Boolean)
+    .map(decodeURIComponent);
+  if (parts[0] === "space") {
+    return {
+      view: "space",
+      spaceID: parts[1] || personalSpaceID,
+      folderID: parts[2] || null,
+    };
+  }
+  const view = parts[0] ?? "";
+  return ["home", "recent", "shared", "trash"].includes(view)
+    ? { view: view as Exclude<WorkspaceView, "space"> }
+    : { view: "home" };
 }
 
 function defaultName(type: number): string {
@@ -1278,7 +2015,8 @@ type IconName =
   | "search"
   | "share"
   | "sparkles"
-  | "trash";
+  | "trash"
+  | "users";
 
 function icon(name: IconName): string {
   const paths: Record<IconName, string> = {
@@ -1300,6 +2038,7 @@ function icon(name: IconName): string {
     share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/>',
     sparkles: '<path d="m12 3 1.4 4.1L17 9l-3.6 1.9L12 15l-1.4-4.1L7 9l3.6-1.9zM18.5 15l.8 2.2 1.7.8-1.7.8-.8 2.2-.8-2.2L16 18l1.7-.8z"/>',
     trash: '<path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>',
+    users: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M14 16a5 5 0 0 1 7 4"/>',
   };
   return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name]}</svg>`;
 }
@@ -1330,8 +2069,30 @@ interface CurrentUser {
   readonly name: string;
 }
 
-interface ResourceRecord {
+interface SpaceRecord {
   readonly id: string;
+  readonly type: "personal" | "team";
+  readonly name: string;
+  readonly accessRole: AccessRole;
+  readonly owner: CurrentUser;
+}
+
+interface FolderRecord {
+  readonly kind: "folder";
+  readonly id: string;
+  readonly spaceID: string;
+  readonly parentID: string | null;
+  readonly name: string;
+  readonly status: string;
+  readonly updatedAt: number;
+  readonly accessRole: AccessRole;
+}
+
+interface ResourceRecord {
+  readonly kind: "unit";
+  readonly id: string;
+  readonly spaceID: string;
+  readonly parentID: string | null;
   readonly unitID: string;
   readonly type: number;
   readonly name: string;
@@ -1339,6 +2100,7 @@ interface ResourceRecord {
   readonly updatedAt: number;
   readonly lastOpenedAt?: number;
   readonly accessRole: AccessRole;
+  readonly space: SpaceRecord;
   readonly owner: CurrentUser;
 }
 
@@ -1346,9 +2108,37 @@ function activityTime(resource: ResourceRecord): number {
   return resource.lastOpenedAt ?? resource.updatedAt;
 }
 
-type AccessRole = "owner" | "editor" | "viewer";
+type AccessRole = "owner" | "admin" | "editor" | "viewer";
+
+type DirectoryNode = (FolderRecord | ResourceRecord) & {
+  readonly space: SpaceRecord;
+};
+
+interface DirectoryPayload {
+  readonly space: SpaceRecord;
+  readonly breadcrumbs: FolderRecord[];
+  readonly nodes: Array<FolderRecord | ResourceRecord>;
+}
+
+type WorkspaceRoute =
+  | { readonly view: Exclude<WorkspaceView, "space"> }
+  | {
+      readonly view: "space";
+      readonly spaceID: string;
+      readonly folderID: string | null;
+    };
+
+interface CreateTarget {
+  readonly spaceID: string;
+  readonly parentID: string | null;
+}
 
 interface ShareMember {
+  readonly user: CurrentUser;
+  readonly role: "owner" | "editor" | "viewer";
+}
+
+interface TeamMember {
   readonly user: CurrentUser;
   readonly role: AccessRole;
 }

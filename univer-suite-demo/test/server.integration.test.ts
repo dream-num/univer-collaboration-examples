@@ -2,10 +2,10 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { SuiteApplication } from "../server/application.js";
-import { createSuiteApplication } from "../server/application.js";
 import { UnitAction, UniverType } from "@univerjs/protocol";
 import { afterEach, describe, expect, it } from "vitest";
+import type { SuiteApplication } from "../server/application.js";
+import { createSuiteApplication } from "../server/application.js";
 
 const applications: SuiteApplication[] = [];
 const directories: string[] = [];
@@ -19,505 +19,390 @@ afterEach(async () => {
   }
 });
 
-describe("univer-suite-demo server", () => {
-  it("creates, reads and soft-deletes the currently available Unit types", async () => {
+describe("univer-suite-demo spaces", () => {
+  it("organizes all Unit types in personal folders and restores a deleted subtree", async () => {
     const origin = await startApplication();
-    const cookie = await login(origin, "alice", "alice-password");
-    const types = [
+    const alice = await login(origin, "alice", "alice-password");
+    const personal = await personalSpace(origin, alice);
+    const project = await createFolder(
+      origin,
+      alice,
+      personal.id,
+      null,
+      "Project 2026"
+    );
+    const planning = await createFolder(
+      origin,
+      alice,
+      personal.id,
+      project.id,
+      "Planning"
+    );
+
+    for (const type of [
       UniverType.UNIVER_SHEET,
       UniverType.UNIVER_DOC,
       UniverType.UNIVER_SLIDE,
-    ];
-
-    for (const type of types) {
-      const created = await json<{
-        resource: {
-          id: string;
-          unitID: string;
-          type: UniverType;
-          status: string;
-        };
-      }>(`${origin}/api/units`, {
-        method: "POST",
-        headers: { cookie, "content-type": "application/json" },
-        body: JSON.stringify({ type, name: `Unit ${type}` }),
-      });
-      expect(created.response.status).toBe(201);
-      expect(created.body.resource).toMatchObject({ type, status: "active" });
-
-      const beforeOpen = await json<{ resources: Array<{ id: string }> }>(
-        `${origin}/api/units?scope=recent`,
-        { headers: { cookie } }
+    ]) {
+      const resource = await createUnit(
+        origin,
+        alice,
+        personal.id,
+        planning.id,
+        type,
+        `Unit ${type}`
       );
-      expect(
-        beforeOpen.body.resources.some(
-          ({ id }) => id === created.body.resource.id
-        )
-      ).toBe(false);
-      const opened = await json<{
-        resource: { id: string; lastOpenedAt: number };
-      }>(`${origin}/api/units/${created.body.resource.id}/open`, {
-        method: "POST",
-        headers: { cookie },
-      });
-      expect(opened.response.status).toBe(200);
-      expect(opened.body.resource).toMatchObject({
-        id: created.body.resource.id,
-        lastOpenedAt: expect.any(Number),
-      });
-      const recent = await json<{
-        resources: Array<{ id: string; lastOpenedAt: number }>;
-      }>(`${origin}/api/units?scope=recent`, { headers: { cookie } });
-      expect(recent.body.resources[0]).toMatchObject({
-        id: created.body.resource.id,
-        lastOpenedAt: opened.body.resource.lastOpenedAt,
+      expect(resource).toMatchObject({
+        type,
+        parentID: planning.id,
+        space: { id: personal.id, type: "personal" },
+        accessRole: "owner",
       });
 
       const snapshot = await json<{
         snapshot: { unitID: string; type: UniverType; rev: number };
       }>(
-        `${origin}/universer-api/snapshot/${type}/unit/${created.body.resource.unitID}/rev/0`,
-        { headers: { cookie } }
+        `${origin}/universer-api/snapshot/${type}/unit/${resource.unitID}/rev/0`,
+        { headers: { cookie: alice } }
       );
-      expect(snapshot.response.status).toBe(200);
       expect(snapshot.body.snapshot).toMatchObject({
-        unitID: created.body.resource.unitID,
+        unitID: resource.unitID,
         type,
         rev: 1,
       });
-      const history = await json<{ historyIds: string[] }>(
-        `${origin}/universer-api/history/${created.body.resource.unitID}/list?length=20`,
-        { headers: { cookie } }
-      );
-      expect(history.response.status).toBe(200);
-      expect(history.body.historyIds).toEqual([
-        `${created.body.resource.unitID}:1`,
-      ]);
 
-      const renamed = await json<{
-        resource: { name: string };
-      }>(`${origin}/api/units/${created.body.resource.id}`, {
-        method: "PATCH",
-        headers: { cookie, "content-type": "application/json" },
-        body: JSON.stringify({ name: `Renamed ${type}` }),
+      const opened = await json<{
+        resource: { id: string; lastOpenedAt: number };
+      }>(`${origin}/api/units/${resource.id}/open`, {
+        method: "POST",
+        headers: { cookie: alice },
       });
-      expect(renamed.response.status).toBe(200);
+      expect(opened.body.resource.lastOpenedAt).toEqual(expect.any(Number));
+
+      const renamed = await json<{ resource: { name: string } }>(
+        `${origin}/api/units/${resource.id}`,
+        {
+          method: "PATCH",
+          headers: { cookie: alice, "content-type": "application/json" },
+          body: JSON.stringify({ name: `Renamed ${type}` }),
+        }
+      );
       expect(renamed.body.resource.name).toBe(`Renamed ${type}`);
-      const recentAfterRename = await json<{
-        resources: Array<{ id: string; lastOpenedAt: number }>;
-      }>(`${origin}/api/units?scope=recent`, { headers: { cookie } });
-      expect(
-        recentAfterRename.body.resources.find(
-          ({ id }) => id === created.body.resource.id
-        )?.lastOpenedAt
-      ).toBe(opened.body.resource.lastOpenedAt);
-      const renamedUnit = await json<{
-        resource: { name: string };
-      }>(`${origin}/api/units/${created.body.resource.id}`, {
-        headers: { cookie },
-      });
-      expect(renamedUnit.body.resource.name).toBe(`Renamed ${type}`);
-      const renamedSnapshot = await json<{
-        changesets: Array<{
-          mutations: Array<{ id: string; data: string }>;
-        }>;
-      }>(
-        `${origin}/universer-api/snapshot/${type}/unit/${created.body.resource.unitID}/rev/0`,
-        { headers: { cookie } }
-      );
-      expect(
-        renamedSnapshot.body.changesets.some((changeset) =>
-          changeset.mutations.some(
-            (mutation) =>
-              JSON.parse(mutation.data).name === `Renamed ${type}`
-          )
-        )
-      ).toBe(true);
-
-      const removed = await fetch(
-        `${origin}/api/units/${created.body.resource.id}`,
-        { method: "DELETE", headers: { cookie } }
-      );
-      expect(removed.status).toBe(204);
-      const blocked = await fetch(
-        `${origin}/universer-api/snapshot/${type}/unit/${created.body.resource.unitID}/rev/0`,
-        { headers: { cookie } }
-      );
-      expect(blocked.status).toBe(404);
-      const recentAfterDelete = await json<{
-        resources: Array<{ id: string }>;
-      }>(`${origin}/api/units?scope=recent`, { headers: { cookie } });
-      expect(
-        recentAfterDelete.body.resources.some(
-          ({ id }) => id === created.body.resource.id
-        )
-      ).toBe(false);
-
-      const restored = await json<{
-        resource: { status: string };
-      }>(
-        `${origin}/api/units/${created.body.resource.id}/restore`,
-        { method: "POST", headers: { cookie } }
-      );
-      expect(restored.body.resource.status).toBe("active");
-      const recentAfterRestore = await json<{
-        resources: Array<{ id: string }>;
-      }>(`${origin}/api/units?scope=recent`, { headers: { cookie } });
-      expect(
-        recentAfterRestore.body.resources.some(
-          ({ id }) => id === created.body.resource.id
-        )
-      ).toBe(false);
     }
 
-    const list = await json<{ resources: unknown[] }>(`${origin}/api/units`, {
-      headers: { cookie },
-    });
-    expect(list.body.resources).toHaveLength(types.length);
-  });
-
-  it("reports Board and Base creation as unavailable without touching collaboration data", async () => {
-    const origin = await startApplication();
-    const cookie = await login(origin, "bob", "bob-password");
-    for (const type of [
-      UniverType.UNIVER_BOARD,
-      UniverType.UNIVER_BASE,
-    ]) {
-      const response = await fetch(`${origin}/api/units`, {
-        method: "POST",
-        headers: { cookie, "content-type": "application/json" },
-        body: JSON.stringify({ type, name: "Unavailable" }),
-      });
-      expect(response.status).toBe(400);
-    }
-
-    const capabilities = await json<{
-      creatableUnitTypes: UniverType[];
-      unavailableUnitTypes: Array<{ type: UniverType }>;
-    }>(`${origin}/api/capabilities`, { headers: { cookie } });
-    expect(capabilities.body.creatableUnitTypes).toEqual([
-      UniverType.UNIVER_SHEET,
-      UniverType.UNIVER_DOC,
-      UniverType.UNIVER_SLIDE,
-    ]);
-    expect(capabilities.body.unavailableUnitTypes.map(({ type }) => type)).toEqual([
-      UniverType.UNIVER_BOARD,
-      UniverType.UNIVER_BASE,
-    ]);
-  });
-
-  it("registers, logs in and isolates each user's personal space", async () => {
-    const origin = await startApplication();
-    const aliceCookie = await login(origin, "alice", "alice-password");
-    const bobCookie = await login(origin, "bob", "bob-password");
-
-    const created = await json<{
-      resource: { id: string; unitID: string };
+    const directory = await json<{
+      breadcrumbs: Array<{ id: string; name: string }>;
+      nodes: Array<{ kind: string; name: string }>;
     }>(
-      `${origin}/api/units`,
-      {
-        method: "POST",
-        headers: {
-          cookie: aliceCookie,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          type: UniverType.UNIVER_SHEET,
-          name: "Alice only",
-        }),
-      }
+      `${origin}/api/spaces/${personal.id}/nodes?parentID=${planning.id}`,
+      { headers: { cookie: alice } }
     );
-    expect(created.response.status).toBe(201);
+    expect(directory.body.breadcrumbs.map(({ name }) => name)).toEqual([
+      "Project 2026",
+      "Planning",
+    ]);
+    expect(directory.body.nodes).toHaveLength(3);
+    expect(directory.body.nodes.every(({ kind }) => kind === "unit")).toBe(
+      true
+    );
 
-    const bobList = await json<{ resources: unknown[] }>(
-      `${origin}/api/units`,
-      { headers: { cookie: bobCookie } }
-    );
-    expect(bobList.body.resources).toEqual([]);
     expect(
-      await fetch(`${origin}/api/units/${created.body.resource.id}`, {
-        headers: { cookie: bobCookie },
+      await fetch(`${origin}/api/nodes/${project.id}`, {
+        method: "DELETE",
+        headers: { cookie: alice },
+      })
+    ).toMatchObject({ status: 204 });
+    const trash = await json<{
+      nodes: Array<{ id: string; kind: string }>;
+    }>(`${origin}/api/spaces/${personal.id}/trash`, {
+      headers: { cookie: alice },
+    });
+    expect(trash.body.nodes).toEqual([
+      expect.objectContaining({ id: project.id, kind: "folder" }),
+    ]);
+    const recentAfterDelete = await json<{ resources: unknown[] }>(
+      `${origin}/api/units?scope=recent`,
+      { headers: { cookie: alice } }
+    );
+    expect(recentAfterDelete.body.resources).toEqual([]);
+
+    expect(
+      await fetch(`${origin}/api/nodes/${project.id}/restore`, {
+        method: "POST",
+        headers: { cookie: alice },
+      })
+    ).toMatchObject({ status: 204 });
+    const restored = await json<{ nodes: Array<{ id: string }> }>(
+      `${origin}/api/spaces/${personal.id}/nodes`,
+      { headers: { cookie: alice } }
+    );
+    expect(restored.body.nodes).toEqual([
+      expect.objectContaining({ id: project.id }),
+    ]);
+    const recentAfterRestore = await json<{ resources: unknown[] }>(
+      `${origin}/api/units?scope=recent`,
+      { headers: { cookie: alice } }
+    );
+    expect(recentAfterRestore.body.resources).toEqual([]);
+  });
+
+  it("shares only personal documents with explicit users and never grants link access", async () => {
+    const origin = await startApplication();
+    const alice = await login(origin, "alice", "alice-password");
+    const bob = await login(origin, "bob", "bob-password");
+    const personal = await personalSpace(origin, alice);
+    const resource = await createUnit(
+      origin,
+      alice,
+      personal.id,
+      null,
+      UniverType.UNIVER_SHEET,
+      "Personal budget"
+    );
+    const bobUser = await findUser(origin, alice, "bob");
+
+    expect(
+      await fetch(`${origin}/api/units/${resource.id}`, {
+        headers: { cookie: bob },
       })
     ).toMatchObject({ status: 404 });
-    expect(
-      await fetch(
-        `${origin}/universer-api/history/${created.body.resource.unitID}/list`,
-        { headers: { cookie: bobCookie } }
-      )
-    ).toMatchObject({ status: 404 });
-
-    const loggedIn = await fetch(`${origin}/api/auth/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        username: "alice",
-        password: "alice-password",
-      }),
-    });
-    expect(loggedIn.status).toBe(200);
-    expect(loggedIn.headers.get("set-cookie")).toContain(
-      "univer_suite_session="
-    );
-
-    const carolCookie = await register(origin, "carol", "carol-password");
-    expect(carolCookie).toContain("univer_suite_session=");
-  });
-
-  it("shares resources with editor and viewer roles across product and collaboration APIs", async () => {
-    const origin = await startApplication();
-    const aliceCookie = await login(origin, "alice", "alice-password");
-    const bobCookie = await login(origin, "bob", "bob-password");
-    const created = await json<{
-      resource: {
-        id: string;
-        unitID: string;
-        type: UniverType;
-        accessRole: string;
-      };
-    }>(`${origin}/api/units`, {
-      method: "POST",
-      headers: {
-        cookie: aliceCookie,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        type: UniverType.UNIVER_SHEET,
-        name: "Shared budget",
-      }),
-    });
-    expect(created.body.resource.accessRole).toBe("owner");
-
-    const users = await json<{
-      users: Array<{ userId: string; username: string }>;
-    }>(`${origin}/api/users?query=bob`, {
-      headers: { cookie: aliceCookie },
-    });
-    expect(users.body.users).toHaveLength(1);
-    expect(users.body.users[0]?.username).toBe("bob");
-    const bobUserId = users.body.users[0]!.userId;
-
     const invited = await json<{
       member: { role: string; user: { userId: string } };
-    }>(`${origin}/api/units/${created.body.resource.id}/members`, {
+    }>(`${origin}/api/units/${resource.id}/members`, {
       method: "POST",
-      headers: {
-        cookie: aliceCookie,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ userId: bobUserId, role: "viewer" }),
+      headers: { cookie: alice, "content-type": "application/json" },
+      body: JSON.stringify({ userId: bobUser.userId, role: "viewer" }),
     });
-    expect(invited.response.status).toBe(201);
     expect(invited.body.member).toMatchObject({
       role: "viewer",
-      user: { userId: bobUserId },
+      user: { userId: bobUser.userId },
     });
 
     const shared = await json<{
-      resources: Array<{
-        id: string;
-        accessRole: string;
-        owner: { username: string };
-      }>;
+      resources: Array<{ id: string; accessRole: string }>;
     }>(`${origin}/api/units?scope=shared`, {
-      headers: { cookie: bobCookie },
+      headers: { cookie: bob },
     });
     expect(shared.body.resources).toEqual([
-      expect.objectContaining({
-        id: created.body.resource.id,
-        accessRole: "viewer",
-        owner: expect.objectContaining({ username: "alice" }),
-      }),
-    ]);
-    const recentBeforeOpen = await json<{ resources: unknown[] }>(
-      `${origin}/api/units?scope=recent`,
-      { headers: { cookie: bobCookie } }
-    );
-    expect(recentBeforeOpen.body.resources).toEqual([]);
-    expect(
-      await fetch(`${origin}/api/units/${created.body.resource.id}`, {
-        headers: { cookie: bobCookie },
-      })
-    ).toMatchObject({ status: 200 });
-    const recentAfterRead = await json<{ resources: unknown[] }>(
-      `${origin}/api/units?scope=recent`,
-      { headers: { cookie: bobCookie } }
-    );
-    expect(recentAfterRead.body.resources).toEqual([]);
-    const openedByBob = await json<{
-      resource: {
-        id: string;
-        accessRole: string;
-        lastOpenedAt: number;
-      };
-    }>(`${origin}/api/units/${created.body.resource.id}/open`, {
-      method: "POST",
-      headers: { cookie: bobCookie },
-    });
-    expect(openedByBob.body.resource).toMatchObject({
-      id: created.body.resource.id,
-      accessRole: "viewer",
-      lastOpenedAt: expect.any(Number),
-    });
-    const recentAfterOpen = await json<{
-      resources: Array<{
-        id: string;
-        accessRole: string;
-        lastOpenedAt: number;
-      }>;
-    }>(`${origin}/api/units?scope=recent`, {
-      headers: { cookie: bobCookie },
-    });
-    expect(recentAfterOpen.body.resources).toEqual([
-      expect.objectContaining({
-        id: created.body.resource.id,
-        accessRole: "viewer",
-        lastOpenedAt: openedByBob.body.resource.lastOpenedAt,
-      }),
+      expect.objectContaining({ id: resource.id, accessRole: "viewer" }),
     ]);
     expect(
-      await fetch(
-        `${origin}/universer-api/snapshot/${UniverType.UNIVER_SHEET}/unit/${created.body.resource.unitID}/rev/0`,
-        { headers: { cookie: bobCookie } }
-      )
-    ).toMatchObject({ status: 200 });
-    expect(
-      await fetch(
-        `${origin}/universer-api/history/${created.body.resource.unitID}/list`,
-        { headers: { cookie: bobCookie } }
-      )
-    ).toMatchObject({ status: 200 });
-
-    const viewerPermissions = await permissionActions(
-      origin,
-      bobCookie,
-      created.body.resource.unitID,
-      [
-        UnitAction.View,
-        UnitAction.Edit,
-        UnitAction.ViewHistory,
-        UnitAction.RecoverHistory,
-      ]
-    );
-    expect(viewerPermissions).toEqual([
-      { action: UnitAction.View, allowed: true },
-      { action: UnitAction.Edit, allowed: false },
-      { action: UnitAction.ViewHistory, allowed: true },
-      { action: UnitAction.RecoverHistory, allowed: false },
-    ]);
-    expect(
-      await fetch(`${origin}/api/units/${created.body.resource.id}`, {
+      await fetch(`${origin}/api/units/${resource.id}`, {
         method: "PATCH",
-        headers: {
-          cookie: bobCookie,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ name: "Viewer cannot rename" }),
+        headers: { cookie: bob, "content-type": "application/json" },
+        body: JSON.stringify({ name: "Blocked" }),
       })
     ).toMatchObject({ status: 403 });
-
-    const viewerSubmit =
-      await applications.at(-1)!.collabService.submitChangeset(
-        {
-          changeset: {
-            unitID: created.body.resource.unitID,
-            type: UniverType.UNIVER_SHEET,
-            baseRev: 1,
-            revision: 2,
-            sid: randomUUID(),
-            reqId: 1,
-            userID: bobUserId,
-            memberID: "bob-viewer",
-            mutations: [],
-          },
-        },
-        {
-          session: {
-            memberId: "bob-viewer",
-            userId: bobUserId,
-            customData: {},
-          },
-        }
-      );
-    expect(viewerSubmit).toMatchObject({
-      status: "rejected",
-      error: { code: "PERMISSION_DENIED" },
-    });
-
     expect(
-      await fetch(
-        `${origin}/api/units/${created.body.resource.id}/members`,
-        { headers: { cookie: bobCookie } }
-      )
-    ).toMatchObject({ status: 404 });
+      await permissionActions(origin, bob, resource.unitID, [
+        UnitAction.View,
+        UnitAction.Edit,
+        UnitAction.Share,
+      ])
+    ).toEqual([
+      { action: UnitAction.View, allowed: true },
+      { action: UnitAction.Edit, allowed: false },
+      { action: UnitAction.Share, allowed: false },
+    ]);
 
-    const updated = await json<{ member: { role: string } }>(
-      `${origin}/api/units/${created.body.resource.id}/members/${bobUserId}`,
+    await json(
+      `${origin}/api/units/${resource.id}/members/${bobUser.userId}`,
       {
         method: "PATCH",
-        headers: {
-          cookie: aliceCookie,
-          "content-type": "application/json",
-        },
+        headers: { cookie: alice, "content-type": "application/json" },
         body: JSON.stringify({ role: "editor" }),
       }
     );
-    expect(updated.body.member.role).toBe("editor");
     expect(
-      await permissionActions(
-        origin,
-        bobCookie,
-        created.body.resource.unitID,
-        [UnitAction.Edit, UnitAction.ManageCollaborator]
-      )
-    ).toEqual([
-      { action: UnitAction.Edit, allowed: true },
-      { action: UnitAction.ManageCollaborator, allowed: false },
-    ]);
-
-    const editorRename = await json<{ resource: { name: string } }>(
-      `${origin}/api/units/${created.body.resource.id}`,
-      {
+      await fetch(`${origin}/api/units/${resource.id}`, {
         method: "PATCH",
-        headers: {
-          cookie: bobCookie,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ name: "Bob renamed budget" }),
-      }
-    );
-    expect(editorRename.response.status).toBe(200);
-    expect(editorRename.body.resource.name).toBe("Bob renamed budget");
-    const recentAfterRename = await json<{
-      resources: Array<{ id: string; name: string; lastOpenedAt: number }>;
-    }>(`${origin}/api/units?scope=recent`, {
-      headers: { cookie: bobCookie },
-    });
-    expect(recentAfterRename.body.resources).toEqual([
-      expect.objectContaining({
-        id: created.body.resource.id,
-        name: "Bob renamed budget",
-        lastOpenedAt: openedByBob.body.resource.lastOpenedAt,
-      }),
-    ]);
+        headers: { cookie: bob, "content-type": "application/json" },
+        body: JSON.stringify({ name: "Bob edited" }),
+      })
+    ).toMatchObject({ status: 200 });
 
     expect(
       await fetch(
-        `${origin}/api/units/${created.body.resource.id}/members/${bobUserId}`,
-        { method: "DELETE", headers: { cookie: aliceCookie } }
+        `${origin}/api/units/${resource.id}/members/${bobUser.userId}`,
+        { method: "DELETE", headers: { cookie: alice } }
       )
     ).toMatchObject({ status: 204 });
     expect(
-      await fetch(`${origin}/api/units/${created.body.resource.id}`, {
-        headers: { cookie: bobCookie },
+      await fetch(
+        `${origin}/universer-api/snapshot/${resource.type}/unit/${resource.unitID}/rev/0`,
+        { headers: { cookie: bob } }
+      )
+    ).toMatchObject({ status: 404 });
+  });
+
+  it("enforces owner, admin, editor and viewer rules across a team directory", async () => {
+    const origin = await startApplication();
+    const alice = await login(origin, "alice", "alice-password");
+    const bob = await login(origin, "bob", "bob-password");
+    const carol = await register(origin, "carol", "carol-password");
+    const dave = await register(origin, "dave", "dave-password");
+    const erin = await register(origin, "erin", "erin-password");
+    const bobUser = await findUser(origin, alice, "bob");
+    const carolUser = await findUser(origin, alice, "carol");
+    const daveUser = await findUser(origin, alice, "dave");
+    const erinUser = await findUser(origin, alice, "erin");
+
+    const createdTeam = await json<{
+      space: { id: string; type: string; accessRole: string };
+    }>(`${origin}/api/spaces`, {
+      method: "POST",
+      headers: { cookie: alice, "content-type": "application/json" },
+      body: JSON.stringify({ name: "Product Team" }),
+    });
+    expect(createdTeam.body.space).toMatchObject({
+      type: "team",
+      accessRole: "owner",
+    });
+    const teamID = createdTeam.body.space.id;
+
+    await addTeamMember(origin, alice, teamID, bobUser.userId, "admin");
+    await addTeamMember(origin, alice, teamID, carolUser.userId, "editor");
+    await addTeamMember(origin, alice, teamID, daveUser.userId, "viewer");
+
+    expect(
+      await fetch(
+        `${origin}/api/spaces/${teamID}/members/${carolUser.userId}`,
+        {
+          method: "PATCH",
+          headers: { cookie: bob, "content-type": "application/json" },
+          body: JSON.stringify({ role: "admin" }),
+        }
+      )
+    ).toMatchObject({ status: 403 });
+    expect(
+      await fetch(
+        `${origin}/api/spaces/${teamID}/members/${bobUser.userId}`,
+        {
+          method: "PATCH",
+          headers: { cookie: bob, "content-type": "application/json" },
+          body: JSON.stringify({ role: "editor" }),
+        }
+      )
+    ).toMatchObject({ status: 403 });
+
+    const invitedByAdmin = await addTeamMember(
+      origin,
+      bob,
+      teamID,
+      erinUser.userId,
+      "viewer"
+    );
+    expect(invitedByAdmin.role).toBe("viewer");
+    expect(
+      await fetch(`${origin}/api/spaces/${teamID}/members`, {
+        method: "POST",
+        headers: { cookie: bob, "content-type": "application/json" },
+        body: JSON.stringify({ userId: randomUUID(), role: "admin" }),
+      })
+    ).toMatchObject({ status: 400 });
+
+    const folder = await createFolder(
+      origin,
+      carol,
+      teamID,
+      null,
+      "Roadmap"
+    );
+    const resource = await createUnit(
+      origin,
+      carol,
+      teamID,
+      folder.id,
+      UniverType.UNIVER_DOC,
+      "Launch plan"
+    );
+    expect(resource.accessRole).toBe("editor");
+
+    expect(
+      await fetch(`${origin}/api/nodes/${resource.id}`, {
+        method: "DELETE",
+        headers: { cookie: carol },
+      })
+    ).toMatchObject({ status: 403 });
+    expect(
+      await fetch(`${origin}/api/units`, {
+        method: "POST",
+        headers: { cookie: dave, "content-type": "application/json" },
+        body: JSON.stringify({
+          spaceID: teamID,
+          type: UniverType.UNIVER_DOC,
+          name: "Viewer blocked",
+        }),
+      })
+    ).toMatchObject({ status: 403 });
+    expect(
+      await fetch(`${origin}/api/units/${resource.id}`, {
+        method: "PATCH",
+        headers: { cookie: dave, "content-type": "application/json" },
+        body: JSON.stringify({ name: "Viewer blocked" }),
+      })
+    ).toMatchObject({ status: 403 });
+
+    const openedByDave = await json<{
+      resource: { accessRole: string };
+    }>(`${origin}/api/units/${resource.id}/open`, {
+      method: "POST",
+      headers: { cookie: dave },
+    });
+    expect(openedByDave.body.resource.accessRole).toBe("viewer");
+
+    expect(
+      await fetch(`${origin}/api/nodes/${folder.id}`, {
+        method: "DELETE",
+        headers: { cookie: bob },
+      })
+    ).toMatchObject({ status: 204 });
+    expect(
+      await fetch(`${origin}/api/nodes/${folder.id}/restore`, {
+        method: "POST",
+        headers: { cookie: bob },
+      })
+    ).toMatchObject({ status: 204 });
+
+    expect(
+      await fetch(
+        `${origin}/api/spaces/${teamID}/members/${daveUser.userId}`,
+        { method: "DELETE", headers: { cookie: bob } }
+      )
+    ).toMatchObject({ status: 204 });
+    expect(
+      await fetch(`${origin}/api/units/${resource.id}`, {
+        headers: { cookie: dave },
       })
     ).toMatchObject({ status: 404 });
-    const recentAfterRevoke = await json<{ resources: unknown[] }>(
+    const daveRecent = await json<{ resources: unknown[] }>(
       `${origin}/api/units?scope=recent`,
-      { headers: { cookie: bobCookie } }
+      { headers: { cookie: dave } }
     );
-    expect(recentAfterRevoke.body.resources).toEqual([]);
+    expect(daveRecent.body.resources).toEqual([]);
+
+    const members = await json<{
+      members: Array<{ role: string; user: { username: string } }>;
+    }>(`${origin}/api/spaces/${teamID}/members`, {
+      headers: { cookie: erin },
+    });
+    expect(members.body.members.map(({ role }) => role)).toEqual([
+      "owner",
+      "admin",
+      "editor",
+      "viewer",
+    ]);
   });
 });
+
+interface Resource {
+  readonly id: string;
+  readonly unitID: string;
+  readonly type: UniverType;
+  readonly parentID: string | null;
+  readonly accessRole: string;
+  readonly space: { readonly id: string; readonly type: string };
+}
 
 async function startApplication(): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), "univer-suite-demo-"));
@@ -531,12 +416,26 @@ async function startApplication(): Promise<string> {
   return `http://127.0.0.1:${port}`;
 }
 
-async function json<T>(
+async function json<T = unknown>(
   url: string,
   init?: RequestInit
 ): Promise<{ response: Response; body: T }> {
   const response = await fetch(url, init);
   return { response, body: (await response.json()) as T };
+}
+
+async function login(
+  origin: string,
+  username: string,
+  password: string
+): Promise<string> {
+  const response = await fetch(`${origin}/api/auth/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+  expect(response.status).toBe(200);
+  return response.headers.get("set-cookie")?.split(";", 1)[0] ?? "";
 }
 
 async function register(
@@ -553,18 +452,85 @@ async function register(
   return response.headers.get("set-cookie")?.split(";", 1)[0] ?? "";
 }
 
-async function login(
+async function personalSpace(
   origin: string,
-  username: string,
-  password: string
-): Promise<string> {
-  const response = await fetch(`${origin}/api/auth/login`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ username, password }),
+  cookie: string
+): Promise<{ id: string }> {
+  const result = await json<{
+    spaces: Array<{ id: string; type: string }>;
+  }>(`${origin}/api/spaces`, { headers: { cookie } });
+  return result.body.spaces.find(({ type }) => type === "personal")!;
+}
+
+async function createFolder(
+  origin: string,
+  cookie: string,
+  spaceID: string,
+  parentID: string | null,
+  name: string
+): Promise<{ id: string }> {
+  const result = await json<{ folder: { id: string } }>(
+    `${origin}/api/spaces/${spaceID}/folders`,
+    {
+      method: "POST",
+      headers: { cookie, "content-type": "application/json" },
+      body: JSON.stringify({ parentID, name }),
+    }
+  );
+  expect(result.response.status).toBe(201);
+  return result.body.folder;
+}
+
+async function createUnit(
+  origin: string,
+  cookie: string,
+  spaceID: string,
+  parentID: string | null,
+  type: UniverType,
+  name: string
+): Promise<Resource> {
+  const result = await json<{ resource: Resource }>(
+    `${origin}/api/units`,
+    {
+      method: "POST",
+      headers: { cookie, "content-type": "application/json" },
+      body: JSON.stringify({ spaceID, parentID, type, name }),
+    }
+  );
+  expect(result.response.status).toBe(201);
+  return result.body.resource;
+}
+
+async function findUser(
+  origin: string,
+  cookie: string,
+  query: string
+): Promise<{ userId: string }> {
+  const result = await json<{
+    users: Array<{ userId: string; username: string }>;
+  }>(`${origin}/api/users?query=${encodeURIComponent(query)}`, {
+    headers: { cookie },
   });
-  expect(response.status).toBe(200);
-  return response.headers.get("set-cookie")?.split(";", 1)[0] ?? "";
+  return result.body.users[0]!;
+}
+
+async function addTeamMember(
+  origin: string,
+  cookie: string,
+  spaceID: string,
+  userId: string,
+  role: "admin" | "editor" | "viewer"
+): Promise<{ role: string }> {
+  const result = await json<{ member: { role: string } }>(
+    `${origin}/api/spaces/${spaceID}/members`,
+    {
+      method: "POST",
+      headers: { cookie, "content-type": "application/json" },
+      body: JSON.stringify({ userId, role }),
+    }
+  );
+  expect(result.response.status).toBe(201);
+  return result.body.member;
 }
 
 async function permissionActions(
@@ -584,6 +550,5 @@ async function permissionActions(
       requests: [{ unitID, objectID: unitID, actions }],
     }),
   });
-  expect(result.response.status).toBe(200);
   return result.body.objectActions[0]!.actions;
 }

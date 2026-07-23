@@ -5,7 +5,12 @@ export interface EditorResource {
   readonly name: string;
   readonly status: string;
   readonly updatedAt: number;
-  readonly accessRole: "owner" | "editor" | "viewer";
+  readonly accessRole: "owner" | "admin" | "editor" | "viewer";
+  readonly space: {
+    readonly id: string;
+    readonly type: "personal" | "team";
+    readonly name: string;
+  };
   readonly owner: {
     readonly userId: string;
     readonly username: string;
@@ -72,7 +77,7 @@ export async function resolveEditorAccess(
     resource.unitID !== input.unitID ||
     resource.type !== input.type ||
     resource.status !== "active" ||
-    !["owner", "editor", "viewer"].includes(resource.accessRole)
+    !["owner", "admin", "editor", "viewer"].includes(resource.accessRole)
   ) {
     return { status: "invalid-link" };
   }

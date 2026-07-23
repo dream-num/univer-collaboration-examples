@@ -96,10 +96,18 @@ export function createCollaborationStack(
     const resource = options.productStore.getByUnitID(
       context.request.snapshot.unitID
     );
+    const role = resource
+      ? options.productStore.getAccessRoleByID(
+          resource.id,
+          context.session.userId
+        )
+      : null;
     if (
       !resource ||
       resource.status !== "creating" ||
-      resource.ownerUserId !== context.session.userId
+      resource.createdBy !== context.session.userId ||
+      !role ||
+      role === "viewer"
     ) {
       throw new CollabError(
         "PERMISSION_DENIED",

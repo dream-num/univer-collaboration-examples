@@ -7,6 +7,6 @@
 | [`basic-sheets`](./basic-sheets/README.md) | 可运行 | SQLite | 固定 `demo-user`，固定 allowed | 上游式 Univer Sheet 前端、实时协同、持久化、历史恢复 |
 | [`jwt-memory-auth`](./jwt-memory-auth/README.md) | 可运行的认证与权限示例 | Memory | JWT Cookie + 内存 ACL | 用户系统和 `admin/editor/viewer` middleware 集成 |
 | `basic-auth-demo` | 规划中 | SQLite | Bearer JWT + ACL | 可持久化认证集成示例 |
-| [`univer-suite-demo`](./univer-suite-demo/README.md) | Spike：Sheet / Doc / Slide、账号、定向分享与 Sheet History | SQLite | HttpOnly 会话、`owner/editor/viewer` middleware | 多类型 Unit 和办公套件纵切面 |
+| [`univer-suite-demo`](./univer-suite-demo/README.md) | Spike：Sheet / Doc / Slide、个人/团队目录与 Sheet History | SQLite | HttpOnly 会话、空间 RBAC 与个人文档定向分享 | 多类型 Unit 和办公套件纵切面 |
 
 完整需求与后续顺序见 [`roadmap.md`](./roadmap.md)。
