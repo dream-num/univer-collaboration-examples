@@ -6,12 +6,10 @@ import type {
 import { json, Router } from "express";
 import { UniverType } from "@univerjs/protocol";
 import type { DemoUser } from "../demo-user.js";
-import type { HistoryStore } from "../history-store.js";
 import { createEmptyWorkbookData } from "../workbook-data.js";
 
 export interface UnitRouterDependencies {
   readonly collabService: UniverCollabService;
-  readonly historyStore: HistoryStore;
   readonly user: DemoUser;
 }
 
@@ -38,10 +36,6 @@ export function createUnitRouter(
           session: callerSession(dependencies.user),
           customData: { user: dependencies.user },
         }
-      );
-      dependencies.historyStore.recordInitialHistory(
-        unitID,
-        dependencies.user.userId
       );
       response.status(201).json({ unitID, type: UniverType.UNIVER_SHEET });
     }

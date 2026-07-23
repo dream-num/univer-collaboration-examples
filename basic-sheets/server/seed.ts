@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
-import { HistoryStore } from "./history-store.js";
+import { SQLiteHistoryDatabaseAdapter } from "@univerjs/collaboration-history-sqlite";
 
 const filename = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -10,7 +10,7 @@ const filename = join(
 );
 mkdirSync(dirname(filename), { recursive: true });
 const database = new SQLiteDatabaseAdapter({ filename });
-const store = new HistoryStore(filename);
-await store.dispose();
+const historyDbAdapter = new SQLiteHistoryDatabaseAdapter({ filename });
+await historyDbAdapter.dispose();
 await database.dispose();
 console.info(`Initialized ${filename}`);

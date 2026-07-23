@@ -1,6 +1,11 @@
 import type { Server } from "node:http";
 import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
 import {
+  UniverHistoryService,
+  type IHistoryDatabaseAdapter,
+} from "@univerjs/collaboration-history";
+import { UniverHistoryEndpoint } from "@univerjs/collaboration-history-endpoint";
+import {
   UniverCollabService,
   type IDatabaseAdapter,
 } from "@univerjs/collaboration-service";
@@ -8,20 +13,23 @@ import { createNodeTransport } from "@univerjs/collaboration-transport-node";
 import { UniverType } from "@univerjs/protocol";
 import type { RequestHandler } from "express";
 import type { DemoUser } from "./demo-user.js";
+import { protocolUser } from "./demo-user.js";
 
 export interface CollaborationStackOptions {
   readonly dbAdapter: IDatabaseAdapter;
+  readonly historyDbAdapter: IHistoryDatabaseAdapter;
   readonly user: DemoUser;
 }
 
 export interface CollaborationStack {
   readonly collabService: UniverCollabService;
+  readonly historyService: UniverHistoryService;
   readonly handleHttp: RequestHandler;
   attachWebSocket(server: Server): void;
   dispose(): Promise<void>;
 }
 
-/** 组装只属于协同核心的 Service、Endpoint 和 Transport。 */
+/** 组装协同与可选 History 的 Service、Endpoint 和 Transport。 */
 export function createCollaborationStack(
   options: CollaborationStackOptions
 ): CollaborationStack {
@@ -29,6 +37,19 @@ export function createCollaborationStack(
     dbAdapter: options.dbAdapter,
   });
   const endpoint = new UniverCollabEndpoint(collabService);
+  const historyService = new UniverHistoryService({
+    collabService,
+    dbAdapter: options.historyDbAdapter,
+    userProvider: {
+      async getUsers(userIds) {
+        return userIds.includes(options.user.userId)
+          ? [protocolUser(options.user)]
+          : [];
+      },
+    },
+  });
+  historyService.attach(collabService);
+  const historyEndpoint = new UniverHistoryEndpoint(historyService);
   const transport = createNodeTransport();
 
   endpoint.use("connect", async (context, next) => {
@@ -55,6 +76,7 @@ export function createCollaborationStack(
     }
     await next();
   });
+  transport.use(historyEndpoint);
   transport.use(endpoint);
   transport.use(async (context, next) => {
     if (context.kind === "http") {
@@ -87,6 +109,7 @@ export function createCollaborationStack(
 
   return {
     collabService,
+    historyService,
 
     // Express mount 会改写 request.url；Endpoint 需要看到完整 Protocol 路径。
     handleHttp(request, response) {
@@ -108,6 +131,7 @@ export function createCollaborationStack(
       attachedServer?.off("upgrade", handleUpgrade);
       attachedServer = undefined;
       await transport.dispose();
+      await historyService.dispose();
       await collabService.dispose();
     },
   };

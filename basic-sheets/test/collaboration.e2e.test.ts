@@ -178,7 +178,7 @@ describe("basic-sheets collaboration protocol", () => {
         );
         expect(history.historyIds.slice(0, 2)).toEqual([
           `${unitID}:6`,
-          `${unitID}:5`,
+          `${unitID}:1`,
         ]);
         expect(history.entities.datas[`${unitID}:6`].additionalFields).toContain(
           '"restoredRevision":1'

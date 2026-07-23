@@ -5,21 +5,23 @@
 
 ```text
 Express
-├── 用户 / Authz / Unit 创建 / History
-└── 协同核心 HTTP
-      → Node Transport
-        → UniverCollabEndpoint
-          → UniverCollabService
-            → SQLiteDatabaseAdapter
+├── 用户 / Authz / Unit 创建
+└── Node Transport
+    ├── UniverHistoryEndpoint
+    │   → UniverHistoryService
+    │     → SQLiteHistoryDatabaseAdapter
+    └── UniverCollabEndpoint
+        → UniverCollabService
+          → SQLiteDatabaseAdapter
 
 HTTP Server WebSocket upgrade
   → Node Transport
     → UniverCollabEndpoint
 ```
 
-Express 承载同源静态资源和应用层接口。只有 snapshot 读取、changeset submit、
-session ticket 等协同核心 HTTP，以及 Comb WebSocket，才进入
-Transport → `UniverCollabEndpoint`。框架本身仍不依赖 Express。
+Express 承载同源静态资源和应用层接口。History、snapshot 读取、changeset
+submit、session ticket 等协议 HTTP，以及 Comb WebSocket，进入对应
+Transport Endpoint。框架本身仍不依赖 Express。
 
 后端按 Express composition root 组织：
 
@@ -31,8 +33,7 @@ server/
 ├── routes/
 │   ├── user.ts
 │   ├── authz.ts
-│   ├── unit.ts
-│   └── history.ts
+│   └── unit.ts
 └── http/
     └── errors.ts       Express 404 和统一错误响应
 ```
@@ -86,8 +87,10 @@ Transport 为每个协同 HTTP 请求设置：
 context.userId = "demo-user";
 ```
 
-`/universer-api/user`、authz、Unit 创建和 history 由 Express Router 实现；
-其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
+`/universer-api/user`、authz 和 Unit 创建由 Express Router 实现；History 由可选的
+`UniverHistoryEndpoint → UniverHistoryService → SQLiteHistoryDatabaseAdapter`
+默认实现
+提供。其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
 所有浏览器窗口因此拥有相同 `userId`，但 WebSocket `memberId` 不同，仍可测试房间、
 Presence、ACK 和广播。
 
@@ -157,6 +160,7 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets test
 - Presence、断线、重连与 fetch-missing。
 - restore 形成新 revision 和 required snapshot。
 
-History metadata 是供 Edit History UI 展示的独立索引。极端进程故障可能造成展示
+History metadata 是供 Edit History UI 展示的独立索引。默认按约 60 秒和特殊
+mutation 分段，而不是每个 changeset 生成一个历史项。极端进程故障可能造成展示
 metadata 缺项，但 confirmed changeset 和 Unit 数据不受影响；生产环境可使用
 transactional outbox 或可重建索引。

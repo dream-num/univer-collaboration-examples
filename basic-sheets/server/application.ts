@@ -4,13 +4,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import express, { Router } from "express";
 import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
+import type { UniverHistoryService } from "@univerjs/collaboration-history";
+import { SQLiteHistoryDatabaseAdapter } from "@univerjs/collaboration-history-sqlite";
 import type { UniverCollabService } from "@univerjs/collaboration-service";
 import { createCollaborationStack } from "./collaboration.js";
 import { DEMO_USER } from "./demo-user.js";
-import { HistoryStore } from "./history-store.js";
 import { errorHandler, notFoundHandler } from "./http/errors.js";
 import { createAuthzRouter } from "./routes/authz.js";
-import { createHistoryRouter } from "./routes/history.js";
 import { createUnitRouter } from "./routes/unit.js";
 import { createUserRouter } from "./routes/user.js";
 
@@ -23,8 +23,9 @@ export interface BasicSheetsApplication {
   readonly app: express.Express;
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
-  readonly historyStore: HistoryStore;
+  readonly historyDbAdapter: SQLiteHistoryDatabaseAdapter;
   readonly collabService: UniverCollabService;
+  readonly historyService: UniverHistoryService;
   listen(port?: number, host?: string): Promise<number>;
   close(): Promise<void>;
 }
@@ -36,18 +37,14 @@ export async function createBasicSheetsApplication(
   mkdirSync(dirname(databaseFilename), { recursive: true });
 
   const database = new SQLiteDatabaseAdapter({ filename: databaseFilename });
-  const historyStore = new HistoryStore(databaseFilename);
+  const historyDbAdapter = new SQLiteHistoryDatabaseAdapter({
+    filename: databaseFilename,
+  });
   const collaboration = createCollaborationStack({
     dbAdapter: database,
+    historyDbAdapter,
     user: DEMO_USER,
   });
-
-  const historySubscription = collaboration.collabService.on(
-    "changesetCommitted",
-    ({ changeset }) => {
-      historyStore.recordChangeset(changeset);
-    }
-  );
 
   const app = express();
   const applicationRouter = Router();
@@ -60,18 +57,9 @@ export async function createBasicSheetsApplication(
   );
   applicationRouter.use("/authz", createAuthzRouter());
   applicationRouter.use(
-    "/history",
-    createHistoryRouter({
-      collabService: collaboration.collabService,
-      historyStore,
-      user: DEMO_USER,
-    })
-  );
-  applicationRouter.use(
     "/snapshot",
     createUnitRouter({
       collabService: collaboration.collabService,
-      historyStore,
       user: DEMO_USER,
     })
   );
@@ -103,17 +91,17 @@ export async function createBasicSheetsApplication(
     app,
     httpServer,
     database,
-    historyStore,
+    historyDbAdapter,
     collabService: collaboration.collabService,
+    historyService: collaboration.historyService,
     listen: (port = 3010, host = "127.0.0.1") =>
       listen(httpServer, port, host),
     close: async () => {
       if (closed) return;
       closed = true;
-      historySubscription.dispose();
       await collaboration.dispose();
       await closeServer(httpServer);
-      await historyStore.dispose();
+      await historyDbAdapter.dispose();
       await database.dispose();
     },
   };
