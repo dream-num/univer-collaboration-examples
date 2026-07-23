@@ -5,14 +5,21 @@
 
 ```text
 Express
+├── 用户 / Authz / Unit 创建 / History
+└── 协同核心 HTTP
+      → Node Transport
+        → UniverCollabEndpoint
+          → UniverCollabService
+            → SQLiteDatabaseAdapter
+
+HTTP Server WebSocket upgrade
   → Node Transport
     → UniverCollabEndpoint
-      → UniverCollabService
-        → SQLiteDatabaseAdapter
 ```
 
-Express 只承载同源静态资源，并把 `/universer-api` 请求和 WebSocket upgrade
-交给 Transport。
+Express 承载同源静态资源和应用层接口。只有 snapshot 读取、changeset submit、
+session ticket 等协同核心 HTTP，以及 Comb WebSocket，才进入
+Transport → `UniverCollabEndpoint`。框架本身仍不依赖 Express。
 
 ## 启动
 
@@ -53,13 +60,15 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets reset
 
 ## 固定身份
 
-这个 example 不演示认证或用户系统。Transport 为每个 HTTP 请求直接设置：
+这个 example 不演示认证或用户系统。Express 应用接口直接使用固定用户；
+Transport 为每个协同 HTTP 请求设置：
 
 ```ts
 context.userId = "demo-user";
 ```
 
-`/universer-api/user` 返回固定的 `Demo User`，authz 查询固定返回 allowed。
+`/universer-api/user`、authz、Unit 创建和 history 由 Express Router 实现；
+其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
 所有浏览器窗口因此拥有相同 `userId`，但 WebSocket `memberId` 不同，仍可测试房间、
 Presence、ACK 和广播。
 
@@ -104,7 +113,7 @@ restore workaround。
 
 服务端接口的归类规则和当前 demo 自定义接口见
 [服务端接口说明](./server-interfaces.md)；Protocol 全接口目录见
-[Univer Protocol 接口索引](../../docs/internal/upstream-protocol/README.md)。
+[Univer Protocol 接口索引](../../docs/internal/reference/upstream-protocol/README.md)。
 
 ## 已知问题
 

@@ -4,10 +4,7 @@ import type {
   UniverCollabService,
 } from "@univerjs/collaboration-service";
 import { CollabError } from "@univerjs/collaboration-service";
-import type {
-  NodeHttpTransportContext,
-  NodeTransportMiddleware,
-} from "@univerjs/collaboration-transport-node";
+import { Router, type Response } from "express";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import type { DemoUser } from "./demo-user.js";
 import { protocolUser } from "./demo-user.js";
@@ -15,59 +12,54 @@ import type { HistoryEntry, HistoryStore } from "./history-store.js";
 
 const OK_ERROR = { code: ErrorCode.OK, message: "" };
 
-export function createHistoryHttpMiddleware(
+/**
+ * History 是 example 的产品能力，因此由 Express 实现 Protocol HTTP 接口，
+ * 不进入只负责协同核心协议的 Transport 和 UniverCollabEndpoint。
+ */
+export function createHistoryRouter(
   service: UniverCollabService,
   store: HistoryStore,
   user: DemoUser
-): NodeTransportMiddleware {
-  return async (context, next) => {
-    if (context.kind !== "http") {
-      await next();
-      return;
-    }
-    const url = new URL(context.incomingMessage.url ?? "/", "http://localhost");
-    const match = matchHistoryRoute(
-      context.incomingMessage.method,
-      url.pathname
-    );
-    if (!match) {
-      await next();
-      return;
-    }
+): Router {
+  const router = Router();
 
-    const session = callerSession(user);
-    try {
-      if (match.action === "list") {
-        const length = clampInteger(url.searchParams.get("length"), 20, 1, 100);
-        const beforeRevision = optionalPositiveInteger(
-          url.searchParams.get("lastLabel")
-        );
-        const origin = optionalOrigin(url.searchParams.get("origin"));
-        const { entries, hasMore } =
-          origin === 2
-            ? { entries: [], hasMore: false }
-            : store.listHistory(match.unitID, {
-                length,
-                ...(beforeRevision === undefined ? {} : { beforeRevision }),
-                userIds: url.searchParams.getAll("userIds").filter(Boolean),
-              });
-        writeJson(context, 200, historyListResponse(entries, user, hasMore));
-        return;
-      }
+  router.get("/:unitID/list", async (request, response) => {
+    await handleHistoryResponse(response, async () => {
+      const url = requestUrl(request.originalUrl);
+      const length = clampInteger(url.searchParams.get("length"), 20, 1, 100);
+      const beforeRevision = optionalPositiveInteger(
+        url.searchParams.get("lastLabel")
+      );
+      const origin = optionalOrigin(url.searchParams.get("origin"));
+      const { entries, hasMore } =
+        origin === 2
+          ? { entries: [], hasMore: false }
+          : store.listHistory(request.params.unitID, {
+              length,
+              ...(beforeRevision === undefined ? {} : { beforeRevision }),
+              userIds: url.searchParams.getAll("userIds").filter(Boolean),
+            });
+      return historyListResponse(entries, user, hasMore);
+    });
+  });
 
-      if (match.action === "creators") {
-        writeJson(context, 200, {
-          error: OK_ERROR,
-          creators: [{
-            userId: user.userId,
-            name: user.name,
-            avatar: "",
-            origins: [1],
-          }],
-        });
-        return;
-      }
+  router.get("/:unitID/creators", async (_request, response) => {
+    await handleHistoryResponse(response, async () => ({
+      error: OK_ERROR,
+      creators: [
+        {
+          userId: user.userId,
+          name: user.name,
+          avatar: "",
+          origins: [1],
+        },
+      ],
+    }));
+  });
 
+  router.get("/:unitID/cs", async (request, response) => {
+    await handleHistoryResponse(response, async () => {
+      const url = requestUrl(request.originalUrl);
       const startRevision = requiredPositiveInteger(
         url.searchParams.get("startRevision"),
         "startRevision"
@@ -81,28 +73,39 @@ export function createHistoryHttpMiddleware(
       }
       const result = await service.getChangesets(
         {
-          unitID: match.unitID,
+          unitID: request.params.unitID,
           type: UniverType.UNIVER_SHEET,
           from: startRevision - 1,
           to: endRevision,
         },
-        { session }
+        { session: callerSession(user) }
       );
-      writeJson(context, 200, {
+      return {
         error: OK_ERROR,
         changesets: result.changesets,
         users: { [user.userId]: protocolUser(user) },
-      });
-    } catch (error) {
-      const failure = historyFailure(error);
-      writeJson(context, failure.status, {
-        error: {
-          code: failure.code,
-          message: failure.message,
-        },
-      });
-    }
-  };
+      };
+    });
+  });
+
+  return router;
+}
+
+async function handleHistoryResponse(
+  response: Response,
+  operation: () => Promise<unknown>
+): Promise<void> {
+  try {
+    response.status(200).json(await operation());
+  } catch (error) {
+    const failure = historyFailure(error);
+    response.status(failure.status).json({
+      error: {
+        code: failure.code,
+        message: failure.message,
+      },
+    });
+  }
 }
 
 function historyFailure(error: unknown): {
@@ -160,29 +163,6 @@ function historyFailure(error: unknown): {
   }
 }
 
-function matchHistoryRoute(
-  method: string | undefined,
-  pathname: string
-):
-  | { readonly action: "list" | "creators" | "changesets"; readonly unitID: string }
-  | null {
-  if (method !== "GET") return null;
-  const segments = pathname.split("/").filter(Boolean);
-  if (
-    segments.length !== 4 ||
-    segments[0] !== "universer-api" ||
-    segments[1] !== "history"
-  ) {
-    return null;
-  }
-  let action: "list" | "creators" | "changesets";
-  if (segments[3] === "list") action = "list";
-  else if (segments[3] === "creators") action = "creators";
-  else if (segments[3] === "cs") action = "changesets";
-  else return null;
-  return { action, unitID: decodeURIComponent(segments[2]!) };
-}
-
 function historyListResponse(
   entries: readonly HistoryEntry[],
   user: DemoUser,
@@ -231,14 +211,8 @@ function callerSession(user: DemoUser): CollabSession {
   };
 }
 
-function writeJson(
-  context: NodeHttpTransportContext,
-  status: number,
-  body: unknown
-): void {
-  context.response.statusCode = status;
-  context.response.setHeader("content-type", "application/json; charset=utf-8");
-  context.response.end(JSON.stringify(body));
+function requestUrl(originalUrl: string): URL {
+  return new URL(originalUrl, "http://localhost");
 }
 
 function clampInteger(
