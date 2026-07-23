@@ -21,6 +21,25 @@ Express 承载同源静态资源和应用层接口。只有 snapshot 读取、ch
 session ticket 等协同核心 HTTP，以及 Comb WebSocket，才进入
 Transport → `UniverCollabEndpoint`。框架本身仍不依赖 Express。
 
+后端按 Express composition root 组织：
+
+```text
+server/
+├── main.ts             进程启动、端口和信号处理
+├── application.ts      显式组装资源、Router 和应用生命周期
+├── collaboration.ts    Service、Endpoint、Transport 和 WebSocket
+├── routes/
+│   ├── user.ts
+│   ├── authz.ts
+│   ├── unit.ts
+│   └── history.ts
+└── http/
+    └── errors.ts       Express 404 和统一错误响应
+```
+
+`application.ts` 直接展示各 Router 的挂载关系，并内联 `listen()`、`close()` 和
+资源释放顺序；本示例不额外抽象 application handle。
+
 ## 启动
 
 要求 Node.js 24 和 pnpm 10。在仓库根目录执行：
