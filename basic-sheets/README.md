@@ -102,6 +102,10 @@ restore workaround。
 完整的客户端差异、影响和后续逐项处理清单见
 [客户端差异清单](./client-differences.md)。
 
+服务端接口的归类规则和当前 demo 自定义接口见
+[服务端接口说明](./server-interfaces.md)；Protocol 全接口目录见
+[Univer Protocol 接口索引](../../docs/internal/upstream-protocol/README.md)。
+
 ## 已知问题
 
 `@univerjs-pro/collaboration-client@1.0.0-alpha.6` 的在线 peer 收到 restore

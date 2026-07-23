@@ -96,7 +96,7 @@ server/
 ├── auth.ts             JWT、HttpOnly Cookie 和用户解析
 ├── memory-stores.ts    bcrypt 密码哈希和 userId ACL
 ├── collaboration.ts    Service/Endpoint 权限 middleware
-└── sheet-snapshot.ts   Workbook data → Univer protocol snapshot
+└── workbook-data.ts    构造交给 Service 的普通 Workbook data
 
 client/
 ├── main.ts             登录、创建、授权和页面交互
