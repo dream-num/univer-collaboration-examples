@@ -136,18 +136,20 @@ export async function openCollaborativeSheet(
     }
     refreshingAfterRemoteRestore = true;
     localCache.disableLocalCache();
-    void waitForRestoredSnapshot(unitID, changeset.revision)
-      .then(async (restoredRevision) => {
+    void (async () => {
+      try {
         await localCache.exhaustSavingTask();
         await localCache.saveOfflineData(unitID, {
           unitID,
           type: UniverInstanceType.UNIVER_SHEET,
-          rev: restoredRevision,
+          rev: changeset.revision,
           awaitingChangeset: null,
           mutations: [],
         });
-      })
-      .finally(() => location.reload());
+      } finally {
+        location.reload();
+      }
+    })();
   });
 
   const permissions = univer.__getInjector().get(IPermissionService);
@@ -161,32 +163,6 @@ export async function openCollaborativeSheet(
     permissions.updatePermissionPoint(permission.id, true);
   }
   onStatus("ready");
-}
-
-async function waitForRestoredSnapshot(
-  unitID: string,
-  confirmedRevision: number
-): Promise<number> {
-  for (let attempt = 0; attempt < 100; attempt += 1) {
-    const response = await fetch(
-      `/universer-api/snapshot/2/unit/${encodeURIComponent(unitID)}/rev/0`
-    );
-    if (response.ok) {
-      const body = (await response.json()) as {
-        readonly snapshot?: { readonly rev?: number };
-        readonly changesets?: readonly unknown[];
-      };
-      if (
-        typeof body.snapshot?.rev === "number" &&
-        body.snapshot.rev >= confirmedRevision &&
-        (body.changesets?.length ?? 0) === 0
-      ) {
-        return body.snapshot.rev;
-      }
-    }
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  throw new Error("Restored snapshot was not published in time");
 }
 
 declare global {

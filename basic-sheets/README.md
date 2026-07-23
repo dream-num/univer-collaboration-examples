@@ -61,7 +61,7 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets reset
 
 - 使用 `UniverSheetsCorePreset`，没有复制上游完整的手工 plugin 注册列表。
 - 保留 Collaboration Client、Collaboration UI 与 Edit History；仍直接使用现有 snapshot、Comb、ticket 和 history 协议，没有前端转换层。
-- `alpha.6` 的 History Loader 只在提交者 ACK 后刷新；本 demo 检测 peer 收到的 remote restore mutation，等待新 revision snapshot 发布、把该 Unit 的 offline cache 重置到新 revision，再刷新页面，使所有在线客户端从恢复后的权威 snapshot 收敛。
+- `alpha.6` 的 History Loader 只在提交者 ACK 后刷新，peer 收到 remote restore mutation 时会进入不可恢复的 conflict。本 demo 用内部 Client API 检测该事件、把 Unit 的 offline cache 重置到 confirmed revision 并刷新页面。服务端保证该事件发出前新 revision snapshot 已持久化，因此前端不轮询 snapshot。
 - 使用同源相对 HTTP URL，并从当前 origin 构造 WebSocket URL。
 - 为无 ACL 的 demo 提供只返回 `allowed: true` 的最小 authz 查询兼容接口，并隐藏需要完整权限对象 CRUD 的 Sheet protection 菜单。
 - 后端替换为本仓库的 Transport → Endpoint → Service 三层与 SQLite Adapter。
@@ -71,6 +71,8 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets reset
 - 页面没有文件列表和产品壳；只有全屏 Sheet，以及加载/失败/重试状态。
 
 因此，本示例证明的是现有 Sheet 协同客户端和历史 UI 的兼容性，不是上游完整 Sheets 产品能力的替代品。
+
+上述 remote restore 处理是针对 `alpha.6` 的兼容 shim，不是推荐给业务代码的稳定前端 API；待 Collaboration Client 或 Edit History Loader 原生处理 peer restore 后应删除。
 
 ## 测试
 
