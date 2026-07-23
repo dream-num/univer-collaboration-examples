@@ -27,6 +27,7 @@
     "@univerjs/collaboration-service": "workspace:*",
     "@univerjs/collaboration-transport-node": "workspace:*",
     "@univerjs/core": "1.0.0-alpha.6",
+    "@univerjs/network": "1.0.0-alpha.6",
     "@univerjs/preset-sheets-core": "1.0.0-alpha.6",
     "@univerjs/presets": "1.0.0-alpha.6",
     "@univerjs/protocol": "1.0.0-alpha.6",

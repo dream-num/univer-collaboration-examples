@@ -33,43 +33,37 @@ afterEach(async () => {
 });
 
 describe("basic-sheets collaboration protocol", () => {
-  it("converges guests, catches up, persists and restores as a new revision", async () => {
+  it("converges clients, catches up, persists and restores as a new revision", async () => {
     const directory = await mkdtemp(join(tmpdir(), "univer-basic-e2e-"));
     directories.push(directory);
     const filename = join(directory, "demo.sqlite");
     let running = await start(filename);
-    const firstGuest = await getGuest(running.origin);
-    const secondGuest = await getGuest(running.origin);
-    const unitID = await createUnit(running.origin, firstGuest.cookie);
+    const user = await getUser(running.origin);
+    const unitID = await createUnit(running.origin);
 
     const clients: CombTestClient[] = [];
     try {
-      let first = await connectComb(running.origin, firstGuest.cookie);
+      let first = await connectComb(running.origin);
       clients.push(first);
       const firstJoin = await first.join(unitID);
       expect(firstJoin.code).toBe(CmdRspCode.OK);
       expect(firstJoin.data.roomInfos[unitID].members[0]).toMatchObject({
-        userID: firstGuest.userID,
-        name: firstGuest.name,
+        userID: user.userID,
+        name: user.name,
       });
 
-      const second = await connectComb(running.origin, secondGuest.cookie);
+      const second = await connectComb(running.origin);
       clients.push(second);
       const firstSeesSecond = first.next();
       const secondJoin = await second.join(unitID);
       expect(secondJoin.code).toBe(CmdRspCode.OK);
-      expect(secondJoin.data.roomInfos[unitID].members).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            userID: firstGuest.userID,
-            name: firstGuest.name,
-          }),
-          expect.objectContaining({
-            userID: secondGuest.userID,
-            name: secondGuest.name,
-          }),
-        ])
-      );
+      expect(secondJoin.data.roomInfos[unitID].members).toHaveLength(2);
+      expect(
+        secondJoin.data.roomInfos[unitID].members.every(
+          (member: { userID: string; name: string }) =>
+            member.userID === user.userID && member.name === user.name
+        )
+      ).toBe(true);
       expect(eventID(await firstSeesSecond)).toBe("users_enter");
 
       const firstEvents = first.take(2);
@@ -77,13 +71,11 @@ describe("basic-sheets collaboration protocol", () => {
       const [firstSubmit, secondSubmit] = await Promise.all([
         postChanges(
           running.origin,
-          firstGuest.cookie,
           first.memberID,
           cellChangeset(unitID, 1, "first", 0, "one", 1)
         ),
         postChanges(
           running.origin,
-          secondGuest.cookie,
           second.memberID,
           cellChangeset(unitID, 1, "second", 1, "two", 1)
         ),
@@ -110,7 +102,6 @@ describe("basic-sheets collaboration protocol", () => {
         (
           await postChanges(
             running.origin,
-            secondGuest.cookie,
             second.memberID,
             cellChangeset(unitID, 3, "second", 2, "offline", 2)
           )
@@ -118,7 +109,7 @@ describe("basic-sheets collaboration protocol", () => {
       ).toBe(200);
       expect(eventID(await secondAck)).toBe("changeset_ack");
 
-      first = await connectComb(running.origin, firstGuest.cookie);
+      first = await connectComb(running.origin);
       clients.push(first);
       const secondSeesReturn = second.next();
       expect((await first.join(unitID)).code).toBe(CmdRspCode.OK);
@@ -126,7 +117,6 @@ describe("basic-sheets collaboration protocol", () => {
 
       const missed = await fetchMissing(
         running.origin,
-        firstGuest.cookie,
         unitID,
         3
       );
@@ -140,7 +130,6 @@ describe("basic-sheets collaboration protocol", () => {
         (
           await postChanges(
             running.origin,
-            firstGuest.cookie,
             first.memberID,
             cellChangeset(unitID, 4, "first", 3, "snapshot", 2)
           )
@@ -162,22 +151,16 @@ describe("basic-sheets collaboration protocol", () => {
       applications.splice(applications.indexOf(running.app), 1);
       running = await start(filename);
 
-      expect((await getGuest(running.origin, firstGuest.cookie)).userID).toBe(
-        firstGuest.userID
-      );
+      expect(await getUser(running.origin)).toEqual(user);
       const persisted = await readLatestWorkbook(running.app, unitID, 5);
       expect(persisted.sheets["sheet-1"]!.cellData?.[0]?.[3]?.v).toBe("snapshot");
 
-      const restoredClient = await connectComb(
-        running.origin,
-        firstGuest.cookie
-      );
+      const restoredClient = await connectComb(running.origin);
       clients.push(restoredClient);
       expect((await restoredClient.join(unitID)).code).toBe(CmdRspCode.OK);
       const restoreAck = restoredClient.next();
       const restoreResponse = await postChanges(
         running.origin,
-        firstGuest.cookie,
         restoredClient.memberID,
         restoreChangeset(unitID, 5, "first", 3, 1)
       );
@@ -191,7 +174,6 @@ describe("basic-sheets collaboration protocol", () => {
       await vi.waitFor(async () => {
         const history = await getHistory(
           running.origin,
-          firstGuest.cookie,
           unitID
         );
         expect(history.historyIds.slice(0, 2)).toEqual([
@@ -319,31 +301,24 @@ async function start(filename: string): Promise<{
   return { app, origin: `http://127.0.0.1:${port}` };
 }
 
-async function getGuest(origin: string, cookie?: string): Promise<{
-  readonly cookie: string;
+async function getUser(origin: string): Promise<{
   readonly userID: string;
   readonly name: string;
 }> {
-  const response = await fetch(`${origin}/universer-api/user`, {
-    headers: cookie ? { cookie } : {},
-  });
+  const response = await fetch(`${origin}/universer-api/user`);
   expect(response.status).toBe(200);
   const body = (await response.json()) as {
     readonly user: { readonly userID: string; readonly name: string };
   };
-  const setCookie = response.headers.get("set-cookie");
-  return {
-    cookie: setCookie?.split(";", 1)[0] ?? cookie ?? "",
-    ...body.user,
-  };
+  return body.user;
 }
 
-async function createUnit(origin: string, cookie: string): Promise<string> {
+async function createUnit(origin: string): Promise<string> {
   const response = await fetch(
     `${origin}/universer-api/snapshot/2/unit/-/create`,
     {
       method: "POST",
-      headers: { cookie, "content-type": "application/json" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ name: "Protocol E2E" }),
     }
   );
@@ -351,13 +326,9 @@ async function createUnit(origin: string, cookie: string): Promise<string> {
   return ((await response.json()) as { readonly unitID: string }).unitID;
 }
 
-async function connectComb(
-  origin: string,
-  cookie: string
-): Promise<CombTestClient> {
+async function connectComb(origin: string): Promise<CombTestClient> {
   const ticketResponse = await fetch(
-    `${origin}/universer-api/user/session-ticket`,
-    { headers: { cookie } }
+    `${origin}/universer-api/user/session-ticket`
   );
   expect(ticketResponse.status).toBe(200);
   const { ticket } = (await ticketResponse.json()) as { readonly ticket: string };
@@ -456,7 +427,6 @@ function restoreChangeset(
 
 async function postChanges(
   origin: string,
-  cookie: string,
   memberID: string,
   changeset: IChangeset
 ): Promise<Response> {
@@ -464,7 +434,7 @@ async function postChanges(
     `${origin}/universer-api/comb/${changeset.type}/unit/${changeset.unitID}/new_changes`,
     {
       method: "POST",
-      headers: { cookie, "content-type": "application/json" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({
         unitID: changeset.unitID,
         memberID,
@@ -477,13 +447,11 @@ async function postChanges(
 
 async function fetchMissing(
   origin: string,
-  cookie: string,
   unitID: string,
   from: number
 ) {
   const response = await fetch(
-    `${origin}/universer-api/snapshot/2/unit/${unitID}/fetchmissing?from=${from}&to=0`,
-    { headers: { cookie } }
+    `${origin}/universer-api/snapshot/2/unit/${unitID}/fetchmissing?from=${from}&to=0`
   );
   expect(response.status).toBe(200);
   return response.json() as Promise<{
@@ -492,10 +460,9 @@ async function fetchMissing(
   }>;
 }
 
-async function getHistory(origin: string, cookie: string, unitID: string) {
+async function getHistory(origin: string, unitID: string) {
   const response = await fetch(
-    `${origin}/universer-api/history/${unitID}/list?length=20`,
-    { headers: { cookie } }
+    `${origin}/universer-api/history/${unitID}/list?length=20`
   );
   expect(response.status).toBe(200);
   return response.json() as Promise<any>;

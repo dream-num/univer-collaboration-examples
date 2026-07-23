@@ -9,13 +9,16 @@ import type {
   NodeTransportMiddleware,
 } from "@univerjs/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
-import type { DemoStore, Guest, HistoryEntry } from "./demo-store.js";
+import type { DemoUser } from "./demo-user.js";
+import { protocolUser } from "./demo-user.js";
+import type { HistoryEntry, HistoryStore } from "./history-store.js";
 
 const OK_ERROR = { code: ErrorCode.OK, message: "" };
 
 export function createHistoryHttpMiddleware(
   service: UniverCollabService,
-  store: DemoStore
+  store: HistoryStore,
+  user: DemoUser
 ): NodeTransportMiddleware {
   return async (context, next) => {
     if (context.kind !== "http") {
@@ -32,8 +35,7 @@ export function createHistoryHttpMiddleware(
       return;
     }
 
-    const guest = requireGuest(context);
-    const session = callerSession(guest);
+    const session = callerSession(user);
     try {
       if (match.action === "list") {
         const length = clampInteger(url.searchParams.get("length"), 20, 1, 100);
@@ -49,20 +51,19 @@ export function createHistoryHttpMiddleware(
                 ...(beforeRevision === undefined ? {} : { beforeRevision }),
                 userIds: url.searchParams.getAll("userIds").filter(Boolean),
               });
-        const guests = store.listCreators(match.unitID);
-        writeJson(context, 200, historyListResponse(entries, guests, hasMore));
+        writeJson(context, 200, historyListResponse(entries, user, hasMore));
         return;
       }
 
       if (match.action === "creators") {
         writeJson(context, 200, {
           error: OK_ERROR,
-          creators: store.listCreators(match.unitID).map((creator) => ({
-            userId: creator.guestId,
-            name: creator.name,
+          creators: [{
+            userId: user.userId,
+            name: user.name,
             avatar: "",
             origins: [1],
-          })),
+          }],
         });
         return;
       }
@@ -87,16 +88,10 @@ export function createHistoryHttpMiddleware(
         },
         { session }
       );
-      const users = Object.fromEntries(
-        store.listCreators(match.unitID).map((creator) => [
-          creator.guestId,
-          protocolUser(creator),
-        ])
-      );
       writeJson(context, 200, {
         error: OK_ERROR,
         changesets: result.changesets,
-        users,
+        users: { [user.userId]: protocolUser(user) },
       });
     } catch (error) {
       const failure = historyFailure(error);
@@ -190,7 +185,7 @@ function matchHistoryRoute(
 
 function historyListResponse(
   entries: readonly HistoryEntry[],
-  guests: readonly Guest[],
+  user: DemoUser,
   hasMore: boolean
 ) {
   const datas = Object.fromEntries(
@@ -222,44 +217,18 @@ function historyListResponse(
     lastLabel: entries.at(-1)?.revision.toString() ?? "",
     entities: {
       datas,
-      users: Object.fromEntries(
-        guests.map((guest) => [guest.guestId, protocolUser(guest)])
-      ),
+      users: { [user.userId]: protocolUser(user) },
     },
     historyIds: entries.map((entry) => `${entry.unitID}:${entry.revision}`),
   };
 }
 
-function protocolUser(guest: Guest) {
-  return {
-    userID: guest.guestId,
-    name: guest.name,
-    avatar: "",
-    anonymous: true,
-    canBindAnonymous: false,
-    phone: "",
-    email: "",
-    createTimestamp: guest.createdAt,
-  };
-}
-
-function callerSession(guest: Guest): CollabSession {
+function callerSession(user: DemoUser): CollabSession {
   return {
     memberId: `http-${randomUUID()}`,
-    userId: guest.guestId,
-    customData: { guest },
+    userId: user.userId,
+    customData: { user },
   };
-}
-
-function requireGuest(context: NodeHttpTransportContext): Guest {
-  const guest = context.customData.guest as Guest | undefined;
-  if (!guest) {
-    throw new CollabError(
-      "UNAUTHENTICATED",
-      "Anonymous guest identity is unavailable"
-    );
-  }
-  return guest;
 }
 
 function writeJson(

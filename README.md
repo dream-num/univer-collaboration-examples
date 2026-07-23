@@ -4,7 +4,7 @@
 
 | 示例 | 状态 | 数据库 | 身份与权限 | 重点 |
 |---|---|---|---|---|
-| [`basic-sheets`](./basic-sheets/README.md) | 可运行 | SQLite | 签名匿名 Cookie，无 ACL | 现有 Univer Sheet 客户端、实时协同、持久化、历史恢复 |
+| [`basic-sheets`](./basic-sheets/README.md) | 可运行 | SQLite | 固定 `demo-user`，固定 allowed | 上游式 Univer Sheet 前端、实时协同、持久化、历史恢复 |
 | [`jwt-memory-auth`](./jwt-memory-auth/README.md) | 可运行的 Phase 1 示例 | Memory | JWT Cookie + 内存 ACL | 用户系统和 `admin/editor/viewer` middleware 集成 |
 | `basic-auth-demo` | 规划中 | SQLite | Bearer JWT + ACL | 可持久化认证集成示例 |
 | `univer-suite-demo` | 规划中 | SQLite | 完整用户与空间权限 | 五种 Unit 和文件空间 |

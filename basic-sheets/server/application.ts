@@ -17,9 +17,9 @@ import {
   type NodeTransportMiddleware,
 } from "@univerjs/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
-import { DemoStore, type Guest } from "./demo-store.js";
-import { GuestIdentityService } from "./guest-identity.js";
+import { DEMO_USER, protocolUser } from "./demo-user.js";
 import { createHistoryHttpMiddleware } from "./history-http.js";
+import { HistoryStore } from "./history-store.js";
 import { createEmptyWorkbook } from "./sheet-snapshot.js";
 
 const OK_ERROR = { code: ErrorCode.OK, message: "" };
@@ -33,7 +33,7 @@ export interface BasicSheetsApplication {
   readonly app: express.Express;
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
-  readonly demoStore: DemoStore;
+  readonly historyStore: HistoryStore;
   readonly collabService: UniverCollabService;
   listen(port?: number, host?: string): Promise<number>;
   close(): Promise<void>;
@@ -45,19 +45,17 @@ export async function createBasicSheetsApplication(
   const databaseFilename = options.databaseFilename ?? defaultDatabaseFilename();
   mkdirSync(dirname(databaseFilename), { recursive: true });
   const database = new SQLiteDatabaseAdapter({ filename: databaseFilename });
-  const demoStore = new DemoStore(databaseFilename);
-  const identities = new GuestIdentityService(demoStore);
+  const historyStore = new HistoryStore(databaseFilename);
   const collabService = new UniverCollabService({ dbAdapter: database });
   const endpoint = new UniverCollabEndpoint(collabService);
   const transport = createNodeTransport();
 
   collabService.on("changesetCommitted", ({ changeset }) => {
-    demoStore.recordChangeset(changeset);
+    historyStore.recordChangeset(changeset);
   });
 
   endpoint.use("connect", async (context, next) => {
-    const guest = context.session.customData.guest as Guest | undefined;
-    context.member.name = guest?.name ?? context.session.userId;
+    context.member.name = DEMO_USER.name;
     await next();
   });
   endpoint.use("joinUnit", async (context, next) => {
@@ -74,17 +72,15 @@ export async function createBasicSheetsApplication(
 
   transport.use(async (context, next) => {
     if (context.kind === "http") {
-      const guest = identities.resolve(
-        context.incomingMessage,
-        context.response
-      );
-      context.userId = guest.guestId;
-      context.customData.guest = guest;
+      context.userId = DEMO_USER.userId;
+      context.customData.user = DEMO_USER;
     }
     await next();
   });
-  transport.use(createDemoProtocolMiddleware(collabService, demoStore));
-  transport.use(createHistoryHttpMiddleware(collabService, demoStore));
+  transport.use(createDemoProtocolMiddleware(collabService, historyStore));
+  transport.use(
+    createHistoryHttpMiddleware(collabService, historyStore, DEMO_USER)
+  );
   transport.use(endpoint);
   transport.use(async (context, next) => {
     if (context.kind === "http") {
@@ -135,7 +131,7 @@ export async function createBasicSheetsApplication(
     app,
     httpServer,
     database,
-    demoStore,
+    historyStore,
     collabService,
     listen: (port = 3010, host = "127.0.0.1") =>
       listen(httpServer, port, host),
@@ -145,7 +141,7 @@ export async function createBasicSheetsApplication(
       await transport.dispose();
       await closeServer(httpServer);
       await collabService.dispose();
-      await demoStore.dispose();
+      await historyStore.dispose();
       await database.dispose();
     },
   };
@@ -153,7 +149,7 @@ export async function createBasicSheetsApplication(
 
 function createDemoProtocolMiddleware(
   service: UniverCollabService,
-  store: DemoStore
+  store: HistoryStore
 ): NodeTransportMiddleware {
   return async (context, next) => {
     if (context.kind !== "http") {
@@ -161,8 +157,6 @@ function createDemoProtocolMiddleware(
       return;
     }
     const url = new URL(context.incomingMessage.url ?? "/", "http://localhost");
-    const guest = context.customData.guest as Guest | undefined;
-    if (!guest) throw new CollabError("UNAUTHENTICATED", "Guest identity missing");
 
     if (
       context.incomingMessage.method === "GET" &&
@@ -170,7 +164,7 @@ function createDemoProtocolMiddleware(
     ) {
       writeJson(context, 200, {
         error: OK_ERROR,
-        user: protocolUser(guest),
+        user: protocolUser(DEMO_USER),
         wechat: undefined,
       });
       return;
@@ -180,9 +174,8 @@ function createDemoProtocolMiddleware(
       context.incomingMessage.method === "POST" &&
       url.pathname === "/universer-api/authz/-/object/-/batch_allowed"
     ) {
-      // The basic example intentionally has no ACL. This compatibility route
-      // only lets the existing Sheet client initialize; production apps must
-      // enforce their own authorization in Service lifecycle middleware.
+      // 本 example 不实现 ACL，只为上游 Sheet 前端返回固定授权结果。
+      // 生产应用应在 Service lifecycle middleware 中执行真实权限判断。
       const body = await context.readJson<{
         readonly requests?: readonly {
           readonly unitID?: unknown;
@@ -218,10 +211,10 @@ function createDemoProtocolMiddleware(
       const unitID = randomUUID();
       const initial = await createEmptyWorkbook(unitID, name);
       await service.createUnit(initial, {
-        session: callerSession(guest),
+        session: callerSession(),
         customData: context.customData,
       });
-      store.recordInitialHistory(unitID, guest.guestId);
+      store.recordInitialHistory(unitID, DEMO_USER.userId);
       writeJson(context, 201, { unitID, type: UniverType.UNIVER_SHEET });
       return;
     }
@@ -230,24 +223,11 @@ function createDemoProtocolMiddleware(
   };
 }
 
-function callerSession(guest: Guest): CollabSession {
+function callerSession(): CollabSession {
   return {
     memberId: `http-${randomUUID()}`,
-    userId: guest.guestId,
-    customData: { guest },
-  };
-}
-
-function protocolUser(guest: Guest) {
-  return {
-    userID: guest.guestId,
-    name: guest.name,
-    avatar: "",
-    anonymous: true,
-    canBindAnonymous: false,
-    phone: "",
-    email: "",
-    createTimestamp: guest.createdAt,
+    userId: DEMO_USER.userId,
+    customData: { user: DEMO_USER },
   };
 }
 

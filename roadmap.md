@@ -73,20 +73,18 @@ examples/
 
 - 页面主体是全屏 Univer Sheet 编辑器，不增加文件列表、登录页或业务导航。
 - URL 没有 `unit` 时，后端创建空 Sheet，然后跳转到 `?unit=<unitID>&type=2`。
-- URL 带 `unit` 时，直接加载对应 Sheet。
-- 首次访问时，后端自动生成类似 `Guest A7F3` 的匿名访客身份。
-- 后端通过签名的匿名访客 Cookie 保存身份；前端不需要读取该 Cookie。
-- 匿名访客标识在同一浏览器中保持稳定；不同浏览器获得不同身份。
+- URL 带 `unit` 时，由上游 Collaboration Data Loader 自动加载对应 Sheet，不手动调用 facade load API。
+- 后端为所有请求硬编码同一个 `demo-user`，不在本示例实现认证、Cookie 或用户持久化。
 - 复制当前 URL 到另一个浏览器，即可演示实时编辑、在线成员和 presence。
-- 正常状态不增加额外产品 UI；只在连接中断或加载失败时显示必要的状态和重试入口。
+- 不增加本仓库自定义的 loading shell、Injector 操作或协同状态 workaround。
 
-匿名身份不等于安全认证。该机制只用于消除最小示例中的登录步骤，README 必须明确说明不能将它作为生产鉴权方案。
+固定身份只用于消除最小示例中的登录步骤，README 必须明确说明不能将它作为生产鉴权方案。
 
 ### 3.3 后端
 
 - 使用新的 UniverCollabService、Node Transport、UniverCollabEndpoint 和 SQLite Database Adapter。
 - 同源提供前端、HTTP 协同端点和 WebSocket 端点，避免 CORS 干扰最小示例。
-- SQLite 持久化 snapshot、changeset、revision、提交幂等信息和演示所需的访客元数据。
+- SQLite 持久化 snapshot、changeset、revision、提交幂等信息和 history 展示索引。
 - 支持断线重连和缺失 changeset 补齐。
 - 提供数据库重置命令。
 - 为与上游 Sheet example 保持兼容，复用现有 edit history UI，并提供其所需的兼容历史接口。
@@ -103,10 +101,13 @@ examples/
 ### 3.5 验收场景
 
 1. 启动 demo 并打开不带 `unit` 的地址，自动创建 Sheet 并跳转到稳定 URL。
-2. 将 URL 复制到另一个浏览器，两个匿名访客可以实时编辑并看到对方的在线状态。
+2. 将 URL 复制到另一个浏览器，两个不同 member 可以实时编辑并看到在线状态。
 3. 刷新页面或重启服务后，Sheet 内容保持不变。
 4. 模拟网络中断后重新连接，客户端补齐缺失 changeset 并恢复一致。
 5. 打开历史版本列表，能够查看并恢复已有版本。
+
+alpha.6 在线 peer restore conflict 属于上游 known issue，不在 example 中使用私有
+Client API 擅自修复，记录见 `docs/issues/known-issues`。
 
 ## 4. `basic-auth-demo`
 
@@ -377,7 +378,7 @@ examples/
 状态：已完成（Phase 1 Step 13）。实现、启动和生产差异见 [`basic-sheets/README.md`](./basic-sheets/README.md)。
 
 - 对齐 `univer-pro/examples/src/sheets` 前端。
-- 接入匿名访客身份和 SQLite。
+- 使用固定演示用户和 SQLite，不在最小示例中实现用户系统。
 - 跑通创建、加载、实时编辑、重连、持久化和历史恢复。
 - 完成与上游 example 的差异清单。
 

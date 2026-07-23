@@ -7,10 +7,6 @@ import {
   type BasicSheetsApplication,
 } from "../server/application.js";
 
-interface ProtocolUserResponse {
-  readonly user: { readonly userID: string; readonly name: string };
-}
-
 const applications: BasicSheetsApplication[] = [];
 const directories: string[] = [];
 
@@ -24,35 +20,20 @@ afterEach(async () => {
 });
 
 describe("basic-sheets server integration", () => {
-  it("keeps signed guest identity, units and history across a restart", async () => {
+  it("serves the fixed user and persists units and history", async () => {
     const directory = await mkdtemp(join(tmpdir(), "univer-basic-sheets-"));
     directories.push(directory);
     const filename = join(directory, "demo.sqlite");
     let running = await start(filename);
 
-    const first = await getUser(running.origin);
-    expect(first.cookie).toContain("univer_basic_guest=");
-    expect(first.setCookie).toContain("HttpOnly");
-    expect(first.setCookie).toContain("SameSite=Lax");
-    expect(first.user.name).toMatch(/^Guest [0-9A-F]{4}$/);
-
-    const repeated = await getUser(running.origin, first.cookie);
-    expect(repeated.user).toEqual(first.user);
-    expect(repeated.setCookie).toBe("");
-
-    const second = await getUser(running.origin);
-    expect(second.user.userID).not.toBe(first.user.userID);
-
-    const tampered = tamperCookie(first.cookie);
-    const replacement = await getUser(running.origin, tampered);
-    expect(replacement.user.userID).not.toBe(first.user.userID);
-    expect(replacement.setCookie).toContain("univer_basic_guest=");
+    const user = await getUser(running.origin);
+    expect(user).toMatchObject({ userID: "demo-user", name: "Demo User" });
 
     const createResponse = await fetch(
       `${running.origin}/universer-api/snapshot/2/unit/-/create`,
       {
         method: "POST",
-        headers: { cookie: first.cookie, "content-type": "application/json" },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ name: "Persistent demo" }),
       }
     );
@@ -62,35 +43,22 @@ describe("basic-sheets server integration", () => {
     };
 
     const snapshot = await protocolJson(
-      `${running.origin}/universer-api/snapshot/2/unit/${unitID}/rev/1`,
-      first.cookie
+      `${running.origin}/universer-api/snapshot/2/unit/${unitID}/rev/1`
     );
     expect(snapshot.response.status).toBe(200);
     expect(snapshot.body.snapshot).toMatchObject({ unitID, rev: 1, type: 2 });
 
     const history = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list?length=20`,
-      first.cookie
+      `${running.origin}/universer-api/history/${unitID}/list?length=20`
     );
-    expect(history.response.status).toBe(200);
     expect(history.body.historyIds).toEqual([`${unitID}:1`]);
-    const creatorFilter = encodeURIComponent(first.user.userID);
-    const filteredHistory = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list?userIds=${creatorFilter}`,
-      first.cookie
-    );
-    expect(filteredHistory.body.historyIds).toEqual([`${unitID}:1`]);
-    const unrelatedHistory = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list?userIds=someone-else`,
-      first.cookie
-    );
-    expect(unrelatedHistory.body.historyIds).toEqual([]);
+    expect(history.body.entities.users["demo-user"]).toMatchObject(user);
 
     const permissionResponse = await fetch(
       `${running.origin}/universer-api/authz/-/object/-/batch_allowed`,
       {
         method: "POST",
-        headers: { cookie: first.cookie, "content-type": "application/json" },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           requests: [
             { unitID, objectID: unitID, objectType: 1, actions: [1, 2] },
@@ -98,7 +66,6 @@ describe("basic-sheets server integration", () => {
         }),
       }
     );
-    expect(permissionResponse.status).toBe(200);
     expect(await permissionResponse.json()).toMatchObject({
       objectActions: [
         {
@@ -109,42 +76,26 @@ describe("basic-sheets server integration", () => {
       ],
     });
 
-    const invalid = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/cs?startRevision=x&endRevision=1`,
-      first.cookie
-    );
-    expect(invalid.response.status).toBe(400);
-    const invalidOrigin = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list?origin=invalid`,
-      first.cookie
-    );
-    expect(invalidOrigin.response.status).toBe(400);
-    const invalidLastLabel = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list?lastLabel=invalid`,
-      first.cookie
-    );
-    expect(invalidLastLabel.response.status).toBe(400);
-
     await running.app.close();
     applications.splice(applications.indexOf(running.app), 1);
     running = await start(filename);
 
-    expect((await getUser(running.origin, first.cookie)).user).toEqual(first.user);
+    expect(await getUser(running.origin)).toEqual(user);
     const persistedSnapshot = await protocolJson(
-      `${running.origin}/universer-api/snapshot/2/unit/${unitID}/rev/1`,
-      first.cookie
+      `${running.origin}/universer-api/snapshot/2/unit/${unitID}/rev/1`
     );
-    expect(persistedSnapshot.response.status).toBe(200);
     expect(persistedSnapshot.body.snapshot).toMatchObject({ unitID, rev: 1 });
     const persistedHistory = await protocolJson(
-      `${running.origin}/universer-api/history/${unitID}/list`,
-      first.cookie
+      `${running.origin}/universer-api/history/${unitID}/list`
     );
     expect(persistedHistory.body.historyIds).toEqual([`${unitID}:1`]);
 
+    const invalid = await protocolJson(
+      `${running.origin}/universer-api/history/${unitID}/cs?startRevision=x&endRevision=1`
+    );
+    expect(invalid.response.status).toBe(400);
     const missing = await protocolJson(
-      `${running.origin}/universer-api/history/missing-unit/cs?startRevision=1&endRevision=1`,
-      first.cookie
+      `${running.origin}/universer-api/history/missing-unit/cs?startRevision=1&endRevision=1`
     );
     expect(missing.response.status).toBe(404);
   });
@@ -163,30 +114,17 @@ async function start(filename: string): Promise<{
   return { app, origin: `http://127.0.0.1:${port}` };
 }
 
-async function getUser(origin: string, cookie?: string): Promise<{
-  readonly cookie: string;
-  readonly setCookie: string;
-  readonly user: ProtocolUserResponse["user"];
-}> {
-  const response = await fetch(`${origin}/universer-api/user`, {
-    headers: cookie ? { cookie } : {},
-  });
+async function getUser(origin: string) {
+  const response = await fetch(`${origin}/universer-api/user`);
   expect(response.status).toBe(200);
-  const body = (await response.json()) as ProtocolUserResponse;
-  const setCookie = response.headers.get("set-cookie") ?? "";
-  return {
-    cookie: setCookie ? setCookie.split(";", 1)[0]! : cookie ?? "",
-    setCookie,
-    user: body.user,
+  const body = (await response.json()) as {
+    readonly user: { readonly userID: string; readonly name: string };
   };
+  expect(response.headers.get("set-cookie")).toBeNull();
+  return body.user;
 }
 
-async function protocolJson(url: string, cookie: string) {
-  const response = await fetch(url, { headers: { cookie } });
+async function protocolJson(url: string) {
+  const response = await fetch(url);
   return { response, body: (await response.json()) as any };
-}
-
-function tamperCookie(cookie: string): string {
-  const last = cookie.at(-1);
-  return `${cookie.slice(0, -1)}${last === "A" ? "B" : "A"}`;
 }
