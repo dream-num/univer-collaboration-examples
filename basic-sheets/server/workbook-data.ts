@@ -1,4 +1,10 @@
-import { LocaleType, type IWorkbookData } from "@univerjs/core";
+import { createRequire } from "node:module";
+import type { IWorkbookData } from "@univerjs/core";
+
+// 服务端协同 Runtime 使用 SDK 的 CommonJS 入口；这里保持同一入口，避免 tsx
+// 同时初始化 @univerjs/core 的 ESM/CJS 构建并重复注册依赖注入 Identifier。
+const sdkRequire = createRequire(import.meta.url);
+const { LocaleType } = sdkRequire("@univerjs/core") as typeof import("@univerjs/core");
 
 export function createEmptyWorkbookData(
   unitID: string,
