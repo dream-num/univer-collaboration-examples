@@ -60,19 +60,36 @@ export function createCollaborationStack(
     },
   });
   historyService.attach(collabService);
+  collabService.on("changesetCommitted", ({ changeset }) => {
+    const name = committedUnitName(changeset.mutations);
+    if (name) {
+      options.productStore.renameByUnitID(changeset.unitID, name);
+    }
+  });
   const historyEndpoint = new UniverHistoryEndpoint(historyService);
   const transport = createNodeTransport();
 
-  const requireActiveResource = (unitID: string, userId: string) => {
+  const requireReadableResource = (unitID: string, userId: string) => {
     const resource = options.productStore.getByUnitID(unitID);
+    const role = resource
+      ? options.productStore.getAccessRoleByID(resource.id, userId)
+      : null;
     if (
       !resource ||
       resource.status !== "active" ||
-      resource.ownerUserId !== userId
+      !role
     ) {
       throw new CollabError("UNIT_NOT_FOUND", "Unit is unavailable");
     }
-    return resource;
+    return { resource, role };
+  };
+
+  const requireEditableResource = (unitID: string, userId: string) => {
+    const access = requireReadableResource(unitID, userId);
+    if (access.role === "viewer") {
+      throw new CollabError("PERMISSION_DENIED", "Unit is read-only");
+    }
+    return access;
   };
 
   collabService.use("createUnit", async (context, next) => {
@@ -92,18 +109,25 @@ export function createCollaborationStack(
     await next();
   });
   collabService.use("readUnitData", async (context, next) => {
-    requireActiveResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.session.userId);
     await next();
   });
   collabService.use("submitChangeset", async (context, next) => {
-    requireActiveResource(
+    requireEditableResource(
       context.request.changeset.unitID,
       context.session.userId
     );
     await next();
   });
   collabService.use("applyChangeset", async (context, next) => {
-    requireActiveResource(
+    requireEditableResource(
+      context.request.changeset.unitID,
+      context.session.userId
+    );
+    await next();
+  });
+  collabService.use("commitChangeset", async (context, next) => {
+    requireEditableResource(
       context.request.changeset.unitID,
       context.session.userId
     );
@@ -111,15 +135,15 @@ export function createCollaborationStack(
   });
 
   historyService.use("getHistoryList", async (context, next) => {
-    requireActiveResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.session.userId);
     await next();
   });
   historyService.use("listHistoryCreators", async (context, next) => {
-    requireActiveResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.session.userId);
     await next();
   });
   historyService.use("getHistoryChangesets", async (context, next) => {
-    requireActiveResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.session.userId);
     await next();
   });
 
@@ -128,7 +152,7 @@ export function createCollaborationStack(
     await next();
   });
   endpoint.use("joinUnit", async (context, next) => {
-    const resource = requireActiveResource(
+    const { resource } = requireReadableResource(
       context.unitID,
       context.session.userId
     );
@@ -207,4 +231,28 @@ export function createCollaborationStack(
       await collabService.dispose();
     },
   };
+}
+
+const UNIT_RENAME_MUTATIONS = new Set([
+  "sheet.mutation.set-workbook-name",
+  "doc.mutation.rename-doc",
+  "slide.mutation.set-name",
+]);
+
+function committedUnitName(
+  mutations: ReadonlyArray<{ readonly id: string; readonly data: string }>
+): string | null {
+  for (let index = mutations.length - 1; index >= 0; index -= 1) {
+    const mutation = mutations[index]!;
+    if (!UNIT_RENAME_MUTATIONS.has(mutation.id)) continue;
+    try {
+      const data = JSON.parse(mutation.data) as { readonly name?: unknown };
+      if (typeof data.name === "string" && data.name.trim()) {
+        return data.name.trim().slice(0, 120);
+      }
+    } catch {
+      return null;
+    }
+  }
+  return null;
 }

@@ -140,6 +140,27 @@ export class UserStore {
     return row ? toUser(row) : null;
   }
 
+  search(query: string, limit = 10): DemoUser[] {
+    this._assertOpen();
+    const normalized = query.trim();
+    if (!normalized) return [];
+    const safeLimit = Math.max(1, Math.min(20, Math.trunc(limit)));
+    const pattern = `%${escapeLike(normalized)}%`;
+    const rows = this._database
+      .prepare(
+        `SELECT user_id, username, password_hash, name, created_at
+         FROM suite_users
+         WHERE username LIKE ? ESCAPE '\\' COLLATE NOCASE
+            OR name LIKE ? ESCAPE '\\' COLLATE NOCASE
+         ORDER BY
+           CASE WHEN username = ? COLLATE NOCASE THEN 0 ELSE 1 END,
+           username COLLATE NOCASE ASC
+         LIMIT ?`
+      )
+      .all(pattern, pattern, normalized, safeLimit) as unknown as UserRow[];
+    return rows.map(toUser);
+  }
+
   dispose(): void {
     if (this._disposed) return;
     this._disposed = true;
@@ -284,4 +305,8 @@ function toUser(row: UserRow): DemoUser {
     name: row.name,
     createdAt: row.created_at,
   };
+}
+
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, "\\$&");
 }

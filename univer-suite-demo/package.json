@@ -39,6 +39,7 @@
     "@univerjs/preset-sheets-core": "1.0.0-alpha.6",
     "@univerjs/presets": "1.0.0-alpha.6",
     "@univerjs/protocol": "1.0.0-alpha.6",
+    "@univerjs/sheets": "1.0.0-alpha.6",
     "@univerjs/ui": "1.0.0-alpha.6",
     "express": "^5.1.0",
     "react": "^19.0.0",

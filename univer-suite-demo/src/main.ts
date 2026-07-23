@@ -1,8 +1,12 @@
 import { UniverInstanceType } from "@univerjs/core";
 import { PRESET_USERS } from "../shared/preset-users.js";
+import {
+  resolveEditorAccess,
+  type EditorAccessResult,
+} from "./editor-access.js";
 import "./styles.css";
 
-type WorkspaceView = "home" | "recent" | "space" | "trash";
+type WorkspaceView = "home" | "recent" | "space" | "shared" | "trash";
 
 const url = new URL(window.location.href);
 const unitID = url.searchParams.get("unit");
@@ -191,7 +195,21 @@ async function renderEditor(
   editorUnitID: string,
   editorType: UniverInstanceType
 ): Promise<void> {
+  renderEditorLoading();
+  const access = await resolveEditorAccess({
+    resourceID,
+    unitID: editorUnitID,
+    type: editorType,
+  });
+  if (access.status !== "allowed") {
+    renderEditorError(access.status);
+    return;
+  }
+
   const app = requireApp();
+  document.documentElement.dataset.accessRole = access.resource.accessRole;
+  const isOwner = access.resource.accessRole === "owner";
+  const canRename = access.resource.accessRole !== "viewer";
   app.innerHTML = `
     <div class="editor-shell">
       <header class="editor-header">
@@ -200,19 +218,36 @@ async function renderEditor(
           <span>Univer</span>
         </a>
         <span class="editor-divider"></span>
-        <span id="editor-title">正在加载…</span>
-        <span class="editor-status"><i></i> 已连接</span>
+        ${
+          canRename
+            ? `<button id="editor-title" class="editor-title-button" type="button" title="重命名">
+                <span>${escapeHtml(access.resource.name)}</span>${icon("edit")}
+              </button>`
+            : `<span id="editor-title">${escapeHtml(access.resource.name)}</span>`
+        }
+        <span class="editor-status">${accessRoleName(access.resource.accessRole)}</span>
+        ${
+          isOwner
+            ? `<button id="share-button" class="editor-share-button" type="button">
+                ${icon("share")}分享
+              </button>`
+            : `<span class="editor-owner">来自 ${escapeHtml(access.resource.owner.name)}</span>`
+        }
       </header>
       <main id="univer-container"></main>
     </div>
   `;
-  const detail = resourceID
-    ? await api<{ resource: ResourceRecord }>(
-        `/api/units/${encodeURIComponent(resourceID)}`
-      ).catch(() => null)
-    : null;
-  const title = document.querySelector("#editor-title");
-  if (title) title.textContent = detail?.resource.name ?? editorUnitID;
+  document.querySelector("#share-button")?.addEventListener("click", () => {
+    void openShareDialog(access.resource);
+  });
+  document.querySelector("#editor-title")?.addEventListener("click", () => {
+    if (!canRename) return;
+    openRenameDialog(access.resource, (renamed) => {
+      const title = document.querySelector<HTMLElement>("#editor-title span");
+      if (title) title.textContent = renamed.name;
+      document.title = `${renamed.name} · Univer`;
+    });
+  });
 
   switch (editorType) {
     case UniverInstanceType.UNIVER_SHEET:
@@ -224,6 +259,67 @@ async function renderEditor(
     case UniverInstanceType.UNIVER_SLIDE:
       await import("./units/slide.js");
   }
+}
+
+function renderEditorLoading(): void {
+  requireApp().innerHTML = `
+    <div class="editor-route-shell">
+      <header class="editor-header">
+        <a class="editor-brand" href="/">
+          ${logoIcon()}
+          <span>Univer</span>
+        </a>
+      </header>
+      <main class="editor-route-state" aria-live="polite">
+        <span class="editor-route-spinner" aria-hidden="true"></span>
+        <p>正在验证文件访问权限…</p>
+      </main>
+    </div>
+  `;
+}
+
+function renderEditorError(
+  status: Exclude<EditorAccessResult["status"], "allowed">
+): void {
+  const unauthenticated = status === "unauthenticated";
+  const serviceError = status === "service-error";
+  const title = unauthenticated
+    ? "登录状态已失效"
+    : serviceError
+      ? "暂时无法打开文件"
+      : "无法打开此文件";
+  const description = unauthenticated
+    ? "请重新登录后再试。"
+    : serviceError
+      ? "服务暂时不可用，请稍后重试。"
+      : status === "invalid-link"
+        ? "文件链接无效或不完整。"
+        : "文件不存在，或你没有访问权限。";
+
+  requireApp().innerHTML = `
+    <div class="editor-route-shell">
+      <header class="editor-header">
+        <a class="editor-brand" href="/">
+          ${logoIcon()}
+          <span>Univer</span>
+        </a>
+      </header>
+      <main class="editor-route-state editor-route-error">
+        <span class="editor-route-error-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 10V8a5 5 0 0 1 10 0v2"/>
+            <rect x="5" y="10" width="14" height="11" rx="2"/>
+            <path d="M12 14v3"/>
+          </svg>
+        </span>
+        <h1>${title}</h1>
+        <p>${description}</p>
+        <a class="primary-button editor-route-action" href="/">
+          ${unauthenticated ? "重新登录" : "返回首页"}
+        </a>
+      </main>
+    </div>
+  `;
 }
 
 async function renderWorkspace(user: CurrentUser): Promise<void> {
@@ -271,6 +367,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
           ${navButton("home", "首页", "home")}
           ${navButton("recent", "最近使用", "clock")}
           ${navButton("space", "个人空间", "folder")}
+          ${navButton("shared", "与我共享", "share")}
           ${navButton("trash", "回收站", "trash")}
         </nav>
         <div class="sidebar-footer">
@@ -330,6 +427,22 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
   });
 
   async function loadAndRender(): Promise<void> {
+    if (view === "home" || view === "recent") {
+      const result = await api<{ resources: ResourceRecord[] }>(
+        "/api/units?scope=recent"
+      );
+      resources = result.resources;
+      renderCurrentView();
+      return;
+    }
+    if (view === "shared") {
+      const result = await api<{ resources: ResourceRecord[] }>(
+        "/api/units?scope=shared"
+      );
+      resources = result.resources;
+      renderCurrentView();
+      return;
+    }
     const status = view === "trash" ? "deleted" : "active";
     const result = await api<{ resources: ResourceRecord[] }>(
       `/api/units?status=${status}`
@@ -375,6 +488,22 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
         if (event.key === "Enter") item.click();
       });
     });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-rename]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          const resource = resources.find(
+            ({ id }) => id === button.dataset.rename
+          );
+          if (!resource) return;
+          openRenameDialog(resource, (renamed) => {
+            resources = resources.map((item) =>
+              item.id === renamed.id ? renamed : item
+            );
+            renderCurrentView();
+          });
+        });
+      });
     document
       .querySelectorAll<HTMLButtonElement>("[data-delete]")
       .forEach((button) => {
@@ -461,7 +590,7 @@ function homeView(user: CurrentUser, resources: ResourceRecord[]): string {
       resources.length
         ? `<section class="content-section">
             <h2>最近文件</h2>
-            ${resourceTable(resources.slice(0, 5), "active")}
+            ${resourceTable(resources.slice(0, 5), "recent")}
           </section>`
         : ""
     }
@@ -477,7 +606,7 @@ function listView(
     recent: {
       eyebrow: "最近使用",
       title: "最近文件",
-      description: "按照最近活动时间查看你的内容。",
+      description: "按照你的最近打开时间查看内容。",
     },
     space: {
       eyebrow: "个人空间",
@@ -488,6 +617,11 @@ function listView(
       eyebrow: "回收站",
       title: "已删除",
       description: "删除的内容仍保留协同数据，可以随时恢复。",
+    },
+    shared: {
+      eyebrow: "与我共享",
+      title: "共享给我的内容",
+      description: "查看其他用户邀请你协作的 Sheet、Doc 和 Slide。",
     },
   }[view];
   return `
@@ -502,14 +636,35 @@ function listView(
     <section class="content-section list-section">
       ${
         resources.length
-          ? resourceTable(resources, view === "trash" ? "deleted" : "active")
+          ? resourceTable(
+              resources,
+              view === "trash"
+                ? "deleted"
+                : view === "shared"
+                  ? "shared"
+                  : view === "recent"
+                    ? "recent"
+                    : "active"
+            )
           : emptyState(
-              query ? "没有匹配的内容" : view === "trash" ? "回收站为空" : "还没有内容",
+              query
+                ? "没有匹配的内容"
+                : view === "trash"
+                  ? "回收站为空"
+                  : view === "shared"
+                    ? "暂时没有共享内容"
+                    : view === "recent"
+                      ? "最近没有打开内容"
+                    : "还没有内容",
               query
                 ? "试试其他关键词。"
                 : view === "trash"
                   ? "移到回收站的内容会显示在这里。"
-                  : "点击左侧“新建”开始创建。"
+                  : view === "shared"
+                    ? "其他用户分享给你的内容会显示在这里。"
+                    : view === "recent"
+                      ? "打开个人空间或共享给你的内容后，它会显示在这里。"
+                    : "点击左侧“新建”开始创建。"
             )
       }
     </section>
@@ -518,35 +673,79 @@ function listView(
 
 function resourceTable(
   resources: ResourceRecord[],
-  status: "active" | "deleted"
+  mode: "active" | "deleted" | "shared" | "recent"
 ): string {
+  const shared = mode === "shared";
+  const recent = mode === "recent";
   return `
-    <div class="resource-table">
+    <div class="resource-table${shared ? " resource-table-shared" : ""}">
       <div class="resource-table-head">
-        <span>名称</span><span>类型</span><span>最近活动</span><span></span>
+        <span>名称</span><span>${shared ? "所有者" : "类型"}</span><span>${shared ? "权限" : recent ? "最近打开" : "最近活动"}</span><span></span>
       </div>
       ${resources
-        .map(
-          (resource) => `
+        .map((resource) => {
+          const canRename =
+            mode !== "deleted" && resource.accessRole !== "viewer";
+          const canDelete =
+            (mode === "active" || mode === "recent") &&
+            resource.accessRole === "owner";
+          const canRestore =
+            mode === "deleted" && resource.accessRole === "owner";
+          return `
             <div class="resource-row" data-open="${resource.id}" tabindex="0">
               <span class="resource-name">
                 ${unitIcon(resource.type)}
                 <strong>${escapeHtml(resource.name)}</strong>
               </span>
-              <span class="resource-meta">${typeName(resource.type)}</span>
-              <span class="resource-meta">${formatRelativeTime(resource.updatedAt)}</span>
-              <button
-                class="row-action"
-                type="button"
-                data-resource-action
-                data-${status === "active" ? "delete" : "restore"}="${resource.id}"
-                aria-label="${status === "active" ? "移到回收站" : "恢复"}"
-                title="${status === "active" ? "移到回收站" : "恢复"}"
-              >
-                ${icon(status === "active" ? "trash" : "restore")}
-              </button>
-            </div>`
-        )
+              <span class="resource-meta">${shared ? escapeHtml(resource.owner.name) : typeName(resource.type)}</span>
+              <span class="resource-meta">${
+                shared
+                  ? `<i class="access-badge access-${resource.accessRole}">${accessRoleName(resource.accessRole)}</i>`
+                  : formatRelativeTime(
+                      recent ? activityTime(resource) : resource.updatedAt
+                    )
+              }</span>
+              <span class="row-actions">
+                ${
+                  canRename
+                    ? `<button
+                        class="row-action"
+                        type="button"
+                        data-resource-action
+                        data-rename="${resource.id}"
+                        aria-label="重命名"
+                        title="重命名"
+                      >${icon("edit")}</button>`
+                    : ""
+                }
+                ${
+                  canDelete
+                    ? `<button
+                        class="row-action"
+                        type="button"
+                        data-resource-action
+                        data-delete="${resource.id}"
+                        aria-label="移到回收站"
+                        title="移到回收站"
+                      >
+                        ${icon("trash")}
+                      </button>`
+                    : canRestore
+                      ? `<button
+                          class="row-action"
+                          type="button"
+                          data-resource-action
+                          data-restore="${resource.id}"
+                          aria-label="恢复"
+                          title="恢复"
+                        >
+                          ${icon("restore")}
+                        </button>`
+                      : ""
+                }
+              </span>
+            </div>`;
+        })
         .join("")}
     </div>
   `;
@@ -560,7 +759,7 @@ function recommendationCard(resource: ResourceRecord): string {
       </div>
       <div class="recommend-copy">
         <strong>${escapeHtml(resource.name)}</strong>
-        <span>${formatRelativeTime(resource.updatedAt)}打开</span>
+        <span>${formatRelativeTime(activityTime(resource))}打开</span>
         <small>${typeName(resource.type)}</small>
       </div>
     </article>
@@ -619,6 +818,314 @@ function openResource(resource: ResourceRecord): void {
   window.location.href = next.toString();
 }
 
+function openRenameDialog(
+  resource: { readonly id: string; readonly name: string },
+  onRenamed: (resource: ResourceRecord) => void
+): void {
+  document.querySelector(".rename-dialog-backdrop")?.remove();
+  const backdrop = document.createElement("div");
+  backdrop.className = "share-dialog-backdrop rename-dialog-backdrop";
+  backdrop.innerHTML = `
+    <form class="rename-dialog" role="dialog" aria-modal="true" aria-labelledby="rename-title">
+      <header>
+        <div>
+          <p>文件名称</p>
+          <h2 id="rename-title">重命名</h2>
+        </div>
+        <button class="share-dialog-close" type="button" aria-label="关闭">${icon("close")}</button>
+      </header>
+      <label>
+        <span>名称</span>
+        <input name="name" value="${escapeHtml(resource.name)}" maxlength="120" required />
+      </label>
+      <p class="form-error rename-error" role="alert" hidden></p>
+      <footer>
+        <button class="rename-cancel-button" type="button">取消</button>
+        <button class="primary-button rename-submit-button" type="submit">保存</button>
+      </footer>
+    </form>
+  `;
+  document.body.append(backdrop);
+
+  const input = backdrop.querySelector<HTMLInputElement>("input[name=name]")!;
+  const form = backdrop.querySelector<HTMLFormElement>(".rename-dialog")!;
+  const error = backdrop.querySelector<HTMLElement>(".rename-error");
+  function close(): void {
+    document.removeEventListener("keydown", onKeydown);
+    backdrop.remove();
+  }
+  function onKeydown(event: KeyboardEvent): void {
+    if (event.key === "Escape") close();
+  }
+  document.addEventListener("keydown", onKeydown);
+  backdrop
+    .querySelector(".share-dialog-close")
+    ?.addEventListener("click", close);
+  backdrop
+    .querySelector(".rename-cancel-button")
+    ?.addEventListener("click", close);
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) close();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = input.value.trim();
+    if (!name || name === resource.name) {
+      if (!name) showInlineError(error, "名称不能为空");
+      else close();
+      return;
+    }
+    const submit = form.querySelector<HTMLButtonElement>("[type=submit]");
+    if (submit) submit.disabled = true;
+    input.disabled = true;
+    try {
+      const result = await api<{ resource: ResourceRecord }>(
+        `/api/units/${encodeURIComponent(resource.id)}`,
+        {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name }),
+        }
+      );
+      close();
+      onRenamed(result.resource);
+      showToast("名称已更新");
+    } catch (caught) {
+      showInlineError(
+        error,
+        caught instanceof Error ? caught.message : String(caught)
+      );
+      input.disabled = false;
+      if (submit) submit.disabled = false;
+      input.focus();
+    }
+  });
+  input.focus();
+  input.select();
+}
+
+async function openShareDialog(resource: {
+  readonly id: string;
+  readonly name: string;
+}): Promise<void> {
+  document.querySelector(".share-dialog-backdrop")?.remove();
+  const backdrop = document.createElement("div");
+  backdrop.className = "share-dialog-backdrop";
+  backdrop.innerHTML = `
+    <section class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <header class="share-dialog-header">
+        <div>
+          <p>共享</p>
+          <h2 id="share-title">${escapeHtml(resource.name)}</h2>
+        </div>
+        <button class="share-dialog-close" type="button" aria-label="关闭">${icon("close")}</button>
+      </header>
+      <div class="share-dialog-body">
+        <label class="share-search">
+          ${icon("search")}
+          <input type="search" placeholder="输入姓名或用户名" aria-label="搜索用户" autocomplete="off" />
+        </label>
+        <div class="share-search-results" hidden></div>
+        <p class="share-section-title">有访问权限的用户</p>
+        <div class="share-member-list" aria-live="polite">
+          <div class="share-loading"><span class="editor-route-spinner"></span>正在加载…</div>
+        </div>
+      </div>
+      <footer class="share-dialog-footer">
+        <p>${icon("lock")}仅受邀用户可以通过链接访问</p>
+        <button class="share-copy-button" type="button">${icon("link")}复制链接</button>
+      </footer>
+    </section>
+  `;
+  document.body.append(backdrop);
+
+  function close(): void {
+    document.removeEventListener("keydown", onKeydown);
+    backdrop.remove();
+  }
+  backdrop
+    .querySelector(".share-dialog-close")
+    ?.addEventListener("click", close);
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) close();
+  });
+  function onKeydown(event: KeyboardEvent): void {
+    if (event.key === "Escape") {
+      close();
+    }
+  }
+  document.addEventListener("keydown", onKeydown);
+
+  const memberList =
+    backdrop.querySelector<HTMLElement>(".share-member-list")!;
+  const resultList =
+    backdrop.querySelector<HTMLElement>(".share-search-results")!;
+  const search = backdrop.querySelector<HTMLInputElement>(".share-search input")!;
+  let members: ShareMember[] = [];
+  let searchSequence = 0;
+
+  const renderMembers = () => {
+    memberList.innerHTML = members
+      .map(
+        ({ user, role }) => `
+          <div class="share-member">
+            <span class="share-avatar">${escapeHtml(initials(user.name))}</span>
+            <span class="share-member-copy">
+              <strong>${escapeHtml(user.name)}</strong>
+              <small>@${escapeHtml(user.username)}</small>
+            </span>
+            ${
+              role === "owner"
+                ? `<span class="share-owner-role">所有者</span>`
+                : `<select data-member-role="${escapeHtml(user.userId)}" aria-label="${escapeHtml(user.name)}的权限">
+                    <option value="editor"${role === "editor" ? " selected" : ""}>可编辑</option>
+                    <option value="viewer"${role === "viewer" ? " selected" : ""}>仅查看</option>
+                  </select>
+                  <button class="share-remove-button" data-remove-member="${escapeHtml(user.userId)}" type="button" aria-label="移除 ${escapeHtml(user.name)}">${icon("close")}</button>`
+            }
+          </div>`
+      )
+      .join("");
+
+    memberList
+      .querySelectorAll<HTMLSelectElement>("[data-member-role]")
+      .forEach((select) => {
+        select.addEventListener("change", async () => {
+          select.disabled = true;
+          try {
+            const result = await api<{ member: ShareMember }>(
+              `/api/units/${encodeURIComponent(resource.id)}/members/${encodeURIComponent(select.dataset.memberRole!)}`,
+              {
+                method: "PATCH",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ role: select.value }),
+              }
+            );
+            members = members.map((member) =>
+              member.user.userId === result.member.user.userId
+                ? result.member
+                : member
+            );
+            renderMembers();
+            showToast("权限已更新");
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            renderMembers();
+          }
+        });
+      });
+    memberList
+      .querySelectorAll<HTMLButtonElement>("[data-remove-member]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await api(
+              `/api/units/${encodeURIComponent(resource.id)}/members/${encodeURIComponent(button.dataset.removeMember!)}`,
+              { method: "DELETE" }
+            );
+            members = members.filter(
+              ({ user }) => user.userId !== button.dataset.removeMember
+            );
+            renderMembers();
+            showToast("已移除访问权限");
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            button.disabled = false;
+          }
+        });
+      });
+  };
+
+  const renderSearchResults = (users: CurrentUser[]) => {
+    const memberIDs = new Set(members.map(({ user }) => user.userId));
+    const available = users.filter(({ userId }) => !memberIDs.has(userId));
+    resultList.hidden = false;
+    resultList.innerHTML = available.length
+      ? available
+          .map(
+            (user) => `
+              <button type="button" data-add-member="${escapeHtml(user.userId)}">
+                <span class="share-avatar">${escapeHtml(initials(user.name))}</span>
+                <span><strong>${escapeHtml(user.name)}</strong><small>@${escapeHtml(user.username)}</small></span>
+                <i>添加</i>
+              </button>`
+          )
+          .join("")
+      : `<p>没有可添加的用户</p>`;
+    resultList
+      .querySelectorAll<HTMLButtonElement>("[data-add-member]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            const result = await api<{ member: ShareMember }>(
+              `/api/units/${encodeURIComponent(resource.id)}/members`,
+              {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                  userId: button.dataset.addMember,
+                  role: "editor",
+                }),
+              }
+            );
+            members = [...members, result.member];
+            renderMembers();
+            search.value = "";
+            resultList.hidden = true;
+            showToast(`已邀请 ${result.member.user.name}`);
+          } catch (caught) {
+            showToast(caught instanceof Error ? caught.message : String(caught));
+            button.disabled = false;
+          }
+        });
+      });
+  };
+
+  search.addEventListener("input", async () => {
+    const query = search.value.trim();
+    const sequence = ++searchSequence;
+    if (!query) {
+      resultList.hidden = true;
+      return;
+    }
+    try {
+      const result = await api<{ users: CurrentUser[] }>(
+        `/api/users?query=${encodeURIComponent(query)}`
+      );
+      if (sequence === searchSequence) renderSearchResults(result.users);
+    } catch (caught) {
+      if (sequence === searchSequence) {
+        resultList.hidden = false;
+        resultList.innerHTML = `<p>${escapeHtml(caught instanceof Error ? caught.message : String(caught))}</p>`;
+      }
+    }
+  });
+
+  backdrop
+    .querySelector(".share-copy-button")
+    ?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("链接已复制，仅受邀用户可访问");
+      } catch {
+        showToast("复制失败，请从地址栏复制链接");
+      }
+    });
+
+  try {
+    const result = await api<{ members: ShareMember[] }>(
+      `/api/units/${encodeURIComponent(resource.id)}/members`
+    );
+    members = result.members;
+    renderMembers();
+    search.focus();
+  } catch (caught) {
+    memberList.innerHTML = `<p class="share-load-error">${escapeHtml(caught instanceof Error ? caught.message : String(caught))}</p>`;
+  }
+}
+
 async function getCurrentUser(): Promise<CurrentUser | null> {
   const response = await fetch("/api/auth/me", { credentials: "include" });
   if (response.status === 401) return null;
@@ -669,9 +1176,15 @@ function showToast(message: string): void {
   window.setTimeout(() => toast.remove(), 3600);
 }
 
+function accessRoleName(role: AccessRole): string {
+  if (role === "owner") return "所有者";
+  if (role === "editor") return "可编辑";
+  return "仅查看";
+}
+
 function viewFromHash(): WorkspaceView {
   const candidate = window.location.hash.slice(1);
-  return ["home", "recent", "space", "trash"].includes(candidate)
+  return ["home", "recent", "space", "shared", "trash"].includes(candidate)
     ? (candidate as WorkspaceView)
     : "home";
 }
@@ -751,14 +1264,19 @@ type IconName =
   | "arrow"
   | "chevron"
   | "clock"
+  | "close"
+  | "edit"
   | "file"
   | "folder"
   | "help"
   | "home"
   | "logout"
+  | "link"
+  | "lock"
   | "plus"
   | "restore"
   | "search"
+  | "share"
   | "sparkles"
   | "trash";
 
@@ -767,14 +1285,19 @@ function icon(name: IconName): string {
     arrow: '<path d="M5 12h14M14 7l5 5-5 5"/>',
     chevron: '<path d="m8 10 4 4 4-4"/>',
     clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
+    close: '<path d="m7 7 10 10M17 7 7 17"/>',
+    edit: '<path d="m14 5 5 5M4 20l3.5-.8L19 7.7a1.8 1.8 0 0 0 0-2.5l-.2-.2a1.8 1.8 0 0 0-2.5 0L4.8 16.5z"/>',
     file: '<path d="M7 3h7l4 4v14H7zM14 3v5h5M10 13h5M10 17h5"/>',
     folder: '<path d="M3 6h7l2 2h9v11H3z"/>',
     help: '<circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 1 1 3 2.3c-.8.3-.8.9-.8 1.7M12 17h.01"/>',
     home: '<path d="m4 10 8-6 8 6v10h-6v-6h-4v6H4z"/>',
     logout: '<path d="M10 5H5v14h5M14 8l4 4-4 4M9 12h9"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l2.3-2.3A4 4 0 0 0 12.3 6L11 7.3M14 10a4 4 0 0 0-5.7 0L6 12.3A4 4 0 0 0 11.7 18l1.3-1.3"/>',
+    lock: '<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V8a4 4 0 0 1 8 0v2"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
     restore: '<path d="M4 8v5h5M5 13a7 7 0 1 0 2-7"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/>',
+    share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/>',
     sparkles: '<path d="m12 3 1.4 4.1L17 9l-3.6 1.9L12 15l-1.4-4.1L7 9l3.6-1.9zM18.5 15l.8 2.2 1.7.8-1.7.8-.8 2.2-.8-2.2L16 18l1.7-.8z"/>',
     trash: '<path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>',
   };
@@ -814,4 +1337,18 @@ interface ResourceRecord {
   readonly name: string;
   readonly status: string;
   readonly updatedAt: number;
+  readonly lastOpenedAt?: number;
+  readonly accessRole: AccessRole;
+  readonly owner: CurrentUser;
+}
+
+function activityTime(resource: ResourceRecord): number {
+  return resource.lastOpenedAt ?? resource.updatedAt;
+}
+
+type AccessRole = "owner" | "editor" | "viewer";
+
+interface ShareMember {
+  readonly user: CurrentUser;
+  readonly role: AccessRole;
 }

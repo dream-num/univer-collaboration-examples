@@ -1,5 +1,4 @@
 import {
-  IAuthzIoService,
   IUndoRedoService,
   LocaleType,
   LogLevel,
@@ -16,6 +15,7 @@ import { UniverUIPlugin } from "@univerjs/ui";
 import {
   loadCurrentUser,
   registerRawCollaboration,
+  syncEditorTitle,
 } from "../collaboration.js";
 
 import "@univerjs/ui/lib/index.css";
@@ -27,7 +27,6 @@ const univer = new Univer({
   locales: {},
   logLevel: LogLevel.WARN,
   override: [
-    [IAuthzIoService, null],
     [IUndoRedoService, null],
   ],
 });
@@ -46,4 +45,8 @@ univer.registerPlugin(UniverSlidesPlugin);
 univer.registerPlugin(UniverSlidesUIPlugin);
 univer.registerPlugin(UniverNetworkPlugin);
 registerRawCollaboration(univer);
+syncEditorTitle(
+  univer,
+  new URL(window.location.href).searchParams.get("unit")
+);
 void loadCurrentUser(univer);

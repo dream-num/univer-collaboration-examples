@@ -62,11 +62,12 @@ export async function createSuiteApplication(
       collabService: collaboration.collabService,
       productStore,
       authService,
+      userStore,
     })
   );
   app.use(
     "/universer-api",
-    createProtocolCompatibilityRouter(authService)
+    createProtocolCompatibilityRouter({ authService, productStore })
   );
   app.use("/universer-api", collaboration.handleHttp);
 

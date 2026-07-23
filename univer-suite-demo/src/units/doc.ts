@@ -13,6 +13,7 @@ import {
 import {
   collaborationPlugins,
   loadCurrentUser,
+  syncEditorTitle,
 } from "../collaboration.js";
 
 import "@univerjs/preset-docs-core/lib/index.css";
@@ -35,4 +36,8 @@ const { univer } = createUniver({
   ],
 });
 
+syncEditorTitle(
+  univer,
+  new URL(window.location.href).searchParams.get("unit")
+);
 void loadCurrentUser(univer);

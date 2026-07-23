@@ -12,6 +12,8 @@ import {
 } from "@univerjs-pro/collaboration-client-ui";
 import { UniverEditHistoryLoaderPlugin } from "@univerjs-pro/edit-history-loader";
 import {
+  IUniverInstanceService,
+  type UnitModel,
   Univer,
   UserManagerService,
 } from "@univerjs/core";
@@ -80,4 +82,31 @@ export async function loadCurrentUser(univer: Univer): Promise<void> {
   if (response.body.user) {
     injector.get(UserManagerService).setCurrentUser(response.body.user);
   }
+}
+
+export function syncEditorTitle(univer: Univer, unitID: string | null): void {
+  if (!unitID) return;
+  const instanceService = univer.__getInjector().get(IUniverInstanceService);
+  let nameSubscription: { unsubscribe(): void } | undefined;
+  const updateTitle = (name: string) => {
+    const title = document.querySelector<HTMLElement>("#editor-title");
+    const label = title?.querySelector<HTMLElement>("span") ?? title;
+    if (label) label.textContent = name;
+    document.title = `${name} · Univer`;
+  };
+  const bind = (unit: UnitModel) => {
+    nameSubscription?.unsubscribe();
+    nameSubscription = unit.name$.subscribe(updateTitle);
+  };
+  const existing = instanceService.getUnit(unitID);
+  if (existing) bind(existing);
+  const unitAddedSubscription = instanceService.unitAdded$.subscribe(
+    ({ unit }) => {
+      if (unit.getUnitId() === unitID) bind(unit);
+    }
+  );
+  univer.onDispose(() => {
+    unitAddedSubscription.unsubscribe();
+    nameSubscription?.unsubscribe();
+  });
 }
