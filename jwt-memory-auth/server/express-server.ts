@@ -13,7 +13,7 @@ import { createCollabService } from "./collaboration.js";
 import { MemoryDocumentAccessStore, MemoryUserStore } from "./memory-stores.js";
 import type { AuthenticatedUser, DocumentRole } from "./model.js";
 import { canAdmin } from "./model.js";
-import { createEmptyWorkbook } from "./sheet-snapshot.js";
+import { createEmptyWorkbookData } from "./workbook-data.js";
 
 const DEMO_USERS = [
   { userId: "user-alice", username: "alice", password: "alice-password" },
@@ -166,11 +166,14 @@ export async function createDemoApplication(
         : "Collaborative Sheet";
     access.grant(user.userId, unitID, "admin");
     try {
-      const initial = await createEmptyWorkbook(unitID, name);
-      await collabService.createUnit(initial, {
-        session: applicationSession(user),
-        customData: { traceId: randomUUID() },
-      });
+      const data = createEmptyWorkbookData(unitID, name);
+      await collabService.createUnitFromData(
+        { type: UniverType.UNIVER_SHEET, data },
+        {
+          session: applicationSession(user),
+          customData: { traceId: randomUUID() },
+        }
+      );
       response.status(201).json({
         unitID,
         type: UniverType.UNIVER_SHEET,

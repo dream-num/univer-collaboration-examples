@@ -20,7 +20,7 @@ import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { DEMO_USER, protocolUser } from "./demo-user.js";
 import { createHistoryHttpMiddleware } from "./history-http.js";
 import { HistoryStore } from "./history-store.js";
-import { createEmptyWorkbook } from "./sheet-snapshot.js";
+import { createEmptyWorkbookData } from "./workbook-data.js";
 
 const OK_ERROR = { code: ErrorCode.OK, message: "" };
 
@@ -209,11 +209,14 @@ function createDemoProtocolMiddleware(
           ? body.name.trim().slice(0, 120)
           : "Collaborative Sheet";
       const unitID = randomUUID();
-      const initial = await createEmptyWorkbook(unitID, name);
-      await service.createUnit(initial, {
-        session: callerSession(),
-        customData: context.customData,
-      });
+      const data = createEmptyWorkbookData(unitID, name);
+      await service.createUnitFromData(
+        { type: UniverType.UNIVER_SHEET, data },
+        {
+          session: callerSession(),
+          customData: context.customData,
+        }
+      );
       store.recordInitialHistory(unitID, DEMO_USER.userId);
       writeJson(context, 201, { unitID, type: UniverType.UNIVER_SHEET });
       return;
