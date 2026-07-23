@@ -3,9 +3,9 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": true,
+    "verbatimModuleSyntax": true,
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
     "types": ["vite/client"]
   },
   "include": ["client/**/*.ts", "vite.config.ts"]

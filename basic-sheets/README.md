@@ -95,14 +95,14 @@ context.userId = "demo-user";
 Presence、ACK 和广播。
 
 该硬编码方式只能用于本地演示。真实用户、认证与 ACL 集成见
-[JWT + Memory ACL](../jwt-memory-auth/README.md)。
+[Basic Sheets Auth](../basic-sheets-auth/README.md)。
 
 ## 相对上游 Sheets example 的差异
 
-前端目录采用：
+前端与服务端目录对称，客户端采用：
 
 ```text
-src/
+client/
 ├── global.css
 └── sheets/
     ├── consts.ts

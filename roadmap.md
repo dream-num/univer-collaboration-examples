@@ -5,12 +5,13 @@
 `univer-collaboration` 完成框架设计和实现后，提供三个相互独立、可直接运行的全栈示例：
 
 1. `basic-sheets`：证明现有 Univer 协同前端可以用极少改动切换到新后端。
-2. `basic-auth-demo`：展示业务用户、Bearer JWT、WebSocket session ticket 和文档 ACL 的接入方式。
+2. `basic-sheets-auth`：展示业务用户、JWT Cookie、WebSocket session ticket 和文档 ACL 的接入方式。
 3. `univer-suite-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
 
 三个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、启动和修改该示例。
 
-本文记录已经确认的需求与实施顺序。阶段 0 和 `basic-sheets` 已完成；
+本文记录已经确认的需求与实施顺序。阶段 0、`basic-sheets` 和
+`basic-sheets-auth` 已完成；
 `univer-suite-demo` 已有 Sheet、Doc、Slide、个人与团队目录、空间 RBAC 和个人文档
 定向分享 spike；公开链接等其余产品化能力不描述为已实现能力。
 
@@ -23,11 +24,9 @@ examples/
 ├── README.md
 ├── roadmap.md
 ├── basic-sheets/
-├── basic-auth-demo/
+├── basic-sheets-auth/
 └── univer-suite-demo/
 ```
-
-当前 `jwt-memory-auth` 设计草案后续并入 `basic-auth-demo`，不同时保留两个定位重叠的认证示例。
 
 ### 2.2 独立性
 
@@ -384,12 +383,15 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 跑通创建、加载、实时编辑、重连、持久化和历史恢复。
 - 完成与上游 example 的差异清单。
 
-### 阶段 3：`basic-auth-demo`
+### 阶段 3：`basic-sheets-auth`
 
-- 实现 SQLite 用户、密码哈希、JWT、session ticket 和文档角色。
-- 实现四个页面及 demo-only 权限配置接口。
-- 覆盖权限撤销、viewer 绕过尝试、token 过期和 ticket 重放测试。
-- 用可运行示例替换当前 `jwt-memory-auth` 草案。
+状态：已完成。实现与启动方式见
+[`basic-sheets-auth/README.md`](./basic-sheets-auth/README.md)。
+
+- 在 `basic-sheets` 客户端和服务端结构上增加认证，不另建一套协同集成。
+- 实现 SQLite 用户、密码哈希、JWT Cookie、session ticket 和文档角色。
+- 实现登录、成员授权与 owner/editor/viewer 服务端权限。
+- 覆盖未认证请求、viewer 绕过尝试以及用户、ACL、Unit 和 History 重启持久化。
 
 ### 阶段 4：`univer-suite-demo` 文件空间
 

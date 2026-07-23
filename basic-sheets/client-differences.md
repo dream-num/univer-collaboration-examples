@@ -156,7 +156,7 @@ authz = allowed
 待确认：
 
 - [ ] Basic Sheets 是否始终保持固定用户的最小定位。
-- [ ] 真实认证和 ACL 是否只由 `jwt-memory-auth` 及后续产品 example 演示。
+- [x] 真实认证和 ACL 由 `basic-sheets-auth` 及后续产品 example 演示。
 - [ ] 如果 Basic Sheets 引入认证，再对齐 401/OIDC 客户端流程。
 
 ### 8. 创建 Unit

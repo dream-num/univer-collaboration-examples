@@ -1,0 +1,279 @@
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+:root {
+  color: #1f2329;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.login-shell {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 18% 14%, rgb(81 112 255 / 12%), transparent 32%),
+    #f5f6f8;
+}
+
+.login-card {
+  width: min(420px, calc(100vw - 32px));
+  padding: 32px;
+  border: 1px solid #e5e6eb;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgb(31 35 41 / 10%);
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: #465cff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.brand p {
+  margin: 3px 0 0;
+  color: #646a73;
+  font-size: 13px;
+}
+
+.preset-users {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.preset-users button {
+  padding: 11px;
+  border: 1px solid #d9dce3;
+  border-radius: 8px;
+  color: #1f2329;
+  background: #fff;
+}
+
+.preset-users button:hover {
+  border-color: #465cff;
+  color: #3145dc;
+}
+
+.divider {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 0;
+  color: #8f959e;
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  height: 1px;
+  flex: 1;
+  background: #e5e6eb;
+  content: "";
+}
+
+#login-form {
+  display: grid;
+  gap: 12px;
+}
+
+#login-form label {
+  display: grid;
+  gap: 6px;
+  color: #4e5969;
+  font-size: 13px;
+}
+
+#login-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9dce3;
+  border-radius: 8px;
+  outline: none;
+}
+
+#login-form input:focus {
+  border-color: #465cff;
+  box-shadow: 0 0 0 3px rgb(70 92 255 / 10%);
+}
+
+.primary {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  background: #465cff;
+}
+
+.error {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: #d92d20;
+  font-size: 13px;
+}
+
+.session-bar {
+  position: fixed;
+  z-index: 15;
+  top: 10px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px 6px 12px;
+  border: 1px solid #e5e6eb;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 6px 20px rgb(31 35 41 / 10%);
+  font-size: 13px;
+}
+
+.session-bar button {
+  padding: 6px 10px;
+  border: 1px solid #d9dce3;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.session-bar .role {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #3145dc;
+  background: #eef0ff;
+  font-size: 12px;
+}
+
+dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: 0;
+  border: 1px solid #e5e6eb;
+  border-radius: 14px;
+  box-shadow: 0 18px 56px rgb(31 35 41 / 20%);
+}
+
+dialog::backdrop {
+  background: rgb(31 35 41 / 32%);
+}
+
+.dialog-header,
+.dialog-body,
+.dialog-footer {
+  padding: 18px 20px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.dialog-header h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+}
+
+.dialog-header button,
+.dialog-footer button {
+  padding: 7px 11px;
+  border: 1px solid #d9dce3;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.grant-row {
+  display: grid;
+  grid-template-columns: 1fr 120px auto;
+  gap: 8px;
+}
+
+.grant-row select,
+.grant-row button {
+  padding: 8px 10px;
+  border: 1px solid #d9dce3;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.member-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+}
+
+.member span:first-child {
+  flex: 1;
+}
+
+.member small {
+  color: #8f959e;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #edf0f3;
+}
+
+.page-error {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background: #f5f6f8;
+  color: #d92d20;
+  text-align: center;
+}
