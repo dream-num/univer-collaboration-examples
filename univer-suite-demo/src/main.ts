@@ -465,7 +465,11 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       ?.addEventListener("click", () => {
         if (newMenu) newMenu.hidden = true;
         const target = createTarget();
-        openCreateFolderDialog(target, () => void loadAndRender());
+        openCreateFolderDialog(target, (folder) => {
+          window.location.hash = `space/${encodeURIComponent(
+            target.spaceID
+          )}/${encodeURIComponent(folder.id)}`;
+        });
       });
     document
       .querySelector("#create-team-button")
@@ -735,12 +739,29 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
   }
 
   renderShell();
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (!target.closest(".new-area")) {
+      const newMenu = document.querySelector<HTMLElement>("#new-menu");
+      if (newMenu) newMenu.hidden = true;
+    }
+    if (!target.closest(".account")) {
+      const accountMenu =
+        document.querySelector<HTMLElement>(".account-menu");
+      if (accountMenu) accountMenu.hidden = true;
+    }
+  });
   window.addEventListener("keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
       event.preventDefault();
       document
         .querySelector<HTMLInputElement>(".global-search input")
         ?.focus();
+    }
+    if (event.key === "Escape") {
+      const newMenu = document.querySelector<HTMLElement>("#new-menu");
+      if (newMenu) newMenu.hidden = true;
     }
   });
   window.addEventListener("hashchange", () => void loadAndRender());
@@ -1191,7 +1212,7 @@ function openCreateTeamDialog(
 
 function openCreateFolderDialog(
   target: CreateTarget,
-  onCreated: () => void
+  onCreated: (folder: { readonly id: string }) => void
 ): void {
   openTextDialog({
     eyebrow: "目录",
@@ -1200,12 +1221,15 @@ function openCreateFolderDialog(
     placeholder: "未命名文件夹",
     submitLabel: "创建",
     async submit(name) {
-      await api(`/api/spaces/${encodeURIComponent(target.spaceID)}/folders`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name, parentID: target.parentID }),
-      });
-      onCreated();
+      const result = await api<{ folder: { readonly id: string } }>(
+        `/api/spaces/${encodeURIComponent(target.spaceID)}/folders`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name, parentID: target.parentID }),
+        }
+      );
+      onCreated(result.folder);
       showToast("文件夹已创建");
     },
   });
