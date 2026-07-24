@@ -2,16 +2,18 @@
 
 ## 1. 目标
 
-`univer-collaboration` 完成框架设计和实现后，提供三个相互独立、可直接运行的全栈示例：
+`univer-collaboration` 提供四个相互独立、可直接运行的全栈示例：
 
 1. `basic-sheets`：证明现有 Univer 协同前端可以用极少改动切换到新后端。
 2. `basic-sheets-auth`：展示业务用户、JWT Cookie、WebSocket session ticket 和文档 ACL 的接入方式。
-3. `univer-suite-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
+3. `basic-sheets-worktree`：展示 Worktree-local Sheet 的 draft、ready 和 merge。
+4. `univer-suite-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
 
-三个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、启动和修改该示例。
+四个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、
+启动和修改该示例。
 
 本文记录已经确认的需求与实施顺序。阶段 0、`basic-sheets` 和
-`basic-sheets-auth` 已完成；
+`basic-sheets-auth`、`basic-sheets-worktree` 已完成；
 `univer-suite-demo` 已有 Sheet、Doc、Slide、个人与团队目录、空间 RBAC 和个人文档
 定向分享 spike；公开链接等其余产品化能力不描述为已实现能力。
 
@@ -25,19 +27,20 @@ examples/
 ├── roadmap.md
 ├── basic-sheets/
 ├── basic-sheets-auth/
+├── basic-sheets-worktree/
 └── univer-suite-demo/
 ```
 
 ### 2.2 独立性
 
 - 每个示例拥有自己的前端、后端、SQLite schema、seed、测试、启动命令和 README。
-- 三个示例不共享业务代码；可以复用仓库级 TypeScript、lint 和构建配置。
+- 四个示例不共享业务代码；可以复用仓库级 TypeScript、lint 和构建配置。
 - 每个示例都应支持一条命令启动，并提供独立的数据库初始化和重置命令。
 - 示例数据存放在各自的 `.data/` 目录，不提交运行时数据库文件。
 
 ### 2.3 数据与正确性
 
-- 三个示例全部使用 SQLite Database Adapter，不使用内存数据库。
+- 四个示例全部使用 SQLite Database Adapter，不使用内存数据库。
 - 页面刷新和服务重启后，文档、changeset、revision、权限和业务元数据仍然存在。
 - `userId` 是稳定业务主键，也是 confirmed changeset 的作者；`username` 只用于登录和展示。
 - `memberId` 由 UniverCollabEndpoint 为 Session 生成，不能由前端作为可信身份提供。
@@ -196,9 +199,36 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 5. JWT 过期后，HTTP 和 WebSocket 重连都不能绕过认证。
 6. session ticket 不能重复使用，也不能替代 JWT 调用普通 HTTP API。
 
-## 5. `univer-suite-demo`
+## 5. `basic-sheets-worktree`
 
 ### 5.1 定位
+
+使用与 `basic-sheets` 相同的现有 Univer Pro Collaboration Client，展示 Worktree
+scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
+
+### 5.2 页面与流程
+
+- 首次打开自动创建空 Worktree 和一个 Worktree-local Sheet。
+- URL 明确携带 `worktree`、`unit` 和 `type`。
+- Sheet 在 `draft` 状态实时编辑，状态栏提供 ready、reopen、merge 和 discard。
+- merge 完成后展示每个 Unit 的稳定结果与 trunk revision。
+- SQLite 同时持久化 trunk Unit 与 Worktree aggregate、seed、draft changeset 和
+  merge artifact。
+
+### 5.3 验收
+
+1. 浏览器真实加载 Worktree scoped snapshot 并建立 Comb WebSocket。
+2. Sheet 编辑通过 scoped HTTP submit，收到 ACK，draft revision 增长。
+3. `draft → ready → merging → merged` 后，trunk 创建 revision 1 Unit。
+4. 服务重启后 Worktree 状态和 trunk 内容仍可读取。
+5. 自动化集成测试与手动浏览器流程均通过。
+
+状态：已完成。实现与启动方式见
+[`basic-sheets-worktree/README.md`](./basic-sheets-worktree/README.md)。
+
+## 6. `univer-suite-demo`
+
+### 6.1 定位
 
 提供一个真实可运行的多类型协作办公套件参考应用，产品形态接近 Google Drive、Google Docs 和飞书文档，但只展示已经完整实现的能力。
 
@@ -212,7 +242,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 
 `UNIVER_PROJECT` 不作为“新建文档”类型；项目与层级由应用自己的空间和资源树表达。
 
-### 5.2 空间与资源模型
+### 6.2 空间与资源模型
 
 ```text
 用户
@@ -229,7 +259,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 快捷方式只存在于个人空间，引用一个已分享给当前用户的个人文档。
 - 快捷方式不复制 Unit、不改变所有者，也不产生访问权限。
 
-### 5.3 权限模型
+### 6.3 权限模型
 
 #### 个人空间
 
@@ -254,7 +284,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 跨个人空间和共享工作空间移动会改变资源归属和权限。
 - 跨空间移动前必须展示权限变化，确认后在一个事务中完成树节点、归属和授权迁移。
 
-### 5.4 主要页面
+### 6.4 主要页面
 
 #### 登录与注册
 
@@ -290,7 +320,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 支持恢复到原位置；原父目录不存在时恢复到空间根目录。
 - 永久删除必须二次确认，并清理业务元数据和对应协同数据。
 
-### 5.5 协作能力
+### 6.5 协作能力
 
 - 多人实时编辑。
 - 在线成员和 presence。
@@ -301,7 +331,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 页面刷新和服务重启后的持久化恢复。
 - 所有五种 Unit 类型使用同一套 Session、Request、middleware、revision 和 Database Adapter 契约。
 
-### 5.6 版本历史
+### 6.6 版本历史
 
 - 复用 Univer 现有 edit history UI，不重新实现历史面板。
 - 服务端使用已持久化的 revision、changeset 和 snapshot 提供历史数据。
@@ -309,7 +339,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 恢复历史版本时创建一个新的最新 revision，不删除、不重排也不覆盖旧 revision。
 - 历史查看和恢复同样执行当前用户权限检查。
 
-### 5.7 首版不包含
+### 6.7 首版不包含
 
 - 线程评论。
 - 模板中心。
@@ -319,7 +349,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 审计后台。
 - 计费和配额。
 
-### 5.8 验收场景
+### 6.8 验收场景
 
 1. 用户注册登录后，在个人空间创建五种 Unit，并在资源树中移动和重命名。
 2. 用户把个人文档分享给另一个用户；对方从“与我共享”打开，并添加快捷方式。
@@ -330,28 +360,34 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 7. 删除资源后可以从回收站恢复或永久删除。
 8. 查看历史版本并恢复后，产生新的 revision，其他在线客户端最终收敛到恢复后的最新状态。
 
-## 6. 页面设计原则
+## 7. 页面设计原则
 
-### 6.1 `basic-sheets`
+### 7.1 `basic-sheets`
 
 - 整个页面就是 Univer Sheets example。
 - 不添加产品导航或文件管理壳。
 - 只为不可恢复错误和连接状态增加必要反馈。
 
-### 6.2 `basic-auth-demo`
+### 7.2 `basic-auth-demo`
 
 - 页面刻意简单，突出登录、文档角色和 Bearer JWT 链路。
 - `/login`、`/documents`、`/documents/:unitID` 和 `/demo-admin` 各自只有一个清晰目的。
 - 不为了视觉完整度加入分享、通知、搜索或工作空间入口。
 
-### 6.3 `univer-suite-demo`
+### 7.3 `basic-sheets-worktree`
+
+- 页面主体仍是完整 Univer Sheet 编辑器。
+- Worktree 工具栏只展示生命周期、当前 Unit 和 merge 结果。
+- 不增加文件树、审批流或未实现的冲突解决 UI。
+
+### 7.4 `univer-suite-demo`
 
 - 文件空间使用稳定左侧导航、顶部搜索与账号入口、中间资源列表。
 - 编辑器使用轻量产品头部，跨文档能力放在头部，具体编辑能力交给 Univer。
 - 个人文档显示“分享”，共享空间文档显示“空间成员”，避免出现无法实现的子级权限入口。
 - 桌面端优先；响应式布局必须保证登录、文件浏览和只读查看可用，不要求首版在窄屏提供完整编辑体验。
 
-## 7. 实施顺序
+## 8. 实施顺序
 
 以下顺序不承诺日期；每个阶段只有在对应验收条件通过后才进入下一阶段。
 
@@ -367,7 +403,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 
 ### 阶段 1：示例基础设施
 
-状态：`basic-sheets` 所需部分已完成；跨三个示例的公共浏览器测试基础设施随后续示例再抽象。
+状态：`basic-sheets` 所需部分已完成；跨四个示例的公共浏览器测试基础设施随后续示例再抽象。
 
 - 将 `examples/*` 加入 pnpm workspace。
 - 统一开发脚本、端口约定、SQLite 数据目录和重置方式。
@@ -392,6 +428,16 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - 实现 SQLite 用户、密码哈希、JWT Cookie、session ticket 和文档角色。
 - 实现登录、成员授权与 owner/editor/viewer 服务端权限。
 - 覆盖未认证请求、viewer 绕过尝试以及用户、ACL、Unit 和 History 重启持久化。
+
+### 阶段 3.5：`basic-sheets-worktree`
+
+状态：已完成。实现与启动方式见
+[`basic-sheets-worktree/README.md`](./basic-sheets-worktree/README.md)。
+
+- 使用 SQLite trunk 与 Worktree Adapter。
+- 接入 Worktree Client scoped 配置和完整状态事件。
+- 跑通 Worktree-local Sheet 创建、编辑、ready、merge 和重启恢复。
+- 实际浏览器验证协同 submit、ACK 和 trunk revision 1 内容。
 
 ### 阶段 4：`univer-suite-demo` 文件空间
 
@@ -421,7 +467,7 @@ export 限制，非 Sheet 历史 UI 受 alpha.6 viewer 限制，见 `docs/issues
 - 完成 README、架构说明、安全边界和生产部署差异说明。
 - 提供可重复的 seed 与演示脚本。
 
-## 8. 完成标准
+## 9. 完成标准
 
 一个示例只有同时满足以下条件才可标记为完成：
 
