@@ -22,6 +22,7 @@ body,
 
 button,
 input,
+select,
 a {
   color: inherit;
   font: inherit;
@@ -1915,6 +1916,383 @@ button {
   text-decoration: none;
 }
 
+/* Worktree review */
+.worktree-review-heading,
+.worktree-detail-header,
+.review-preview-toolbar,
+.review-title-line,
+.review-item-top,
+.review-list-heading {
+  display: flex;
+  align-items: center;
+}
+
+.worktree-review-heading {
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.worktree-review-heading h1 {
+  margin: 5px 0 8px;
+  font-size: 30px;
+  letter-spacing: -0.035em;
+}
+
+.worktree-review-heading p {
+  margin: 0;
+  color: #8f959e;
+}
+
+.review-readonly-badge,
+.review-visibility {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid #dce5ff;
+  border-radius: 999px;
+  color: #285dcc;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  background: #f3f6ff;
+  white-space: nowrap;
+}
+
+.worktree-review-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.review-segmented,
+.review-mode-switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid #e4e7ec;
+  border-radius: 9px;
+  background: #f7f8fa;
+}
+
+.review-segmented button,
+.review-mode-switch button {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  color: #6b7280;
+  font-size: 13px;
+  background: transparent;
+}
+
+.review-segmented button.active,
+.review-mode-switch button.active {
+  color: #1f2329;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(31 35 41 / 12%);
+}
+
+[data-worktree-space] {
+  min-width: 180px;
+  height: 38px;
+  padding: 0 32px 0 11px;
+  border: 1px solid #e0e3e8;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+}
+
+.worktree-review-layout {
+  display: grid;
+  min-height: 680px;
+  grid-template-columns: 282px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid #e5e8ed;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 14px 40px rgb(31 35 41 / 5%);
+}
+
+.worktree-review-list {
+  overflow: auto;
+  border-right: 1px solid #e8eaee;
+  background: #fafbfc;
+}
+
+.review-list-heading {
+  height: 52px;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid #e8eaee;
+  font-size: 13px;
+}
+
+.review-list-heading span {
+  min-width: 24px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: #667085;
+  text-align: center;
+  background: #eceff3;
+}
+
+.worktree-review-item {
+  display: grid;
+  width: 100%;
+  gap: 7px;
+  padding: 14px;
+  border: 0;
+  border-bottom: 1px solid #eceef2;
+  text-align: left;
+  background: transparent;
+}
+
+.worktree-review-item:hover {
+  background: #f3f6ff;
+}
+
+.worktree-review-item.active {
+  background: #edf3ff;
+  box-shadow: inset 3px 0 #3370ff;
+}
+
+.review-item-top {
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.review-item-top strong,
+.worktree-review-item > span:not(.review-item-top),
+.worktree-review-item small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worktree-review-item > span:not(.review-item-top),
+.worktree-review-item small {
+  color: #7a818c;
+  font-size: 12px;
+}
+
+.review-status {
+  padding: 3px 7px;
+  border-radius: 999px;
+  color: #596273;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  background: #e9ecf1;
+  white-space: nowrap;
+}
+
+.review-status-ready {
+  color: #8a5a00;
+  background: #fff1c7;
+}
+
+.review-status-merged {
+  color: #087443;
+  background: #dff7e9;
+}
+
+.review-status-discarded {
+  color: #8b3b3b;
+  background: #fbe7e7;
+}
+
+.worktree-review-detail {
+  min-width: 0;
+}
+
+.worktree-detail-header {
+  min-height: 154px;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e8eaee;
+}
+
+.review-title-line {
+  gap: 10px;
+}
+
+.review-title-line h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.worktree-detail-header p {
+  margin: 8px 0 16px;
+  color: #7a818c;
+  font-size: 13px;
+}
+
+.review-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0;
+}
+
+.review-metadata div {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.review-metadata dt {
+  color: #949aa4;
+}
+
+.review-metadata dd {
+  margin: 0;
+  color: #444b55;
+  font-weight: 550;
+}
+
+.worktree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.worktree-actions button {
+  min-width: 76px;
+  height: 38px;
+}
+
+.worktree-unit-review {
+  display: grid;
+  min-height: 524px;
+  grid-template-columns: 210px minmax(0, 1fr);
+}
+
+.worktree-unit-list {
+  overflow: auto;
+  border-right: 1px solid #e8eaee;
+  background: #fcfcfd;
+}
+
+.worktree-unit-list h3 {
+  margin: 0;
+  padding: 15px 13px 10px;
+  color: #8a9099;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.worktree-unit-list > button {
+  display: grid;
+  width: 100%;
+  gap: 5px;
+  padding: 12px 13px;
+  border: 0;
+  border-left: 3px solid transparent;
+  text-align: left;
+  background: transparent;
+}
+
+.worktree-unit-list > button:hover,
+.worktree-unit-list > button.active {
+  background: #f1f5ff;
+}
+
+.worktree-unit-list > button.active {
+  border-left-color: #3370ff;
+}
+
+.worktree-unit-list > button small {
+  color: #8b929d;
+}
+
+.unit-type {
+  width: max-content;
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: #2563a8;
+  font-size: 10px;
+  font-weight: 650;
+  background: #e7f2ff;
+}
+
+.unit-type-1 {
+  color: #6d4cc2;
+  background: #f0ebff;
+}
+
+.unit-type-3 {
+  color: #b54f1b;
+  background: #fff0e7;
+}
+
+.unit-merge-result {
+  color: #687182;
+  font-size: 11px;
+}
+
+.unit-merge-failed,
+.unit-merge-conflict {
+  color: #b42318;
+}
+
+.worktree-unit-preview {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #f5f6f8;
+}
+
+.review-preview-toolbar {
+  min-height: 58px;
+  gap: 16px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #e2e5e9;
+  background: #fff;
+}
+
+.review-preview-toolbar > div:first-child {
+  display: grid;
+  margin-right: auto;
+}
+
+.review-preview-toolbar > div:first-child span {
+  color: #8b929d;
+  font-size: 11px;
+}
+
+.worktree-preview-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 465px;
+  border: 0;
+  background: #fff;
+}
+
+.review-empty {
+  padding: 28px 18px;
+  color: #8a919d;
+  text-align: center;
+}
+
+.review-empty p {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+
+.review-empty-large {
+  display: grid;
+  min-height: 500px;
+  place-content: center;
+}
+
+.review-editor-shell .editor-owner {
+  margin-left: auto;
+}
+
 @keyframes editor-route-spin {
   to {
     transform: rotate(360deg);
@@ -1922,6 +2300,18 @@ button {
 }
 
 @media (max-width: 900px) {
+  .worktree-review-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .worktree-unit-review {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+
+  .review-metadata {
+    display: none;
+  }
+
   .topbar {
     grid-template-columns: 190px minmax(240px, 1fr) auto;
   }
@@ -1945,6 +2335,51 @@ button {
 }
 
 @media (max-width: 680px) {
+  .worktree-review-heading,
+  .worktree-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .worktree-review-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .worktree-review-layout {
+    display: block;
+  }
+
+  .worktree-review-list {
+    max-height: 220px;
+    border-right: 0;
+    border-bottom: 1px solid #e8eaee;
+  }
+
+  .worktree-unit-review {
+    display: block;
+  }
+
+  .worktree-unit-list {
+    display: flex;
+    overflow: auto;
+    border-right: 0;
+    border-bottom: 1px solid #e8eaee;
+  }
+
+  .worktree-unit-list h3 {
+    display: none;
+  }
+
+  .worktree-unit-list > button {
+    min-width: 160px;
+  }
+
+  .review-preview-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
   .workspace-shell {
     display: block;
     padding-top: 58px;
@@ -2003,7 +2438,7 @@ button {
 
   .main-nav {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .main-nav a {

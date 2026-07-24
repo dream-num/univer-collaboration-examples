@@ -12,19 +12,62 @@ import {
 } from "@univerjs-pro/collaboration-client-ui";
 import { UniverEditHistoryLoaderPlugin } from "@univerjs-pro/edit-history-loader";
 import {
+  CommandType,
   IUniverInstanceService,
   type UnitModel,
   Univer,
   UserManagerService,
 } from "@univerjs/core";
+import { FUniver } from "@univerjs/core/facade";
+import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
+import {
+  createWorktreeCollaborationConfig,
+  createWorktreeMergePreviewConfig,
+} from "@univerjs/collaboration-worktree-client";
 import { HTTPService } from "@univerjs/network";
 
 const secure = window.location.protocol === "https:";
 const httpProtocol = secure ? "https" : "http";
 const wsProtocol = secure ? "wss" : "ws";
 const host = window.location.host;
+const origin = `${httpProtocol}://${host}`;
+
+export type ReviewCollaborationScope =
+  | { readonly kind: "trunk" }
+  | { readonly kind: "worktree"; readonly worktreeID: string }
+  | {
+      readonly kind: "merge";
+      readonly worktreeID: string;
+      readonly preview: SaveSnapshotInput;
+    };
+
+let reviewScope: ReviewCollaborationScope | null = null;
+
+export function configureReviewCollaboration(
+  scope: ReviewCollaborationScope
+): void {
+  reviewScope = scope;
+}
 
 export function collaborationPlugins(): IPresetPlugin[] {
+  const scopedConfig =
+    reviewScope === null || reviewScope.kind === "trunk"
+      ? {
+          snapshotServerUrl: `${origin}/universer-api/snapshot`,
+          collabSubmitChangesetUrl: `${origin}/universer-api/comb`,
+          collabWebSocketUrl: `${wsProtocol}://${host}/universer-api/comb/connect`,
+          wsSessionTicketUrl: `${origin}/universer-api/user/session-ticket`,
+        }
+      : reviewScope.kind === "worktree"
+        ? createWorktreeCollaborationConfig({
+            origin,
+            worktreeID: reviewScope.worktreeID,
+          })
+        : createWorktreeMergePreviewConfig({
+            origin,
+            worktreeID: reviewScope.worktreeID,
+            preview: reviewScope.preview,
+          });
   return [
     UniverCollaborationPlugin,
     [
@@ -41,15 +84,30 @@ export function collaborationPlugins(): IPresetPlugin[] {
           ],
         ],
         authzUrl: `${httpProtocol}://${host}/universer-api/authz`,
-        snapshotServerUrl: `${httpProtocol}://${host}/universer-api/snapshot`,
-        collabSubmitChangesetUrl: `${httpProtocol}://${host}/universer-api/comb`,
-        collabWebSocketUrl: `${wsProtocol}://${host}/universer-api/comb/connect`,
-        wsSessionTicketUrl: `${httpProtocol}://${host}/universer-api/user/session-ticket`,
         sendChangesetTimeout: 200,
+        ...scopedConfig,
       },
     ],
     UniverCollaborationClientUIPlugin,
   ];
+}
+
+export function enforceReadOnlyReview(univer: Univer): void {
+  if (document.documentElement.dataset.reviewReadonly !== "true") return;
+  const univerAPI = FUniver.newAPI(univer);
+  univerAPI.getHooks().onSteady(() => {
+    univerAPI.addEvent(univerAPI.Event.BeforeCommandExecute, (event) => {
+      if (event.options?.fromCollab || event.options?.fromChangeset) {
+        return;
+      }
+      if (
+        event.type === CommandType.COMMAND ||
+        event.type === CommandType.MUTATION
+      ) {
+        event.cancel = true;
+      }
+    });
+  });
 }
 
 export function historyPlugins(): IPresetPlugin[] {

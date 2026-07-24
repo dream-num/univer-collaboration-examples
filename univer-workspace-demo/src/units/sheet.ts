@@ -16,6 +16,7 @@ import {
 } from "@univerjs/presets";
 import {
   collaborationPlugins,
+  enforceReadOnlyReview,
   historyPlugins,
   loadCurrentUser,
   syncEditorTitle,
@@ -57,6 +58,7 @@ const { univer } = createUniver({
   ],
 });
 
+enforceReadOnlyReview(univer);
 const unitID = new URL(window.location.href).searchParams.get("unit");
 syncEditorTitle(univer, unitID);
 if (document.documentElement.dataset.accessRole === "viewer") {

@@ -1,5 +1,8 @@
 import type { Server } from "node:http";
-import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
+import {
+  MemorySessionTicketStore,
+  UniverCollabEndpoint,
+} from "@univerjs/collaboration-endpoint";
 import {
   DefaultHistoryPolicy,
   UniverHistoryService,
@@ -12,18 +15,31 @@ import {
   type IDatabaseAdapter,
 } from "@univerjs/collaboration-service";
 import { createNodeTransport } from "@univerjs/collaboration-transport-node";
+import type { IWorktreeDatabaseAdapter } from "@univerjs/collaboration-worktree-service";
+import { UniverCollabWorktreeService } from "@univerjs/collaboration-worktree-service";
+import { UniverCollabWorktreeEndpoint } from "@univerjs/collaboration-worktree-endpoint";
 import type { RequestHandler } from "express";
 import type { AuthService } from "./auth.js";
 import type { DemoUser } from "./demo-user.js";
 import { protocolUser } from "./demo-user.js";
 import type { ProductStore } from "./product-store.js";
 import type { UserStore } from "./auth.js";
+import type { WorkspaceWorktreeCatalog } from "./worktrees/worktree-catalog.js";
+import { isOrchestrated } from "./worktrees/orchestration.js";
+import {
+  canEditResource,
+  canEditWorktree,
+  canReviewWorktree,
+  isSpaceEditor,
+} from "./worktrees/worktree-policy.js";
 
 const DEMO_HISTORY_INTERVAL_MS = 5_000;
 
 export interface CollaborationStackOptions {
   readonly dbAdapter: IDatabaseAdapter;
   readonly historyDbAdapter: IHistoryDatabaseAdapter;
+  readonly worktreeDbAdapter: IWorktreeDatabaseAdapter;
+  readonly worktreeCatalog: WorkspaceWorktreeCatalog;
   readonly productStore: ProductStore;
   readonly authService: AuthService;
   readonly userStore: UserStore;
@@ -32,6 +48,7 @@ export interface CollaborationStackOptions {
 export interface CollaborationStack {
   readonly collabService: UniverCollabService;
   readonly historyService: UniverHistoryService;
+  readonly worktreeService: UniverCollabWorktreeService;
   readonly handleHttp: RequestHandler;
   attachWebSocket(server: Server): void;
   dispose(): Promise<void>;
@@ -43,7 +60,18 @@ export function createCollaborationStack(
   const collabService = new UniverCollabService({
     dbAdapter: options.dbAdapter,
   });
-  const endpoint = new UniverCollabEndpoint(collabService);
+  const ticketStore = new MemorySessionTicketStore();
+  const endpoint = new UniverCollabEndpoint(collabService, { ticketStore });
+  const worktreeService = new UniverCollabWorktreeService({
+    trunk: {
+      service: collabService,
+      dbAdapter: options.dbAdapter,
+    },
+    dbAdapter: options.worktreeDbAdapter,
+  });
+  const worktreeEndpoint = new UniverCollabWorktreeEndpoint(worktreeService, {
+    ticketStore,
+  });
   const historyService = new UniverHistoryService({
     collabService,
     dbAdapter: options.historyDbAdapter,
@@ -96,6 +124,26 @@ export function createCollaborationStack(
     const resource = options.productStore.getByUnitID(
       context.request.snapshot.unitID
     );
+    const staged = options.worktreeCatalog.getStagedResourceByUnitID(
+      context.request.snapshot.unitID
+    );
+    const stagedRole = staged
+      ? options.productStore.getSpaceRole(
+          staged.spaceID,
+          context.session.userId
+        )
+      : null;
+    if (
+      isOrchestrated(context.request.customData) &&
+      staged &&
+      isSpaceEditor(stagedRole) &&
+      staged.type === context.request.snapshot.type &&
+      (staged.status === "staged" ||
+        staged.status === "activation-pending")
+    ) {
+      await next();
+      return;
+    }
     const role = resource
       ? options.productStore.getAccessRoleByID(
           resource.id,
@@ -175,6 +223,166 @@ export function createCollaborationStack(
     await next();
   });
 
+  const requireWorktreeReview = (worktreeID: string, userID: string) => {
+    const catalog = options.worktreeCatalog.get(worktreeID);
+    if (!catalog) {
+      throw new CollabError("UNIT_NOT_FOUND", "Worktree does not exist");
+    }
+    const spaceRole =
+      catalog.scope.kind === "space"
+        ? options.productStore.getSpaceRole(catalog.scope.spaceID, userID)
+        : null;
+    if (!canReviewWorktree(userID, catalog, spaceRole)) {
+      throw new CollabError("UNIT_NOT_FOUND", "Worktree does not exist");
+    }
+    return catalog;
+  };
+
+  const requireWorktreeEdit = (worktreeID: string, userID: string) => {
+    const catalog = requireWorktreeReview(worktreeID, userID);
+    const spaceRole =
+      catalog.scope.kind === "space"
+        ? options.productStore.getSpaceRole(catalog.scope.spaceID, userID)
+        : null;
+    if (!canEditWorktree(userID, catalog, spaceRole)) {
+      throw new CollabError("PERMISSION_DENIED", "Worktree is read-only");
+    }
+    return catalog;
+  };
+
+  const requireWorktreeUnitRead = (
+    worktreeID: string,
+    unitID: string,
+    userID: string
+  ) => {
+    const catalog = requireWorktreeReview(worktreeID, userID);
+    const mapping = catalog.units.find((unit) => unit.unitID === unitID);
+    if (!mapping) {
+      throw new CollabError("UNIT_NOT_FOUND", "Worktree Unit does not exist");
+    }
+    if (mapping.source === "trunk") {
+      const resource = options.productStore.getByID(mapping.resourceID);
+      const role = resource
+        ? options.productStore.getAccessRoleByID(resource.id, userID)
+        : null;
+      if (!resource || resource.status !== "active" || !role) {
+        throw new CollabError("UNIT_NOT_FOUND", "Worktree Unit is unavailable");
+      }
+    } else {
+      const staged = options.worktreeCatalog.getStagedResource(
+        mapping.resourceID
+      );
+      const role = staged
+        ? options.productStore.getSpaceRole(staged.spaceID, userID)
+        : null;
+      if (!staged || staged.status === "discarded" || !role) {
+        throw new CollabError("UNIT_NOT_FOUND", "Worktree Unit is unavailable");
+      }
+    }
+    return { catalog, mapping };
+  };
+
+  const requireWorktreeUnitEdit = (
+    worktreeID: string,
+    unitID: string,
+    userID: string
+  ) => {
+    const { catalog, mapping } = requireWorktreeUnitRead(
+      worktreeID,
+      unitID,
+      userID
+    );
+    requireWorktreeEdit(worktreeID, userID);
+    if (mapping.source === "trunk") {
+      const role = options.productStore.getAccessRoleByID(
+        mapping.resourceID,
+        userID
+      );
+      if (!canEditResource(role)) {
+        throw new CollabError("PERMISSION_DENIED", "Unit is read-only");
+      }
+    }
+    return { catalog, mapping };
+  };
+
+  const requireOrchestrated = (customData: Record<PropertyKey, unknown>) => {
+    if (!isOrchestrated(customData)) {
+      throw new CollabError(
+        "PERMISSION_DENIED",
+        "Worktree mutation must use the Workspace application"
+      );
+    }
+  };
+
+  worktreeService.use("readWorktreeData", async (context, next) => {
+    const recoveringCreate =
+      isOrchestrated(context.request.customData) &&
+      options.worktreeCatalog.listPendingOperations().some(
+        (operation) =>
+          operation.kind === "create-worktree" &&
+          operation.worktree.worktreeID === context.request.worktreeID &&
+          operation.actorUserID === context.session.userId
+      );
+    if (recoveringCreate) {
+      await next();
+      return;
+    }
+    requireWorktreeReview(
+      context.request.worktreeID,
+      context.session.userId
+    );
+    await next();
+  });
+  const requireOrchestratedRequest = async (
+    context: { readonly request: { readonly customData: Record<string, unknown> } },
+    next: () => Promise<void>
+  ) => {
+    requireOrchestrated(context.request.customData);
+    await next();
+  };
+  worktreeService.use("createWorktree", requireOrchestratedRequest);
+  worktreeService.use("addWorktreeUnit", requireOrchestratedRequest);
+  worktreeService.use("createWorktreeUnit", requireOrchestratedRequest);
+  worktreeService.use("markWorktreeReady", requireOrchestratedRequest);
+  worktreeService.use("reopenWorktree", requireOrchestratedRequest);
+  worktreeService.use("discardWorktree", requireOrchestratedRequest);
+  worktreeService.use("mergeWorktree", requireOrchestratedRequest);
+  worktreeService.use("readUnitData", async (context, next) => {
+    requireWorktreeUnitRead(
+      context.request.worktreeID,
+      context.request.unitID,
+      context.session.userId
+    );
+    await next();
+  });
+  worktreeService.use("submitChangeset", async (context, next) => {
+    requireOrchestrated(context.request.customData);
+    requireWorktreeUnitEdit(
+      context.request.worktreeID,
+      context.request.changeset.unitID,
+      context.session.userId
+    );
+    await next();
+  });
+  worktreeService.use("applyChangeset", async (context, next) => {
+    requireOrchestrated(context.request.customData);
+    requireWorktreeUnitEdit(
+      context.request.worktreeID,
+      context.request.changeset.unitID,
+      context.session.userId
+    );
+    await next();
+  });
+  worktreeService.use("commitChangeset", async (context, next) => {
+    requireOrchestrated(context.request.customData);
+    requireWorktreeUnitEdit(
+      context.request.worktreeID,
+      context.request.changeset.unitID,
+      context.session.userId
+    );
+    await next();
+  });
+
   transport.use(async (context, next) => {
     if (context.kind === "http") {
       const user = options.authService.requireUser(context.incomingMessage);
@@ -184,6 +392,7 @@ export function createCollaborationStack(
     await next();
   });
   transport.use(historyEndpoint);
+  transport.use(worktreeEndpoint);
   transport.use(endpoint);
   transport.use(async (context, next) => {
     if (context.kind === "http") {
@@ -208,7 +417,10 @@ export function createCollaborationStack(
     head
   ) => {
     const url = new URL(request.url ?? "/", "http://localhost");
-    if (url.pathname !== "/universer-api/comb/connect") {
+    if (
+      url.pathname !== "/universer-api/comb/connect" &&
+      !url.pathname.startsWith("/universer-api/worktrees/")
+    ) {
       socket.destroy();
       return;
     }
@@ -218,6 +430,7 @@ export function createCollaborationStack(
   return {
     collabService,
     historyService,
+    worktreeService,
     handleHttp(request, response) {
       request.url = request.originalUrl;
       transport.handleRequest(request, response);
@@ -235,8 +448,10 @@ export function createCollaborationStack(
       attachedServer?.off("upgrade", handleUpgrade);
       attachedServer = undefined;
       await transport.dispose();
+      await worktreeService.dispose();
       await historyService.dispose();
       await collabService.dispose();
+      await ticketStore.dispose();
     },
   };
 }

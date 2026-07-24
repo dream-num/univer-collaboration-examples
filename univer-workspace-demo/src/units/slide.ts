@@ -13,6 +13,7 @@ import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverNetworkPlugin } from "@univerjs/network";
 import { UniverUIPlugin } from "@univerjs/ui";
 import {
+  enforceReadOnlyReview,
   loadCurrentUser,
   registerRawCollaboration,
   syncEditorTitle,
@@ -45,6 +46,7 @@ univer.registerPlugin(UniverSlidesPlugin);
 univer.registerPlugin(UniverSlidesUIPlugin);
 univer.registerPlugin(UniverNetworkPlugin);
 registerRawCollaboration(univer);
+enforceReadOnlyReview(univer);
 syncEditorTitle(
   univer,
   new URL(window.location.href).searchParams.get("unit")

@@ -7,6 +7,8 @@ import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
 import type { UniverHistoryService } from "@univerjs/collaboration-history";
 import { SQLiteHistoryDatabaseAdapter } from "@univerjs/collaboration-history-sqlite";
 import type { UniverCollabService } from "@univerjs/collaboration-service";
+import { SQLiteWorktreeDatabaseAdapter } from "@univerjs/collaboration-worktree-database-sqlite";
+import type { UniverCollabWorktreeService } from "@univerjs/collaboration-worktree-service";
 import { createCollaborationStack } from "./collaboration.js";
 import { AuthService, UserStore } from "./auth.js";
 import { errorHandler, notFoundHandler } from "./http.js";
@@ -15,6 +17,12 @@ import {
   createApplicationRouter,
   createProtocolCompatibilityRouter,
 } from "./routes.js";
+import { WorkspaceWorktreeCatalog } from "./worktrees/worktree-catalog.js";
+import {
+  createWorkspaceWorktreeApplication,
+  type WorkspaceWorktreeApplication as WorkspaceWorktreeApplicationModule,
+} from "./worktrees/worktree-application.js";
+import { createWorkspaceWorktreeRouter } from "./worktrees/worktree-routes.js";
 
 export interface WorkspaceApplicationOptions {
   readonly databaseFilename?: string;
@@ -26,10 +34,14 @@ export interface WorkspaceApplication {
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
   readonly historyDbAdapter: SQLiteHistoryDatabaseAdapter;
+  readonly worktreeDbAdapter: SQLiteWorktreeDatabaseAdapter;
+  readonly worktreeCatalog: WorkspaceWorktreeCatalog;
+  readonly worktreeApplication: WorkspaceWorktreeApplicationModule;
   readonly productStore: ProductStore;
   readonly userStore: UserStore;
   readonly collabService: UniverCollabService;
   readonly historyService: UniverHistoryService;
+  readonly worktreeService: UniverCollabWorktreeService;
   listen(port?: number, host?: string): Promise<number>;
   close(): Promise<void>;
 }
@@ -43,6 +55,10 @@ export async function createWorkspaceApplication(
   const historyDbAdapter = new SQLiteHistoryDatabaseAdapter({
     filename: databaseFilename,
   });
+  const worktreeDbAdapter = new SQLiteWorktreeDatabaseAdapter({
+    filename: databaseFilename,
+  });
+  const worktreeCatalog = new WorkspaceWorktreeCatalog(databaseFilename);
   const productStore = new ProductStore(databaseFilename);
   const userStore = new UserStore(databaseFilename);
   await userStore.ensurePresetUsers();
@@ -50,12 +66,28 @@ export async function createWorkspaceApplication(
   const collaboration = createCollaborationStack({
     dbAdapter: database,
     historyDbAdapter,
+    worktreeDbAdapter,
+    worktreeCatalog,
     productStore,
     authService,
     userStore,
   });
+  const worktreeApplication = createWorkspaceWorktreeApplication({
+    catalog: worktreeCatalog,
+    productStore,
+    userStore,
+    service: collaboration.worktreeService,
+  });
+  await worktreeApplication.reconcile();
 
   const app = express();
+  app.use(
+    "/api/worktrees",
+    createWorkspaceWorktreeRouter({
+      authService,
+      application: worktreeApplication,
+    })
+  );
   app.use(
     "/api",
     createApplicationRouter({
@@ -94,10 +126,14 @@ export async function createWorkspaceApplication(
     httpServer,
     database,
     historyDbAdapter,
+    worktreeDbAdapter,
+    worktreeCatalog,
+    worktreeApplication,
     productStore,
     userStore,
     collabService: collaboration.collabService,
     historyService: collaboration.historyService,
+    worktreeService: collaboration.worktreeService,
     listen: (port = 3020, host = "127.0.0.1") =>
       listen(httpServer, port, host),
     close: async () => {
@@ -107,6 +143,8 @@ export async function createWorkspaceApplication(
       await closeServer(httpServer);
       productStore.dispose();
       userStore.dispose();
+      worktreeCatalog.dispose();
+      await worktreeDbAdapter.dispose();
       await historyDbAdapter.dispose();
       await database.dispose();
     },

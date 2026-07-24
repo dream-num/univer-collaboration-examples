@@ -532,6 +532,76 @@ export class ProductStore {
     return this.getByID(id)!;
   }
 
+  /**
+   * Worktree-local Unit merge 后的唯一产品激活入口。
+   *
+   * staged metadata 由 Worktree Catalog 持有；这里只在一个事务内创建最终
+   * node/unit，重复调用相同输入时幂等返回，任何 identity 冲突都拒绝。
+   */
+  activateStagedResource(input: {
+    readonly resourceID: string;
+    readonly unitID: string;
+    readonly spaceID: string;
+    readonly parentID: string | null;
+    readonly name: string;
+    readonly type: UniverType;
+    readonly createdBy: string;
+  }): WorkspaceResource {
+    this._assertOpen();
+    const existingByResource = this.getByID(input.resourceID);
+    const existingByUnit = this.getByUnitID(input.unitID);
+    if (existingByResource || existingByUnit) {
+      if (
+        existingByResource &&
+        existingByUnit?.id === existingByResource.id &&
+        existingByResource.id === input.resourceID &&
+        existingByResource.unitID === input.unitID &&
+        existingByResource.spaceID === input.spaceID &&
+        existingByResource.parentID === input.parentID &&
+        existingByResource.name === input.name &&
+        existingByResource.type === input.type &&
+        existingByResource.createdBy === input.createdBy &&
+        existingByResource.status === "active"
+      ) {
+        return existingByResource;
+      }
+      throw new Error("Resource or Unit identity is already in use");
+    }
+
+    this._assertValidParent(input.spaceID, input.parentID);
+    const now = Date.now();
+    this._database.exec("BEGIN IMMEDIATE");
+    try {
+      this._database
+        .prepare(
+          `INSERT INTO workspace_nodes
+            (id, space_id, parent_id, kind, name, status, created_by,
+             created_at, updated_at)
+           VALUES (?, ?, ?, 'unit', ?, 'active', ?, ?, ?)`
+        )
+        .run(
+          input.resourceID,
+          input.spaceID,
+          input.parentID,
+          input.name,
+          input.createdBy,
+          now,
+          now
+        );
+      this._database
+        .prepare(
+          `INSERT INTO workspace_units (node_id, unit_id, unit_type)
+           VALUES (?, ?, ?)`
+        )
+        .run(input.resourceID, input.unitID, input.type);
+      this._database.exec("COMMIT");
+    } catch (error) {
+      this._database.exec("ROLLBACK");
+      throw error;
+    }
+    return this.getByID(input.resourceID)!;
+  }
+
   markFailed(id: string): WorkspaceResource {
     this._setNodeStatus(id, "failed");
     return this.getByID(id)!;

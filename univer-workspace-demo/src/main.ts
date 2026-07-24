@@ -1,16 +1,34 @@
 import { UniverInstanceType } from "@univerjs/core";
+import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
 import { PRESET_USERS } from "../shared/preset-users.js";
 import {
   resolveEditorAccess,
   type EditorAccessResult,
 } from "./editor-access.js";
+import {
+  worktreeReviewView,
+  type ReviewMode,
+  type ReviewWorktree,
+  type ReviewWorktreeScope,
+  type ReviewWorktreeView,
+} from "./worktrees/review.js";
+import {
+  configureReviewCollaboration,
+} from "./collaboration.js";
 import "./styles.css";
 
-type WorkspaceView = "home" | "recent" | "space" | "shared" | "trash";
+type WorkspaceView =
+  | "home"
+  | "recent"
+  | "space"
+  | "shared"
+  | "trash"
+  | "worktrees";
 
 const url = new URL(window.location.href);
 const unitID = url.searchParams.get("unit");
 const resourceID = url.searchParams.get("resource");
+const reviewWorktreeID = url.searchParams.get("reviewWorktree");
 const type = Number(url.searchParams.get("type"));
 
 void start();
@@ -23,6 +41,18 @@ async function start(): Promise<void> {
   }
 
   if (
+    reviewWorktreeID &&
+    unitID &&
+    [
+      UniverInstanceType.UNIVER_SHEET,
+      UniverInstanceType.UNIVER_DOC,
+      UniverInstanceType.UNIVER_SLIDE,
+    ].includes(type)
+  ) {
+    await renderWorktreeReviewEditor(reviewWorktreeID, unitID, type);
+    return;
+  }
+  if (
     unitID &&
     [
       UniverInstanceType.UNIVER_SHEET,
@@ -34,6 +64,110 @@ async function start(): Promise<void> {
     return;
   }
   await renderWorkspace(user);
+}
+
+async function renderWorktreeReviewEditor(
+  worktreeID: string,
+  reviewUnitID: string,
+  reviewType: UniverInstanceType
+): Promise<void> {
+  const result = await api<{ worktree: ReviewWorktree }>(
+    `/api/worktrees/${encodeURIComponent(worktreeID)}`
+  );
+  const worktree = result.worktree;
+  const unit = worktree.units.find(
+    (candidate) =>
+      candidate.unitID === reviewUnitID &&
+      candidate.type === reviewType
+  );
+  if (!unit) {
+    renderEditorError("unavailable");
+    return;
+  }
+  const requestedMode = url.searchParams.get("reviewMode");
+  const mode: ReviewMode =
+    requestedMode === "trunk" ||
+    requestedMode === "merge" ||
+    requestedMode === "draft"
+      ? requestedMode
+      : "draft";
+  if (mode === "trunk" && unit.source !== "trunk") {
+    renderReviewUnavailable("Agent 新建的 Unit 没有主线版本。");
+    return;
+  }
+  if (mode === "merge") {
+    const preview = await api<{
+      evaluation: {
+        readonly status: string;
+        readonly preview?: SaveSnapshotInput;
+      };
+    }>(
+      `/universer-api/worktrees/${encodeURIComponent(worktreeID)}/units/${encodeURIComponent(reviewUnitID)}/merge-preview`
+    );
+    if (
+      preview.evaluation.status !== "preview" ||
+      preview.evaluation.preview === undefined
+    ) {
+      renderReviewUnavailable(
+        preview.evaluation.status === "conflict"
+          ? "当前变更存在合并冲突，无法生成合入预览。"
+          : "当前状态没有可用的合入预览。"
+      );
+      return;
+    }
+    configureReviewCollaboration({
+      kind: "merge",
+      worktreeID,
+      preview: preview.evaluation.preview,
+    });
+  } else if (mode === "draft") {
+    configureReviewCollaboration({ kind: "worktree", worktreeID });
+  } else {
+    configureReviewCollaboration({ kind: "trunk" });
+  }
+
+  const app = requireApp();
+  document.documentElement.dataset.accessRole = "viewer";
+  document.documentElement.dataset.reviewReadonly = "true";
+  app.innerHTML = `
+    <div class="editor-shell review-editor-shell">
+      <header class="editor-header">
+        <a class="editor-brand" href="/#worktrees" target="_top">
+          ${logoIcon()}
+          <span>Univer</span>
+        </a>
+        <span class="editor-divider"></span>
+        <span id="editor-title">${escapeHtml(unit.name)}</span>
+        <span class="editor-status">只读 · ${reviewModeName(mode)}</span>
+        <span class="editor-owner">${escapeHtml(worktree.name)}</span>
+      </header>
+      <main id="univer-container"></main>
+    </div>
+  `;
+  switch (reviewType) {
+    case UniverInstanceType.UNIVER_SHEET:
+      await import("./units/sheet.js");
+      return;
+    case UniverInstanceType.UNIVER_DOC:
+      await import("./units/doc.js");
+      return;
+    case UniverInstanceType.UNIVER_SLIDE:
+      await import("./units/slide.js");
+  }
+}
+
+function renderReviewUnavailable(message: string): void {
+  requireApp().innerHTML = `
+    <main class="editor-route-state editor-route-error">
+      <h1>预览不可用</h1>
+      <p>${escapeHtml(message)}</p>
+      <a class="primary-button editor-route-action" href="/#worktrees" target="_top">返回 Worktrees</a>
+    </main>
+  `;
+}
+
+function reviewModeName(mode: ReviewMode): string {
+  return { trunk: "主线", draft: "Worktree", merge: "合入预览" }[mode];
 }
 
 function renderAuth(mode: "login" | "register"): void {
@@ -350,9 +484,16 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
 
   let resources: ResourceRecord[] = [];
   let nodes: DirectoryNode[] = [];
+  let worktrees: ReviewWorktree[] = [];
   let directory: DirectoryPayload | null = null;
   let route = workspaceRoute(personalSpace.id);
   let query = "";
+  let worktreeView: ReviewWorktreeView = "active";
+  let worktreeScope: ReviewWorktreeScope = "all";
+  let worktreeSpaceID = "";
+  let selectedWorktreeID = "";
+  let selectedWorktreeUnitID = "";
+  let reviewMode: ReviewMode = "draft";
 
   function renderShell(): void {
     const teamSpaces = spaces.filter(({ type }) => type === "team");
@@ -402,6 +543,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
               ${icon("folder")}<span>个人空间</span>
             </a>
             ${navButton("shared", "与我共享", "share")}
+            ${navButton("worktrees", "Agent Worktrees", "sparkles")}
             ${navButton("trash", "回收站", "trash")}
           </nav>
           <div class="team-nav">
@@ -497,6 +639,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     directory = null;
     nodes = [];
     resources = [];
+    worktrees = [];
     if (currentRoute.view === "home" || currentRoute.view === "recent") {
       const result = await api<{ resources: ResourceRecord[] }>(
         "/api/units?scope=recent"
@@ -529,6 +672,10 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       );
       nodes = trash.flat();
       renderCurrentView();
+      return;
+    }
+    if (currentRoute.view === "worktrees") {
+      await loadWorktrees();
       return;
     }
     if (currentRoute.view !== "space") return;
@@ -564,6 +711,14 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     const filteredNodes = nodes.filter((node) =>
       node.name.toLocaleLowerCase().includes(query)
     );
+    const filteredWorktrees = worktrees.filter(
+      (worktree) =>
+        worktree.name.toLocaleLowerCase().includes(query) ||
+        worktree.creatorName.toLocaleLowerCase().includes(query) ||
+        worktree.units.some((unit) =>
+          unit.name.toLocaleLowerCase().includes(query)
+        )
+    );
     const content = document.querySelector<HTMLElement>("#workspace-content");
     if (!content) return;
     if (currentRoute.view === "home") {
@@ -572,6 +727,19 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       content.innerHTML = directoryView(directory, filteredNodes, query);
     } else if (currentRoute.view === "trash") {
       content.innerHTML = trashView(filteredNodes, query);
+    } else if (currentRoute.view === "worktrees") {
+      content.innerHTML = worktreeReviewView({
+        worktrees: filteredWorktrees,
+        ...(selectedWorktreeID ? { selectedWorktreeID } : {}),
+        ...(selectedWorktreeUnitID
+          ? { selectedUnitID: selectedWorktreeUnitID }
+          : {}),
+        mode: reviewMode,
+        view: worktreeView,
+        scope: worktreeScope,
+        ...(worktreeSpaceID ? { spaceID: worktreeSpaceID } : {}),
+        spaces,
+      });
     } else if (
       currentRoute.view === "recent" ||
       currentRoute.view === "shared"
@@ -589,11 +757,108 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
         ? spaces.find(({ id }) => id === currentRoute.spaceID)
         : personalSpace;
     const newButton = document.querySelector<HTMLButtonElement>("#new-button");
-    if (newButton) newButton.disabled = currentSpace?.accessRole === "viewer";
+    if (newButton) {
+      newButton.disabled =
+        currentRoute.view === "worktrees" ||
+        currentSpace?.accessRole === "viewer";
+    }
     wireContentActions();
   }
 
   function wireContentActions(): void {
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-view]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          worktreeView = button.dataset
+            .worktreeView as ReviewWorktreeView;
+          selectedWorktreeID = "";
+          selectedWorktreeUnitID = "";
+          void loadWorktrees();
+        });
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-scope]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          worktreeScope = button.dataset
+            .worktreeScope as ReviewWorktreeScope;
+          if (worktreeScope !== "space") worktreeSpaceID = "";
+          selectedWorktreeID = "";
+          selectedWorktreeUnitID = "";
+          void loadWorktrees();
+        });
+      });
+    document
+      .querySelector<HTMLSelectElement>("[data-worktree-space]")
+      ?.addEventListener("change", (event) => {
+        worktreeSpaceID = (event.currentTarget as HTMLSelectElement).value;
+        selectedWorktreeID = "";
+        selectedWorktreeUnitID = "";
+        void loadWorktrees();
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-select]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedWorktreeID = button.dataset.worktreeSelect ?? "";
+          selectedWorktreeUnitID =
+            worktrees.find(
+              ({ worktreeID }) => worktreeID === selectedWorktreeID
+            )?.units[0]?.unitID ?? "";
+          reviewMode = "draft";
+          renderCurrentView();
+        });
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-unit]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedWorktreeUnitID = button.dataset.worktreeUnit ?? "";
+          reviewMode = "draft";
+          renderCurrentView();
+        });
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-review-mode]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          reviewMode = button.dataset.reviewMode as ReviewMode;
+          renderCurrentView();
+        });
+      });
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-action]")
+      .forEach((button) => {
+        button.addEventListener("click", async () => {
+          const action = button.dataset.worktreeAction;
+          const worktreeID = button.dataset.worktreeId;
+          if (!action || !worktreeID) return;
+          if (
+            (action === "merge" || action === "discard") &&
+            !window.confirm(
+              action === "merge"
+                ? "确认合并这个 Worktree？已成功合并的 Unit 不会回滚。"
+                : "确认丢弃这个 Worktree？"
+            )
+          ) {
+            return;
+          }
+          button.disabled = true;
+          try {
+            await api(
+              `/api/worktrees/${encodeURIComponent(worktreeID)}/${action}`,
+              { method: "POST" }
+            );
+            await loadWorktrees();
+          } catch (caught) {
+            showToast(
+              caught instanceof Error ? caught.message : String(caught)
+            );
+            button.disabled = false;
+          }
+        });
+      });
     document
       .querySelectorAll<HTMLButtonElement>("[data-quick-create]")
       .forEach((button) => {
@@ -701,6 +966,27 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
           void openTeamMembersDialog(directory.space);
         }
       });
+  }
+
+  async function loadWorktrees(): Promise<void> {
+    const query = new URLSearchParams({ view: worktreeView });
+    if (worktreeScope !== "all") query.set("scope", worktreeScope);
+    if (worktreeSpaceID) query.set("spaceID", worktreeSpaceID);
+    const result = await api<{ worktrees: ReviewWorktree[] }>(
+      `/api/worktrees?${query}`
+    );
+    worktrees = result.worktrees;
+    if (
+      !selectedWorktreeID ||
+      !worktrees.some(
+        ({ worktreeID }) => worktreeID === selectedWorktreeID
+      )
+    ) {
+      selectedWorktreeID = worktrees[0]?.worktreeID ?? "";
+      selectedWorktreeUnitID = worktrees[0]?.units[0]?.unitID ?? "";
+      reviewMode = "draft";
+    }
+    renderCurrentView();
   }
 
   async function createResource(
@@ -1004,7 +1290,7 @@ function nodeTable(
 }
 
 function listView(
-  view: Exclude<WorkspaceView, "home" | "space" | "trash">,
+  view: "recent" | "shared",
   resources: ResourceRecord[],
   query: string
 ): string {
@@ -1945,7 +2231,9 @@ function workspaceRoute(personalSpaceID: string): WorkspaceRoute {
     };
   }
   const view = parts[0] ?? "";
-  return ["home", "recent", "shared", "trash"].includes(view)
+  return ["home", "recent", "shared", "trash", "worktrees"].includes(
+    view
+  )
     ? { view: view as Exclude<WorkspaceView, "space"> }
     : { view: "home" };
 }

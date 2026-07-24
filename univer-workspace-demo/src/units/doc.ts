@@ -12,6 +12,7 @@ import {
 } from "@univerjs/presets";
 import {
   collaborationPlugins,
+  enforceReadOnlyReview,
   loadCurrentUser,
   syncEditorTitle,
 } from "../collaboration.js";
@@ -36,6 +37,7 @@ const { univer } = createUniver({
   ],
 });
 
+enforceReadOnlyReview(univer);
 syncEditorTitle(
   univer,
   new URL(window.location.href).searchParams.get("unit")

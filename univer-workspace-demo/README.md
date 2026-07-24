@@ -30,6 +30,16 @@
 - Sheet 编辑器使用 grid Ribbon 和高级数据/UI 插件；多类型编辑器不额外创建
   Formula、Pivot 或 History Worker。
 - Sheet、Doc、Slide 按 URL 中的 Unit type 动态加载对应编辑器。
+- Creator 可以在个人或团队 Scope 创建 Worktree；个人 Worktree 只对 Creator 可见，
+  团队 Worktree 可选择仅 Creator 或当前团队成员可见。
+- Worktree 可以引用当前用户可编辑的现有 Unit，也可以创建仅存在于 Worktree 的
+  Sheet、Doc、Slide；本地 Unit 只在 merge 成功后激活为产品资源。
+- `#/worktrees` 提供只读 Review 页面，显示 trunk、draft 和 merge preview，并支持
+  ready、reopen、merge、discard 生命周期操作。
+- Worktree 内容读取、提交、ready 和逐 Unit merge 都实时复核产品 ACL；visibility
+  只控制发现与 Review，不授予 Unit 权限。
+- Worktree 创建、加入 Unit 和本地 Unit 创建使用 SQLite operation journal；
+  启动时恢复半程操作，并补齐已提交 merge/discard 的产品侧状态。
 
 Board 和 Base 暂未显示创建入口，因为 alpha.7 协同包没有从公开入口导出对应 data
 transformer。Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅支持 Sheet，
@@ -68,11 +78,17 @@ pnpm --filter @univerjs/collaboration-example-univer-workspace reset
 
 ```text
 Browser
-├── /api/*                 Express 产品 API
+├── /api/*                 Express 产品与 Worktree API
+│   └── WorkspaceWorktreeApplication
+│       ├── WorkspaceWorktreeCatalog（SQLite）
+│       └── ProductStore
 └── /universer-api/*       Node Transport
     ├── UniverHistoryEndpoint
     │     └── UniverHistoryService
     │           └── SQLiteHistoryDatabaseAdapter
+    ├── UniverCollabWorktreeEndpoint
+    │     └── UniverCollabWorktreeService
+    │           └── SQLiteWorktreeDatabaseAdapter
     └── UniverCollabEndpoint
           └── UniverCollabService
                 └── SQLiteDatabaseAdapter
@@ -84,6 +100,11 @@ Express 产品 API
     ├── workspace_nodes + workspace_units
     ├── workspace_node_members
     └── workspace_node_recents
+
+WorkspaceWorktreeCatalog
+├── workspace_worktrees + workspace_worktree_units
+├── workspace_staged_resources
+└── workspace_worktree_operations
 ```
 
 个人空间和团队空间共用 `workspace_nodes` 目录树；`parent_id = NULL` 表示空间根目录。
@@ -151,6 +172,17 @@ History 是 confirmed changeset 的最终一致派生索引。Workspace Demo 使
 - `POST /api/units/:resourceID/members`
 - `PATCH /api/units/:resourceID/members/:userID`
 - `DELETE /api/units/:resourceID/members/:userID`
+- `GET /api/worktrees?view=<active|processed>`
+- `POST /api/worktrees`
+- `GET /api/worktrees/:worktreeID`
+- `PATCH /api/worktrees/:worktreeID`
+- `POST /api/worktrees/:worktreeID/units`
+- `POST /api/worktrees/:worktreeID/units/new`
+- `POST /api/worktrees/:worktreeID/units/:unitID/submit_changesets`
+- `POST /api/worktrees/:worktreeID/ready`
+- `POST /api/worktrees/:worktreeID/reopen`
+- `POST /api/worktrees/:worktreeID/merge`
+- `POST /api/worktrees/:worktreeID/discard`
 
 ## Spike 边界
 
