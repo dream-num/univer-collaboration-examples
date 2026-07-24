@@ -5,5 +5,5 @@
     "verbatimModuleSyntax": true,
     "types": ["node"]
   },
-  "include": ["server/**/*.ts", "test/**/*.ts"]
+  "include": ["server/**/*.ts", "shared/**/*.ts", "test/**/*.ts"]
 }

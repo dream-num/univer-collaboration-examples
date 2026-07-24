@@ -1,22 +1,137 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Univer Basic Sheets Worktree</title>
+    <title>Univer Worktree Demo</title>
   </head>
   <body>
-    <header id="worktree-toolbar">
-      <strong>Worktree</strong>
-      <span id="worktree-identity">initializing…</span>
-      <span id="worktree-status"></span>
-      <button id="worktree-ready" type="button">Mark ready</button>
-      <button id="worktree-reopen" type="button">Reopen</button>
-      <button id="worktree-merge" type="button">Merge</button>
-      <button id="worktree-discard" type="button">Discard</button>
-      <span id="worktree-message"></span>
-    </header>
-    <div id="app"></div>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Worktree 导航">
+        <div class="workspace-title">
+          <span class="workspace-mark" aria-hidden="true">U</span>
+          <div>
+            <strong>Worktree Demo</strong>
+            <span>Basic Sheets</span>
+          </div>
+        </div>
+
+        <nav class="navigation">
+          <section class="nav-section">
+            <div class="section-label">主线</div>
+            <button id="trunk-row" class="nav-row" type="button">
+              <span class="row-icon" aria-hidden="true">▦</span>
+              <span class="row-copy">
+                <strong>主线</strong>
+                <small>共享正式版本</small>
+              </span>
+            </button>
+          </section>
+
+          <section class="nav-section">
+            <div class="section-heading">
+              <span class="section-label">Worktrees</span>
+              <button
+                id="create-worktree"
+                class="icon-button"
+                type="button"
+                aria-label="创建 Worktree"
+                title="创建 Worktree"
+              >
+                +
+              </button>
+            </div>
+            <div id="active-worktrees" class="row-list"></div>
+          </section>
+        </nav>
+
+        <section class="processed-section">
+          <button
+            id="processed-toggle"
+            class="processed-toggle"
+            type="button"
+            aria-expanded="false"
+          >
+            <span>
+              <span class="row-icon" aria-hidden="true">↺</span>
+              <span id="processed-label">已处理 · 0</span>
+            </span>
+            <span id="processed-chevron" aria-hidden="true">›</span>
+          </button>
+          <div id="processed-worktrees" class="processed-list" hidden></div>
+        </section>
+      </aside>
+
+      <main class="main-pane">
+        <header id="topbar" class="topbar"></header>
+        <div class="editor-pane">
+          <div id="univer-container"></div>
+          <div id="viewer-overlay" class="viewer-overlay" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="viewer-overlay-text">正在加载表格…</span>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <dialog id="create-dialog" class="dialog">
+      <form id="create-form">
+        <div class="dialog-heading">
+          <div>
+            <h2>创建 Worktree</h2>
+            <p>从当前主线表格创建一个可独立编辑的分支。</p>
+          </div>
+          <button
+            id="create-close"
+            class="dialog-close"
+            type="button"
+            aria-label="关闭"
+          >
+            ×
+          </button>
+        </div>
+        <label class="field">
+          <span>名称</span>
+          <input
+            id="worktree-name"
+            name="name"
+            maxlength="80"
+            autocomplete="off"
+            required
+          />
+        </label>
+        <div id="create-error" class="form-error" aria-live="polite"></div>
+        <div class="dialog-actions">
+          <button id="create-cancel" class="button secondary" type="button">
+            取消
+          </button>
+          <button id="create-submit" class="button primary" type="submit">
+            创建并打开
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="confirm-dialog" class="dialog confirm-dialog">
+      <form method="dialog">
+        <div class="dialog-heading">
+          <div>
+            <h2 id="confirm-title"></h2>
+            <p id="confirm-message"></p>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button class="button secondary" value="cancel">取消</button>
+          <button
+            id="confirm-submit"
+            class="button primary"
+            value="confirm"
+          ></button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script type="module" src="/client/sheets/main.ts"></script>
   </body>
 </html>

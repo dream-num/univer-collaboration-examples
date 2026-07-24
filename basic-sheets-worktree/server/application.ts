@@ -5,13 +5,24 @@ import { fileURLToPath } from "node:url";
 import express, { Router } from "express";
 import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
 import { SQLiteWorktreeDatabaseAdapter } from "@univerjs/collaboration-worktree-database-sqlite";
-import type { UniverCollabService } from "@univerjs/collaboration-service";
+import {
+  CollabError,
+  type UniverCollabService,
+} from "@univerjs/collaboration-service";
 import type { UniverCollabWorktreeService } from "@univerjs/collaboration-worktree-service";
+import {
+  DEMO_TRUNK_UNIT_ID,
+  DEMO_TRUNK_UNIT_TYPE,
+} from "../shared/demo.js";
 import { createWorktreeCollaborationStack } from "./collaboration.js";
 import { DEMO_USER } from "./demo-user.js";
+import { demoCallOptions } from "./demo-session.js";
 import { errorHandler, notFoundHandler } from "./http/errors.js";
 import { createAuthzRouter } from "./routes/authz.js";
 import { createUserRouter } from "./routes/user.js";
+import { createWorktreeRouter } from "./routes/worktrees.js";
+import { createDemoTrunkWorkbookData } from "./workbook-data.js";
+import { WorktreeCatalog } from "./worktree-catalog.js";
 
 export interface BasicSheetsWorktreeApplicationOptions {
   readonly databaseFilename?: string;
@@ -23,6 +34,7 @@ export interface BasicSheetsWorktreeApplication {
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
   readonly worktreeDatabase: SQLiteWorktreeDatabaseAdapter;
+  readonly worktreeCatalog: WorktreeCatalog;
   readonly collabService: UniverCollabService;
   readonly worktreeService: UniverCollabWorktreeService;
   listen(port?: number, host?: string): Promise<number>;
@@ -36,16 +48,34 @@ export async function createBasicSheetsWorktreeApplication(
   mkdirSync(dirname(filename), { recursive: true });
   const database = new SQLiteDatabaseAdapter({ filename });
   const worktreeDatabase = new SQLiteWorktreeDatabaseAdapter({ filename });
+  const worktreeCatalog = new WorktreeCatalog(filename);
   const collaboration = createWorktreeCollaborationStack({
     dbAdapter: database,
     worktreeDbAdapter: worktreeDatabase,
     user: DEMO_USER,
   });
+  await ensureDemoTrunkUnit(collaboration.collabService);
+  collaboration.worktreeService.on(
+    "worktreeStatusChanged",
+    ({ worktree, status, occurredAt }) => {
+      if (status === "merged" || status === "discarded") {
+        worktreeCatalog.markCompleted(worktree.worktreeID, occurredAt);
+      }
+    }
+  );
 
   const app = express();
   const applicationRouter = Router();
   applicationRouter.use("/user", createUserRouter(DEMO_USER));
   applicationRouter.use("/authz", createAuthzRouter());
+  app.use(
+    "/api/worktrees",
+    createWorktreeRouter({
+      catalog: worktreeCatalog,
+      service: collaboration.worktreeService,
+      user: DEMO_USER,
+    })
+  );
   app.use("/universer-api", applicationRouter);
   app.use("/universer-api", collaboration.handleHttp);
 
@@ -70,6 +100,7 @@ export async function createBasicSheetsWorktreeApplication(
     httpServer,
     database,
     worktreeDatabase,
+    worktreeCatalog,
     collabService: collaboration.collabService,
     worktreeService: collaboration.worktreeService,
     listen: (port = 3020, host = "127.0.0.1") =>
@@ -79,10 +110,40 @@ export async function createBasicSheetsWorktreeApplication(
       closed = true;
       await collaboration.dispose();
       await closeServer(httpServer);
+      worktreeCatalog.dispose();
       await worktreeDatabase.dispose();
       await database.dispose();
     },
   };
+}
+
+async function ensureDemoTrunkUnit(
+  service: UniverCollabService
+): Promise<void> {
+  try {
+    await service.getUnit(
+      {
+        unitID: DEMO_TRUNK_UNIT_ID,
+        type: DEMO_TRUNK_UNIT_TYPE,
+        revision: 0,
+      },
+      demoCallOptions(DEMO_USER)
+    );
+  } catch (error) {
+    if (
+      !(error instanceof CollabError) ||
+      error.code !== "UNIT_NOT_FOUND"
+    ) {
+      throw error;
+    }
+    await service.createUnitFromData(
+      {
+        type: DEMO_TRUNK_UNIT_TYPE,
+        data: createDemoTrunkWorkbookData(),
+      },
+      demoCallOptions(DEMO_USER)
+    );
+  }
 }
 
 function defaultDatabaseFilename(): string {
