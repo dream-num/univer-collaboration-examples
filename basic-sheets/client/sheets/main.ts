@@ -60,7 +60,6 @@ import {
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 import "@univerjs-pro/edit-history-viewer/lib/index.css";
-import "@univerjs-pro/live-share/lib/index.css";
 import "@univerjs-pro/sheets-chart-ui/lib/index.css";
 import "@univerjs-pro/sheets-outline-ui/lib/index.css";
 import "@univerjs-pro/sheets-pivot-ui/lib/index.css";
@@ -91,7 +90,6 @@ import "@univerjs-pro/sheets-sparkline/facade";
 import "@univerjs-pro/sheets-outline/facade";
 import "@univerjs/sheets-table/facade";
 import "@univerjs/sheets-formula/facade";
-import "@univerjs-pro/live-share/facade";
 import "@univerjs-pro/range-preprocess/facade";
 import "@univerjs-pro/collaboration-client/facade";
 

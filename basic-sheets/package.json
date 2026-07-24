@@ -23,7 +23,6 @@
     "@univerjs-pro/edit-history-viewer": "1.0.0-alpha.7",
     "@univerjs-pro/engine-formula": "1.0.0-alpha.7",
     "@univerjs-pro/license": "1.0.0-alpha.7",
-    "@univerjs-pro/live-share": "1.0.0-alpha.7",
     "@univerjs-pro/range-preprocess": "1.0.0-alpha.7",
     "@univerjs-pro/sheets-chart": "1.0.0-alpha.7",
     "@univerjs-pro/sheets-chart-ui": "1.0.0-alpha.7",

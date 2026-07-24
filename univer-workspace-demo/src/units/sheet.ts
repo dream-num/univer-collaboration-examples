@@ -21,7 +21,6 @@ import {
   syncEditorTitle,
 } from "../collaboration.js";
 import {
-  getSheetCollaborationFeaturePlugins,
   getSheetFeaturePlugins,
   sheetFeatureLocale,
 } from "./sheet-features.js";
@@ -54,7 +53,6 @@ const { univer } = createUniver({
     ],
     ...getSheetFeaturePlugins(),
     ...collaborationPlugins(),
-    ...getSheetCollaborationFeaturePlugins(),
     ...historyPlugins(),
   ],
 });

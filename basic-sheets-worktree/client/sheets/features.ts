@@ -1,6 +1,5 @@
 import type { IPresetPlugin } from "@univerjs/presets";
 import { IImageIoService } from "@univerjs/core";
-import { UniverLiveSharePlugin } from "@univerjs-pro/live-share";
 import { UniverRangePreprocessPlugin } from "@univerjs-pro/range-preprocess";
 import { UniverSheetsChartPlugin } from "@univerjs-pro/sheets-chart";
 import SheetsChartZhCN from "@univerjs-pro/sheets-chart/locale/zh-CN";
@@ -56,7 +55,6 @@ import { UniverSheetsTableUIPlugin } from "@univerjs/sheets-table-ui";
 import SheetsTableUIZhCN from "@univerjs/sheets-table-ui/locale/zh-CN";
 import { mergeLocales } from "@univerjs/presets";
 
-import "@univerjs-pro/live-share/lib/index.css";
 import "@univerjs-pro/sheets-chart-ui/lib/index.css";
 import "@univerjs-pro/sheets-outline-ui/lib/index.css";
 import "@univerjs-pro/sheets-pivot-ui/lib/index.css";
@@ -80,7 +78,6 @@ import "@univerjs-pro/sheets-shape/facade";
 import "@univerjs-pro/sheets-sparkline/facade";
 import "@univerjs-pro/sheets-outline/facade";
 import "@univerjs/sheets-table/facade";
-import "@univerjs-pro/live-share/facade";
 import "@univerjs-pro/range-preprocess/facade";
 
 export const sheetFeatureLocale = mergeLocales(
@@ -150,8 +147,4 @@ export function getSheetFeaturePlugins(): IPresetPlugin[] {
     UniverSheetsPivotTableUIPlugin,
     UniverSheetsHyperLinkUIPlugin,
   ];
-}
-
-export function getSheetCollaborationFeaturePlugins(): IPresetPlugin[] {
-  return [UniverLiveSharePlugin];
 }

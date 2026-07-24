@@ -34,7 +34,6 @@ import {
 } from "../api";
 import { host, httpProtocol, unit, url } from "./consts";
 import {
-  getSheetCollaborationFeaturePlugins,
   getSheetFeaturePlugins,
   sheetFeatureLocale,
 } from "./features";
@@ -171,7 +170,6 @@ function initializeUniver(): void {
       ],
       ...getSheetFeaturePlugins(),
       ...getCollaborationPlugins(),
-      ...getSheetCollaborationFeaturePlugins(),
       ...getHistoryPlugins(),
     ],
   });

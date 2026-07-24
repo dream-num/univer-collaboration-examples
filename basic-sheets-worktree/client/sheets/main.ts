@@ -40,7 +40,6 @@ import {
 } from "./api";
 import { origin } from "./consts";
 import {
-  getSheetCollaborationFeaturePlugins,
   getSheetFeaturePlugins,
   sheetFeatureLocale,
 } from "./features";
@@ -458,7 +457,6 @@ class WorktreeDemoApp {
           ],
           ...getSheetFeaturePlugins(),
           ...getCollaborationPlugins(scope),
-          ...getSheetCollaborationFeaturePlugins(),
         ],
       });
       this._univer = univer;

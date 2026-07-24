@@ -11,7 +11,6 @@ import {
 } from "@univerjs-pro/collaboration-client-ui";
 import { UniverEditHistoryLoaderPlugin } from "@univerjs-pro/edit-history-loader";
 import { UniverProFormulaEnginePlugin } from "@univerjs-pro/engine-formula";
-import { UniverLiveSharePlugin } from "@univerjs-pro/live-share";
 import { UniverSheetsChartPlugin } from "@univerjs-pro/sheets-chart";
 import { UniverSheetsChartUIPlugin } from "@univerjs-pro/sheets-chart-ui";
 import { UniverSheetsOutlinePlugin } from "@univerjs-pro/sheets-outline";
@@ -126,7 +125,6 @@ export function registerCollaborationFeatures(univer: Univer): void {
     sendChangesetTimeout: 200,
   });
   univer.registerPlugin(UniverCollaborationClientUIPlugin);
-  univer.registerPlugin(UniverLiveSharePlugin);
   univer.registerPlugin(UniverSheetsNotePlugin);
   univer.registerPlugin(UniverSheetsNoteUIPlugin);
 }
