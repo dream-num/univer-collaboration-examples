@@ -40,21 +40,28 @@
 
 ### 1. SDK 代码基线
 
-当前 example 固定依赖 npm `1.0.0-alpha.6`。本清单最近一次对照的上游基线是
-本地 `univer-pro` `b6babb152702`（`dev` 分支）；该 commit 中
+当前 example 固定依赖 npm `1.0.0-alpha.7`。本清单最近一次对照的上游基线是
+本地 `univer-pro` `bdac4f4aa`（`dev` 分支）；该 commit 中
 collaboration、collaboration-client 和 collaboration-client-ui 的包版本声明为
 `1.0.0-alpha.7`，且上游 example 直接使用 workspace 源码。
 
 影响：
 
-- 两边不是严格相同的构建产物。
+- 两边版本声明一致，但 npm 发布物与持续移动的 workspace 源码不是严格相同的构建
+  产物。
 - 行为差异不能只从插件配置推断，也可能来自 SDK 代码版本。
 - 本地分支会继续移动；后续比较必须记录 commit，不能只写“当前 dev”。
 
-待确认：
+当前策略：
 
-- [ ] example 长期跟随 npm 发布版，还是本地开发时对齐 `univer-pro` workspace。
-- [ ] 建立明确的 SDK 升级和兼容验证方式。
+- 所有 packages 和 examples 精确锁定同一个 npm SDK 版本，不直接依赖本地
+  `univer-pro` workspace。
+- 每次升级记录 `univer-pro` 对照 commit，并运行完整 build、typecheck、测试和
+  example 集成测试。
+
+从上一对照点 `b6babb152702` 到 `bdac4f4aa`，上游 `sheets` example 涉及的变化只有
+formula package consolidation；本 example 通过 `UniverSheetsCorePreset` 间接装配
+公式能力，没有直接引用被重命名的 formula package，因此不需要同步源码改动。
 
 ### 2. Univer 初始化方式
 

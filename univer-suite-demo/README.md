@@ -29,8 +29,8 @@
 - Sheet 编辑器中的 Univer Edit History UI。
 - Sheet、Doc、Slide 按 URL 中的 Unit type 动态加载对应编辑器。
 
-Board 和 Base 暂未显示创建入口，因为 alpha.6 协同包没有从公开入口导出对应 data
-transformer。Doc 和 Slide 已保存 History 元数据，但 alpha.6 viewer 仅支持 Sheet，
+Board 和 Base 暂未显示创建入口，因为 alpha.7 协同包没有从公开入口导出对应 data
+transformer。Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅支持 Sheet，
 因此暂不展示可视化历史入口。相关证据和后续方向见
 [`docs/issues`](../../docs/issues/README.md)。
 

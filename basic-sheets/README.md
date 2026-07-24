@@ -139,9 +139,9 @@ restore workaround。
 
 ## 已知问题
 
-`@univerjs-pro/collaboration-client@1.0.0-alpha.6` 的在线 peer 收到 restore
+`@univerjs-pro/collaboration-client@1.0.0-alpha.7` 的在线 peer 收到 restore
 changeset 后可能进入 conflict。它存在于未修改的上游客户端，本 example 不擅自修复。
-详见 [alpha.6 peer restore conflict](../../docs/issues/known-issues/alpha6-peer-restore-conflict.md)。
+详见 [Collaboration Client peer restore conflict](../../docs/issues/known-issues/collaboration-client-peer-restore-conflict.md)。
 
 服务端仍保证 restore snapshot 在发布 `changesetCommitted` 前持久化，因此
 Endpoint 入队和发送 ACK/broadcast 时 snapshot 已经可读；这不等价于修复客户端

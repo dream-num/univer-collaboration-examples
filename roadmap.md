@@ -113,7 +113,7 @@ examples/
 4. 模拟网络中断后重新连接，客户端补齐缺失 changeset 并恢复一致。
 5. 打开历史版本列表，能够查看并恢复已有版本。
 
-alpha.6 在线 peer restore conflict 属于上游 known issue，不在 example 中使用私有
+当前 alpha.7 在线 peer restore conflict 属于上游 known issue，不在 example 中使用私有
 Client API 擅自修复，记录见 `docs/issues/known-issues`。
 
 ## 4. `basic-auth-demo`
