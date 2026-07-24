@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { UnitAction, UniverType } from "@univerjs/protocol";
 import { afterEach, describe, expect, it } from "vitest";
-import type { SuiteApplication } from "../server/application.js";
-import { createSuiteApplication } from "../server/application.js";
+import type { WorkspaceApplication } from "../server/application.js";
+import { createWorkspaceApplication } from "../server/application.js";
 
-const applications: SuiteApplication[] = [];
+const applications: WorkspaceApplication[] = [];
 const directories: string[] = [];
 
 afterEach(async () => {
@@ -19,7 +19,7 @@ afterEach(async () => {
   }
 });
 
-describe("univer-suite-demo spaces", () => {
+describe("univer-workspace-demo spaces", () => {
   it("organizes all Unit types in personal folders and restores a deleted subtree", async () => {
     const origin = await startApplication();
     const alice = await login(origin, "alice", "alice-password");
@@ -405,10 +405,10 @@ interface Resource {
 }
 
 async function startApplication(): Promise<string> {
-  const directory = await mkdtemp(join(tmpdir(), "univer-suite-demo-"));
+  const directory = await mkdtemp(join(tmpdir(), "univer-workspace-demo-"));
   directories.push(directory);
-  const application = await createSuiteApplication({
-    databaseFilename: join(directory, "suite.sqlite"),
+  const application = await createWorkspaceApplication({
+    databaseFilename: join(directory, "workspace.sqlite"),
     serveClient: false,
   });
   applications.push(application);

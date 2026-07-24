@@ -1,11 +1,11 @@
-import { createSuiteApplication } from "./application.js";
+import { createWorkspaceApplication } from "./application.js";
 
 const port = Number(process.env.PORT ?? 3020);
 const host = process.env.HOST ?? "127.0.0.1";
-const application = await createSuiteApplication();
+const application = await createWorkspaceApplication();
 const actualPort = await application.listen(port, host);
 
-console.info(`Univer Suite Demo is running at http://${host}:${actualPort}`);
+console.info(`Univer Workspace Demo is running at http://${host}:${actualPort}`);
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {

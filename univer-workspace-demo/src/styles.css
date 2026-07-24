@@ -339,7 +339,7 @@ button {
 }
 
 /* Workspace shell */
-.suite-shell {
+.workspace-shell {
   display: grid;
   width: 100%;
   min-height: 100%;
@@ -1926,7 +1926,7 @@ button {
     grid-template-columns: 190px minmax(240px, 1fr) auto;
   }
 
-  .suite-shell {
+  .workspace-shell {
     grid-template-columns: 190px minmax(0, 1fr);
   }
 
@@ -1945,7 +1945,7 @@ button {
 }
 
 @media (max-width: 680px) {
-  .suite-shell {
+  .workspace-shell {
     display: block;
     padding-top: 58px;
     padding-bottom: 62px;

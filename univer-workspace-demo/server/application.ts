@@ -16,12 +16,12 @@ import {
   createProtocolCompatibilityRouter,
 } from "./routes.js";
 
-export interface SuiteApplicationOptions {
+export interface WorkspaceApplicationOptions {
   readonly databaseFilename?: string;
   readonly serveClient?: boolean;
 }
 
-export interface SuiteApplication {
+export interface WorkspaceApplication {
   readonly app: express.Express;
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
@@ -34,9 +34,9 @@ export interface SuiteApplication {
   close(): Promise<void>;
 }
 
-export async function createSuiteApplication(
-  options: SuiteApplicationOptions = {}
-): Promise<SuiteApplication> {
+export async function createWorkspaceApplication(
+  options: WorkspaceApplicationOptions = {}
+): Promise<WorkspaceApplication> {
   const databaseFilename = options.databaseFilename ?? defaultDatabaseFilename();
   mkdirSync(dirname(databaseFilename), { recursive: true });
   const database = new SQLiteDatabaseAdapter({ filename: databaseFilename });
@@ -116,7 +116,7 @@ export async function createSuiteApplication(
 function defaultDatabaseFilename(): string {
   return join(
     dirname(fileURLToPath(import.meta.url)),
-    "../.data/univer-suite-demo.sqlite"
+    "../.data/univer-workspace-demo.sqlite"
   );
 }
 

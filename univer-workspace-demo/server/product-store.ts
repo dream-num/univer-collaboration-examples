@@ -9,7 +9,7 @@ export type ResourceMemberRole = "editor" | "viewer";
 export type ResourceAccessRole = SpaceAccessRole | ResourceMemberRole;
 export type NodeStatus = "creating" | "active" | "failed" | "deleted";
 
-export interface SuiteSpace {
+export interface WorkspaceSpace {
   readonly id: string;
   readonly type: SpaceType;
   readonly name: string;
@@ -18,7 +18,7 @@ export interface SuiteSpace {
   readonly updatedAt: number;
 }
 
-export interface SuiteFolder {
+export interface WorkspaceFolder {
   readonly kind: "folder";
   readonly id: string;
   readonly spaceID: string;
@@ -30,7 +30,7 @@ export interface SuiteFolder {
   readonly updatedAt: number;
 }
 
-export interface SuiteResource {
+export interface WorkspaceResource {
   readonly kind: "unit";
   readonly id: string;
   readonly spaceID: string;
@@ -47,7 +47,7 @@ export interface SuiteResource {
   readonly updatedAt: number;
 }
 
-export type SuiteNode = SuiteFolder | SuiteResource;
+export type WorkspaceNode = WorkspaceFolder | WorkspaceResource;
 
 export interface SpaceMember {
   readonly spaceID: string;
@@ -66,12 +66,12 @@ export interface ResourceMember {
 }
 
 export interface AccessibleSpace {
-  readonly space: SuiteSpace;
+  readonly space: WorkspaceSpace;
   readonly role: SpaceAccessRole;
 }
 
 export interface AccessibleResource {
-  readonly resource: SuiteResource;
+  readonly resource: WorkspaceResource;
   readonly role: ResourceAccessRole;
 }
 
@@ -130,9 +130,9 @@ const RESOURCE_SELECT = `
     node.created_by, node.created_at, node.updated_at,
     unit.unit_id, unit.unit_type,
     space.owner_user_id, space.type AS space_type, space.name AS space_name
-  FROM suite_nodes AS node
-  JOIN suite_units AS unit ON unit.node_id = node.id
-  JOIN suite_spaces AS space ON space.id = node.space_id
+  FROM workspace_nodes AS node
+  JOIN workspace_units AS unit ON unit.node_id = node.id
+  JOIN workspace_spaces AS space ON space.id = node.space_id
 `;
 
 /**
@@ -148,7 +148,7 @@ export class ProductStore {
     this._database.exec(`
       PRAGMA foreign_keys = ON;
 
-      CREATE TABLE IF NOT EXISTS suite_spaces (
+      CREATE TABLE IF NOT EXISTS workspace_spaces (
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK (type IN ('personal', 'team')),
         name TEXT NOT NULL,
@@ -156,23 +156,23 @@ export class ProductStore {
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL
       );
-      CREATE UNIQUE INDEX IF NOT EXISTS suite_spaces_personal_owner
-        ON suite_spaces(owner_user_id)
+      CREATE UNIQUE INDEX IF NOT EXISTS workspace_spaces_personal_owner
+        ON workspace_spaces(owner_user_id)
         WHERE type = 'personal';
 
-      CREATE TABLE IF NOT EXISTS suite_space_members (
+      CREATE TABLE IF NOT EXISTS workspace_space_members (
         space_id TEXT NOT NULL,
         user_id TEXT NOT NULL,
         role TEXT NOT NULL CHECK (role IN ('admin', 'editor', 'viewer')),
         invited_by TEXT NOT NULL,
         created_at INTEGER NOT NULL,
         PRIMARY KEY (space_id, user_id),
-        FOREIGN KEY (space_id) REFERENCES suite_spaces(id) ON DELETE CASCADE
+        FOREIGN KEY (space_id) REFERENCES workspace_spaces(id) ON DELETE CASCADE
       );
-      CREATE INDEX IF NOT EXISTS suite_space_members_user
-        ON suite_space_members(user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS workspace_space_members_user
+        ON workspace_space_members(user_id, created_at DESC);
 
-      CREATE TABLE IF NOT EXISTS suite_nodes (
+      CREATE TABLE IF NOT EXISTS workspace_nodes (
         id TEXT PRIMARY KEY,
         space_id TEXT NOT NULL,
         parent_id TEXT,
@@ -183,49 +183,49 @@ export class ProductStore {
         created_by TEXT NOT NULL,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
-        FOREIGN KEY (space_id) REFERENCES suite_spaces(id) ON DELETE CASCADE,
-        FOREIGN KEY (parent_id) REFERENCES suite_nodes(id) ON DELETE RESTRICT
+        FOREIGN KEY (space_id) REFERENCES workspace_spaces(id) ON DELETE CASCADE,
+        FOREIGN KEY (parent_id) REFERENCES workspace_nodes(id) ON DELETE RESTRICT
       );
-      CREATE INDEX IF NOT EXISTS suite_nodes_space_parent_status
-        ON suite_nodes(space_id, parent_id, status, kind, name);
+      CREATE INDEX IF NOT EXISTS workspace_nodes_space_parent_status
+        ON workspace_nodes(space_id, parent_id, status, kind, name);
 
-      CREATE TABLE IF NOT EXISTS suite_units (
+      CREATE TABLE IF NOT EXISTS workspace_units (
         node_id TEXT PRIMARY KEY,
         unit_id TEXT NOT NULL UNIQUE,
         unit_type INTEGER NOT NULL,
-        FOREIGN KEY (node_id) REFERENCES suite_nodes(id) ON DELETE CASCADE
+        FOREIGN KEY (node_id) REFERENCES workspace_nodes(id) ON DELETE CASCADE
       );
 
-      CREATE TABLE IF NOT EXISTS suite_node_members (
+      CREATE TABLE IF NOT EXISTS workspace_node_members (
         node_id TEXT NOT NULL,
         user_id TEXT NOT NULL,
         role TEXT NOT NULL CHECK (role IN ('editor', 'viewer')),
         invited_by TEXT NOT NULL,
         created_at INTEGER NOT NULL,
         PRIMARY KEY (node_id, user_id),
-        FOREIGN KEY (node_id) REFERENCES suite_nodes(id) ON DELETE CASCADE
+        FOREIGN KEY (node_id) REFERENCES workspace_nodes(id) ON DELETE CASCADE
       );
-      CREATE INDEX IF NOT EXISTS suite_node_members_user
-        ON suite_node_members(user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS workspace_node_members_user
+        ON workspace_node_members(user_id, created_at DESC);
 
-      CREATE TABLE IF NOT EXISTS suite_node_recents (
+      CREATE TABLE IF NOT EXISTS workspace_node_recents (
         node_id TEXT NOT NULL,
         user_id TEXT NOT NULL,
         last_opened_at INTEGER NOT NULL,
         PRIMARY KEY (node_id, user_id),
-        FOREIGN KEY (node_id) REFERENCES suite_nodes(id) ON DELETE CASCADE
+        FOREIGN KEY (node_id) REFERENCES workspace_nodes(id) ON DELETE CASCADE
       );
-      CREATE INDEX IF NOT EXISTS suite_node_recents_user_opened
-        ON suite_node_recents(user_id, last_opened_at DESC);
+      CREATE INDEX IF NOT EXISTS workspace_node_recents_user_opened
+        ON workspace_node_recents(user_id, last_opened_at DESC);
     `);
   }
 
-  ensurePersonalSpace(userId: string, userName: string): SuiteSpace {
+  ensurePersonalSpace(userId: string, userName: string): WorkspaceSpace {
     this._assertOpen();
     const existing = this._database
       .prepare(
         `SELECT id, type, name, owner_user_id, created_at, updated_at
-         FROM suite_spaces
+         FROM workspace_spaces
          WHERE type = 'personal' AND owner_user_id = ?`
       )
       .get(userId) as SpaceRow | undefined;
@@ -235,7 +235,7 @@ export class ProductStore {
     const id = randomUUID();
     this._database
       .prepare(
-        `INSERT INTO suite_spaces
+        `INSERT INTO workspace_spaces
           (id, type, name, owner_user_id, created_at, updated_at)
          VALUES (?, 'personal', ?, ?, ?, ?)`
       )
@@ -247,12 +247,12 @@ export class ProductStore {
     readonly id: string;
     readonly name: string;
     readonly ownerUserId: string;
-  }): SuiteSpace {
+  }): WorkspaceSpace {
     this._assertOpen();
     const now = Date.now();
     this._database
       .prepare(
-        `INSERT INTO suite_spaces
+        `INSERT INTO workspace_spaces
           (id, type, name, owner_user_id, created_at, updated_at)
          VALUES (?, 'team', ?, ?, ?, ?)`
       )
@@ -260,12 +260,12 @@ export class ProductStore {
     return this.getSpace(input.id)!;
   }
 
-  getSpace(spaceID: string): SuiteSpace | null {
+  getSpace(spaceID: string): WorkspaceSpace | null {
     this._assertOpen();
     const row = this._database
       .prepare(
         `SELECT id, type, name, owner_user_id, created_at, updated_at
-         FROM suite_spaces WHERE id = ?`
+         FROM workspace_spaces WHERE id = ?`
       )
       .get(spaceID) as SpaceRow | undefined;
     return row ? toSpace(row) : null;
@@ -282,8 +282,8 @@ export class ProductStore {
              WHEN space.owner_user_id = ? THEN 'owner'
              ELSE member.role
            END AS access_role
-         FROM suite_spaces AS space
-         LEFT JOIN suite_space_members AS member
+         FROM workspace_spaces AS space
+         LEFT JOIN workspace_space_members AS member
            ON member.space_id = space.id AND member.user_id = ?
          WHERE space.owner_user_id = ? OR member.user_id IS NOT NULL
          ORDER BY
@@ -305,7 +305,7 @@ export class ProductStore {
     if (space.ownerUserId === userId) return "owner";
     const row = this._database
       .prepare(
-        `SELECT role FROM suite_space_members
+        `SELECT role FROM workspace_space_members
          WHERE space_id = ? AND user_id = ?`
       )
       .get(spaceID, userId) as { readonly role: SpaceMemberRole } | undefined;
@@ -317,7 +317,7 @@ export class ProductStore {
     const rows = this._database
       .prepare(
         `SELECT space_id, user_id, role, invited_by, created_at
-         FROM suite_space_members
+         FROM workspace_space_members
          WHERE space_id = ?
          ORDER BY
            CASE role WHEN 'admin' THEN 0 WHEN 'editor' THEN 1 ELSE 2 END,
@@ -332,7 +332,7 @@ export class ProductStore {
     const row = this._database
       .prepare(
         `SELECT space_id, user_id, role, invited_by, created_at
-         FROM suite_space_members
+         FROM workspace_space_members
          WHERE space_id = ? AND user_id = ?`
       )
       .get(spaceID, userId) as SpaceMemberRow | undefined;
@@ -355,7 +355,7 @@ export class ProductStore {
     }
     this._database
       .prepare(
-        `INSERT INTO suite_space_members
+        `INSERT INTO workspace_space_members
           (space_id, user_id, role, invited_by, created_at)
          VALUES (?, ?, ?, ?, ?)
          ON CONFLICT(space_id, user_id)
@@ -376,16 +376,16 @@ export class ProductStore {
     const removed =
       this._database
         .prepare(
-          `DELETE FROM suite_space_members
+          `DELETE FROM workspace_space_members
            WHERE space_id = ? AND user_id = ?`
         )
         .run(spaceID, userId).changes === 1;
     if (removed) {
       this._database
         .prepare(
-          `DELETE FROM suite_node_recents
+          `DELETE FROM workspace_node_recents
            WHERE user_id = ? AND node_id IN (
-             SELECT id FROM suite_nodes WHERE space_id = ?
+             SELECT id FROM workspace_nodes WHERE space_id = ?
            )`
         )
         .run(userId, spaceID);
@@ -399,12 +399,12 @@ export class ProductStore {
     readonly parentID: string | null;
     readonly name: string;
     readonly createdBy: string;
-  }): SuiteFolder {
+  }): WorkspaceFolder {
     this._assertValidParent(input.spaceID, input.parentID);
     const now = Date.now();
     this._database
       .prepare(
-        `INSERT INTO suite_nodes
+        `INSERT INTO workspace_nodes
           (id, space_id, parent_id, kind, name, status, created_by,
            created_at, updated_at)
          VALUES (?, ?, ?, 'folder', ?, 'active', ?, ?, ?)`
@@ -421,13 +421,13 @@ export class ProductStore {
     return this.getFolder(input.id)!;
   }
 
-  getFolder(folderID: string): SuiteFolder | null {
+  getFolder(folderID: string): WorkspaceFolder | null {
     this._assertOpen();
     const row = this._database
       .prepare(
         `SELECT id, space_id, parent_id, kind, name, status, created_by,
                 created_at, updated_at
-         FROM suite_nodes
+         FROM workspace_nodes
          WHERE id = ? AND kind = 'folder'`
       )
       .get(folderID) as NodeRow | undefined;
@@ -437,13 +437,13 @@ export class ProductStore {
   listChildren(
     spaceID: string,
     parentID: string | null
-  ): SuiteNode[] {
+  ): WorkspaceNode[] {
     this._assertOpen();
     const folderRows = this._database
       .prepare(
         `SELECT id, space_id, parent_id, kind, name, status, created_by,
                 created_at, updated_at
-         FROM suite_nodes
+         FROM workspace_nodes
          WHERE space_id = ?
            AND parent_id IS ?
            AND kind = 'folder'
@@ -463,8 +463,8 @@ export class ProductStore {
     return [...folderRows.map(toFolder), ...resourceRows.map(toResource)];
   }
 
-  getBreadcrumbs(spaceID: string, folderID: string | null): SuiteFolder[] {
-    const breadcrumbs: SuiteFolder[] = [];
+  getBreadcrumbs(spaceID: string, folderID: string | null): WorkspaceFolder[] {
+    const breadcrumbs: WorkspaceFolder[] = [];
     let currentID = folderID;
     const visited = new Set<string>();
     while (currentID) {
@@ -492,14 +492,14 @@ export class ProductStore {
     readonly spaceID: string;
     readonly parentID: string | null;
     readonly createdBy: string;
-  }): SuiteResource {
+  }): WorkspaceResource {
     this._assertValidParent(input.spaceID, input.parentID);
     const now = Date.now();
     this._database.exec("BEGIN IMMEDIATE");
     try {
       this._database
         .prepare(
-          `INSERT INTO suite_nodes
+          `INSERT INTO workspace_nodes
             (id, space_id, parent_id, kind, name, status, created_by,
              created_at, updated_at)
            VALUES (?, ?, ?, 'unit', ?, 'creating', ?, ?, ?)`
@@ -515,7 +515,7 @@ export class ProductStore {
         );
       this._database
         .prepare(
-          `INSERT INTO suite_units (node_id, unit_id, unit_type)
+          `INSERT INTO workspace_units (node_id, unit_id, unit_type)
            VALUES (?, ?, ?)`
         )
         .run(input.id, input.unitID, input.type);
@@ -527,17 +527,17 @@ export class ProductStore {
     return this.getByID(input.id)!;
   }
 
-  markActive(id: string): SuiteResource {
+  markActive(id: string): WorkspaceResource {
     this._setNodeStatus(id, "active");
     return this.getByID(id)!;
   }
 
-  markFailed(id: string): SuiteResource {
+  markFailed(id: string): WorkspaceResource {
     this._setNodeStatus(id, "failed");
     return this.getByID(id)!;
   }
 
-  getByID(id: string): SuiteResource | null {
+  getByID(id: string): WorkspaceResource | null {
     this._assertOpen();
     const row = this._database
       .prepare(`${RESOURCE_SELECT} WHERE node.id = ?`)
@@ -545,7 +545,7 @@ export class ProductStore {
     return row ? toResource(row) : null;
   }
 
-  getByUnitID(unitID: string): SuiteResource | null {
+  getByUnitID(unitID: string): WorkspaceResource | null {
     this._assertOpen();
     const row = this._database
       .prepare(`${RESOURCE_SELECT} WHERE unit.unit_id = ?`)
@@ -553,24 +553,24 @@ export class ProductStore {
     return row ? toResource(row) : null;
   }
 
-  renameByUnitID(unitID: string, name: string): SuiteResource | null {
+  renameByUnitID(unitID: string, name: string): WorkspaceResource | null {
     this._assertOpen();
     const result = this._database
       .prepare(
-        `UPDATE suite_nodes
+        `UPDATE workspace_nodes
          SET name = ?, updated_at = ?
-         WHERE id = (SELECT node_id FROM suite_units WHERE unit_id = ?)
+         WHERE id = (SELECT node_id FROM workspace_units WHERE unit_id = ?)
            AND status = 'active'`
       )
       .run(name, Date.now(), unitID);
     return result.changes === 1 ? this.getByUnitID(unitID) : null;
   }
 
-  renameFolder(folderID: string, name: string): SuiteFolder | null {
+  renameFolder(folderID: string, name: string): WorkspaceFolder | null {
     this._assertOpen();
     const result = this._database
       .prepare(
-        `UPDATE suite_nodes
+        `UPDATE workspace_nodes
          SET name = ?, updated_at = ?
          WHERE id = ? AND kind = 'folder' AND status = 'active'`
       )
@@ -586,14 +586,14 @@ export class ProductStore {
       const result = this._database
         .prepare(
           `WITH RECURSIVE descendants(id) AS (
-             SELECT id FROM suite_nodes WHERE id = ? AND status = 'active'
+             SELECT id FROM workspace_nodes WHERE id = ? AND status = 'active'
              UNION ALL
              SELECT node.id
-             FROM suite_nodes AS node
+             FROM workspace_nodes AS node
              JOIN descendants ON node.parent_id = descendants.id
              WHERE node.status = 'active'
            )
-           UPDATE suite_nodes
+           UPDATE workspace_nodes
            SET status = 'deleted', updated_at = ?
            WHERE id IN (SELECT id FROM descendants)`
         )
@@ -601,13 +601,13 @@ export class ProductStore {
       if (result.changes > 0) {
         this._database
           .prepare(
-            `DELETE FROM suite_node_recents
+            `DELETE FROM workspace_node_recents
              WHERE node_id IN (
                WITH RECURSIVE descendants(id) AS (
-                 SELECT id FROM suite_nodes WHERE id = ?
+                 SELECT id FROM workspace_nodes WHERE id = ?
                  UNION ALL
                  SELECT node.id
-                 FROM suite_nodes AS node
+                 FROM workspace_nodes AS node
                  JOIN descendants ON node.parent_id = descendants.id
                )
                SELECT id FROM descendants
@@ -627,28 +627,28 @@ export class ProductStore {
     this._assertOpen();
     const parent = this._database
       .prepare(
-        `SELECT parent_id FROM suite_nodes
+        `SELECT parent_id FROM workspace_nodes
          WHERE id = ? AND status = 'deleted'`
       )
       .get(nodeID) as { readonly parent_id: string | null } | undefined;
     if (!parent) return false;
     if (parent.parent_id) {
       const parentStatus = this._database
-        .prepare("SELECT status FROM suite_nodes WHERE id = ?")
+        .prepare("SELECT status FROM workspace_nodes WHERE id = ?")
         .get(parent.parent_id) as { readonly status: NodeStatus } | undefined;
       if (parentStatus?.status === "deleted") return false;
     }
     const result = this._database
       .prepare(
         `WITH RECURSIVE descendants(id) AS (
-           SELECT id FROM suite_nodes WHERE id = ? AND status = 'deleted'
+           SELECT id FROM workspace_nodes WHERE id = ? AND status = 'deleted'
            UNION ALL
            SELECT node.id
-           FROM suite_nodes AS node
+           FROM workspace_nodes AS node
            JOIN descendants ON node.parent_id = descendants.id
            WHERE node.status = 'deleted'
          )
-         UPDATE suite_nodes
+         UPDATE workspace_nodes
          SET status = 'active', updated_at = ?
          WHERE id IN (SELECT id FROM descendants)`
       )
@@ -656,14 +656,14 @@ export class ProductStore {
     return result.changes > 0;
   }
 
-  listTrash(spaceID: string): SuiteNode[] {
+  listTrash(spaceID: string): WorkspaceNode[] {
     this._assertOpen();
     const folderRows = this._database
       .prepare(
         `SELECT node.id, node.space_id, node.parent_id, node.kind, node.name,
                 node.status, node.created_by, node.created_at, node.updated_at
-         FROM suite_nodes AS node
-         LEFT JOIN suite_nodes AS parent ON parent.id = node.parent_id
+         FROM workspace_nodes AS node
+         LEFT JOIN workspace_nodes AS parent ON parent.id = node.parent_id
          WHERE node.space_id = ?
            AND node.kind = 'folder'
            AND node.status = 'deleted'
@@ -674,7 +674,7 @@ export class ProductStore {
     const resourceRows = this._database
       .prepare(
         `${RESOURCE_SELECT}
-         LEFT JOIN suite_nodes AS parent ON parent.id = node.parent_id
+         LEFT JOIN workspace_nodes AS parent ON parent.id = node.parent_id
          WHERE node.space_id = ?
            AND node.status = 'deleted'
            AND (parent.id IS NULL OR parent.status != 'deleted')
@@ -707,7 +707,7 @@ export class ProductStore {
     const rows = this._database
       .prepare(
         `${RESOURCE_SELECT}
-         JOIN suite_node_members AS member ON member.node_id = node.id
+         JOIN workspace_node_members AS member ON member.node_id = node.id
          WHERE member.user_id = ?
            AND space.type = 'personal'
            AND node.status = 'active'
@@ -727,7 +727,7 @@ export class ProductStore {
     const latest = this._database
       .prepare(
         `SELECT MAX(last_opened_at) AS last_opened_at
-         FROM suite_node_recents WHERE user_id = ?`
+         FROM workspace_node_recents WHERE user_id = ?`
       )
       .get(userId) as { readonly last_opened_at: number | null };
     const lastOpenedAt = Math.max(
@@ -736,7 +736,7 @@ export class ProductStore {
     );
     this._database
       .prepare(
-        `INSERT INTO suite_node_recents (node_id, user_id, last_opened_at)
+        `INSERT INTO workspace_node_recents (node_id, user_id, last_opened_at)
          VALUES (?, ?, ?)
          ON CONFLICT(node_id, user_id)
          DO UPDATE SET last_opened_at = excluded.last_opened_at`
@@ -750,13 +750,13 @@ export class ProductStore {
     const rows = this._database
       .prepare(
         `${RESOURCE_SELECT}
-         JOIN suite_node_recents AS recent ON recent.node_id = node.id
+         JOIN workspace_node_recents AS recent ON recent.node_id = node.id
          WHERE recent.user_id = ? AND node.status = 'active'
          ORDER BY recent.last_opened_at DESC, node.id ASC`
       )
       .all(userId) as unknown as ResourceRow[];
     const openedAt = this._database.prepare(
-      `SELECT last_opened_at FROM suite_node_recents
+      `SELECT last_opened_at FROM workspace_node_recents
        WHERE node_id = ? AND user_id = ?`
     );
     return rows.flatMap((row) => {
@@ -775,7 +775,7 @@ export class ProductStore {
     const rows = this._database
       .prepare(
         `SELECT node_id, user_id, role, invited_by, created_at
-         FROM suite_node_members
+         FROM workspace_node_members
          WHERE node_id = ?
          ORDER BY created_at ASC, user_id ASC`
       )
@@ -791,7 +791,7 @@ export class ProductStore {
     const row = this._database
       .prepare(
         `SELECT node_id, user_id, role, invited_by, created_at
-         FROM suite_node_members
+         FROM workspace_node_members
          WHERE node_id = ? AND user_id = ?`
       )
       .get(resourceID, userId) as ResourceMemberRow | undefined;
@@ -814,7 +814,7 @@ export class ProductStore {
     }
     this._database
       .prepare(
-        `INSERT INTO suite_node_members
+        `INSERT INTO workspace_node_members
           (node_id, user_id, role, invited_by, created_at)
          VALUES (?, ?, ?, ?, ?)
          ON CONFLICT(node_id, user_id)
@@ -835,14 +835,14 @@ export class ProductStore {
     const removed =
       this._database
         .prepare(
-          `DELETE FROM suite_node_members
+          `DELETE FROM workspace_node_members
            WHERE node_id = ? AND user_id = ?`
         )
         .run(resourceID, userId).changes === 1;
     if (removed) {
       this._database
         .prepare(
-          `DELETE FROM suite_node_recents
+          `DELETE FROM workspace_node_recents
            WHERE node_id = ? AND user_id = ?`
         )
         .run(resourceID, userId);
@@ -857,7 +857,7 @@ export class ProductStore {
   }
 
   private _getResourceRole(
-    resource: SuiteResource,
+    resource: WorkspaceResource,
     userId: string
   ): ResourceAccessRole | null {
     if (resource.ownerUserId === userId) return "owner";
@@ -890,7 +890,7 @@ export class ProductStore {
     this._assertOpen();
     const result = this._database
       .prepare(
-        "UPDATE suite_nodes SET status = ?, updated_at = ? WHERE id = ?"
+        "UPDATE workspace_nodes SET status = ?, updated_at = ? WHERE id = ?"
       )
       .run(status, Date.now(), id);
     if (result.changes !== 1) {
@@ -903,7 +903,7 @@ export class ProductStore {
   }
 }
 
-function toSpace(row: SpaceRow): SuiteSpace {
+function toSpace(row: SpaceRow): WorkspaceSpace {
   return {
     id: row.id,
     type: row.type,
@@ -914,7 +914,7 @@ function toSpace(row: SpaceRow): SuiteSpace {
   };
 }
 
-function toFolder(row: NodeRow): SuiteFolder {
+function toFolder(row: NodeRow): WorkspaceFolder {
   return {
     kind: "folder",
     id: row.id,
@@ -928,7 +928,7 @@ function toFolder(row: NodeRow): SuiteFolder {
   };
 }
 
-function toResource(row: ResourceRow): SuiteResource {
+function toResource(row: ResourceRow): WorkspaceResource {
   return {
     kind: "unit",
     id: row.id,

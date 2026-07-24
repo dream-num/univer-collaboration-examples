@@ -15,10 +15,10 @@ import type {
   ResourceMemberRole,
   SpaceAccessRole,
   SpaceMemberRole,
-  SuiteFolder,
-  SuiteNode,
-  SuiteResource,
-  SuiteSpace,
+  WorkspaceFolder,
+  WorkspaceNode,
+  WorkspaceResource,
+  WorkspaceSpace,
 } from "./product-store.js";
 import {
   CREATABLE_UNIT_TYPES,
@@ -773,7 +773,7 @@ function requireBrowsableSpace(
   productStore: ProductStore,
   spaceID: string,
   userId: string
-): { space: SuiteSpace; role: SpaceAccessRole } {
+): { space: WorkspaceSpace; role: SpaceAccessRole } {
   const space = productStore.getSpace(spaceID);
   const role = space ? productStore.getSpaceRole(space.id, userId) : null;
   if (!space || !role || (space.type === "personal" && role !== "owner")) {
@@ -786,7 +786,7 @@ function requireTeamSpace(
   productStore: ProductStore,
   spaceID: string,
   userId: string
-): { space: SuiteSpace; role: SpaceAccessRole } {
+): { space: WorkspaceSpace; role: SpaceAccessRole } {
   const access = requireBrowsableSpace(productStore, spaceID, userId);
   if (access.space.type !== "team") {
     throw new CollabError("UNIT_NOT_FOUND", "Team space does not exist");
@@ -796,7 +796,7 @@ function requireTeamSpace(
 
 function requireContentEditor(
   role: SpaceAccessRole | null,
-  spaceType: SuiteSpace["type"]
+  spaceType: WorkspaceSpace["type"]
 ): void {
   const allowed =
     role === "owner" ||
@@ -808,7 +808,7 @@ function requireContentEditor(
 
 function canDelete(
   role: ResourceAccessRole,
-  spaceType: SuiteSpace["type"]
+  spaceType: WorkspaceSpace["type"]
 ): boolean {
   return role === "owner" || (spaceType === "team" && role === "admin");
 }
@@ -831,7 +831,7 @@ function assertAssignableRole(
 function requireActiveFolder(
   productStore: ProductStore,
   folderID: string
-): SuiteFolder {
+): WorkspaceFolder {
   const folder = productStore.getFolder(folderID);
   if (!folder || folder.status !== "active") {
     throw new CollabError("UNIT_NOT_FOUND", "文件夹不存在");
@@ -842,7 +842,7 @@ function requireActiveFolder(
 function requireExistingNode(
   productStore: ProductStore,
   nodeID: string
-): SuiteNode {
+): WorkspaceNode {
   const node = productStore.getFolder(nodeID) ?? productStore.getByID(nodeID);
   if (!node) throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
   return node;
@@ -852,7 +852,7 @@ function requireEditableActiveResource(
   productStore: ProductStore,
   resourceID: string,
   userId: string
-): { resource: SuiteResource; role: ResourceAccessRole } {
+): { resource: WorkspaceResource; role: ResourceAccessRole } {
   const access = requireReadableActiveResource(
     productStore,
     resourceID,
@@ -868,7 +868,7 @@ function requireReadableActiveResource(
   productStore: ProductStore,
   resourceID: string,
   userId: string
-): { resource: SuiteResource; role: ResourceAccessRole } {
+): { resource: WorkspaceResource; role: ResourceAccessRole } {
   const resource = productStore.getByID(resourceID);
   const role = resource
     ? productStore.getAccessRoleByID(resource.id, userId)
@@ -883,7 +883,7 @@ function requireOwnedPersonalResource(
   productStore: ProductStore,
   resourceID: string,
   userId: string
-): SuiteResource {
+): WorkspaceResource {
   const resource = productStore.getByID(resourceID);
   if (
     !resource ||
@@ -913,7 +913,7 @@ function renameMutationID(type: UniverType): string {
 }
 
 function spaceResponse(
-  space: SuiteSpace,
+  space: WorkspaceSpace,
   accessRole: SpaceAccessRole,
   userStore: UserStore
 ) {
@@ -933,7 +933,7 @@ function spaceResponse(
   };
 }
 
-function folderResponse(folder: SuiteFolder) {
+function folderResponse(folder: WorkspaceFolder) {
   return {
     kind: "folder" as const,
     id: folder.id,
@@ -947,7 +947,7 @@ function folderResponse(folder: SuiteFolder) {
 }
 
 function nodeResponse(
-  node: SuiteNode,
+  node: WorkspaceNode,
   role: SpaceAccessRole,
   userStore: UserStore
 ) {
@@ -957,7 +957,7 @@ function nodeResponse(
 }
 
 function resourceResponse(
-  resource: SuiteResource,
+  resource: WorkspaceResource,
   accessRole: ResourceAccessRole,
   userStore: UserStore,
   lastOpenedAt?: number
@@ -990,7 +990,7 @@ function resourceResponse(
 }
 
 function teamMembers(
-  space: SuiteSpace,
+  space: WorkspaceSpace,
   productStore: ProductStore,
   userStore: UserStore
 ) {

@@ -7,7 +7,7 @@
 1. `basic-sheets`：证明现有 Univer 协同前端可以用极少改动切换到新后端。
 2. `basic-sheets-auth`：展示业务用户、JWT Cookie、WebSocket session ticket 和文档 ACL 的接入方式。
 3. `basic-sheets-worktree`：展示 Worktree-local Sheet 的 draft、ready 和 merge。
-4. `univer-suite-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
+4. `univer-workspace-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
 
 四个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、
 启动和修改该示例。
@@ -18,7 +18,7 @@
 - [`basic-sheets`](./basic-sheets/README.md)
 - [`basic-sheets-auth`](./basic-sheets-auth/README.md)
 - [`basic-sheets-worktree`](./basic-sheets-worktree/README.md)
-- [`univer-suite-demo`](./univer-suite-demo/README.md)
+- [`univer-workspace-demo`](./univer-workspace-demo/README.md)
 
 ## 2. 共同原则
 
@@ -31,7 +31,7 @@ examples/
 ├── basic-sheets/
 ├── basic-sheets-auth/
 ├── basic-sheets-worktree/
-└── univer-suite-demo/
+└── univer-workspace-demo/
 ```
 
 ### 2.2 独立性
@@ -226,7 +226,7 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 4. 服务重启后 Worktree 状态和 trunk 内容仍可读取。
 5. 自动化集成测试与手动浏览器流程均通过。
 
-## 6. `univer-suite-demo`
+## 6. `univer-workspace-demo`
 
 ### 6.1 定位
 
@@ -380,7 +380,7 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 - Worktree 工具栏只展示生命周期、当前 Unit 和 merge 结果。
 - 不增加文件树、审批流或未实现的冲突解决 UI。
 
-### 7.4 `univer-suite-demo`
+### 7.4 `univer-workspace-demo`
 
 - 文件空间使用稳定左侧导航、顶部搜索与账号入口、中间资源列表。
 - 编辑器使用轻量产品头部，跨文档能力放在头部，具体编辑能力交给 Univer。
@@ -391,7 +391,7 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 
 以下顺序不承诺日期；每个阶段只有在对应验收条件通过后才进入下一阶段。
 
-### 阶段 4：`univer-suite-demo` 文件空间
+### 阶段 4：`univer-workspace-demo` 文件空间
 
 剩余需求：
 
@@ -401,9 +401,9 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 - 永久删除和团队所有权转移。
 - 完整错误页、访问申请及审批流程。
 
-### 阶段 5：`univer-suite-demo` 多类型编辑器
+### 阶段 5：`univer-workspace-demo` 多类型编辑器
 
-Sheet、Doc、Slide 的当前实现事实见 Suite Demo README。剩余需求：
+Sheet、Doc、Slide 的当前实现事实见 Workspace Demo README。剩余需求：
 
 - 在公开 transformer 可用后接入 Board 和 Base 创建。
 - 实现统一编辑器产品头部、连接状态、在线成员和权限只读体验。

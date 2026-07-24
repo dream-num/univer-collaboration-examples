@@ -13,7 +13,7 @@ import type { DemoUser } from "./demo-user.js";
 import { PRESET_USERS } from "../shared/preset-users.js";
 
 const scrypt = promisify(scryptCallback);
-const COOKIE_NAME = "univer_suite_session";
+const COOKIE_NAME = "univer_workspace_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 
 interface UserRow {
@@ -31,7 +31,7 @@ export class UserStore {
   constructor(filename: string) {
     this._database = new DatabaseSync(filename);
     this._database.exec(`
-      CREATE TABLE IF NOT EXISTS suite_users (
+      CREATE TABLE IF NOT EXISTS workspace_users (
         user_id TEXT PRIMARY KEY,
         username TEXT NOT NULL UNIQUE COLLATE NOCASE,
         password_hash TEXT NOT NULL,
@@ -59,7 +59,7 @@ export class UserStore {
     try {
       this._database
         .prepare(
-          `INSERT INTO suite_users
+          `INSERT INTO workspace_users
             (user_id, username, password_hash, name, created_at)
            VALUES (?, ?, ?, ?, ?)`
         )
@@ -89,7 +89,7 @@ export class UserStore {
       if (existing) {
         this._database
           .prepare(
-            `UPDATE suite_users
+            `UPDATE workspace_users
              SET password_hash = ?, name = ?
              WHERE user_id = ?`
           )
@@ -98,7 +98,7 @@ export class UserStore {
       }
       this._database
         .prepare(
-          `INSERT INTO suite_users
+          `INSERT INTO workspace_users
             (user_id, username, password_hash, name, created_at)
            VALUES (?, ?, ?, ?, ?)`
         )
@@ -129,7 +129,7 @@ export class UserStore {
     const row = this._database
       .prepare(
         `SELECT user_id, username, password_hash, name, created_at
-         FROM suite_users WHERE user_id = ?`
+         FROM workspace_users WHERE user_id = ?`
       )
       .get(userId) as UserRow | undefined;
     return row ? toUser(row) : null;
@@ -149,7 +149,7 @@ export class UserStore {
     const rows = this._database
       .prepare(
         `SELECT user_id, username, password_hash, name, created_at
-         FROM suite_users
+         FROM workspace_users
          WHERE username LIKE ? ESCAPE '\\' COLLATE NOCASE
             OR name LIKE ? ESCAPE '\\' COLLATE NOCASE
          ORDER BY
@@ -172,7 +172,7 @@ export class UserStore {
     return this._database
       .prepare(
         `SELECT user_id, username, password_hash, name, created_at
-         FROM suite_users WHERE username = ? COLLATE NOCASE`
+         FROM workspace_users WHERE username = ? COLLATE NOCASE`
       )
       .get(username) as UserRow | undefined;
   }

@@ -41,9 +41,9 @@ function renderAuth(mode: "login" | "register"): void {
   const app = requireApp();
   app.innerHTML = `
     <main class="auth-page">
-      <a class="auth-brand" href="/" aria-label="Univer Suite 首页">
+      <a class="auth-brand" href="/" aria-label="Univer Workspace 首页">
         ${logoIcon()}
-        <span>Univer Suite</span>
+        <span>Univer Workspace</span>
       </a>
       <div class="auth-orb auth-orb-one"></div>
       <div class="auth-orb auth-orb-two"></div>
@@ -357,7 +357,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
   function renderShell(): void {
     const teamSpaces = spaces.filter(({ type }) => type === "team");
     app.innerHTML = `
-      <div class="suite-shell">
+      <div class="workspace-shell">
         <header class="topbar">
           <a class="topbar-brand" href="#home">
             ${logoIcon()}

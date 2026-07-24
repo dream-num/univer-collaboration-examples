@@ -1,4 +1,4 @@
-# Univer Suite Demo（Spike）
+# Univer Workspace Demo（Spike）
 
 这是基于 `univer-collaboration` 框架搭建多类型办公套件的第一阶段 spike。它验证
 应用可以把产品资源模型、Express 路由、SQLite 协同持久化和 Univer 前端协议组合
@@ -40,11 +40,11 @@ transformer。Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅
 
 ```bash
 pnpm install
-pnpm example:univer-suite
+pnpm example:univer-workspace
 ```
 
 然后打开 `http://127.0.0.1:3020`。运行数据保存在
-`examples/univer-suite-demo/.data/univer-suite-demo.sqlite`。
+`examples/univer-workspace-demo/.data/univer-workspace-demo.sqlite`。
 
 登录页提供两个可直接点击的预设账号：
 
@@ -59,7 +59,7 @@ pnpm example:univer-suite
 重置示例数据：
 
 ```bash
-pnpm --filter @univerjs/collaboration-example-univer-suite reset
+pnpm --filter @univerjs/collaboration-example-univer-workspace reset
 ```
 
 ## 架构
@@ -76,17 +76,17 @@ Browser
                 └── SQLiteDatabaseAdapter
 
 Express 产品 API
-├── AuthService + UserStore（suite_users）
+├── AuthService + UserStore（workspace_users）
 └── ProductStore
-    ├── suite_spaces + suite_space_members
-    ├── suite_nodes + suite_units
-    ├── suite_node_members
-    └── suite_node_recents
+    ├── workspace_spaces + workspace_space_members
+    ├── workspace_nodes + workspace_units
+    ├── workspace_node_members
+    └── workspace_node_recents
 ```
 
-个人空间和团队空间共用 `suite_nodes` 目录树；`parent_id = NULL` 表示空间根目录。
-团队内容的有效权限从空间 Owner 或 `suite_space_members` 实时计算，个人文档则由
-个人空间 Owner 和可选的定向 `suite_node_members` 计算。团队文档没有独立成员表，
+个人空间和团队空间共用 `workspace_nodes` 目录树；`parent_id = NULL` 表示空间根目录。
+团队内容的有效权限从空间 Owner 或 `workspace_space_members` 实时计算，个人文档则由
+个人空间 Owner 和可选的定向 `workspace_node_members` 计算。团队文档没有独立成员表，
 因此不会产生空间角色和文档角色冲突。
 
 创建 Unit 时先在目标空间目录中写入状态为 `creating` 的产品节点，再调用
@@ -111,7 +111,7 @@ snapshot 与 changeset 仍保留；恢复根文件夹时一并恢复子树。删
 共享被撤销时会清除对应记录，恢复或重新分享后不会在用户未打开的情况下自动回到
 最近列表。
 
-History 是 confirmed changeset 的最终一致派生索引。Suite Demo 使用
+History 是 confirmed changeset 的最终一致派生索引。Workspace Demo 使用
 `historyService.attach(collabService)` 接入，并通过 History middleware 复用资源
 所有者检查；删除后的资源不能读取历史，恢复后重新可用。框架默认的 History
 分段间隔为 60 秒，本示例通过 `DefaultHistoryPolicy` 配置为 5 秒，便于快速观察
