@@ -1,6 +1,7 @@
 import type {
   WorktreeData,
   WorktreeStatus,
+  WorktreeUnitMergeEvaluation,
 } from "@univerjs/collaboration-worktree-service";
 import { DEMO_TRUNK_UNIT_ID } from "../../shared/demo.js";
 
@@ -13,6 +14,13 @@ export interface DemoWorktree extends WorktreeData {
 export interface WorktreeGroups {
   readonly active: readonly DemoWorktree[];
   readonly processed: readonly DemoWorktree[];
+}
+
+export type WorktreeViewerKind = "worktree" | "merge-preview";
+
+export interface MergePreviewPresentation {
+  readonly showSwitch: boolean;
+  readonly defaultView: WorktreeViewerKind;
 }
 
 export async function listWorktrees(): Promise<readonly DemoWorktree[]> {
@@ -59,6 +67,20 @@ export function groupWorktrees(
 
 export function isProcessedStatus(status: WorktreeStatus): boolean {
   return status === "merged" || status === "discarded";
+}
+
+export function mergePreviewPresentation(
+  evaluation: WorktreeUnitMergeEvaluation
+): MergePreviewPresentation {
+  switch (evaluation.status) {
+    case "preview":
+    case "conflict":
+      return { showSwitch: true, defaultView: "merge-preview" };
+    case "not-behind":
+    case "already-merged":
+    case "not-applicable":
+      return { showSwitch: false, defaultView: "worktree" };
+  }
 }
 
 async function readJson(response: Response): Promise<unknown> {

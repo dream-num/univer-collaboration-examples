@@ -18,6 +18,7 @@ import {
 import type {
   WorktreeData,
   WorktreeStatus,
+  WorktreeUnitMergeEvaluation,
 } from "@univerjs/collaboration-worktree-service";
 import { HTTPService } from "@univerjs/network";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
@@ -33,10 +34,15 @@ import {
   groupWorktrees,
   isProcessedStatus,
   listWorktrees,
+  mergePreviewPresentation,
   type DemoWorktree,
+  type WorktreeViewerKind,
 } from "./api";
 import { origin } from "./consts";
-import { getCollaborationPlugins } from "./plugins";
+import {
+  getCollaborationPlugins,
+  type CollaborationScope,
+} from "./plugins";
 
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "../global.css";
@@ -46,6 +52,21 @@ type View =
   | { readonly kind: "worktree"; readonly worktreeID: string };
 
 type LifecycleAction = "ready" | "reopen" | "merge" | "discard";
+
+type MergePreviewState =
+  | { readonly kind: "inactive" }
+  | { readonly kind: "loading"; readonly key: string }
+  | {
+      readonly kind: "resolved";
+      readonly key: string;
+      readonly evaluation: WorktreeUnitMergeEvaluation;
+      readonly viewer: WorktreeViewerKind;
+    }
+  | {
+      readonly kind: "failed";
+      readonly key: string;
+      readonly message: string;
+    };
 
 const elements = {
   trunkRow: requireButton("trunk-row"),
@@ -58,6 +79,7 @@ const elements = {
   viewerContainer: requireElement("univer-container"),
   viewerOverlay: requireElement("viewer-overlay"),
   viewerOverlayText: requireElement("viewer-overlay-text"),
+  viewerOverlayAction: requireButton("viewer-overlay-action"),
   createDialog: requireDialog("create-dialog"),
   createForm: requireForm("create-form"),
   createName: requireInput("worktree-name"),
@@ -78,6 +100,8 @@ class WorktreeDemoApp {
   private _view: View = { kind: "trunk" };
   private _processedExpanded = false;
   private _operationBusy = false;
+  private _mergePreview: MergePreviewState = { kind: "inactive" };
+  private _overlayAction: (() => void) | undefined;
   private _univer: Univer | undefined;
   private _viewerKey = "";
   private _viewerGeneration = 0;
@@ -118,6 +142,9 @@ class WorktreeDemoApp {
     });
     elements.createForm.addEventListener("submit", (event) => {
       void this._submitCreate(event);
+    });
+    elements.viewerOverlayAction.addEventListener("click", () => {
+      this._overlayAction?.();
     });
     window.addEventListener("popstate", () => {
       void this._activateFromLocation();
@@ -167,16 +194,28 @@ class WorktreeDemoApp {
   }
 
   private async _selectView(view: View): Promise<void> {
+    const previousPreviewKey = this._activeMergePreviewKey();
     this._view = view;
     this._eventSubscription?.dispose();
     this._eventSubscription = undefined;
     this._events?.dispose();
     this._events = undefined;
+    const previewKey = this._activeMergePreviewKey();
+    if (!previewKey || previewKey !== previousPreviewKey) {
+      this._mergePreview = { kind: "inactive" };
+    }
     this._renderSidebar();
     this._renderTopbar();
 
     if (view.kind === "worktree") {
       this._connectEvents(view.worktreeID);
+    }
+    const worktree =
+      view.kind === "worktree"
+        ? this._findWorktree(view.worktreeID)
+        : undefined;
+    if (worktree?.status === "ready") {
+      await this._evaluateMergePreview(worktree);
     }
     await this._mountViewer();
   }
@@ -197,6 +236,131 @@ class WorktreeDemoApp {
     });
   }
 
+  private _activeMergePreviewKey(): string | undefined {
+    if (this._view.kind !== "worktree") return undefined;
+    const worktree = this._findWorktree(this._view.worktreeID);
+    return worktree?.status === "ready"
+      ? `${worktree.worktreeID}:${DEMO_TRUNK_UNIT_ID}`
+      : undefined;
+  }
+
+  private async _evaluateMergePreview(
+    worktree: DemoWorktree,
+    force = false
+  ): Promise<void> {
+    const key = `${worktree.worktreeID}:${DEMO_TRUNK_UNIT_ID}`;
+    if (
+      !force &&
+      this._mergePreview.kind !== "inactive" &&
+      this._mergePreview.key === key
+    ) {
+      return;
+    }
+    this._mergePreview = { kind: "loading", key };
+    this._renderTopbar();
+    try {
+      const evaluation = await this._client.evaluateUnitMerge(
+        worktree.worktreeID,
+        DEMO_TRUNK_UNIT_ID
+      );
+      if (this._activeMergePreviewKey() !== key) return;
+      const presentation = mergePreviewPresentation(evaluation);
+      this._mergePreview = {
+        kind: "resolved",
+        key,
+        evaluation,
+        viewer: presentation.defaultView,
+      };
+    } catch (error) {
+      if (this._activeMergePreviewKey() !== key) return;
+      this._mergePreview = {
+        kind: "failed",
+        key,
+        message: errorMessage(error),
+      };
+    }
+    this._renderTopbar();
+  }
+
+  private _worktreeViewer(worktree: DemoWorktree): WorktreeViewerKind {
+    if (
+      worktree.status === "ready" &&
+      this._mergePreview.kind === "resolved" &&
+      this._mergePreview.key ===
+        `${worktree.worktreeID}:${DEMO_TRUNK_UNIT_ID}`
+    ) {
+      return this._mergePreview.viewer;
+    }
+    return "worktree";
+  }
+
+  private async _selectWorktreeViewer(
+    viewer: WorktreeViewerKind
+  ): Promise<void> {
+    if (this._mergePreview.kind !== "resolved") return;
+    if (this._mergePreview.viewer === viewer) return;
+    this._mergePreview = { ...this._mergePreview, viewer };
+    this._renderTopbar();
+    await this._mountViewer();
+  }
+
+  private _mergePreviewControl(worktree: DemoWorktree): HTMLElement | undefined {
+    if (worktree.status !== "ready") return undefined;
+    const key = `${worktree.worktreeID}:${DEMO_TRUNK_UNIT_ID}`;
+    if (this._mergePreview.kind === "loading" && this._mergePreview.key === key) {
+      return textElement("span", "preview-state", "正在检查主线…");
+    }
+    if (this._mergePreview.kind === "failed" && this._mergePreview.key === key) {
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "preview-retry";
+      retry.textContent = "合入预览失败 · 重试";
+      retry.title = this._mergePreview.message;
+      retry.addEventListener("click", () => {
+        void this._retryMergePreview(worktree);
+      });
+      return retry;
+    }
+    if (
+      this._mergePreview.kind !== "resolved" ||
+      this._mergePreview.key !== key ||
+      !mergePreviewPresentation(this._mergePreview.evaluation).showSwitch
+    ) {
+      return undefined;
+    }
+
+    const switcher = document.createElement("div");
+    switcher.className = "viewer-switch";
+    switcher.setAttribute("role", "group");
+    switcher.setAttribute("aria-label", "版本视图");
+    for (const [viewer, label] of [
+      ["merge-preview", "合入预览"],
+      ["worktree", "Worktree 版本"],
+    ] as const) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.classList.toggle(
+        "active",
+        this._mergePreview.viewer === viewer
+      );
+      button.setAttribute(
+        "aria-pressed",
+        String(this._mergePreview.viewer === viewer)
+      );
+      button.addEventListener("click", () => {
+        void this._selectWorktreeViewer(viewer);
+      });
+      switcher.append(button);
+    }
+    return switcher;
+  }
+
+  private async _retryMergePreview(worktree: DemoWorktree): Promise<void> {
+    await this._evaluateMergePreview(worktree, true);
+    await this._mountViewer();
+  }
+
   private async _mountViewer(): Promise<void> {
     const worktree =
       this._view.kind === "worktree"
@@ -206,11 +370,52 @@ class WorktreeDemoApp {
       await this._returnToTrunk("该 Worktree 不存在");
       return;
     }
-    const editable = worktree?.status === "draft";
-    const key =
+    const viewer = worktree ? this._worktreeViewer(worktree) : "worktree";
+    const resolvedPreview =
+      this._mergePreview.kind === "resolved"
+        ? this._mergePreview.evaluation
+        : undefined;
+    if (
+      worktree &&
+      viewer === "merge-preview" &&
+      resolvedPreview?.status === "conflict"
+    ) {
+      const generation = ++this._viewerGeneration;
+      this._disposeViewer();
+      this._viewerGeneration = generation;
+      this._viewerKey = `${worktree.worktreeID}:merge-preview:conflict`;
+      this._setViewerOverlay(
+        "empty",
+        "Worktree 修改与当前主线存在冲突，无法生成合入预览。",
+        "查看 Worktree 版本",
+        () => {
+          void this._selectWorktreeViewer("worktree");
+        }
+      );
+      return;
+    }
+
+    const editable = worktree?.status === "draft" && viewer === "worktree";
+    const scope: CollaborationScope =
       this._view.kind === "trunk"
+        ? { kind: "trunk" }
+        : viewer === "merge-preview" &&
+            resolvedPreview?.status === "preview"
+          ? {
+              kind: "merge-preview",
+              worktreeID: this._view.worktreeID,
+              preview: resolvedPreview.preview,
+            }
+          : {
+              kind: "worktree",
+              worktreeID: this._view.worktreeID,
+            };
+    const key =
+      scope.kind === "trunk"
         ? "trunk:readonly"
-        : `${this._view.worktreeID}:${editable ? "editable" : "readonly"}`;
+        : scope.kind === "merge-preview"
+          ? `${scope.worktreeID}:merge-preview:${scope.preview.snapshot.rev}`
+          : `${scope.worktreeID}:${editable ? "editable" : "readonly"}`;
     if (key === this._viewerKey && this._univer) return;
 
     const generation = ++this._viewerGeneration;
@@ -244,11 +449,7 @@ class WorktreeDemoApp {
                 import.meta.env.VITE_UNIVER_LICENSE || undefined,
             },
           ],
-          ...getCollaborationPlugins(
-            this._view.kind === "worktree"
-              ? this._view.worktreeID
-              : undefined
-          ),
+          ...getCollaborationPlugins(scope),
         ],
       });
       this._univer = univer;
@@ -347,6 +548,8 @@ class WorktreeDemoApp {
     const worktree = this._findWorktree(this._view.worktreeID);
     if (!worktree) return;
     const actions: HTMLElement[] = [statusChip(worktree.status)];
+    const mergePreviewControl = this._mergePreviewControl(worktree);
+    if (mergePreviewControl) actions.push(mergePreviewControl);
     if (worktree.status === "draft") {
       actions.push(
         this._actionButton("标记为待合入", "ready", "primary"),
@@ -471,6 +674,12 @@ class WorktreeDemoApp {
       ...(completedAt === undefined ? {} : { completedAt }),
     };
     this._worktrees.splice(index, 1, updated);
+    const isCurrentWorktree =
+      this._view.kind === "worktree" &&
+      this._view.worktreeID === updated.worktreeID;
+    if (isCurrentWorktree && updated.status !== "ready") {
+      this._mergePreview = { kind: "inactive" };
+    }
     this._renderSidebar();
     this._renderTopbar();
 
@@ -489,10 +698,12 @@ class WorktreeDemoApp {
     }
 
     if (
-      this._view.kind === "worktree" &&
-      this._view.worktreeID === updated.worktreeID &&
-      (previous.status === "draft") !== (updated.status === "draft")
+      isCurrentWorktree &&
+      previous.status !== updated.status
     ) {
+      if (updated.status === "ready") {
+        await this._evaluateMergePreview(updated);
+      }
       await this._mountViewer();
     }
   }
@@ -560,12 +771,18 @@ class WorktreeDemoApp {
   }
 
   private _setViewerOverlay(
-    state: "loading" | "error" | "hidden",
-    message = ""
+    state: "loading" | "error" | "empty" | "hidden",
+    message = "",
+    actionLabel?: string,
+    action?: () => void
   ): void {
     elements.viewerOverlay.classList.toggle("visible", state !== "hidden");
     elements.viewerOverlay.classList.toggle("error", state === "error");
+    elements.viewerOverlay.classList.toggle("empty", state === "empty");
     elements.viewerOverlayText.textContent = message;
+    this._overlayAction = action;
+    elements.viewerOverlayAction.hidden = !actionLabel || !action;
+    elements.viewerOverlayAction.textContent = actionLabel ?? "";
   }
 
   private _showToast(message: string): void {

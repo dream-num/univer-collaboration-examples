@@ -376,6 +376,48 @@ button {
   gap: 8px;
 }
 
+.viewer-switch {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--surface-strong);
+}
+
+.viewer-switch button {
+  min-height: 26px;
+  padding: 3px 9px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.viewer-switch button.active {
+  color: var(--text);
+  background: var(--background);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+}
+
+.preview-state {
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.preview-retry {
+  padding: 3px 8px;
+  border: 1px solid #ecc7c7;
+  border-radius: 6px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  cursor: pointer;
+  font-size: 11px;
+}
+
 .button {
   min-height: 32px;
   padding: 6px 12px;
@@ -445,6 +487,18 @@ button {
 
 .viewer-overlay.error .spinner {
   display: none;
+}
+
+.viewer-overlay.empty .spinner {
+  display: none;
+}
+
+.viewer-overlay-copy {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
 }
 
 .spinner {

@@ -68,7 +68,15 @@
           <div id="univer-container"></div>
           <div id="viewer-overlay" class="viewer-overlay" aria-live="polite">
             <span class="spinner" aria-hidden="true"></span>
-            <span id="viewer-overlay-text">正在加载表格…</span>
+            <div class="viewer-overlay-copy">
+              <span id="viewer-overlay-text">正在加载表格…</span>
+              <button
+                id="viewer-overlay-action"
+                class="button secondary"
+                type="button"
+                hidden
+              ></button>
+            </div>
           </div>
         </div>
       </main>

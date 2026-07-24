@@ -5,20 +5,43 @@ import {
   BrowserCollaborationSocketService,
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
-import { createWorktreeCollaborationConfig } from "@univerjs/collaboration-worktree-client";
+import {
+  createWorktreeCollaborationConfig,
+  createWorktreeMergePreviewConfig,
+} from "@univerjs/collaboration-worktree-client";
+import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
 import { origin } from "./consts";
 
+export type CollaborationScope =
+  | { readonly kind: "trunk" }
+  | { readonly kind: "worktree"; readonly worktreeID: string }
+  | {
+      readonly kind: "merge-preview";
+      readonly worktreeID: string;
+      readonly preview: SaveSnapshotInput;
+    };
+
 export function getCollaborationPlugins(
-  worktreeID?: string
+  scope: CollaborationScope
 ): IPresetPlugin[] {
-  const scopeConfig = worktreeID
-    ? createWorktreeCollaborationConfig({ origin, worktreeID })
-    : {
-        snapshotServerUrl: `${origin}/universer-api/snapshot`,
-        collabSubmitChangesetUrl: `${origin}/universer-api/comb`,
-        collabWebSocketUrl: `${webSocketOrigin()}/universer-api/comb/connect`,
-        wsSessionTicketUrl: `${origin}/universer-api/user/session-ticket`,
-      };
+  const scopeConfig =
+    scope.kind === "trunk"
+      ? {
+          snapshotServerUrl: `${origin}/universer-api/snapshot`,
+          collabSubmitChangesetUrl: `${origin}/universer-api/comb`,
+          collabWebSocketUrl: `${webSocketOrigin()}/universer-api/comb/connect`,
+          wsSessionTicketUrl: `${origin}/universer-api/user/session-ticket`,
+        }
+      : scope.kind === "worktree"
+        ? createWorktreeCollaborationConfig({
+            origin,
+            worktreeID: scope.worktreeID,
+          })
+        : createWorktreeMergePreviewConfig({
+            origin,
+            worktreeID: scope.worktreeID,
+            preview: scope.preview,
+          });
   return [
     UniverCollaborationPlugin,
     [

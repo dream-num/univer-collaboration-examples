@@ -7,6 +7,7 @@
 - `@univerjs/collaboration-worktree-client` 只提供 scoped URL、管理 API 和状态事件。
 - 左侧栏在主线、活动 Worktree 和已处理历史之间组织导航。
 - 页面可以命名并创建 Worktree；Worktree 从固定 Trunk Sheet 建立基线。
+- ready Unit 落后主线时默认显示静态合入预览，并可切换回 Worktree 版本。
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-basic-sheets-worktree build
@@ -17,6 +18,12 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets-worktree start
 标题旁的 `+`，输入名称并创建分支；draft 状态下可以编辑表格，然后依次执行
 `标记为待合入` 和 `合入主线`。合入或丢弃后的 Worktree 会进入左下角可展开的
 `已处理` 列表，历史项只展示状态，不重新加载终态内容。
+
+进入 `ready` 后，页面按当前 Unit 查询合入预览。若主线在 Worktree 创建后继续
+前进，顶部显示 `合入预览 / Worktree 版本`，并默认选择合入预览；OT 冲突会显示
+空状态，但不会禁用正式合入。预览请求失败时回退到 Worktree 版本并可重试。
+预览是当前页面的一次性缓存，不建立协同连接，也不保证与主线再次变化后的正式
+合入完全相同。
 
 当前 Worktree 使用 `?worktree=<id>` 深链接；主线不使用查询参数。浏览器前进、
 后退和刷新都可以恢复活动 Worktree。其他浏览器页面新创建的 Worktree 在刷新后
