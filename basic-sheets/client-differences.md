@@ -1,202 +1,101 @@
-# Basic Sheets 客户端差异清单
+# Basic Sheets 客户端对齐说明
 
 本文对比：
 
-- 当前 example：`univer-collaboration/examples/basic-sheets`
-- 参考实现：`univer-pro/examples/src/sheets`
+- 当前 example：`examples/basic-sheets`
+- 上游基线：`univer-pro/examples/src/sheets`
+- 上游 commit：`bdac4f4aa`
+- SDK npm 基线：`1.0.0-alpha.7`
 
-这些内容是待逐项评审的客户端差异，不自动等同于 issue。只有确认属于缺陷、决定延后
-处理并得到用户显式记录确认后，才按照仓库规则归入 `docs/issues/known-issues`
-或 `docs/issues/new-issues`。
+当前 example 不实现另一套前端协同引擎，直接使用官方
+`collaboration`、`collaboration-client` 和 `collaboration-client-ui`。
 
-## 已对齐的协同主链路
+## 已对齐
 
-当前 example 直接使用官方：
+### 协同主链路
 
-- `@univerjs-pro/collaboration`
-- `@univerjs-pro/collaboration-client`
-- `@univerjs-pro/collaboration-client-ui`
-
-以下协同配置已经对齐：
-
-| 能力 | 当前状态 |
+| 能力 | 配置 |
 |---|---|
-| Unit 加载 | URL 中的 `unit/type` 驱动 `CollaborationDataLoaderController` 自动加载 |
+| Unit 加载 | `unit/type` URL 参数驱动官方 Data Loader |
 | Snapshot | `/universer-api/snapshot` |
 | HTTP submit | `/universer-api/comb` |
 | WebSocket | `/universer-api/comb/connect` |
 | Session ticket | `/universer-api/user/session-ticket` |
 | Authz | `/universer-api/authz` |
 | Edit history | `/universer-api/history` |
-| Socket service | `BrowserCollaborationSocketService` |
 | Offline editing | 开启 |
 | Single-active lock | 开启 |
-| 当前用户 | 请求 `/universer-api/user` 后写入 `UserManagerService` |
-| 协议对象 | 直接使用官方 changeset、snapshot 和 Comb 协议 |
+| HTTP override | 配置与上游一致，但 alpha.7 运行时实际仍使用 XHR |
+| Collaboration Facade | 已导入 |
 
-因此当前没有实现另一套前端协同引擎；差异集中在 SDK 基线、插件装配和产品能力。
+### Sheet 插件
 
-## 待逐项处理的差异
+客户端已经装配与服务端 Apply Host 对称的数据插件和相应 UI：
 
-### 1. SDK 代码基线
+- Formula、Numfmt。
+- Conditional Formatting、Data Validation。
+- Filter、Sort、Hyperlink、Note。
+- Drawing、Shape、Chart、Sparkline。
+- Outline、Pivot Table、Table。
 
-当前 example 固定依赖 npm `1.0.0-alpha.7`。本清单最近一次对照的上游基线是
-本地 `univer-pro` `bdac4f4aa`（`dev` 分支）；该 commit 中
-collaboration、collaboration-client 和 collaboration-client-ui 的包版本声明为
-`1.0.0-alpha.7`，且上游 example 直接使用 workspace 源码。
+Find/Replace、Crosshair、Range Preprocess 和 Live Share 是客户端能力，不要求服务端
+存在同名插件。
 
-影响：
+### Worker
 
-- 两边版本声明一致，但 npm 发布物与持续移动的 workspace 源码不是严格相同的构建
-  产物。
-- 行为差异不能只从插件配置推断，也可能来自 SDK 代码版本。
-- 本地分支会继续移动；后续比较必须记录 commit，不能只写“当前 dev”。
+主编辑器使用独立 RPC Worker 执行 Formula、Filter 和 Pivot 相关计算；Edit History
+打开时使用同一份 worker bundle 创建独立 Worker。
 
-当前策略：
+Worker URL 由 Vite 生成后交给 `UniverRPCMainThreadPlugin`。由插件在自己的生命周期内
+创建 Worker，避免提前 `new Worker()` 与 URL Data Loader 初始化产生竞态。
 
-- 所有 packages 和 examples 精确锁定同一个 npm SDK 版本，不直接依赖本地
-  `univer-pro` workspace。
-- 每次升级记录 `univer-pro` 对照 commit，并运行完整 build、typecheck、测试和
-  example 集成测试。
+## 有意保留的差异
 
-从上一对照点 `b6babb152702` 到 `bdac4f4aa`，上游 `sheets` example 涉及的变化只有
-formula package consolidation；本 example 通过 `UniverSheetsCorePreset` 间接装配
-公式能力，没有直接引用被重命名的 formula package，因此不需要同步源码改动。
+### 不在当前范围的能力
 
-### 2. Univer 初始化方式
+以下插件和入口没有注册：
 
-当前使用：
+- Thread Comment。
+- 文件上传、签名 URL、Import/Export。
+- Print、Watermark。
+- Telemetry、Debugger、Action Recorder。
 
-```ts
-createUniver({
-  presets: [UniverSheetsCorePreset(...)],
-  plugins: [...],
-});
-```
+因此页面不会展示当前后端无法完整支持的对应入口。
 
-上游使用 `new Univer()` 后逐个 `registerPlugin()`。
+### Demo 与构建设施
 
-当前 Preset 方式更接近普通 SDK 用户的集成方式，尚未发现它会改变核心协同协议。
+- 使用 Vite，不复制上游 example 的 esbuild 和开发服务器。
+- `lazy.ts` 保留上游的插件分类，但启动时立即注册，不人为等待三秒。
+- 使用 English locale 和 `defaultTheme`，不依赖上游 mockdata locale 与
+  `greenTheme`。
+- 图片 I/O 暂时禁用；Drawing、Shape 和 Chart 的模型及协同 mutation 仍然启用。
+- 用户固定为 `demo-user`，不实现 OIDC；真实认证由 `basic-sheets-auth` 演示。
+- Unit 创建不支持 Action Recorder template。
 
-待确认：
+### SDK 产物
 
-- [ ] 保持面向用户的 Preset 方式，还是为了示例源码一致改为手动注册。
+上游 example 直接运行 workspace 源码，本 example 精确依赖 npm
+`1.0.0-alpha.7`。两者 package version 声明相同，但不应假设发布产物与持续移动的
+workspace 源码逐字一致；升级时必须同时记录上游 commit 并重新执行浏览器验收。
 
-### 3. Sheet 产品能力
+### HTTP implementation
 
-当前只启用 Core Sheet 和协同、历史能力。上游还启用：
+`UniverCollaborationClientPlugin` 中的 `FetchHTTPImplementation` override 与上游
+配置一致，但真实浏览器运行时仍解析为 `XHRHTTPImplementation`。当前同源 demo
+不受影响，暂不修改初始化顺序。证据与后续方向见
+[known issue](../../docs/issues/known-issues/collaboration-client-fetch-http-override-ineffective.md)。
 
-- Conditional Formatting、Data Validation、Filter、Sort
-- Drawing、Note、Thread Comment、Outline
-- Pivot Table、Chart、Sparkline、Table、Shape
-- Print、Import/Export、Find/Replace、Hyperlink
-- Watermark、Telemetry、Debugger、Action Recorder、Live Share
+### Formula quota
 
-当前后端没有 comments、upload、exchange 等对应服务，直接注册相关客户端插件会产生
-无法处理的网络请求。
+`collaboration-client-ui` 会访问 `/license/formula/limit/start`、`status` 和
+`done`。额度服务不属于 Collaboration Service、Endpoint 或 Transport，当前 demo
+不提供兼容接口，因此这些请求会返回 404。alpha.7 当前按默认
+`maxFormulaLimit = 0`（unlimited）继续计算，已验证公式计算、协同提交和刷新恢复
+不受影响；未来升级 SDK 时需要重新验证该容错行为。
 
-待确认：
+## 保留原则
 
-- [ ] 按用户价值逐项选择要支持的产品功能。
-- [ ] 每启用一个依赖远程服务的插件前，先明确后端 API 和数据正确性边界。
-- [ ] 不为了源码表面一致一次性注册全部插件。
-
-### 4. Worker 与公式引擎
-
-上游注册 RPC Worker、`UniverProFormulaEnginePlugin` 和 History Worker。当前：
-
-- 没有 `UniverRPCMainThreadPlugin`。
-- 使用 Core Preset 的公式引擎。
-- 没有给 Edit History Loader 配置 `workerURL`。
-
-当前普通协同编辑可运行，但公式计算线程、Worker 数据同步、复杂历史处理和大型 Workbook
-性能不与上游完全一致。
-
-待确认：
-
-- [ ] 是否加入 RPC/Formula Worker。
-- [ ] 是否加入 History Worker。
-- [ ] 加入 Worker 前明确 license、构建产物和部署路径。
-
-### 5. HTTP 实现
-
-上游显式使用：
-
-```ts
-[IHTTPImplementation, { useClass: FetchHTTPImplementation }]
-```
-
-当前使用 Core Preset 提供的 XHR 实现。同源、固定用户 demo 已验证可工作，但跨域
-credentials、Cookie、取消请求和 interceptor 行为可能不同。
-
-待确认：
-
-- [ ] 对齐 `FetchHTTPImplementation`。
-- [ ] 增加认证和跨域场景后重新验证 HTTP 行为。
-
-### 6. Facade API
-
-Core Preset 已引入普通 Sheet Facade，但当前没有显式引入：
-
-```ts
-import "@univerjs-pro/collaboration-client/facade";
-```
-
-URL 自动加载和实时协同不依赖该 Facade；但 `window.univerAPI` 不保证包含上游全部
-Pro Facade 扩展，例如 `getCollaboration()`。当前也没有 chart、pivot、print、
-live-share 等 Facade。
-
-待确认：
-
-- [ ] example 是否需要公开演示 Collaboration Facade。
-- [ ] 只随实际启用的产品插件导入对应 Facade。
-
-### 7. 用户与认证
-
-两边前端都会请求 `/universer-api/user` 并设置当前用户。当前后端固定：
-
-```text
-userId = demo-user
-authz = allowed
-```
-
-当前不使用 Cookie、JWT 或 OIDC，创建 Unit 也没有上游的 401 登录跳转流程。
-
-待确认：
-
-- [ ] Basic Sheets 是否始终保持固定用户的最小定位。
-- [x] 真实认证和 ACL 由 `basic-sheets-auth` 及后续产品 example 演示。
-- [ ] 如果 Basic Sheets 引入认证，再对齐 401/OIDC 客户端流程。
-
-### 8. 创建 Unit
-
-当前创建请求使用固定 `demo-user`，不处理 `record` 参数或 template。上游支持
-`record=e2e-template` 相关流程。
-
-Service 最终以可信 Session 的 `userId` 为作者，不信任客户端 `creator`。
-
-待确认：
-
-- [ ] 是否移除创建请求中没有权威作用的 `creator`。
-- [ ] 是否需要 template 或 Action Recorder 场景。
-
-### 9. UI、主题和 locale
-
-当前使用 `defaultTheme`、English locale 和最小全屏容器。上游使用 `greenTheme`，
-并包含更完整的中英文 locale、Debugger 和延迟加载插件。
-
-待确认：
-
-- [ ] 是否对齐主题。
-- [ ] 是否加入中文 locale。
-- [ ] Debugger 和测试工具是否应该留在独立开发 example。
-
-## 当前保留原则
-
-在逐项评审完成前：
-
-- 不手动调用 `loadSheetAsync()`，继续使用 URL Data Loader。
+- 不手动调用 `loadSheetAsync()`，正常启动始终由 URL Data Loader 加载。
 - 不访问 `ILocalCacheService` 或 `CollaborationController` 改变协同内部状态。
-- 不增加 peer restore workaround；该问题仍按 known issue 单独处理。
-- 不注册后端没有实现的远程产品插件。
-- 不为了对齐 example UI 改造 changeset、snapshot 或 Comb 协议。
+- 不增加 peer restore workaround。
+- 不为 demo 差异修改 changeset、snapshot 或 Comb 协议。

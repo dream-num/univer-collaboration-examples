@@ -107,7 +107,9 @@ client/
 └── sheets/
     ├── consts.ts
     ├── main.ts
-    └── plugins.ts
+    ├── plugins.ts
+    ├── lazy.ts
+    └── worker.ts
 ```
 
 与上游保持一致的部分：
@@ -115,15 +117,25 @@ client/
 - `?unit=<unitID>&type=2` 驱动 Unit 自动加载。
 - Collaboration Client、Collaboration UI 和 Edit History Loader。
 - snapshot、Comb、session ticket、authz 和 history URL。
+- Pro Formula、Pivot 与 History RPC Worker。
+- Conditional Formatting、Data Validation、Filter、Sort、Drawing、Note、
+  Hyperlink、Outline、Pivot、Chart、Sparkline、Table 和 Shape。
+- Find/Replace、Crosshair、Range Preprocess 和 Live Share。
 - 创建 Unit 后刷新到稳定 URL。
 - 不增加协议转换层或本仓库专用前端 SDK。
 
 有意保留的差异：
 
-- 使用 `UniverSheetsCorePreset`，不注册 comments、live share、chart、pivot、
-  import/export、upload、telemetry、debugger 和 action recorder；本后端不提供这些服务。
+- 使用 Vite 构建，不复制上游 esbuild 开发设施。
+- 不注册 Thread Comment、文件上传、Import/Export、Print、Watermark、Telemetry、
+  Debugger 和 Action Recorder。
+- 上游 `lazy.ts` 中保留的本地客户端工具在启动时立即注册，不人为等待三秒。
+- 图片 I/O 暂时禁用，但 Drawing、Shape 和 Chart 的协同模型仍启用。
 - 用户和授权由后端硬编码，不使用 OIDC。
 - 使用环境变量提供 license。
+- 不提供公式并发额度接口；alpha.7 会请求 `/license/formula/limit/*` 并收到
+  404，但当前默认值按 unlimited 处理，不影响公式计算和协同提交。
+- 使用 English locale 和 `defaultTheme`。
 - 后端替换为本仓库的 Transport → Endpoint → Service 与 SQLite Adapter。
 
 除上游 `fetchServerUser` 同样使用 Injector 设置当前用户外，前端不访问
