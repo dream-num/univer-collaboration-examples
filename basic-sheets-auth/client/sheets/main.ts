@@ -34,6 +34,11 @@ import {
 } from "../api";
 import { host, httpProtocol, unit, url } from "./consts";
 import {
+  getSheetCollaborationFeaturePlugins,
+  getSheetFeaturePlugins,
+  sheetFeatureLocale,
+} from "./features";
+import {
   getCollaborationPlugins,
   getHistoryPlugins,
 } from "./plugins";
@@ -146,7 +151,8 @@ function initializeUniver(): void {
         CollaborationClientEnUS,
         CollaborationClientUIEnUS,
         EditHistoryLoaderEnUS,
-        EditHistoryViewerEnUS
+        EditHistoryViewerEnUS,
+        sheetFeatureLocale
       ),
     },
     theme: defaultTheme,
@@ -155,6 +161,7 @@ function initializeUniver(): void {
     presets: [
       UniverSheetsCorePreset({
         container: "app",
+        ribbonType: "grid",
       }),
     ],
     plugins: [
@@ -162,7 +169,9 @@ function initializeUniver(): void {
         UniverLicensePlugin,
         { license: import.meta.env.VITE_UNIVER_LICENSE || undefined },
       ],
+      ...getSheetFeaturePlugins(),
       ...getCollaborationPlugins(),
+      ...getSheetCollaborationFeaturePlugins(),
       ...getHistoryPlugins(),
     ],
   });

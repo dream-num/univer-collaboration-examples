@@ -20,6 +20,11 @@ import {
   loadCurrentUser,
   syncEditorTitle,
 } from "../collaboration.js";
+import {
+  getSheetCollaborationFeaturePlugins,
+  getSheetFeaturePlugins,
+  sheetFeatureLocale,
+} from "./sheet-features.js";
 
 import "@univerjs/preset-sheets-core/lib/index.css";
 
@@ -29,19 +34,27 @@ const { univer } = createUniver({
     [LocaleType.EN_US]: mergeLocales(
       UniverPresetSheetsCoreEnUS,
       EditHistoryLoaderEnUS,
-      EditHistoryViewerEnUS
+      EditHistoryViewerEnUS,
+      sheetFeatureLocale
     ),
   },
   theme: defaultTheme,
   logLevel: LogLevel.WARN,
   collaboration: true,
-  presets: [UniverSheetsCorePreset({ container: "univer-container" })],
+  presets: [
+    UniverSheetsCorePreset({
+      container: "univer-container",
+      ribbonType: "grid",
+    }),
+  ],
   plugins: [
     [
       UniverLicensePlugin,
       { license: import.meta.env.VITE_UNIVER_LICENSE || undefined },
     ],
+    ...getSheetFeaturePlugins(),
     ...collaborationPlugins(),
+    ...getSheetCollaborationFeaturePlugins(),
     ...historyPlugins(),
   ],
 });

@@ -40,6 +40,11 @@ import {
 } from "./api";
 import { origin } from "./consts";
 import {
+  getSheetCollaborationFeaturePlugins,
+  getSheetFeaturePlugins,
+  sheetFeatureLocale,
+} from "./features";
+import {
   getCollaborationPlugins,
   type CollaborationScope,
 } from "./plugins";
@@ -430,7 +435,8 @@ class WorktreeDemoApp {
           [LocaleType.ZH_CN]: mergeLocales(
             UniverPresetSheetsCoreZhCN,
             CollaborationClientZhCN,
-            CollaborationClientUIZhCN
+            CollaborationClientUIZhCN,
+            sheetFeatureLocale
           ),
         },
         theme: defaultTheme,
@@ -439,6 +445,7 @@ class WorktreeDemoApp {
         presets: [
           UniverSheetsCorePreset({
             container: "univer-container",
+            ribbonType: "grid",
           }),
         ],
         plugins: [
@@ -449,7 +456,9 @@ class WorktreeDemoApp {
                 import.meta.env.VITE_UNIVER_LICENSE || undefined,
             },
           ],
+          ...getSheetFeaturePlugins(),
           ...getCollaborationPlugins(scope),
+          ...getSheetCollaborationFeaturePlugins(),
         ],
       });
       this._univer = univer;

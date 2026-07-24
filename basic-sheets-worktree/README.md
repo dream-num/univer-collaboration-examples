@@ -3,6 +3,8 @@
 一个完全本地运行的 Sheet Worktree demo：
 
 - SQLite 保存固定 Trunk Sheet、Worktree draft 和应用层 Worktree Catalog。
+- 使用 grid Ribbon 和与 Basic Sheets 一致的高级 Sheet 数据/UI 插件；Worktree
+  viewer 不创建 Worker。
 - 浏览器继续使用现有 Univer Pro Collaboration Client。
 - `@univerjs/collaboration-worktree-client` 只提供 scoped URL、管理 API 和状态事件。
 - 左侧栏在主线、活动 Worktree 和已处理历史之间组织导航。

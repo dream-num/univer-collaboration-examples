@@ -4,6 +4,8 @@
 目录、URL 自动加载、SQLite Collaboration/History 和
 `Transport → Endpoint → Service` 主链路；本示例只在应用边界增加：
 
+- 与 Basic Sheets 一致的 grid Ribbon 和高级 Sheet 数据/UI 插件；公式、Pivot 和
+  History 留在主线程，不创建 Worker。
 - Alice、Bob 两个持久化演示用户。
 - HttpOnly Cookie 中的 8 小时 JWT，`sub` 保存稳定 `userId`。
 - 持久化的 `owner / editor / viewer` Unit ACL。

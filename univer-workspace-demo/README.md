@@ -27,6 +27,8 @@
 - 登录用户下的 snapshot、changeset、WebSocket 和 presence 协议入口。
 - Sheet、Doc、Slide 的 History 元数据索引与持久化协议。
 - Sheet 编辑器中的 Univer Edit History UI。
+- Sheet 编辑器使用 grid Ribbon 和高级数据/UI 插件；多类型编辑器不额外创建
+  Formula、Pivot 或 History Worker。
 - Sheet、Doc、Slide 按 URL 中的 Unit type 动态加载对应编辑器。
 
 Board 和 Base 暂未显示创建入口，因为 alpha.7 协同包没有从公开入口导出对应 data
