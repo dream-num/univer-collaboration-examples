@@ -40,14 +40,16 @@
 
 ### 1. SDK 代码基线
 
-当前 example 固定依赖 npm `1.0.0-alpha.6`。对比时，本地 `univer-pro` workspace
-中 collaboration、collaboration-client 和 collaboration-client-ui 的包版本声明为
-`1.0.0-alpha.4`，且上游 example 直接使用 workspace 源码。
+当前 example 固定依赖 npm `1.0.0-alpha.6`。本清单最近一次对照的上游基线是
+本地 `univer-pro` `b6babb152702`（`dev` 分支）；该 commit 中
+collaboration、collaboration-client 和 collaboration-client-ui 的包版本声明为
+`1.0.0-alpha.7`，且上游 example 直接使用 workspace 源码。
 
 影响：
 
 - 两边不是严格相同的构建产物。
 - 行为差异不能只从插件配置推断，也可能来自 SDK 代码版本。
+- 本地分支会继续移动；后续比较必须记录 commit，不能只写“当前 dev”。
 
 待确认：
 

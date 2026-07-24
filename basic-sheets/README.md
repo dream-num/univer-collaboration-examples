@@ -143,8 +143,10 @@ restore workaround。
 changeset 后可能进入 conflict。它存在于未修改的上游客户端，本 example 不擅自修复。
 详见 [alpha.6 peer restore conflict](../../docs/issues/known-issues/alpha6-peer-restore-conflict.md)。
 
-服务端仍保证 restore snapshot 在 `changesetCommitted` 及 Endpoint ACK / broadcast
-前持久化；这不等价于修复客户端 conflict。
+服务端仍保证 restore snapshot 在发布 `changesetCommitted` 前持久化，因此
+Endpoint 入队和发送 ACK/broadcast 时 snapshot 已经可读；这不等价于修复客户端
+conflict。精确时序见
+[Snapshots 设计](../../docs/internal/design/modules/snapshots.md)。
 
 ## 测试
 

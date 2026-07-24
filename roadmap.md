@@ -12,10 +12,13 @@
 四个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、
 启动和修改该示例。
 
-本文记录已经确认的需求与实施顺序。阶段 0、`basic-sheets` 和
-`basic-sheets-auth`、`basic-sheets-worktree` 已完成；
-`univer-suite-demo` 已有 Sheet、Doc、Slide、个人与团队目录、空间 RBAC 和个人文档
-定向分享 spike；公开链接等其余产品化能力不描述为已实现能力。
+本文记录各 example 的稳定目标、验收要求和尚未完成的实施顺序。动态实现状态由
+各自 README 维护，不在这里复制状态清单：
+
+- [`basic-sheets`](./basic-sheets/README.md)
+- [`basic-sheets-auth`](./basic-sheets-auth/README.md)
+- [`basic-sheets-worktree`](./basic-sheets-worktree/README.md)
+- [`univer-suite-demo`](./univer-suite-demo/README.md)
 
 ## 2. 共同原则
 
@@ -223,9 +226,6 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 4. 服务重启后 Worktree 状态和 trunk 内容仍可读取。
 5. 自动化集成测试与手动浏览器流程均通过。
 
-状态：已完成。实现与启动方式见
-[`basic-sheets-worktree/README.md`](./basic-sheets-worktree/README.md)。
-
 ## 6. `univer-suite-demo`
 
 ### 6.1 定位
@@ -391,70 +391,21 @@ scoped 协同链路，不复制 OT、offline state 或 ACK state machine。
 
 以下顺序不承诺日期；每个阶段只有在对应验收条件通过后才进入下一阶段。
 
-### 阶段 0：框架前置能力
-
-状态：已完成（Phase 1 Step 1–12）。
-
-- UniverCollabService、Node Transport 和 UniverCollabEndpoint 均提供可运行实现。
-- SQLite Database Adapter 通过共享 database testkit。
-- 完成 snapshot、changeset、submit、WebSocket、session ticket、authz 和 history 所需的协议端点。
-- Headless Unit Runtime 能加载和应用 Sheet、Doc、Slide、Base、Board 的 snapshot 与 changeset。
-- 版本历史查询和恢复语义稳定。
-
-### 阶段 1：示例基础设施
-
-状态：`basic-sheets` 所需部分已完成；跨四个示例的公共浏览器测试基础设施随后续示例再抽象。
-
-- 将 `examples/*` 加入 pnpm workspace。
-- 统一开发脚本、端口约定、SQLite 数据目录和重置方式。
-- 建立 examples 总 README 和能力矩阵。
-- 建立浏览器端到端测试基础设施。
-
-### 阶段 2：`basic-sheets`
-
-状态：已完成（Phase 1 Step 13）。实现、启动和生产差异见 [`basic-sheets/README.md`](./basic-sheets/README.md)。
-
-- 对齐 `univer-pro/examples/src/sheets` 前端。
-- 使用固定演示用户和 SQLite，不在最小示例中实现用户系统。
-- 跑通创建、加载、实时编辑、重连、持久化和历史恢复。
-- 完成与上游 example 的差异清单。
-
-### 阶段 3：`basic-sheets-auth`
-
-状态：已完成。实现与启动方式见
-[`basic-sheets-auth/README.md`](./basic-sheets-auth/README.md)。
-
-- 在 `basic-sheets` 客户端和服务端结构上增加认证，不另建一套协同集成。
-- 实现 SQLite 用户、密码哈希、JWT Cookie、session ticket 和文档角色。
-- 实现登录、成员授权与 owner/editor/viewer 服务端权限。
-- 覆盖未认证请求、viewer 绕过尝试以及用户、ACL、Unit 和 History 重启持久化。
-
-### 阶段 3.5：`basic-sheets-worktree`
-
-状态：已完成。实现与启动方式见
-[`basic-sheets-worktree/README.md`](./basic-sheets-worktree/README.md)。
-
-- 使用 SQLite trunk 与 Worktree Adapter。
-- 接入 Worktree Client scoped 配置和完整状态事件。
-- 跑通 Worktree-local Sheet 创建、编辑、ready、merge 和重启恢复。
-- 实际浏览器验证协同 submit、ACK 和 trunk revision 1 内容。
-
 ### 阶段 4：`univer-suite-demo` 文件空间
 
-状态：Spike 已完成账号、个人空间中的资源列表、创建、软删除和恢复；共享空间、
-文件夹树与分享仍未实现。
+剩余需求：
 
-- 实现账号、个人空间、共享工作空间和资源树 schema。
-- 实现资源 CRUD、名称搜索、最近使用、与我共享和回收站。
-- 实现个人文档分享、空间成员权限和快捷方式。
-- 完成文件空间、错误页和访问申请页。
+- 节点移动和对应的归属、权限事务。
+- 个人文件夹分享。
+- 公开、匿名或“知道链接即可访问”的分享链接。
+- 永久删除和团队所有权转移。
+- 完整错误页、访问申请及审批流程。
 
 ### 阶段 5：`univer-suite-demo` 多类型编辑器
 
-状态：Spike 已接入 Sheet、Doc、Slide。Board / Base 创建受 alpha.6 transformer
-export 限制，非 Sheet 历史 UI 受 alpha.6 viewer 限制，见 `docs/issues`。
+Sheet、Doc、Slide 的当前实现事实见 Suite Demo README。剩余需求：
 
-- 分别接入 Sheet、Doc、Slide、Base 和 Board。
+- 在公开 transformer 可用后接入 Board 和 Base 创建。
 - 实现统一编辑器产品头部、连接状态、在线成员和权限只读体验。
 - 跑通五种 Unit 的实时编辑、重连、持久化和历史恢复。
 - 验证跨空间移动的归属与权限事务。
