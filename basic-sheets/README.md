@@ -10,6 +10,9 @@ Express
     ├── UniverHistoryEndpoint
     │   → UniverHistoryService
     │     → SQLiteHistoryDatabaseAdapter
+    ├── UniverCommentEndpoint
+    │   → UniverCommentService
+    │     → SQLiteCommentDatabaseAdapter
     └── UniverCollabEndpoint
         → UniverCollabService
           → SQLiteDatabaseAdapter
@@ -66,8 +69,9 @@ VITE_UNIVER_LICENSE='your-license' pnpm --filter @univerjs/collaboration-example
 1. 打开页面，等待 Sheet 加载。
 2. 把完整 URL 复制到另一个浏览器或无痕会话。
 3. 在任一端编辑，另一端会收到 confirmed changeset、成员和 presence。
-4. 刷新页面或重启服务器，URL、内容、revision 和历史记录保持不变。
-5. 从版本历史入口查看历史并恢复旧版本；恢复会创建新的最新 revision。
+4. 右键单元格新增评论、回复、解决或删除；另一端会收到 `comment_update`。
+5. 刷新页面或重启服务器，URL、内容、revision、评论和历史记录保持不变。
+6. 从版本历史入口查看历史并恢复旧版本；恢复会创建新的最新 revision。
 
 运行时数据位于 `examples/basic-sheets/.data/`：
 
@@ -90,9 +94,13 @@ context.userId = "demo-user";
 `/universer-api/user`、authz 和 Unit 创建由 Express Router 实现；History 由可选的
 `UniverHistoryEndpoint → UniverHistoryService → SQLiteHistoryDatabaseAdapter`
 默认实现
-提供。其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
+提供；Comment 由 `UniverCommentEndpoint → UniverCommentService →
+SQLiteCommentDatabaseAdapter` 提供。其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
 所有浏览器窗口因此拥有相同 `userId`，但 WebSocket `memberId` 不同，仍可测试房间、
 Presence、ACK 和广播。
+
+Comment Service 的 User Provider 把作者补全为 `Demo User`；删除 middleware 演示
+author-only 策略。由于固定身份示例没有用户搜索，`@mention` 候选仍保持禁用。
 
 该硬编码方式只能用于本地演示。真实用户、认证与 ACL 集成见
 [Basic Sheets Auth](../basic-sheets-auth/README.md)。
@@ -119,7 +127,7 @@ client/
 - snapshot、Comb、session ticket、authz 和 history URL。
 - Pro Formula、Pivot 与 History RPC Worker。
 - Conditional Formatting、Data Validation、Filter、Sort、Drawing、Note、
-  Hyperlink、Outline、Pivot、Chart、Sparkline、Table 和 Shape。
+  Hyperlink、Outline、Pivot、Chart、Sparkline、Table、Shape 和 Thread Comment。
 - Find/Replace、Crosshair、Range Preprocess 和 Live Share。
 - 创建 Unit 后刷新到稳定 URL。
 - 不增加协议转换层或本仓库专用前端 SDK。
@@ -127,7 +135,7 @@ client/
 有意保留的差异：
 
 - 使用 Vite 构建，不复制上游 esbuild 开发设施。
-- 不注册 Thread Comment、文件上传、Import/Export、Print、Watermark、Telemetry、
+- 不注册文件上传、Import/Export、Print、Watermark、Telemetry、
   Debugger 和 Action Recorder。
 - 上游 `lazy.ts` 中保留的本地客户端工具在启动时立即注册，不人为等待三秒。
 - 图片 I/O 暂时禁用，但 Drawing、Shape 和 Chart 的协同模型仍启用。
@@ -170,6 +178,7 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets test
 
 - 固定用户和固定授权响应。
 - Unit、snapshot 和 history 重启持久化。
+- Thread Comment 正文与用户资料的 SQLite 重启持久化。
 - 两个 member 并发提交、ACK、广播和 OT 收敛。
 - Presence、断线、重连与 fetch-missing。
 - restore 形成新 revision 和 required snapshot。

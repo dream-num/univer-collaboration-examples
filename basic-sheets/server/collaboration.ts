@@ -1,4 +1,9 @@
 import type { Server } from "node:http";
+import { UniverCommentEndpoint } from "@univerjs/collaboration-comment-endpoint";
+import {
+  UniverCommentService,
+  type ICommentDatabaseAdapter,
+} from "@univerjs/collaboration-comment-service";
 import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
 import {
   UniverHistoryService,
@@ -6,6 +11,7 @@ import {
 } from "@univerjs/collaboration-history";
 import { UniverHistoryEndpoint } from "@univerjs/collaboration-history-endpoint";
 import {
+  CollabError,
   UniverCollabService,
   type IDatabaseAdapter,
 } from "@univerjs/collaboration-service";
@@ -17,12 +23,14 @@ import { protocolUser } from "./demo-user.js";
 
 export interface CollaborationStackOptions {
   readonly dbAdapter: IDatabaseAdapter;
+  readonly commentDbAdapter: ICommentDatabaseAdapter;
   readonly historyDbAdapter: IHistoryDatabaseAdapter;
   readonly user: DemoUser;
 }
 
 export interface CollaborationStack {
   readonly collabService: UniverCollabService;
+  readonly commentService: UniverCommentService;
   readonly historyService: UniverHistoryService;
   readonly handleHttp: RequestHandler;
   attachWebSocket(server: Server): void;
@@ -37,6 +45,29 @@ export function createCollaborationStack(
     dbAdapter: options.dbAdapter,
   });
   const endpoint = new UniverCollabEndpoint(collabService);
+  const commentService = new UniverCommentService({
+    database: options.commentDbAdapter,
+    userProvider: {
+      async getUsers(userIds) {
+        return userIds.includes(options.user.userId)
+          ? [protocolUser(options.user)]
+          : [];
+      },
+    },
+  });
+  commentService.use("deleteComment", async (context, next) => {
+    if (context.target.authorUserID !== context.session.userId) {
+      throw new CollabError(
+        "PERMISSION_DENIED",
+        "Only the Comment author can delete it in this demo"
+      );
+    }
+    await next();
+  });
+  const commentEndpoint = new UniverCommentEndpoint({
+    service: commentService,
+    roomHost: endpoint,
+  });
   const historyService = new UniverHistoryService({
     collabService,
     dbAdapter: options.historyDbAdapter,
@@ -77,6 +108,7 @@ export function createCollaborationStack(
     await next();
   });
   transport.use(historyEndpoint);
+  transport.use(commentEndpoint);
   transport.use(endpoint);
   transport.use(async (context, next) => {
     if (context.kind === "http") {
@@ -109,6 +141,7 @@ export function createCollaborationStack(
 
   return {
     collabService,
+    commentService,
     historyService,
 
     // Express mount 会改写 request.url；Endpoint 需要看到完整 Protocol 路径。
@@ -132,6 +165,7 @@ export function createCollaborationStack(
       attachedServer = undefined;
       await transport.dispose();
       await historyService.dispose();
+      await commentService.dispose();
       await collabService.dispose();
     },
   };

@@ -37,6 +37,7 @@
 - Filter、Sort、Hyperlink、Note。
 - Drawing、Shape、Chart、Sparkline。
 - Outline、Pivot Table、Table。
+- Thread Comment UI 与官方远端 datasource。
 
 Find/Replace、Crosshair、Range Preprocess 和 Live Share 是客户端能力，不要求服务端
 存在同名插件。
@@ -55,12 +56,13 @@ Worker URL 由 Vite 生成后交给 `UniverRPCMainThreadPlugin`。由插件在�
 
 以下插件和入口没有注册：
 
-- Thread Comment。
 - 文件上传、签名 URL、Import/Export。
 - Print、Watermark。
 - Telemetry、Debugger、Action Recorder。
 
-因此页面不会展示当前后端无法完整支持的对应入口。
+Thread Comment 已使用本仓库的 Comment Endpoint/Service/SQLite Adapter；固定身份示例没有
+mention 用户搜索，因此评论可用，但 `@mention` 候选保持禁用。页面不会展示其余当前后端
+无法完整支持的入口。
 
 ### Demo 与构建设施
 

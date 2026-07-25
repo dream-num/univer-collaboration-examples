@@ -23,6 +23,7 @@ import SheetsPivotEnUS from "@univerjs-pro/sheets-pivot/locale/en-US";
 import SheetsPivotUIEnUS from "@univerjs-pro/sheets-pivot-ui/locale/en-US";
 import SheetsShapeUIEnUS from "@univerjs-pro/sheets-shape-ui/locale/en-US";
 import SheetsSparklineUIEnUS from "@univerjs-pro/sheets-sparkline-ui/locale/en-US";
+import ThreadCommentUIEnUS from "@univerjs/thread-comment-ui/locale/en-US";
 import { UniverRangePreprocessPlugin } from "@univerjs-pro/range-preprocess";
 import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { HTTPService } from "@univerjs/network";
@@ -47,6 +48,7 @@ import SheetsNumfmtUIEnUS from "@univerjs/sheets-numfmt-ui/locale/en-US";
 import SheetsSortUIEnUS from "@univerjs/sheets-sort-ui/locale/en-US";
 import SheetsTableEnUS from "@univerjs/sheets-table/locale/en-US";
 import SheetsTableUIEnUS from "@univerjs/sheets-table-ui/locale/en-US";
+import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
 import { host, httpProtocol, unit, url } from "./consts";
 import getClientToolPlugins from "./lazy";
 import workerURL from "./worker.ts?worker&url";
@@ -75,6 +77,8 @@ import "@univerjs/sheets-hyper-link-ui/lib/index.css";
 import "@univerjs/sheets-note-ui/lib/index.css";
 import "@univerjs/sheets-sort-ui/lib/index.css";
 import "@univerjs/sheets-table-ui/lib/index.css";
+import "@univerjs/sheets-thread-comment-ui/lib/index.css";
+import "@univerjs/thread-comment-ui/lib/index.css";
 import "../global.css";
 
 import "@univerjs/sheets/facade";
@@ -128,7 +132,9 @@ function main(): void {
         SheetsPivotEnUS,
         SheetsPivotUIEnUS,
         SheetsShapeUIEnUS,
-        SheetsSparklineUIEnUS
+        SheetsSparklineUIEnUS,
+        ThreadCommentUIEnUS,
+        SheetsThreadCommentUIEnUS
       ),
     },
     theme: defaultTheme,

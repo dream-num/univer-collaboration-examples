@@ -20,6 +20,7 @@ import { UniverSheetsShapePlugin } from "@univerjs-pro/sheets-shape";
 import { UniverSheetsShapeUIPlugin } from "@univerjs-pro/sheets-shape-ui";
 import { UniverSheetSparklinePlugin } from "@univerjs-pro/sheets-sparkline";
 import { UniverSheetSparklineUIPlugin } from "@univerjs-pro/sheets-sparkline-ui";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
 import { UniverDataValidationPlugin } from "@univerjs/data-validation";
 import { UniverDocsPlugin } from "@univerjs/docs";
 import { UniverDocsUIPlugin } from "@univerjs/docs-ui";
@@ -45,6 +46,7 @@ import { UniverSheetsNumfmtPlugin } from "@univerjs/sheets-numfmt";
 import { UniverSheetsSortPlugin } from "@univerjs/sheets-sort";
 import { UniverSheetsTablePlugin } from "@univerjs/sheets-table";
 import { UniverSheetsTableUIPlugin } from "@univerjs/sheets-table-ui";
+import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
 import { UniverSheetsUIPlugin } from "@univerjs/sheets-ui";
 import { UniverUIPlugin } from "@univerjs/ui";
 import { host, httpProtocol, wsProtocol } from "./consts";
@@ -86,6 +88,7 @@ export function registerSheetPlugins(univer: Univer): void {
   univer.registerPlugin(UniverSheetsDrawingPlugin);
   univer.registerPlugin(UniverSheetsDrawingUIPlugin);
   univer.registerPlugin(UniverSheetsSortPlugin);
+  univer.registerPlugin(UniverSheetsThreadCommentUIPlugin);
 
   univer.registerPlugin(UniverSheetsPivotTablePlugin, {
     notExecuteFormula: true,
@@ -125,6 +128,7 @@ export function registerCollaborationFeatures(univer: Univer): void {
     sendChangesetTimeout: 200,
   });
   univer.registerPlugin(UniverCollaborationClientUIPlugin);
+  univer.registerPlugin(UniverThreadCommentDataSourcePlugin);
   univer.registerPlugin(UniverSheetsNotePlugin);
   univer.registerPlugin(UniverSheetsNoteUIPlugin);
 }

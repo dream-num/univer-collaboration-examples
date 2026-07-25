@@ -3,6 +3,8 @@ import { createServer, type Server } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import express, { Router } from "express";
+import { SQLiteCommentDatabaseAdapter } from "@univerjs/collaboration-comment-database-sqlite";
+import type { UniverCommentService } from "@univerjs/collaboration-comment-service";
 import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
 import type { UniverHistoryService } from "@univerjs/collaboration-history";
 import { SQLiteHistoryDatabaseAdapter } from "@univerjs/collaboration-history-sqlite";
@@ -23,8 +25,10 @@ export interface BasicSheetsApplication {
   readonly app: express.Express;
   readonly httpServer: Server;
   readonly database: SQLiteDatabaseAdapter;
+  readonly commentDatabase: SQLiteCommentDatabaseAdapter;
   readonly historyDbAdapter: SQLiteHistoryDatabaseAdapter;
   readonly collabService: UniverCollabService;
+  readonly commentService: UniverCommentService;
   readonly historyService: UniverHistoryService;
   listen(port?: number, host?: string): Promise<number>;
   close(): Promise<void>;
@@ -37,11 +41,15 @@ export async function createBasicSheetsApplication(
   mkdirSync(dirname(databaseFilename), { recursive: true });
 
   const database = new SQLiteDatabaseAdapter({ filename: databaseFilename });
+  const commentDatabase = new SQLiteCommentDatabaseAdapter({
+    filename: databaseFilename,
+  });
   const historyDbAdapter = new SQLiteHistoryDatabaseAdapter({
     filename: databaseFilename,
   });
   const collaboration = createCollaborationStack({
     dbAdapter: database,
+    commentDbAdapter: commentDatabase,
     historyDbAdapter,
     user: DEMO_USER,
   });
@@ -91,8 +99,10 @@ export async function createBasicSheetsApplication(
     app,
     httpServer,
     database,
+    commentDatabase,
     historyDbAdapter,
     collabService: collaboration.collabService,
+    commentService: collaboration.commentService,
     historyService: collaboration.historyService,
     listen: (port = 3010, host = "127.0.0.1") =>
       listen(httpServer, port, host),
@@ -102,6 +112,7 @@ export async function createBasicSheetsApplication(
       await collaboration.dispose();
       await closeServer(httpServer);
       await historyDbAdapter.dispose();
+      await commentDatabase.dispose();
       await database.dispose();
     },
   };

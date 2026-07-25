@@ -99,6 +99,48 @@ describe("basic-sheets server integration", () => {
     );
     expect(missing.response.status).toBe(404);
   });
+
+  it("persists Thread Comments and enriches list users", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "univer-basic-sheets-comment-"));
+    directories.push(directory);
+    const filename = join(directory, "demo.sqlite");
+    let running = await start(filename);
+    const createResponse = await fetch(
+      `${running.origin}/universer-api/snapshot/2/unit/-/create`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: "Comment demo" }),
+      }
+    );
+    const { unitID } = (await createResponse.json()) as { readonly unitID: string };
+    const created = await running.app.commentService.addComment({
+      unitID,
+      content: JSON.stringify({ dataStream: "Persistent comment\r\n" }),
+      mentions: [],
+    }, {
+      session: { memberId: "test-member", userId: "demo-user", customData: {} },
+    });
+
+    await running.app.close();
+    applications.splice(applications.indexOf(running.app), 1);
+    running = await start(filename);
+    const response = await fetch(
+      `${running.origin}/universer-api/comment/unit/${unitID}/list`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ unitId: unitID, threadId: [created.threadId] }),
+      }
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json() as any;
+    expect(body.comments[created.threadId]).toMatchObject({
+      threadId: created.threadId,
+      replies: [{ userId: "demo-user", content: JSON.stringify({ dataStream: "Persistent comment\r\n" }) }],
+    });
+    expect(body.users["demo-user"]).toMatchObject({ userID: "demo-user", name: "Demo User" });
+  });
 });
 
 async function start(filename: string): Promise<{

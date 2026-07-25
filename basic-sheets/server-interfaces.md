@@ -22,6 +22,7 @@
 | Snapshot 读取、block/resource、fetch-missing | Node Transport → `UniverCollabEndpoint` |
 | Session ticket、changeset submit | Node Transport → `UniverCollabEndpoint` |
 | Comb WebSocket | Node Transport → `UniverCollabEndpoint` |
+| Comment add/list/reply/solved/edit/delete | Node Transport → `UniverCommentEndpoint` |
 
 前一组回答用户、权限和产品 Unit 如何组织，属于应用能力；后一组影响协同状态、
 revision、ACK 和实时投递，属于协同核心协议。
