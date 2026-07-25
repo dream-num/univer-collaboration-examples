@@ -48,31 +48,71 @@ describe("Worktree review UI", () => {
       selectedWorktreeID: worktree.worktreeID,
       selectedUnitID: worktree.units[0]!.unitID,
       mode: "draft",
-      view: "active",
+      filter: "all",
       scope: "all",
       spaces: [],
     });
 
+    expect(html).toContain("智能工作台");
+    expect(html).toContain(
+      "查看 AI 正在进行/已完成的文档任务，确认后纳入正式版本。"
+    );
     expect(html).toContain("Agent budget");
     expect(html).toContain("Alice");
     expect(html).toContain("Budget");
     expect(html).toContain("合并失败");
     expect(html).toContain("PERMISSION_DENIED");
     expect(html).toContain("只读预览");
+    expect(html).toContain("正式版本 r1 → AI 修改版 r2");
+    expect(html).toContain(">丢弃</button>");
+    expect(html).toContain(">合入</button>");
+    expect(html).toContain("data-review-expand");
+    expect(html).toContain("worktree-preview-frame");
+    expect(html).not.toContain("Agent Worktrees");
+    expect(html).not.toContain("<h3>Units</h3>");
     expect(html).not.toContain("<input");
     expect(html).not.toContain("contenteditable");
   });
 
+  it("renders a vertical task tree and keeps processed tasks collapsed by default", () => {
+    const html = worktreeReviewView({
+      worktrees: [
+        { ...worktree, status: "draft", worktreeID: "running" },
+        { ...worktree, status: "merged", worktreeID: "processed" },
+      ],
+      selectedWorktreeID: "running",
+      selectedUnitID: worktree.units[0]!.unitID,
+      mode: "draft",
+      filter: "all",
+      scope: "all",
+      spaces: [],
+    });
+
+    expect(html).toContain('class="task-tree-group task-tree-group-running" open');
+    expect(html).toContain('class="task-tree-group task-tree-group-ready" open');
+    expect(html).toContain('class="task-tree-group task-tree-group-processed"');
+    expect(html).not.toContain(
+      'class="task-tree-group task-tree-group-processed" open'
+    );
+    expect(html).toContain('class="task-document-item active"');
+    expect(html).toContain("data-worktree-unit");
+
+    const processedOnly = worktreeReviewView({
+      worktrees: [{ ...worktree, status: "merged", worktreeID: "processed" }],
+      mode: "draft",
+      filter: "all",
+      scope: "all",
+      spaces: [],
+    });
+    expect(processedOnly).not.toContain("worktree-preview-frame");
+  });
+
   it("offers lifecycle actions from current aggregate state", () => {
     expect(lifecycleActions({ ...worktree, status: "draft" })).toEqual([
+      "discard",
       "ready",
-      "discard",
     ]);
-    expect(lifecycleActions(worktree)).toEqual([
-      "reopen",
-      "merge",
-      "discard",
-    ]);
+    expect(lifecycleActions(worktree)).toEqual(["discard", "merge"]);
     expect(
       lifecycleActions({ ...worktree, status: "merged" })
     ).toEqual([]);

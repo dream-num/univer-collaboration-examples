@@ -1,5 +1,9 @@
 export type ReviewMode = "trunk" | "draft" | "merge";
-export type ReviewWorktreeView = "active" | "processed";
+export type ReviewWorktreeFilter =
+  | "all"
+  | "running"
+  | "ready"
+  | "processed";
 export type ReviewWorktreeScope = "all" | "user" | "space";
 export type ReviewLifecycleAction =
   | "ready"
@@ -57,9 +61,9 @@ export function lifecycleActions(
 ): readonly ReviewLifecycleAction[] {
   switch (worktree.status) {
     case "draft":
-      return ["ready", "discard"];
+      return ["discard", "ready"];
     case "ready":
-      return ["reopen", "merge", "discard"];
+      return ["discard", "merge"];
     case "merging":
       return ["merge"];
     case "merged":
@@ -87,107 +91,192 @@ export function worktreeReviewView(input: {
   readonly selectedWorktreeID?: string;
   readonly selectedUnitID?: string;
   readonly mode: ReviewMode;
-  readonly view: ReviewWorktreeView;
+  readonly filter: ReviewWorktreeFilter;
   readonly scope: ReviewWorktreeScope;
   readonly spaceID?: string;
   readonly spaces: readonly ReviewSpace[];
 }): string {
-  const selected =
-    input.worktrees.find(
-      ({ worktreeID }) => worktreeID === input.selectedWorktreeID
-    ) ?? input.worktrees[0];
+  const groups = groupWorktrees(input.worktrees);
+  const visible = visibleWorktrees(groups, input.filter);
+  const defaultSelection =
+    input.filter === "all"
+      ? [...groups.running, ...groups.ready][0]
+      : visible[0];
+  const selected = input.selectedWorktreeID
+    ? (visible.find(
+        ({ worktreeID }) => worktreeID === input.selectedWorktreeID
+      ) ?? defaultSelection)
+    : defaultSelection;
   const unit =
     selected?.units.find(({ unitID }) => unitID === input.selectedUnitID) ??
     selected?.units[0];
   return `
-    <section class="worktree-review-heading">
-      <div>
-        <p class="breadcrumb">Agent Worktrees</p>
-        <h1>审阅 Agent 工作</h1>
-        <p>内容预览为只读。你可以检查结果并执行生命周期操作。</p>
-      </div>
-      <span class="review-readonly-badge">只读 Review</span>
-    </section>
-    <section class="worktree-review-filters" aria-label="Worktree 筛选">
-      <div class="review-segmented">
-        ${filterButton("view", "active", "进行中", input.view)}
-        ${filterButton("view", "processed", "已处理", input.view)}
-      </div>
-      <div class="review-segmented">
-        ${filterButton("scope", "all", "全部", input.scope)}
-        ${filterButton("scope", "user", "个人", input.scope)}
-        ${filterButton("scope", "space", "团队空间", input.scope)}
-      </div>
-      ${
-        input.scope === "space"
-          ? `<select data-worktree-space aria-label="团队空间">
-              <option value="">所有团队空间</option>
-              ${input.spaces
-                .filter(({ type }) => type === "team")
-                .map(
-                  (space) =>
-                    `<option value="${escapeHtml(space.id)}"${
-                      space.id === input.spaceID ? " selected" : ""
-                    }>${escapeHtml(space.name)}</option>`
-                )
-                .join("")}
-            </select>`
-          : ""
-      }
-    </section>
-    <section class="worktree-review-layout">
-      <aside class="worktree-review-list" aria-label="Worktree 列表">
-        <div class="review-list-heading">
-          <strong>${input.view === "active" ? "进行中" : "已处理"}</strong>
-          <span>${input.worktrees.length}</span>
+    <div class="worktree-review-page">
+      <section class="worktree-review-heading">
+        <div>
+          <h1>智能工作台</h1>
+          <p>查看 AI 正在进行/已完成的文档任务，确认后纳入正式版本。</p>
+        </div>
+      </section>
+      <section class="worktree-review-filters" aria-label="文档任务筛选">
+        <div class="review-segmented">
+          ${filterButton("filter", "all", "全部", input.filter)}
+          ${filterButton("filter", "running", "正在进行", input.filter)}
+          ${filterButton("filter", "ready", "待确认", input.filter)}
+          ${filterButton("filter", "processed", "已处理", input.filter)}
+        </div>
+        <div class="review-segmented">
+          ${filterButton("scope", "all", "全部", input.scope)}
+          ${filterButton("scope", "user", "个人", input.scope)}
+          ${filterButton("scope", "space", "团队空间", input.scope)}
         </div>
         ${
-          input.worktrees.length
-            ? input.worktrees
-                .map((worktree) =>
-                  worktreeListItem(
-                    worktree,
-                    worktree.worktreeID === selected?.worktreeID
+          input.scope === "space"
+            ? `<select data-worktree-space aria-label="团队空间">
+                <option value="">所有团队空间</option>
+                ${input.spaces
+                  .filter(({ type }) => type === "team")
+                  .map(
+                    (space) =>
+                      `<option value="${escapeHtml(space.id)}"${
+                        space.id === input.spaceID ? " selected" : ""
+                      }>${escapeHtml(space.name)}</option>`
                   )
-                )
-                .join("")
-            : `<div class="review-empty">
-                <strong>没有 Worktree</strong>
-                <p>Agent 创建的工作会显示在这里。</p>
-              </div>`
+                  .join("")}
+              </select>`
+            : ""
         }
-      </aside>
-      <div class="worktree-review-detail">
-        ${
-          selected
-            ? worktreeDetail(selected, unit, input.mode)
-            : `<div class="review-empty review-empty-large">
-                <strong>选择一个 Worktree</strong>
-                <p>查看 Unit、revision 和合并结果。</p>
-              </div>`
-        }
-      </div>
-    </section>
+        <button class="review-panel-toggle" type="button" data-task-panel-toggle aria-expanded="true">
+          <span aria-hidden="true">‹</span><b>收起任务列表</b>
+        </button>
+      </section>
+      <section class="worktree-review-layout">
+        <aside class="worktree-task-tree" aria-label="任务与文档">
+          ${taskGroup("正在进行", "running", groups.running, selected, unit, input.filter)}
+          ${taskGroup("待确认", "ready", groups.ready, selected, unit, input.filter)}
+          ${taskGroup("已处理", "processed", groups.processed, selected, unit, input.filter)}
+          ${
+            visible.length
+              ? ""
+              : `<div class="review-empty">
+                  <strong>没有文档任务</strong>
+                  <p>AI 创建的工作会显示在这里。</p>
+                </div>`
+          }
+        </aside>
+        <div class="worktree-review-detail">
+          ${
+            selected
+              ? worktreeDetail(selected, unit, input.mode)
+              : `<div class="review-empty review-empty-large">
+                  <strong>选择一个文档任务</strong>
+                  <p>在左侧选择文档，查看 AI 的处理结果。</p>
+                </div>`
+          }
+        </div>
+      </section>
+    </div>
   `;
 }
 
-function worktreeListItem(
+type WorktreeGroup = "running" | "ready" | "processed";
+
+function groupWorktrees(worktrees: readonly ReviewWorktree[]): Record<WorktreeGroup, readonly ReviewWorktree[]> {
+  return {
+    running: worktrees.filter(({ status }) => status === "draft" || status === "merging"),
+    ready: worktrees.filter(({ status }) => status === "ready"),
+    processed: worktrees.filter(({ status }) => status === "merged" || status === "discarded"),
+  };
+}
+
+function visibleWorktrees(
+  groups: Record<WorktreeGroup, readonly ReviewWorktree[]>,
+  filter: ReviewWorktreeFilter
+): readonly ReviewWorktree[] {
+  if (filter === "all") {
+    return [...groups.running, ...groups.ready, ...groups.processed];
+  }
+  return groups[filter];
+}
+
+function taskGroup(
+  label: string,
+  group: WorktreeGroup,
+  worktrees: readonly ReviewWorktree[],
+  selectedWorktree: ReviewWorktree | undefined,
+  selectedUnit: ReviewWorktreeUnit | undefined,
+  filter: ReviewWorktreeFilter
+): string {
+  if (filter !== "all" && filter !== group) return "";
+  const groupOpen = group !== "processed" || filter === "processed";
+  return `
+    <details class="task-tree-group task-tree-group-${group}"${groupOpen ? " open" : ""}>
+      <summary>
+        <span class="task-tree-chevron" aria-hidden="true">›</span>
+        <strong>${label}</strong>
+        <span class="task-tree-count">${worktrees.length}</span>
+      </summary>
+      <div class="task-tree-branches">
+        ${worktrees
+          .map((worktree) =>
+            taskTreeItem(
+              worktree,
+              worktree.worktreeID === selectedWorktree?.worktreeID,
+              worktree.worktreeID === selectedWorktree?.worktreeID
+                ? selectedUnit
+                : undefined,
+              group !== "processed" ||
+                (filter === "processed" &&
+                  worktree.worktreeID === selectedWorktree?.worktreeID)
+            )
+          )
+          .join("")}
+      </div>
+    </details>`;
+}
+
+function taskTreeItem(
   worktree: ReviewWorktree,
-  selected: boolean
+  selected: boolean,
+  selectedUnit: ReviewWorktreeUnit | undefined,
+  defaultOpen: boolean
 ): string {
   return `
-    <button
-      class="worktree-review-item${selected ? " active" : ""}"
-      type="button"
-      data-worktree-select="${escapeHtml(worktree.worktreeID)}"
-    >
-      <span class="review-item-top">
-        <strong>${escapeHtml(worktree.name)}</strong>
+    <details class="task-tree-item${selected ? " active" : ""}"${defaultOpen ? " open" : ""}>
+      <summary>
+        <span class="task-tree-chevron" aria-hidden="true">›</span>
+        <span class="task-tree-title">
+          <strong>${escapeHtml(worktree.name)}</strong>
+          <small>${escapeHtml(worktree.creatorName)} · ${formatTime(worktree.updatedAt)}</small>
+        </span>
         <i class="review-status review-status-${worktree.status}">${statusLabel(worktree.status)}</i>
-      </span>
-      <span>${escapeHtml(worktree.creatorName)} · ${scopeLabel(worktree)}</span>
-      <small>${worktree.units.length} 个 Unit · ${formatTime(worktree.updatedAt)}</small>
-    </button>
+      </summary>
+      <div class="task-document-list">
+        ${
+          worktree.units.length
+            ? worktree.units
+                .map(
+                  (unit) => `
+                    <button
+                      type="button"
+                      data-worktree-id="${escapeHtml(worktree.worktreeID)}"
+                      data-worktree-unit="${escapeHtml(unit.unitID)}"
+                      class="task-document-item${unit.unitID === selectedUnit?.unitID ? " active" : ""}"
+                    >
+                      <span class="task-document-branch" aria-hidden="true"></span>
+                      <span class="unit-type unit-type-${unit.type}">${unitTypeLabel(unit.type)}</span>
+                      <span class="task-document-title">
+                        <strong>${escapeHtml(unit.name)}</strong>
+                        <small>${documentVersionLabel(unit)}</small>
+                        ${mergeResult(unit)}
+                      </span>
+                    </button>`
+                )
+                .join("")
+            : `<div class="review-empty"><p>这个任务还没有文档。</p></div>`
+        }
+      </div>
+    </details>
   `;
 }
 
@@ -199,18 +288,10 @@ function worktreeDetail(
   const actions = lifecycleActions(worktree);
   return `
     <header class="worktree-detail-header">
-      <div>
-        <div class="review-title-line">
-          <h2>${escapeHtml(worktree.name)}</h2>
-          <span class="review-visibility">${worktree.visibility === "private" ? "仅创建者" : "团队可见"}</span>
-        </div>
-        <p>${escapeHtml(worktree.summary ?? "没有摘要")}</p>
-        <dl class="review-metadata">
-          <div><dt>创建者</dt><dd>${escapeHtml(worktree.creatorName)}</dd></div>
-          <div><dt>范围</dt><dd>${scopeLabel(worktree)}</dd></div>
-          <div><dt>状态</dt><dd>${statusLabel(worktree.status)}</dd></div>
-          <div><dt>更新时间</dt><dd>${formatTime(worktree.updatedAt)}</dd></div>
-        </dl>
+      <div class="review-title-line">
+        <span>${escapeHtml(worktree.name)} · ${statusLabel(worktree.status)}</span>
+        <h2>${escapeHtml(selectedUnit?.name ?? worktree.name)}</h2>
+        <small>${escapeHtml(worktree.summary ?? "没有任务说明")}</small>
       </div>
       <div class="worktree-actions">
         ${actions
@@ -226,33 +307,18 @@ function worktreeDetail(
           .join("")}
       </div>
     </header>
-    <div class="worktree-unit-review">
-      <nav class="worktree-unit-list" aria-label="Worktree Units">
-        <h3>Units</h3>
-        ${
-          worktree.units.length
-            ? worktree.units
-                .map(
-                  (unit) => `
-                    <button
-                      type="button"
-                      data-worktree-unit="${escapeHtml(unit.unitID)}"
-                      class="${unit.unitID === selectedUnit?.unitID ? "active" : ""}"
-                    >
-                      <span class="unit-type unit-type-${unit.type}">${unitTypeLabel(unit.type)}</span>
-                      <strong>${escapeHtml(unit.name)}</strong>
-                      <small>draft r${unit.draftHeadRevision}</small>
-                      ${mergeResult(unit)}
-                    </button>`
-                )
-                .join("")
-            : `<div class="review-empty"><p>这个 Worktree 还没有 Unit。</p></div>`
-        }
-      </nav>
-      <div class="worktree-unit-preview">
-        ${selectedUnit ? unitPreview(worktree, selectedUnit, mode) : ""}
-      </div>
+    <div class="worktree-unit-preview">
+      ${selectedUnit ? unitPreview(worktree, selectedUnit, mode) : ""}
     </div>
+    <details class="worktree-task-information">
+      <summary><span aria-hidden="true">ⓘ</span><strong>任务信息</strong><span class="task-information-chevron" aria-hidden="true">⌃</span></summary>
+      <dl class="review-metadata">
+        <div><dt>负责人</dt><dd>${escapeHtml(worktree.creatorName)}</dd></div>
+        <div><dt>任务类型</dt><dd>${scopeLabel(worktree)}</dd></div>
+        <div><dt>状态</dt><dd>${statusLabel(worktree.status)}</dd></div>
+        <div><dt>更新时间</dt><dd>${formatTime(worktree.updatedAt)}</dd></div>
+      </dl>
+    </details>
   `;
 }
 
@@ -266,20 +332,30 @@ function unitPreview(
   return `
     <div class="review-preview-toolbar">
       <div>
-        <strong>${escapeHtml(unit.name)}</strong>
-        <span>baseline ${unit.baselineTrunkRevision === null ? "new" : `r${unit.baselineTrunkRevision}`} → draft r${unit.draftHeadRevision}</span>
+        <strong>${documentVersionLabel(unit)}</strong>
+        <span>${modeDescription(mode)}</span>
       </div>
-      <div class="review-mode-switch" aria-label="预览版本">
-        ${modes
-          .map(
-            (candidate) =>
-              `<button type="button" data-review-mode="${candidate}" class="${candidate === mode ? "active" : ""}">${modeLabel(candidate)}</button>`
-          )
-          .join("")}
+      <div class="review-preview-controls">
+        <div class="review-mode-switch" aria-label="预览版本">
+          ${modes
+            .map(
+              (candidate) =>
+                `<button type="button" data-review-mode="${candidate}" class="${candidate === mode ? "active" : ""}">${modeLabel(candidate)}</button>`
+            )
+            .join("")}
+        </div>
+        <span class="review-readonly-badge">只读预览</span>
+        <button
+          class="review-expand-button"
+          type="button"
+          data-review-expand
+          aria-controls="worktree-preview-frame"
+          aria-expanded="false"
+        ><span aria-hidden="true">↗</span><b>沉浸预览</b></button>
       </div>
-      <span class="review-readonly-badge">只读预览</span>
     </div>
     <iframe
+      id="worktree-preview-frame"
       class="worktree-preview-frame"
       title="${escapeHtml(unit.name)} ${modeLabel(mode)}"
       src="${escapeHtml(reviewUnitUrl(worktree.worktreeID, unit, mode))}"
@@ -319,7 +395,7 @@ function mergeResult(unit: ReviewWorktreeUnit): string {
 }
 
 function filterButton(
-  kind: "view" | "scope",
+  kind: "filter" | "scope",
   value: string,
   label: string,
   current: string
@@ -328,34 +404,56 @@ function filterButton(
 }
 
 function scopeLabel(worktree: ReviewWorktree): string {
-  return worktree.scope.kind === "user" ? "个人 Worktree" : "团队空间";
+  return worktree.scope.kind === "user" ? "个人任务" : "团队任务";
 }
 
 function statusLabel(status: ReviewWorktree["status"]): string {
   return {
-    draft: "草稿",
-    ready: "待审阅",
-    merging: "合并中",
-    merged: "已合并",
+    draft: "正在进行",
+    ready: "待确认",
+    merging: "正在合入",
+    merged: "已合入",
     discarded: "已丢弃",
   }[status];
 }
 
 function actionLabel(action: ReviewLifecycleAction): string {
   return {
-    ready: "提交审阅",
-    reopen: "重新打开",
-    merge: "合并",
+    ready: "提交确认",
+    reopen: "继续修改",
+    merge: "合入",
     discard: "丢弃",
   }[action];
 }
 
 function modeLabel(mode: ReviewMode): string {
-  return { trunk: "主线", draft: "Worktree", merge: "合入预览" }[mode];
+  return { trunk: "正式版本", draft: "AI 修改版", merge: "合入预览" }[mode];
 }
 
 function unitTypeLabel(type: number): string {
-  return { 1: "Doc", 2: "Sheet", 3: "Slide" }[type] ?? `Unit ${type}`;
+  return {
+    1: "文档",
+    2: "表格",
+    3: "演示文稿",
+    4: "白板",
+    5: "多维表格",
+  }[type] ?? `文档类型 ${type}`;
+}
+
+function documentVersionLabel(unit: ReviewWorktreeUnit): string {
+  const baseline =
+    unit.baselineTrunkRevision === null
+      ? "新文档"
+      : `正式版本 r${unit.baselineTrunkRevision}`;
+  return `${unitTypeLabel(unit.type)} · ${baseline} → AI 修改版 r${unit.draftHeadRevision}`;
+}
+
+function modeDescription(mode: ReviewMode): string {
+  return {
+    trunk: "查看任务开始前的正式内容",
+    draft: "查看 AI 当前生成的内容",
+    merge: "查看合入正式版本后的结果",
+  }[mode];
 }
 
 function formatTime(timestamp: number): string {

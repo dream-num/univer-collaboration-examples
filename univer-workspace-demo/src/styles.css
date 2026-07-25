@@ -8,6 +8,440 @@
   text-rendering: optimizeLegibility;
 }
 
+/* 智能工作台：任务作为根节点，文档作为子节点。 */
+.workspace-content-worktrees {
+  max-width: none;
+  padding: 24px clamp(18px, 2.5vw, 36px) 44px;
+}
+
+.worktree-review-heading {
+  margin-bottom: 14px;
+}
+
+.worktree-review-heading h1 {
+  margin: 0 0 5px;
+  font-size: 28px;
+}
+
+.worktree-review-filters {
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.review-panel-toggle {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  color: #697180;
+  background: transparent;
+}
+
+.review-panel-toggle:hover,
+.review-panel-toggle:focus-visible {
+  color: #245edb;
+  background: #f1f5ff;
+}
+
+.review-panel-toggle b {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.worktree-review-layout {
+  display: grid;
+  min-height: clamp(680px, calc(100vh - 194px), 980px);
+  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  transition: grid-template-columns 160ms ease;
+}
+
+.worktree-review-layout.task-panel-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.worktree-task-tree {
+  min-width: 0;
+  overflow: auto;
+  border-right: 1px solid #e8eaee;
+  background: #fafbfc;
+  transition: opacity 120ms ease;
+}
+
+.task-panel-collapsed .worktree-task-tree {
+  overflow: hidden;
+  border-right: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.task-tree-group,
+.task-tree-item {
+  border: 0;
+}
+
+.task-tree-group + .task-tree-group {
+  border-top: 1px solid #e8eaee;
+}
+
+.task-tree-group > summary,
+.task-tree-item > summary {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  cursor: pointer;
+}
+
+.task-tree-group > summary::-webkit-details-marker,
+.task-tree-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.task-tree-group > summary {
+  min-height: 40px;
+  gap: 7px;
+  padding: 0 10px;
+  color: #6f7784;
+  font-size: 12px;
+}
+
+.task-tree-group > summary strong {
+  flex: 1;
+  color: #303640;
+  font-size: 13px;
+}
+
+.task-tree-count {
+  min-width: 22px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  text-align: center;
+  background: #eceff3;
+}
+
+.task-tree-chevron {
+  display: inline-block;
+  color: #8b929d;
+  font-size: 18px;
+  transform-origin: center;
+  transition: transform 120ms ease;
+}
+
+.task-tree-group[open] > summary > .task-tree-chevron,
+.task-tree-item[open] > summary > .task-tree-chevron {
+  transform: rotate(90deg);
+}
+
+.task-tree-item > summary {
+  min-height: 54px;
+  gap: 6px;
+  padding: 7px 9px;
+}
+
+.task-tree-item.active > summary {
+  background: #f3f6ff;
+}
+
+.task-tree-item > summary:hover {
+  background: #f1f4f9;
+}
+
+.task-tree-title {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.task-tree-title strong,
+.task-tree-title small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-tree-title strong {
+  color: #2d333d;
+  font-size: 13px;
+}
+
+.task-tree-title small {
+  color: #8a919c;
+  font-size: 11px;
+}
+
+.task-document-list {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.task-document-list::before {
+  position: absolute;
+  top: 0;
+  bottom: 20px;
+  left: 20px;
+  width: 1px;
+  background: #dfe3e9;
+  content: "";
+}
+
+.task-document-item {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 48px;
+  grid-template-columns: 13px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  padding: 6px 9px 6px 20px;
+  border: 0;
+  border-left: 3px solid transparent;
+  text-align: left;
+  background: transparent;
+}
+
+.task-document-item:hover,
+.task-document-item.active {
+  background: #edf3ff;
+}
+
+.task-document-item.active {
+  border-left-color: #3370ff;
+}
+
+.task-document-branch {
+  width: 13px;
+  height: 1px;
+  background: #dfe3e9;
+}
+
+.task-document-title {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.task-document-title strong,
+.task-document-title small,
+.task-document-title .unit-merge-result {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-document-title strong {
+  color: #2f3540;
+  font-size: 12px;
+}
+
+.task-document-title small {
+  color: #8a919c;
+  font-size: 10px;
+}
+
+.task-document-item .unit-type {
+  min-width: 34px;
+  text-align: center;
+}
+
+.review-status-draft,
+.review-status-merging {
+  color: #285dcc;
+  background: #e8efff;
+}
+
+.worktree-review-detail {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.worktree-detail-header {
+  min-height: 72px;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 13px;
+}
+
+.worktree-detail-header .review-title-line {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+
+.worktree-detail-header .review-title-line > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worktree-detail-header .review-title-line > span,
+.worktree-detail-header .review-title-line > small {
+  color: #858c97;
+  font-size: 11px;
+}
+
+.worktree-detail-header .review-title-line h2 {
+  margin: 0;
+  color: #242932;
+  font-size: 18px;
+}
+
+.worktree-actions {
+  flex-wrap: nowrap;
+}
+
+.worktree-actions .secondary-button[data-worktree-action="discard"] {
+  color: #b42318;
+}
+
+.worktree-unit-preview {
+  min-height: 0;
+}
+
+.review-preview-toolbar {
+  min-height: 56px;
+  padding: 8px 12px;
+}
+
+.review-preview-toolbar > div:first-child strong {
+  color: #3f4652;
+  font-size: 12px;
+}
+
+.worktree-preview-frame {
+  min-height: clamp(610px, calc(100vh - 324px), 880px);
+}
+
+.worktree-task-information {
+  border-top: 1px solid #e4e7ec;
+  background: #fff;
+}
+
+.worktree-task-information > summary {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  list-style: none;
+  color: #5f6774;
+  cursor: pointer;
+}
+
+.worktree-task-information > summary::-webkit-details-marker {
+  display: none;
+}
+
+.worktree-task-information > summary strong {
+  font-size: 12px;
+}
+
+.task-information-chevron {
+  margin-left: auto;
+  transition: transform 120ms ease;
+}
+
+.worktree-task-information[open] .task-information-chevron {
+  transform: rotate(180deg);
+}
+
+.worktree-task-information .review-metadata {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 4px 12px 12px;
+}
+
+.worktree-task-information .review-metadata div {
+  display: grid;
+  gap: 2px;
+}
+
+@media (max-width: 900px) {
+  .worktree-review-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .worktree-review-layout.task-panel-collapsed {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .worktree-detail-header .review-title-line > small,
+  .review-preview-toolbar > div:first-child span {
+    display: none;
+  }
+
+  .review-preview-controls {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 680px) {
+  .workspace-content-worktrees {
+    padding: 20px 12px 32px;
+  }
+
+  .worktree-review-filters {
+    flex-direction: row;
+  }
+
+  .review-panel-toggle {
+    margin-left: 0;
+  }
+
+  .worktree-review-layout,
+  .worktree-review-layout.task-panel-collapsed {
+    display: block;
+    min-height: 0;
+  }
+
+  .worktree-task-tree {
+    max-height: 300px;
+    border-right: 0;
+    border-bottom: 1px solid #e8eaee;
+  }
+
+  .task-panel-collapsed .worktree-task-tree {
+    display: none;
+  }
+
+  .worktree-detail-header {
+    align-items: stretch;
+  }
+
+  .worktree-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .review-preview-controls {
+    width: 100%;
+  }
+
+  .review-mode-switch {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .review-readonly-badge {
+    display: none;
+  }
+
+  .worktree-preview-frame {
+    min-height: 70vh;
+  }
+
+  .worktree-task-information .review-metadata {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -765,6 +1199,11 @@ button {
   justify-self: center;
   padding: 48px clamp(34px, 5vw, 74px) 80px;
   outline: 0;
+}
+
+.workspace-content-worktrees {
+  max-width: none;
+  padding: 28px clamp(20px, 3vw, 44px) 52px;
 }
 
 .page-heading {
@@ -1929,12 +2368,12 @@ button {
 
 .worktree-review-heading {
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .worktree-review-heading h1 {
   margin: 5px 0 8px;
-  font-size: 30px;
+  font-size: 28px;
   letter-spacing: -0.035em;
 }
 
@@ -1963,7 +2402,7 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .review-segmented,
@@ -2005,8 +2444,8 @@ button {
 
 .worktree-review-layout {
   display: grid;
-  min-height: 680px;
-  grid-template-columns: 282px minmax(0, 1fr);
+  min-height: 760px;
+  grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   border: 1px solid #e5e8ed;
   border-radius: 14px;
@@ -2015,16 +2454,26 @@ button {
 }
 
 .worktree-review-list {
-  overflow: auto;
-  border-right: 1px solid #e8eaee;
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-right: 0;
+  border-bottom: 1px solid #e8eaee;
   background: #fafbfc;
 }
 
 .review-list-heading {
-  height: 52px;
+  position: sticky;
+  z-index: 1;
+  left: 0;
+  width: 118px;
+  min-width: 118px;
+  min-height: 88px;
   justify-content: space-between;
   padding: 0 14px;
-  border-bottom: 1px solid #e8eaee;
+  border-right: 1px solid #e8eaee;
+  background: #fafbfc;
   font-size: 13px;
 }
 
@@ -2039,11 +2488,13 @@ button {
 
 .worktree-review-item {
   display: grid;
-  width: 100%;
+  width: 260px;
+  min-width: 260px;
   gap: 7px;
-  padding: 14px;
+  padding: 12px 14px;
   border: 0;
-  border-bottom: 1px solid #eceef2;
+  border-right: 1px solid #eceef2;
+  border-bottom: 3px solid transparent;
   text-align: left;
   background: transparent;
 }
@@ -2054,7 +2505,8 @@ button {
 
 .worktree-review-item.active {
   background: #edf3ff;
-  box-shadow: inset 3px 0 #3370ff;
+  border-bottom-color: #3370ff;
+  box-shadow: none;
 }
 
 .review-item-top {
@@ -2103,14 +2555,16 @@ button {
 }
 
 .worktree-review-detail {
+  display: grid;
   min-width: 0;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .worktree-detail-header {
-  min-height: 154px;
+  min-height: 104px;
   justify-content: space-between;
-  gap: 20px;
-  padding: 22px 24px;
+  gap: 18px;
+  padding: 14px 20px;
   border-bottom: 1px solid #e8eaee;
 }
 
@@ -2120,11 +2574,11 @@ button {
 
 .review-title-line h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 19px;
 }
 
 .worktree-detail-header p {
-  margin: 8px 0 16px;
+  margin: 5px 0 9px;
   color: #7a818c;
   font-size: 13px;
 }
@@ -2132,7 +2586,7 @@ button {
 .review-metadata {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 24px;
+  gap: 8px 18px;
   margin: 0;
 }
 
@@ -2166,19 +2620,28 @@ button {
 
 .worktree-unit-review {
   display: grid;
-  min-height: 524px;
-  grid-template-columns: 210px minmax(0, 1fr);
+  min-height: 650px;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .worktree-unit-list {
+  display: flex;
+  min-width: 0;
+  min-height: 72px;
   overflow: auto;
-  border-right: 1px solid #e8eaee;
+  border-right: 0;
+  border-bottom: 1px solid #e8eaee;
   background: #fcfcfd;
 }
 
 .worktree-unit-list h3 {
+  display: grid;
+  width: 72px;
+  min-width: 72px;
+  place-items: center;
   margin: 0;
-  padding: 15px 13px 10px;
+  padding: 0 13px;
+  border-right: 1px solid #eceef2;
   color: #8a9099;
   font-size: 11px;
   letter-spacing: 0.08em;
@@ -2187,11 +2650,13 @@ button {
 
 .worktree-unit-list > button {
   display: grid;
-  width: 100%;
+  width: 230px;
+  min-width: 230px;
   gap: 5px;
-  padding: 12px 13px;
+  padding: 9px 13px 8px;
   border: 0;
-  border-left: 3px solid transparent;
+  border-right: 1px solid #eceef2;
+  border-bottom: 3px solid transparent;
   text-align: left;
   background: transparent;
 }
@@ -2202,7 +2667,7 @@ button {
 }
 
 .worktree-unit-list > button.active {
-  border-left-color: #3370ff;
+  border-bottom-color: #3370ff;
 }
 
 .worktree-unit-list > button small {
@@ -2247,9 +2712,9 @@ button {
 }
 
 .review-preview-toolbar {
-  min-height: 58px;
+  min-height: 56px;
   gap: 16px;
-  padding: 9px 12px;
+  padding: 8px 14px;
   border-bottom: 1px solid #e2e5e9;
   background: #fff;
 }
@@ -2264,12 +2729,67 @@ button {
   font-size: 11px;
 }
 
+.review-preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.review-expand-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 11px;
+  border: 1px solid #d8dde6;
+  border-radius: 8px;
+  color: #394150;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(31 35 41 / 5%);
+}
+
+.review-expand-button:hover,
+.review-expand-button:focus-visible {
+  border-color: #9db7ff;
+  color: #1f5eea;
+  background: #f5f8ff;
+}
+
+.review-expand-button b {
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .worktree-preview-frame {
   width: 100%;
   height: 100%;
-  min-height: 465px;
+  min-height: clamp(620px, calc(100vh - 230px), 920px);
   border: 0;
   background: #fff;
+}
+
+body.review-preview-open {
+  overflow: hidden;
+}
+
+.worktree-unit-preview.review-preview-expanded {
+  position: fixed;
+  z-index: 80;
+  inset: 12px;
+  overflow: hidden;
+  border: 1px solid #dfe3e9;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 80px rgb(15 23 42 / 28%);
+}
+
+.review-preview-expanded .review-preview-toolbar {
+  min-height: 60px;
+  padding-right: 18px;
+}
+
+.review-preview-expanded .worktree-preview-frame {
+  min-height: 0;
 }
 
 .review-empty {
@@ -2300,14 +2820,6 @@ button {
 }
 
 @media (max-width: 900px) {
-  .worktree-review-layout {
-    grid-template-columns: 220px minmax(0, 1fr);
-  }
-
-  .worktree-unit-review {
-    grid-template-columns: 170px minmax(0, 1fr);
-  }
-
   .review-metadata {
     display: none;
   }
@@ -2347,24 +2859,19 @@ button {
   }
 
   .worktree-review-layout {
-    display: block;
+    min-height: 0;
   }
 
   .worktree-review-list {
-    max-height: 220px;
-    border-right: 0;
-    border-bottom: 1px solid #e8eaee;
+    max-height: 106px;
   }
 
   .worktree-unit-review {
-    display: block;
+    min-height: 0;
   }
 
   .worktree-unit-list {
-    display: flex;
-    overflow: auto;
-    border-right: 0;
-    border-bottom: 1px solid #e8eaee;
+    min-height: 68px;
   }
 
   .worktree-unit-list h3 {
@@ -2372,12 +2879,32 @@ button {
   }
 
   .worktree-unit-list > button {
-    min-width: 160px;
+    width: 180px;
+    min-width: 180px;
   }
 
   .review-preview-toolbar {
     align-items: flex-start;
     flex-wrap: wrap;
+  }
+
+  .review-preview-controls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .review-expand-button {
+    margin-left: auto;
+  }
+
+  .worktree-preview-frame {
+    min-height: 70vh;
+  }
+
+  .worktree-unit-preview.review-preview-expanded {
+    inset: 0;
+    border: 0;
+    border-radius: 0;
   }
 
   .workspace-shell {
@@ -2498,5 +3025,59 @@ button {
 
   .auth-card {
     padding: 34px 24px 24px;
+  }
+}
+
+/* 这些布局规则放在响应式基线之后，避免旧页面样式覆盖智能工作台。 */
+.worktree-review-page .worktree-review-layout {
+  min-height: clamp(680px, calc(100vh - 194px), 980px);
+  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.worktree-review-page .worktree-review-layout.task-panel-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr);
+}
+
+.worktree-review-page .worktree-review-detail {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.worktree-review-page .worktree-detail-header {
+  min-height: 72px;
+  padding: 9px 13px;
+}
+
+.worktree-review-page .worktree-actions {
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 900px) {
+  .worktree-review-page .worktree-review-layout {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .worktree-review-page .worktree-review-layout.task-panel-collapsed {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .worktree-review-page .worktree-task-information .review-metadata {
+    display: grid;
+  }
+}
+
+@media (max-width: 680px) {
+  .worktree-review-page .worktree-review-layout,
+  .worktree-review-page .worktree-review-layout.task-panel-collapsed {
+    display: block;
+    min-height: 0;
+  }
+
+  .worktree-review-page .worktree-detail-header {
+    min-height: 0;
+  }
+
+  .worktree-review-page .worktree-actions {
+    flex-wrap: wrap;
   }
 }

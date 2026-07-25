@@ -9,8 +9,8 @@ import {
   worktreeReviewView,
   type ReviewMode,
   type ReviewWorktree,
+  type ReviewWorktreeFilter,
   type ReviewWorktreeScope,
-  type ReviewWorktreeView,
 } from "./worktrees/review.js";
 import {
   configureReviewCollaboration,
@@ -161,13 +161,13 @@ function renderReviewUnavailable(message: string): void {
     <main class="editor-route-state editor-route-error">
       <h1>预览不可用</h1>
       <p>${escapeHtml(message)}</p>
-      <a class="primary-button editor-route-action" href="/#worktrees" target="_top">返回 Worktrees</a>
+      <a class="primary-button editor-route-action" href="/#worktrees" target="_top">返回智能工作台</a>
     </main>
   `;
 }
 
 function reviewModeName(mode: ReviewMode): string {
-  return { trunk: "主线", draft: "Worktree", merge: "合入预览" }[mode];
+  return { trunk: "正式版本", draft: "AI 修改版", merge: "合入预览" }[mode];
 }
 
 function renderAuth(mode: "login" | "register"): void {
@@ -488,7 +488,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
   let directory: DirectoryPayload | null = null;
   let route = workspaceRoute(personalSpace.id);
   let query = "";
-  let worktreeView: ReviewWorktreeView = "active";
+  let worktreeFilter: ReviewWorktreeFilter = "all";
   let worktreeScope: ReviewWorktreeScope = "all";
   let worktreeSpaceID = "";
   let selectedWorktreeID = "";
@@ -543,7 +543,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
               ${icon("folder")}<span>个人空间</span>
             </a>
             ${navButton("shared", "与我共享", "share")}
-            ${navButton("worktrees", "Agent Worktrees", "sparkles")}
+            ${navButton("worktrees", "智能工作台", "sparkles")}
             ${navButton("trash", "回收站", "trash")}
           </nav>
           <div class="team-nav">
@@ -721,6 +721,9 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     );
     const content = document.querySelector<HTMLElement>("#workspace-content");
     if (!content) return;
+    const isWorktreeView = currentRoute.view === "worktrees";
+    content.classList.toggle("workspace-content-worktrees", isWorktreeView);
+    document.body.classList.remove("review-preview-open");
     if (currentRoute.view === "home") {
       content.innerHTML = homeView(user, filteredResources);
     } else if (currentRoute.view === "space" && directory) {
@@ -735,7 +738,7 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
           ? { selectedUnitID: selectedWorktreeUnitID }
           : {}),
         mode: reviewMode,
-        view: worktreeView,
+        filter: worktreeFilter,
         scope: worktreeScope,
         ...(worktreeSpaceID ? { spaceID: worktreeSpaceID } : {}),
         spaces,
@@ -767,14 +770,13 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
 
   function wireContentActions(): void {
     document
-      .querySelectorAll<HTMLButtonElement>("[data-worktree-view]")
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-filter]")
       .forEach((button) => {
         button.addEventListener("click", () => {
-          worktreeView = button.dataset
-            .worktreeView as ReviewWorktreeView;
-          selectedWorktreeID = "";
-          selectedWorktreeUnitID = "";
-          void loadWorktrees();
+          worktreeFilter = button.dataset
+            .worktreeFilter as ReviewWorktreeFilter;
+          selectFirstVisibleWorktree();
+          renderCurrentView();
         });
       });
     document
@@ -798,26 +800,30 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
         void loadWorktrees();
       });
     document
-      .querySelectorAll<HTMLButtonElement>("[data-worktree-select]")
+      .querySelectorAll<HTMLButtonElement>("[data-worktree-unit]")
       .forEach((button) => {
         button.addEventListener("click", () => {
-          selectedWorktreeID = button.dataset.worktreeSelect ?? "";
-          selectedWorktreeUnitID =
-            worktrees.find(
-              ({ worktreeID }) => worktreeID === selectedWorktreeID
-            )?.units[0]?.unitID ?? "";
+          selectedWorktreeID = button.dataset.worktreeId ?? "";
+          selectedWorktreeUnitID = button.dataset.worktreeUnit ?? "";
           reviewMode = "draft";
           renderCurrentView();
         });
       });
     document
-      .querySelectorAll<HTMLButtonElement>("[data-worktree-unit]")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          selectedWorktreeUnitID = button.dataset.worktreeUnit ?? "";
-          reviewMode = "draft";
-          renderCurrentView();
-        });
+      .querySelector<HTMLButtonElement>("[data-task-panel-toggle]")
+      ?.addEventListener("click", (event) => {
+        const button = event.currentTarget as HTMLButtonElement;
+        const layout = button
+          .closest<HTMLElement>(".worktree-review-page")
+          ?.querySelector<HTMLElement>(".worktree-review-layout");
+        if (!layout) return;
+        const collapsed = layout.classList.toggle("task-panel-collapsed");
+        const expanded = !collapsed;
+        button.setAttribute("aria-expanded", String(expanded));
+        const icon = button.querySelector<HTMLElement>("span");
+        const label = button.querySelector<HTMLElement>("b");
+        if (icon) icon.textContent = expanded ? "‹" : "›";
+        if (label) label.textContent = expanded ? "收起任务列表" : "展开任务列表";
       });
     document
       .querySelectorAll<HTMLButtonElement>("[data-review-mode]")
@@ -826,6 +832,18 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
           reviewMode = button.dataset.reviewMode as ReviewMode;
           renderCurrentView();
         });
+      });
+    document
+      .querySelector<HTMLButtonElement>("[data-review-expand]")
+      ?.addEventListener("click", (event) => {
+        const button = event.currentTarget as HTMLButtonElement;
+        const preview = button.closest<HTMLElement>(".worktree-unit-preview");
+        if (!preview) return;
+        setReviewPreviewExpanded(
+          preview,
+          button,
+          !preview.classList.contains("review-preview-expanded")
+        );
       });
     document
       .querySelectorAll<HTMLButtonElement>("[data-worktree-action]")
@@ -838,8 +856,8 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
             (action === "merge" || action === "discard") &&
             !window.confirm(
               action === "merge"
-                ? "确认合并这个 Worktree？已成功合并的 Unit 不会回滚。"
-                : "确认丢弃这个 Worktree？"
+                ? "确认合入这个文档任务？已成功合入的文档不会回滚。"
+                : "确认丢弃这个文档任务？"
             )
           ) {
             return;
@@ -850,6 +868,8 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
               `/api/worktrees/${encodeURIComponent(worktreeID)}/${action}`,
               { method: "POST" }
             );
+            selectedWorktreeID = "";
+            selectedWorktreeUnitID = "";
             await loadWorktrees();
           } catch (caught) {
             showToast(
@@ -969,24 +989,42 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
   }
 
   async function loadWorktrees(): Promise<void> {
-    const query = new URLSearchParams({ view: worktreeView });
+    const query = new URLSearchParams();
     if (worktreeScope !== "all") query.set("scope", worktreeScope);
     if (worktreeSpaceID) query.set("spaceID", worktreeSpaceID);
-    const result = await api<{ worktrees: ReviewWorktree[] }>(
-      `/api/worktrees?${query}`
-    );
-    worktrees = result.worktrees;
+    const activeQuery = new URLSearchParams(query);
+    activeQuery.set("view", "active");
+    const processedQuery = new URLSearchParams(query);
+    processedQuery.set("view", "processed");
+    const [active, processed] = await Promise.all([
+      api<{ worktrees: ReviewWorktree[] }>(`/api/worktrees?${activeQuery}`),
+      api<{ worktrees: ReviewWorktree[] }>(`/api/worktrees?${processedQuery}`),
+    ]);
+    worktrees = [...active.worktrees, ...processed.worktrees];
     if (
       !selectedWorktreeID ||
       !worktrees.some(
-        ({ worktreeID }) => worktreeID === selectedWorktreeID
+        (worktree) =>
+          worktree.worktreeID === selectedWorktreeID &&
+          worktreeMatchesFilter(worktree, worktreeFilter)
       )
     ) {
-      selectedWorktreeID = worktrees[0]?.worktreeID ?? "";
-      selectedWorktreeUnitID = worktrees[0]?.units[0]?.unitID ?? "";
-      reviewMode = "draft";
+      selectFirstVisibleWorktree();
     }
     renderCurrentView();
+  }
+
+  function selectFirstVisibleWorktree(): void {
+    const first = worktrees.find((worktree) =>
+      worktreeFilter === "all"
+        ? worktree.status === "draft" ||
+          worktree.status === "ready" ||
+          worktree.status === "merging"
+        : worktreeMatchesFilter(worktree, worktreeFilter)
+    );
+    selectedWorktreeID = first?.worktreeID ?? "";
+    selectedWorktreeUnitID = first?.units[0]?.unitID ?? "";
+    reviewMode = "draft";
   }
 
   async function createResource(
@@ -1048,10 +1086,33 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     if (event.key === "Escape") {
       const newMenu = document.querySelector<HTMLElement>("#new-menu");
       if (newMenu) newMenu.hidden = true;
+      const preview = document.querySelector<HTMLElement>(
+        ".worktree-unit-preview.review-preview-expanded"
+      );
+      const button = preview?.querySelector<HTMLButtonElement>(
+        "[data-review-expand]"
+      );
+      if (preview && button) {
+        setReviewPreviewExpanded(preview, button, false);
+      }
     }
   });
   window.addEventListener("hashchange", () => void loadAndRender());
   await loadAndRender();
+}
+
+function setReviewPreviewExpanded(
+  preview: HTMLElement,
+  button: HTMLButtonElement,
+  expanded: boolean
+): void {
+  preview.classList.toggle("review-preview-expanded", expanded);
+  document.body.classList.toggle("review-preview-open", expanded);
+  button.setAttribute("aria-expanded", String(expanded));
+  const icon = button.querySelector<HTMLElement>("span");
+  const label = button.querySelector<HTMLElement>("b");
+  if (icon) icon.textContent = expanded ? "↙" : "↗";
+  if (label) label.textContent = expanded ? "退出沉浸" : "沉浸预览";
 }
 
 function homeView(user: CurrentUser, resources: ResourceRecord[]): string {
@@ -2236,6 +2297,18 @@ function workspaceRoute(personalSpaceID: string): WorkspaceRoute {
   )
     ? { view: view as Exclude<WorkspaceView, "space"> }
     : { view: "home" };
+}
+
+function worktreeMatchesFilter(
+  worktree: ReviewWorktree,
+  filter: ReviewWorktreeFilter
+): boolean {
+  if (filter === "all") return true;
+  if (filter === "running") {
+    return worktree.status === "draft" || worktree.status === "merging";
+  }
+  if (filter === "ready") return worktree.status === "ready";
+  return worktree.status === "merged" || worktree.status === "discarded";
 }
 
 function defaultName(type: number): string {
