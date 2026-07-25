@@ -128,7 +128,7 @@ export function getSheetFeaturePlugins(): IPresetPlugin[] {
     UniverSheetsDrawingPlugin,
     UniverSheetsDrawingUIPlugin,
     UniverSheetsSortPlugin,
-    [UniverSheetsPivotTablePlugin, { notExecuteFormula: false }],
+    UniverSheetsPivotTablePlugin,
     UniverSheetsChartPlugin,
     [UniverSheetsChartUIPlugin, { enableChartElementFloatMenu: true }],
     UniverSheetSparklinePlugin,
