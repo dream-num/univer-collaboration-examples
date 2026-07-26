@@ -1,3 +1,5 @@
+import { UniverType } from "@univerjs/protocol";
+
 export type ReviewMode = "trunk" | "draft" | "merge";
 export type ReviewWorktreeFilter =
   | "all"
@@ -432,11 +434,11 @@ function modeLabel(mode: ReviewMode): string {
 
 function unitTypeLabel(type: number): string {
   return {
-    1: "文档",
-    2: "表格",
-    3: "演示文稿",
-    4: "白板",
-    5: "多维表格",
+    [UniverType.UNIVER_DOC]: "文档",
+    [UniverType.UNIVER_SHEET]: "表格",
+    [UniverType.UNIVER_SLIDE]: "演示文稿",
+    [UniverType.UNIVER_BOARD]: "画板",
+    [UniverType.UNIVER_BASE]: "多维表格",
   }[type] ?? `文档类型 ${type}`;
 }
 

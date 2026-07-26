@@ -8,11 +8,15 @@ import {
   UniverType,
 } from "@univerjs/protocol";
 import type { CreateUnitFromDataInput } from "@univerjs/collaboration-service";
+import type { CreateUnitInput } from "@univerjs/collaboration-service";
+import { createTemporaryInitialSnapshot } from "./temporary-unit-snapshot.js";
 
 export const CREATABLE_UNIT_TYPES = [
   UniverType.UNIVER_SHEET,
   UniverType.UNIVER_DOC,
   UniverType.UNIVER_SLIDE,
+  UniverType.UNIVER_BOARD,
+  UniverType.UNIVER_BASE,
 ] as const;
 
 const EN_US = "enUS" as LocaleType;
@@ -26,19 +30,39 @@ export function isCreatableUnitType(value: unknown): value is CreatableUnitType 
   );
 }
 
-export function createInitialUnitData(
+export type InitialUnitCreation =
+  | { readonly kind: "data"; readonly input: CreateUnitFromDataInput }
+  | { readonly kind: "snapshot"; readonly input: CreateUnitInput };
+
+export function createInitialUnit(
   type: CreatableUnitType,
   unitID: string,
   name: string
-): CreateUnitFromDataInput {
+): InitialUnitCreation {
   switch (type) {
     case UniverType.UNIVER_SHEET:
-      return { type, data: createWorkbookData(unitID, name) };
+      return {
+        kind: "data",
+        input: { type, data: createWorkbookData(unitID, name) },
+      };
     case UniverType.UNIVER_DOC: {
-      return { type, data: createDocumentData(unitID, name) };
+      return {
+        kind: "data",
+        input: { type, data: createDocumentData(unitID, name) },
+      };
     }
     case UniverType.UNIVER_SLIDE: {
-      return { type, data: createSlideData(unitID, name) };
+      return {
+        kind: "data",
+        input: { type, data: createSlideData(unitID, name) },
+      };
+    }
+    case UniverType.UNIVER_BOARD:
+    case UniverType.UNIVER_BASE: {
+      return {
+        kind: "snapshot",
+        input: createTemporaryInitialSnapshot(type, unitID, name),
+      };
     }
   }
 }

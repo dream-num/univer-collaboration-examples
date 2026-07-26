@@ -8,7 +8,7 @@ import {
   createWorkspaceApplication,
   type WorkspaceApplication,
 } from "../server/application.js";
-import { createInitialUnitData } from "../server/unit-data.js";
+import { createInitialUnit } from "../server/unit-data.js";
 
 const applications: WorkspaceApplication[] = [];
 const directories: string[] = [];
@@ -109,12 +109,14 @@ describe("Workspace Worktree security", () => {
         parentID: null,
         createdBy: ownerUserID,
       });
-      await application.collabService.createUnitFromData(
-        createInitialUnitData(
+      const initial = createInitialUnit(
           UniverType.UNIVER_SHEET,
           `shared-unit-${index}`,
           `Shared ${index}`
-        ),
+        );
+      if (initial.kind !== "data") throw new Error("Expected data creation");
+      await application.collabService.createUnitFromData(
+        initial.input,
         {
           session: {
             memberId: `security-owner-${index}`,

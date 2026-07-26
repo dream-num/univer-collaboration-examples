@@ -7,6 +7,7 @@ import {
 } from "@univerjs-pro/collaboration-client";
 import {
   BrowserCollaborationSocketService,
+  type IUniverCollaborationClientUIConfig,
   UniverCollaborationClientUIPlugin,
   WebBrowserSingleActiveUnitService,
 } from "@univerjs-pro/collaboration-client-ui";
@@ -49,7 +50,9 @@ export function configureReviewCollaboration(
   reviewScope = scope;
 }
 
-export function collaborationPlugins(): IPresetPlugin[] {
+export function collaborationPlugins(
+  uiConfig: Partial<IUniverCollaborationClientUIConfig> = {}
+): IPresetPlugin[] {
   const scopedConfig =
     reviewScope === null || reviewScope.kind === "trunk"
       ? {
@@ -88,7 +91,7 @@ export function collaborationPlugins(): IPresetPlugin[] {
         ...scopedConfig,
       },
     ],
-    UniverCollaborationClientUIPlugin,
+    [UniverCollaborationClientUIPlugin, uiConfig],
   ];
 }
 
@@ -122,8 +125,11 @@ export function historyPlugins(): IPresetPlugin[] {
   ];
 }
 
-export function registerRawCollaboration(univer: Univer): void {
-  for (const plugin of collaborationPlugins()) {
+export function registerRawCollaboration(
+  univer: Univer,
+  uiConfig: Partial<IUniverCollaborationClientUIConfig> = {}
+): void {
+  for (const plugin of collaborationPlugins(uiConfig)) {
     if (Array.isArray(plugin)) {
       univer.registerPlugin(plugin[0], plugin[1] as never);
     } else {

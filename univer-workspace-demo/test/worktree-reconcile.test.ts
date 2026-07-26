@@ -7,7 +7,7 @@ import {
   createWorkspaceApplication,
   type WorkspaceApplication,
 } from "../server/application.js";
-import { createInitialUnitData } from "../server/unit-data.js";
+import { createInitialUnit } from "../server/unit-data.js";
 import { orchestrationCustomData } from "../server/worktrees/orchestration.js";
 
 const applications: WorkspaceApplication[] = [];
@@ -238,12 +238,14 @@ describe("Workspace Worktree reconciliation", () => {
       parentID: null,
       createdBy: actorUserID,
     });
-    await application.collabService.createUnitFromData(
-      createInitialUnitData(
+    const trunkInitial = createInitialUnit(
         UniverType.UNIVER_SHEET,
         "trunk-unit",
         "Trunk sheet"
-      ),
+      );
+    if (trunkInitial.kind !== "data") throw new Error("Expected data creation");
+    await application.collabService.createUnitFromData(
+      trunkInitial.input,
       { session: options.session }
     );
     application.productStore.markActive("trunk-resource");
@@ -281,14 +283,16 @@ describe("Workspace Worktree reconciliation", () => {
       staged,
     });
     application.worktreeCatalog.stageResource(staged);
+    const localInitial = createInitialUnit(
+      UniverType.UNIVER_DOC,
+      "local-doc",
+      "Local doc"
+    );
+    if (localInitial.kind !== "data") throw new Error("Expected data creation");
     await application.worktreeService.createUnitFromData(
       {
         worktreeID: "recover-members",
-        ...createInitialUnitData(
-          UniverType.UNIVER_DOC,
-          "local-doc",
-          "Local doc"
-        ),
+        ...localInitial.input,
       },
       options
     );

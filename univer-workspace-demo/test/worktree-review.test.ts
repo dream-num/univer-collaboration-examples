@@ -125,4 +125,28 @@ describe("Worktree review UI", () => {
       "/?reviewWorktree=wt%2F1&unit=unit%2F1&type=2&reviewMode=merge"
     );
   });
+
+  it("uses protocol Unit labels for Board and Base review items", () => {
+    const html = worktreeReviewView({
+      worktrees: [
+        {
+          ...worktree,
+          units: [
+            { ...worktree.units[0]!, unitID: "board", type: 6 },
+            { ...worktree.units[0]!, unitID: "base", type: 5 },
+          ],
+        },
+      ],
+      selectedWorktreeID: worktree.worktreeID,
+      selectedUnitID: "board",
+      mode: "draft",
+      filter: "all",
+      scope: "all",
+      spaces: [],
+    });
+
+    expect(html).toContain("画板 · 正式版本 r1 → AI 修改版 r2");
+    expect(html).toContain("多维表格 · 正式版本 r1 → AI 修改版 r2");
+    expect(html).not.toContain("文档类型 6");
+  });
 });

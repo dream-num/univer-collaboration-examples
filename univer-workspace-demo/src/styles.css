@@ -1354,7 +1354,7 @@ button {
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -1422,6 +1422,16 @@ button {
 .type-slide {
   color: #c45b24;
   background: #fff1e8;
+}
+
+.type-board {
+  color: #7c4dce;
+  background: #f3edff;
+}
+
+.type-base {
+  color: #007f83;
+  background: #e8f8f7;
 }
 
 .recommend-grid {
@@ -1564,6 +1574,70 @@ button {
   height: 28px;
   border-radius: 50%;
   background: rgb(196 91 36 / 15%);
+}
+
+.board-preview {
+  position: relative;
+  display: block;
+  width: 94px;
+  height: 72px;
+  border: 1px solid rgb(124 77 206 / 18%);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgb(124 77 206 / 10%);
+}
+
+.board-preview i,
+.board-preview b,
+.board-preview em {
+  position: absolute;
+  display: block;
+  border: 2px solid rgb(124 77 206 / 38%);
+  background: rgb(124 77 206 / 10%);
+}
+
+.board-preview i {
+  top: 13px;
+  left: 12px;
+  width: 26px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.board-preview b {
+  top: 36px;
+  left: 38px;
+  width: 34px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.board-preview em {
+  top: 24px;
+  left: 35px;
+  width: 22px;
+  height: 2px;
+  border-width: 1px 0 0;
+  background: transparent;
+  transform: rotate(25deg);
+}
+
+.base-preview {
+  display: grid;
+  width: 88px;
+  height: 74px;
+  overflow: hidden;
+  grid-template-columns: 34px 1fr;
+  border: 1px solid rgb(0 127 131 / 18%);
+  border-top: 9px solid rgb(0 127 131 / 28%);
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgb(0 127 131 / 8%);
+}
+
+.base-preview i {
+  border-right: 1px solid rgb(0 127 131 / 16%);
+  border-bottom: 1px solid rgb(0 127 131 / 16%);
 }
 
 .resource-table {

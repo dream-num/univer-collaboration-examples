@@ -22,7 +22,7 @@ import type {
 } from "./product-store.js";
 import {
   CREATABLE_UNIT_TYPES,
-  createInitialUnitData,
+  createInitialUnit,
   isCreatableUnitType,
 } from "./unit-data.js";
 
@@ -88,16 +88,7 @@ export function createApplicationRouter(
   router.get("/capabilities", (_request, response) => {
     response.json({
       creatableUnitTypes: CREATABLE_UNIT_TYPES,
-      unavailableUnitTypes: [
-        {
-          type: UniverType.UNIVER_BOARD,
-          reason: "Board data transformer is not exported by the current SDK",
-        },
-        {
-          type: UniverType.UNIVER_BASE,
-          reason: "Base data transformer is not exported by the current SDK",
-        },
-      ],
+      unavailableUnitTypes: [],
     });
   });
 
@@ -417,6 +408,29 @@ export function createApplicationRouter(
       user.userId
     );
     const name = requiredName(request.body?.name, "名称不能为空");
+    if (
+      resource.type === UniverType.UNIVER_BOARD ||
+      resource.type === UniverType.UNIVER_BASE
+    ) {
+      const renamed = dependencies.productStore.renameByUnitID(
+        resource.unitID,
+        name
+      );
+      if (!renamed) {
+        throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
+      }
+      response.json({
+        resource: resourceResponse(
+          renamed,
+          dependencies.productStore.getAccessRoleByID(
+            renamed.id,
+            user.userId
+          )!,
+          dependencies.userStore
+        ),
+      });
+      return;
+    }
     const session = applicationSession(user);
     const current = await dependencies.collabService.getUnit(
       {
@@ -494,13 +508,23 @@ export function createApplicationRouter(
     });
 
     try {
-      await dependencies.collabService.createUnitFromData(
-        createInitialUnitData(type, unitID, optionalName(request.body?.name)),
-        {
-          session: applicationSession(user),
-          customData: { resourceID },
-        }
+      const initial = createInitialUnit(
+        type,
+        unitID,
+        optionalName(request.body?.name)
       );
+      const options = {
+        session: applicationSession(user),
+        customData: { resourceID },
+      };
+      if (initial.kind === "data") {
+        await dependencies.collabService.createUnitFromData(
+          initial.input,
+          options
+        );
+      } else {
+        await dependencies.collabService.createUnit(initial.input, options);
+      }
       const resource = dependencies.productStore.markActive(resourceID);
       response.status(201).json({
         resource: resourceResponse(

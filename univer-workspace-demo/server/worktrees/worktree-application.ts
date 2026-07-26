@@ -9,7 +9,7 @@ import type {
   ProductStore,
   WorkspaceResource,
 } from "../product-store.js";
-import { createInitialUnitData, isCreatableUnitType } from "../unit-data.js";
+import { createInitialUnit, isCreatableUnitType } from "../unit-data.js";
 import type {
   CreateWorkspaceWorktreeInput,
   CreateWorkspaceWorktreeUnitInput,
@@ -318,13 +318,22 @@ export function createWorkspaceWorktreeApplication(input: {
             "Pending operation contains an unsupported Unit type"
           );
         }
-        await service.createUnitFromData(
-          {
-            worktreeID: staged.worktreeID,
-            ...createInitialUnitData(staged.type, staged.unitID, staged.name),
-          },
-          options(operation.actorUserID)
+        const initial = createInitialUnit(
+          staged.type,
+          staged.unitID,
+          staged.name
         );
+        if (initial.kind === "data") {
+          await service.createUnitFromData(
+            { worktreeID: staged.worktreeID, ...initial.input },
+            options(operation.actorUserID)
+          );
+        } else {
+          await service.createUnit(
+            { worktreeID: staged.worktreeID, ...initial.input },
+            options(operation.actorUserID)
+          );
+        }
         catalog.addUnit({
           worktreeID: staged.worktreeID,
           unitID: staged.unitID,

@@ -3,6 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { UnitAction, UniverType } from "@univerjs/protocol";
+import { JSON1 } from "@univerjs/core";
 import { afterEach, describe, expect, it } from "vitest";
 import type { WorkspaceApplication } from "../server/application.js";
 import { createWorkspaceApplication } from "../server/application.js";
@@ -20,6 +21,56 @@ afterEach(async () => {
 });
 
 describe("univer-workspace-demo spaces", () => {
+  it("applies the first Base mutation in the trunk runtime", async () => {
+    const origin = await startApplication();
+    const application = applications.at(-1)!;
+    const alice = await login(origin, "alice", "alice-password");
+    const personal = await personalSpace(origin, alice);
+    const resource = await createUnit(
+      origin,
+      alice,
+      personal.id,
+      null,
+      UniverType.UNIVER_BASE,
+      "Agent Base"
+    );
+    const session = {
+      memberId: "base-runtime-test",
+      userId: "user-alice",
+      customData: Object.create(null) as Record<string, unknown>,
+    };
+    const result = await application.collabService.submitChangeset(
+      {
+        changeset: {
+          unitID: resource.unitID,
+          type: UniverType.UNIVER_BASE,
+          baseRev: 1,
+          revision: 2,
+          sid: randomUUID(),
+          reqId: 1,
+          userID: "",
+          memberID: "",
+          mutations: [
+            {
+              id: "base.mutation.apply-base-json1",
+              data: JSON.stringify({
+                unitId: resource.unitID,
+                op: JSON1.replaceOp(
+                  ["name"],
+                  "Agent Base" as never,
+                  "Edited Base" as never
+                ),
+              }),
+            },
+          ],
+        },
+      },
+      { session }
+    );
+
+    expect(result.status).toBe("committed");
+  });
+
   it("organizes all Unit types in personal folders and restores a deleted subtree", async () => {
     const origin = await startApplication();
     const alice = await login(origin, "alice", "alice-password");
@@ -39,10 +90,27 @@ describe("univer-workspace-demo spaces", () => {
       "Planning"
     );
 
+    const capabilities = await json<{
+      creatableUnitTypes: UniverType[];
+      unavailableUnitTypes: unknown[];
+    }>(`${origin}/api/capabilities`, { headers: { cookie: alice } });
+    expect(capabilities.body).toEqual({
+      creatableUnitTypes: [
+        UniverType.UNIVER_SHEET,
+        UniverType.UNIVER_DOC,
+        UniverType.UNIVER_SLIDE,
+        UniverType.UNIVER_BOARD,
+        UniverType.UNIVER_BASE,
+      ],
+      unavailableUnitTypes: [],
+    });
+
     for (const type of [
       UniverType.UNIVER_SHEET,
       UniverType.UNIVER_DOC,
       UniverType.UNIVER_SLIDE,
+      UniverType.UNIVER_BOARD,
+      UniverType.UNIVER_BASE,
     ]) {
       const resource = await createUnit(
         origin,
@@ -60,7 +128,13 @@ describe("univer-workspace-demo spaces", () => {
       });
 
       const snapshot = await json<{
-        snapshot: { unitID: string; type: UniverType; rev: number };
+        snapshot: {
+          unitID: string;
+          type: UniverType;
+          rev: number;
+          board?: unknown;
+          workbook?: { blockMeta: Record<string, { blocks: string[] }> };
+        };
       }>(
         `${origin}/universer-api/snapshot/${type}/unit/${resource.unitID}/rev/0`,
         { headers: { cookie: alice } }
@@ -70,6 +144,17 @@ describe("univer-workspace-demo spaces", () => {
         type,
         rev: 1,
       });
+      if (type === UniverType.UNIVER_BOARD) {
+        expect(snapshot.body.snapshot.board).toBeDefined();
+      }
+      if (type === UniverType.UNIVER_BASE) {
+        expect(snapshot.body.snapshot.workbook).toBeDefined();
+        expect(
+          Object.values(snapshot.body.snapshot.workbook!.blockMeta).every(
+            ({ blocks }) => blocks.length === 0
+          )
+        ).toBe(true);
+      }
 
       const opened = await json<{
         resource: { id: string; lastOpenedAt: number };
@@ -101,7 +186,7 @@ describe("univer-workspace-demo spaces", () => {
       "Project 2026",
       "Planning",
     ]);
-    expect(directory.body.nodes).toHaveLength(3);
+    expect(directory.body.nodes).toHaveLength(5);
     expect(directory.body.nodes.every(({ kind }) => kind === "unit")).toBe(
       true
     );

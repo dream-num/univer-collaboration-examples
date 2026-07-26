@@ -12,6 +12,7 @@ import {
   type ReviewWorktreeFilter,
   type ReviewWorktreeScope,
 } from "./worktrees/review.js";
+import { resolveMergeReview } from "./worktrees/merge-review.js";
 import {
   configureReviewCollaboration,
 } from "./collaboration.js";
@@ -47,6 +48,8 @@ async function start(): Promise<void> {
       UniverInstanceType.UNIVER_SHEET,
       UniverInstanceType.UNIVER_DOC,
       UniverInstanceType.UNIVER_SLIDE,
+      UniverInstanceType.UNIVER_BOARD,
+      UniverInstanceType.UNIVER_BASE,
     ].includes(type)
   ) {
     await renderWorktreeReviewEditor(reviewWorktreeID, unitID, type);
@@ -58,6 +61,8 @@ async function start(): Promise<void> {
       UniverInstanceType.UNIVER_SHEET,
       UniverInstanceType.UNIVER_DOC,
       UniverInstanceType.UNIVER_SLIDE,
+      UniverInstanceType.UNIVER_BOARD,
+      UniverInstanceType.UNIVER_BASE,
     ].includes(type)
   ) {
     await renderEditor(unitID, type);
@@ -104,22 +109,16 @@ async function renderWorktreeReviewEditor(
     }>(
       `/universer-api/worktrees/${encodeURIComponent(worktreeID)}/units/${encodeURIComponent(reviewUnitID)}/merge-preview`
     );
-    if (
-      preview.evaluation.status !== "preview" ||
-      preview.evaluation.preview === undefined
-    ) {
+    const resolution = resolveMergeReview(worktreeID, preview.evaluation);
+    if ("unavailable" in resolution) {
       renderReviewUnavailable(
-        preview.evaluation.status === "conflict"
+        resolution.unavailable === "conflict"
           ? "当前变更存在合并冲突，无法生成合入预览。"
           : "当前状态没有可用的合入预览。"
       );
       return;
     }
-    configureReviewCollaboration({
-      kind: "merge",
-      worktreeID,
-      preview: preview.evaluation.preview,
-    });
+    configureReviewCollaboration(resolution.scope);
   } else if (mode === "draft") {
     configureReviewCollaboration({ kind: "worktree", worktreeID });
   } else {
@@ -153,6 +152,12 @@ async function renderWorktreeReviewEditor(
       return;
     case UniverInstanceType.UNIVER_SLIDE:
       await import("./units/slide.js");
+      return;
+    case UniverInstanceType.UNIVER_BOARD:
+      await import("./units/board.js");
+      return;
+    case UniverInstanceType.UNIVER_BASE:
+      await import("./units/base.js");
   }
 }
 
@@ -409,6 +414,12 @@ async function renderEditor(
       return;
     case UniverInstanceType.UNIVER_SLIDE:
       await import("./units/slide.js");
+      return;
+    case UniverInstanceType.UNIVER_BOARD:
+      await import("./units/board.js");
+      return;
+    case UniverInstanceType.UNIVER_BASE:
+      await import("./units/base.js");
   }
 }
 
@@ -534,6 +545,8 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
               ${createMenuItem(UniverInstanceType.UNIVER_SHEET, "空白表格", "sheet")}
               ${createMenuItem(UniverInstanceType.UNIVER_DOC, "空白文档", "doc")}
               ${createMenuItem(UniverInstanceType.UNIVER_SLIDE, "空白幻灯片", "slide")}
+              ${createMenuItem(UniverInstanceType.UNIVER_BOARD, "空白白板", "board")}
+              ${createMenuItem(UniverInstanceType.UNIVER_BASE, "空白多维表格", "base")}
             </div>
           </div>
           <nav class="main-nav" aria-label="主要导航">
@@ -1130,6 +1143,8 @@ function homeView(user: CurrentUser, resources: ResourceRecord[]): string {
         ${quickCard(UniverInstanceType.UNIVER_SHEET, "空白表格", "Sheet", "sheet")}
         ${quickCard(UniverInstanceType.UNIVER_DOC, "空白文档", "Doc", "doc")}
         ${quickCard(UniverInstanceType.UNIVER_SLIDE, "空白幻灯片", "Slide", "slide")}
+        ${quickCard(UniverInstanceType.UNIVER_BOARD, "空白白板", "Board", "board")}
+        ${quickCard(UniverInstanceType.UNIVER_BASE, "空白多维表格", "Base", "base")}
       </div>
     </section>
     <section class="content-section">
@@ -2342,6 +2357,8 @@ function typeSlug(type: number): string {
   if (type === UniverInstanceType.UNIVER_SHEET) return "sheet";
   if (type === UniverInstanceType.UNIVER_DOC) return "doc";
   if (type === UniverInstanceType.UNIVER_SLIDE) return "slide";
+  if (type === UniverInstanceType.UNIVER_BOARD) return "board";
+  if (type === UniverInstanceType.UNIVER_BASE) return "base";
   return "file";
 }
 
@@ -2435,6 +2452,12 @@ function unitIcon(type: number): string {
   if (type === UniverInstanceType.UNIVER_DOC) {
     return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 12h6M9 16h6"/></svg>';
   }
+  if (type === UniverInstanceType.UNIVER_BOARD) {
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 15 3-4 3 3 2-2 3 4M8 8h.01"/></svg>';
+  }
+  if (type === UniverInstanceType.UNIVER_BASE) {
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16M3 14h18"/></svg>';
+  }
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21l4-3 4 3M7 8h10v6H7z"/></svg>';
 }
 
@@ -2444,6 +2467,12 @@ function previewGraphic(type: number): string {
   }
   if (type === UniverInstanceType.UNIVER_DOC) {
     return '<span class="doc-preview"><i></i><i></i><i></i><i></i><i></i></span>';
+  }
+  if (type === UniverInstanceType.UNIVER_BOARD) {
+    return '<span class="board-preview"><i></i><b></b><em></em></span>';
+  }
+  if (type === UniverInstanceType.UNIVER_BASE) {
+    return '<span class="base-preview"><i></i><i></i><i></i><i></i><i></i><i></i></span>';
   }
   return '<span class="slide-preview"><i></i><b></b><em></em></span>';
 }

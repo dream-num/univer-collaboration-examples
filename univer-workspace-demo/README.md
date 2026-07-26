@@ -14,8 +14,9 @@
   `viewer`。
 - `owner` 可以邀请和设置所有非 Owner 角色；`admin` 只能管理
   `editor/viewer`，不能修改或移除其他管理员。
-- 创建、打开、协同重命名、软删除、恢复 Sheet、Doc、Slide。
-- 三种 Unit 都通过 `UniverCollabService.createUnitFromData` 创建。
+- 创建、打开、软删除、恢复 Sheet、Doc、Slide、Board、Base。
+- Sheet、Doc、Slide 通过 `UniverCollabService.createUnitFromData` 创建；Board、Base
+  暂由 Demo 生成空白 revision-1 协议 snapshot，再调用低层 `createUnit`。
 - 产品资源元数据和协同数据写入同一个 SQLite 文件中的独立表。
 - 用户、空间、目录节点、团队成员和个人文档定向分享成员持久化到 SQLite。
 - 所有者可按用户授予 `editor/viewer`、调整角色或移除成员；被邀请者可从
@@ -29,11 +30,12 @@
 - Sheet 编辑器中的 Univer Edit History UI。
 - Sheet 编辑器使用 grid Ribbon 和高级数据/UI 插件；多类型编辑器不额外创建
   Formula、Pivot 或 History Worker。
-- Sheet、Doc、Slide 按 URL 中的 Unit type 动态加载对应编辑器。
+- 五种 Unit 按 URL 中的 Unit type 动态加载对应编辑器；Base 使用独立 Vite Worker
+  承载 RPC 与公式远端模型。
 - Creator 可以在个人或团队 Scope 创建 Worktree；个人 Worktree 只对 Creator 可见，
   团队 Worktree 可选择仅 Creator 或当前团队成员可见。
 - Worktree 可以引用当前用户可编辑的现有 Unit，也可以创建仅存在于 Worktree 的
-  Sheet、Doc、Slide；本地 Unit 只在 merge 成功后激活为产品资源。
+  Sheet、Doc、Slide、Board、Base；本地 Unit 只在 merge 成功后激活为产品资源。
 - `#/worktrees` 提供只读 Review 页面，显示 trunk、draft 和 merge preview，并支持
   ready、reopen、merge、discard 生命周期操作。
 - Worktree 内容读取、提交、ready 和逐 Unit merge 都实时复核产品 ACL；visibility
@@ -41,9 +43,29 @@
 - Worktree 创建、加入 Unit 和本地 Unit 创建使用 SQLite operation journal；
   启动时恢复半程操作，并补齐已提交 merge/discard 的产品侧状态。
 
-Board 和 Base 暂未显示创建入口，因为 alpha.7 协同包没有从公开入口导出对应 data
-transformer。Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅支持 Sheet，
-因此暂不展示可视化历史入口。相关证据和后续方向见
+Board 和 Base 的临时 snapshot 编码器只支持 Demo 创建的空白初始数据，并集中位于
+`server/temporary-unit-snapshot.ts`。升级到包含
+[univer-pro PR #5259](https://github.com/dream-num/univer-pro/pull/5259) 的发布版本后，
+应删除该文件并把两类 Unit 切回 `createUnitFromData`。alpha.7 中 Board 没有公开的协同
+重命名 mutation，Base 重命名也不是简单名称 mutation，因此这两类 Unit 暂以产品目录
+名称为权威；编辑器标题不会用 snapshot 内的旧名称覆盖它。Sheet、Doc、Slide 的重命名
+仍进入协同版本与 History。
+
+Base 的浏览器主线程和 Base Vite Worker 都注册 Base 模型；协同 Service 的 Node RPC
+Worker 也注册 `UniverRemoteBasesPlugin`，因此首次 Base 修改可以在主线程和 Worker
+之间完成公式与 JSON1 数据同步。alpha.7 的 Collaboration Client UI 公式守卫会把未指定
+类型取得的 Base 当成 Workbook，并直接调用 `getSheetBySheetId`。Demo 在 Base 模型加入
+Instance Service 前临时补充一个返回 `null` 的同名 resolver，同时关闭 Base 不需要的
+Docs 协同 UI；该 shim 不覆盖 SDK 已有实现。升级到公式守卫只处理 Sheet、或 SDK 为
+非 Workbook Unit 提供类型安全分支的版本后，应删除
+`src/units/base-compatibility.ts`、`WorkspaceUniverInstanceService` 及对应测试。
+
+Worktree 的 `not-behind` 合入预览直接复用只读 draft：此时 Trunk 自创建 Worktree 后没有
+变化，合入结果与 AI 修改版相同。只有 Trunk 已前进时才使用服务端生成的 merge preview
+snapshot；冲突仍保持不可预览。
+
+Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅支持 Sheet，因此暂不展示
+可视化历史入口。相关证据和后续方向见
 [`docs/issues`](../../docs/issues/README.md)。
 
 ## 启动
@@ -112,17 +134,19 @@ WorkspaceWorktreeCatalog
 个人空间 Owner 和可选的定向 `workspace_node_members` 计算。团队文档没有独立成员表，
 因此不会产生空间角色和文档角色冲突。
 
-创建 Unit 时先在目标空间目录中写入状态为 `creating` 的产品节点，再调用
-`createUnitFromData`，成功后标记为 `active`。Service middleware 只允许这个流程
+创建 Unit 时先在目标空间目录中写入状态为 `creating` 的产品节点。Sheet、Doc、Slide
+调用 `createUnitFromData`，Board、Base 调用带初始 snapshot 的 `createUnit`，成功后标记
+为 `active`。Service middleware 只允许这个流程
 创建 Unit，并在读取、提交和应用 changeset 时确认产品节点仍为 `active`，且当前
 Session 拥有有效空间或文档角色。`viewer` 的提交会在 Service middleware 中被拒绝，
 不能依赖前端只读状态保障安全；协议兼容 Authz API 同时把角色映射为 Univer
 `UnitAction`。Sheet 前端还设置本地 `WorkbookEditablePermission`，提供明确的只读
 体验。
 
-重命名通过对应 Unit 类型的协同 mutation 提交；changeset confirmed 后，
+Sheet、Doc、Slide 重命名通过对应 Unit 类型的协同 mutation 提交；changeset confirmed 后，
 `changesetCommitted` 事件把名称同步到产品资源表。因此名称修改会进入协同版本与
-History，文件列表不需要另建一套独立的重命名状态。
+History。Board、Base 在 alpha.7 阶段只更新产品资源表，待公开 transformer 和稳定的
+协同重命名入口一并可用后再收敛为同一语义。
 
 删除文件夹时以递归 CTE 将整棵子树软删除，协同 middleware 立即拒绝访问，但
 snapshot 与 changeset 仍保留；恢复根文件夹时一并恢复子树。删除会清除相关用户的
@@ -189,4 +213,5 @@ History 是 confirmed changeset 的最终一致派生索引。Workspace Demo 使
 当前不包含公开链接、匿名访问、组织/群组同步、团队所有权转移、节点移动、永久删除，
 以及 Doc/Slide 的历史 UI。个人空间暂只支持单个文档定向分享，不支持分享整个个人
 文件夹。搜索在当前页面已加载的目录或资源中进行。集成测试覆盖个人目录、团队四角色
-边界、管理员越权拒绝、个人文档定向分享、三种 Unit、History、递归删除和恢复。
+边界、管理员越权拒绝、个人文档定向分享、五种 Unit、History、递归删除和恢复。
+Worktree 集成测试也覆盖 Board、Base 的协议 snapshot 创建、暂存和 merge 激活。

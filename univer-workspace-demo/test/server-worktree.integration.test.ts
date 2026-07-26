@@ -3,6 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { UniverType } from "@univerjs/protocol";
+import { JSON1 } from "@univerjs/core";
 import { CollabError } from "@univerjs/collaboration-service";
 import { afterEach, describe, expect, it } from "vitest";
 import type { WorkspaceApplication } from "../server/application.js";
@@ -297,6 +298,158 @@ describe("Workspace Worktree application", () => {
       ).toMatchObject({ status: 200 });
     }
   );
+
+  it.each([
+    { label: "Board", type: UniverType.UNIVER_BOARD, envelope: "board" },
+    { label: "Base", type: UniverType.UNIVER_BASE, envelope: "workbook" },
+  ])(
+    "creates and activates a Worktree-local $label from a protocol snapshot",
+    async ({ label, type, envelope }) => {
+      const origin = await startApplication();
+      const cookie = await login(origin);
+      const personal = await personalSpace(origin, cookie);
+      const worktreeID = randomUUID();
+      const resourceID = randomUUID();
+      const unitID = randomUUID();
+      await request(`${origin}/api/worktrees`, cookie, {
+        method: "POST",
+        body: {
+          worktreeID,
+          name: `New ${label}`,
+          scope: { kind: "user" },
+        },
+      });
+      const created = await request<{
+        worktree: {
+          units: Array<{
+            unitID: string;
+            resourceStatus: string;
+            draftHeadRevision: number;
+          }>;
+        };
+      }>(`${origin}/api/worktrees/${worktreeID}/units/new`, cookie, {
+        method: "POST",
+        body: {
+          resourceID,
+          unitID,
+          spaceID: personal.id,
+          name: `Agent ${label}`,
+          type,
+        },
+      });
+      expect(created.response.status).toBe(201);
+      expect(created.body.worktree.units).toEqual([
+        expect.objectContaining({
+          unitID,
+          resourceStatus: "staged",
+          draftHeadRevision: 1,
+        }),
+      ]);
+
+      const snapshotResponse = await fetch(
+        `${origin}/universer-api/worktrees/${worktreeID}/snapshot/${type}/unit/${unitID}/rev/0`,
+        { headers: { cookie } }
+      );
+      expect(snapshotResponse.status).toBe(200);
+      const snapshot = (await snapshotResponse.json()) as {
+        snapshot: Record<string, unknown>;
+      };
+      expect(snapshot.snapshot).toMatchObject({ unitID, type, rev: 1 });
+      expect(snapshot.snapshot[envelope]).toBeDefined();
+
+      await request(`${origin}/api/worktrees/${worktreeID}/ready`, cookie, {
+        method: "POST",
+      });
+      const merged = await request<{
+        worktree: {
+          status: string;
+          units: Array<{
+            unitID: string;
+            resourceStatus: string;
+            mergeResult?: { status: string };
+          }>;
+        };
+      }>(`${origin}/api/worktrees/${worktreeID}/merge`, cookie, {
+        method: "POST",
+      });
+      expect(merged.body.worktree).toMatchObject({
+        status: "merged",
+        units: [
+          {
+            unitID,
+            resourceStatus: "active",
+            mergeResult: { status: "merged" },
+          },
+        ],
+      });
+      expect(
+        await fetch(`${origin}/api/units/${resourceID}`, {
+          headers: { cookie },
+        })
+      ).toMatchObject({ status: 200 });
+    }
+  );
+
+  it("applies the first Base mutation in a Worktree runtime", async () => {
+    const origin = await startApplication();
+    const cookie = await login(origin);
+    const personal = await personalSpace(origin, cookie);
+    const worktreeID = randomUUID();
+    const resourceID = randomUUID();
+    const unitID = randomUUID();
+    await request(`${origin}/api/worktrees`, cookie, {
+      method: "POST",
+      body: {
+        worktreeID,
+        name: "Base mutation runtime",
+        scope: { kind: "user" },
+      },
+    });
+    await request(`${origin}/api/worktrees/${worktreeID}/units/new`, cookie, {
+      method: "POST",
+      body: {
+        resourceID,
+        unitID,
+        spaceID: personal.id,
+        name: "Agent Base",
+        type: UniverType.UNIVER_BASE,
+      },
+    });
+
+    const submitted = await request<{ status: string }>(
+      `${origin}/api/worktrees/${worktreeID}/units/${unitID}/submit_changesets`,
+      cookie,
+      {
+        method: "POST",
+        body: {
+          changeset: {
+            unitID,
+            type: UniverType.UNIVER_BASE,
+            baseRev: 1,
+            revision: 2,
+            sid: randomUUID(),
+            reqId: 1,
+            userID: "",
+            memberID: "",
+            mutations: [
+              {
+                id: "base.mutation.apply-base-json1",
+                data: JSON.stringify({
+                  unitId: unitID,
+                  op: JSON1.replaceOp(
+                    ["name"],
+                    "Agent Base" as never,
+                    "Edited Base" as never
+                  ),
+                }),
+              },
+            ],
+          },
+        },
+      }
+    );
+    expect(submitted.body.status).toBe("committed");
+  });
 
   it("reports partial merge facts without rolling back a merged Unit", async () => {
     const origin = await startApplication();
