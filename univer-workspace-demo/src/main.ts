@@ -12,6 +12,10 @@ import {
   type ReviewWorktreeFilter,
   type ReviewWorktreeScope,
 } from "./worktrees/review.js";
+import {
+  outstandingWorktreeCount,
+  worktreeCountBadge,
+} from "./worktrees/task-count.js";
 import { resolveMergeReview } from "./worktrees/merge-review.js";
 import {
   configureReviewCollaboration,
@@ -486,9 +490,14 @@ function renderEditorError(
 
 async function renderWorkspace(user: CurrentUser): Promise<void> {
   const app = requireApp();
-  let spaces = (
-    await api<{ spaces: SpaceRecord[] }>("/api/spaces")
-  ).spaces;
+  const [initialSpaces, initialActiveWorktrees] = await Promise.all([
+    api<{ spaces: SpaceRecord[] }>("/api/spaces"),
+    api<{ worktrees: ReviewWorktree[] }>("/api/worktrees?view=active"),
+  ]);
+  let spaces = initialSpaces.spaces;
+  let worktreeTaskCount = outstandingWorktreeCount(
+    initialActiveWorktrees.worktrees
+  );
   const foundPersonalSpace = spaces.find(({ type }) => type === "personal");
   if (!foundPersonalSpace) throw new Error("个人空间不存在");
   const personalSpace: SpaceRecord = foundPersonalSpace;
@@ -556,7 +565,12 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
               ${icon("folder")}<span>个人空间</span>
             </a>
             ${navButton("shared", "与我共享", "share")}
-            ${navButton("worktrees", "智能工作台", "sparkles")}
+            ${navButton(
+              "worktrees",
+              "智能工作台",
+              "sparkles",
+              worktreeTaskCount
+            )}
             ${navButton("trash", "回收站", "trash")}
           </nav>
           <div class="team-nav">
@@ -1009,10 +1023,21 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
     activeQuery.set("view", "active");
     const processedQuery = new URLSearchParams(query);
     processedQuery.set("view", "processed");
-    const [active, processed] = await Promise.all([
+    const needsUnfilteredActive = query.size > 0;
+    const [active, processed, unfilteredActive] = await Promise.all([
       api<{ worktrees: ReviewWorktree[] }>(`/api/worktrees?${activeQuery}`),
       api<{ worktrees: ReviewWorktree[] }>(`/api/worktrees?${processedQuery}`),
+      needsUnfilteredActive
+        ? api<{ worktrees: ReviewWorktree[] }>(
+            "/api/worktrees?view=active"
+          )
+        : Promise.resolve(null),
     ]);
+    updateWorktreeTaskCount(
+      outstandingWorktreeCount(
+        unfilteredActive?.worktrees ?? active.worktrees
+      )
+    );
     worktrees = [...active.worktrees, ...processed.worktrees];
     if (
       !selectedWorktreeID ||
@@ -1025,6 +1050,16 @@ async function renderWorkspace(user: CurrentUser): Promise<void> {
       selectFirstVisibleWorktree();
     }
     renderCurrentView();
+  }
+
+  function updateWorktreeTaskCount(count: number): void {
+    worktreeTaskCount = count;
+    const navItem = document.querySelector<HTMLElement>(
+      '[data-view="worktrees"]'
+    );
+    if (!navItem) return;
+    navItem.querySelector(".worktree-task-count")?.remove();
+    navItem.insertAdjacentHTML("beforeend", worktreeCountBadge(count));
   }
 
   function selectFirstVisibleWorktree(): void {
@@ -1528,9 +1563,10 @@ function createMenuItem(
 function navButton(
   view: WorkspaceView,
   label: string,
-  iconName: IconName
+  iconName: IconName,
+  badgeCount = 0
 ): string {
-  return `<a href="#${view}" data-view="${view}">${icon(iconName)}<span>${label}</span></a>`;
+  return `<a href="#${view}" data-view="${view}">${icon(iconName)}<span>${label}</span>${worktreeCountBadge(badgeCount)}</a>`;
 }
 
 function emptyState(title: string, description: string): string {

@@ -40,7 +40,8 @@
 - Worktree 可以引用当前用户可编辑的现有 Unit，也可以创建仅存在于 Worktree 的
   Sheet、Doc、Slide、Board、Base；本地 Unit 只在 merge 成功后激活为产品资源。
 - `#/worktrees` 提供只读 Review 页面，显示 trunk、draft 和 merge preview，并支持
-  ready、reopen、merge、discard 生命周期操作。
+  ready、reopen、merge、discard 生命周期操作；侧栏智能工作台入口显示正在进行与
+  待确认的任务总数，没有待处理任务时不显示徽标。
 - Worktree 内容读取、提交、ready 和逐 Unit merge 都实时复核产品 ACL；visibility
   只控制发现与 Review，不授予 Unit 权限。
 - Worktree 创建、加入 Unit 和本地 Unit 创建使用 SQLite operation journal；
