@@ -1,6 +1,7 @@
 import type { IPresetPlugin } from "@univerjs/presets";
 import { IImageIoService } from "@univerjs/core";
 import { UniverRangePreprocessPlugin } from "@univerjs-pro/range-preprocess";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
 import { UniverSheetsChartPlugin } from "@univerjs-pro/sheets-chart";
 import SheetsChartEnUS from "@univerjs-pro/sheets-chart/locale/en-US";
 import { UniverSheetsChartUIPlugin } from "@univerjs-pro/sheets-chart-ui";
@@ -41,6 +42,7 @@ import SheetsFilterEnUS from "@univerjs/sheets-filter/locale/en-US";
 import { UniverSheetsFilterUIPlugin } from "@univerjs/sheets-filter-ui";
 import SheetsFilterUIEnUS from "@univerjs/sheets-filter-ui/locale/en-US";
 import { UniverSheetsFindReplacePlugin } from "@univerjs/sheets-find-replace";
+import { UniverSheetsHyperLinkPlugin } from "@univerjs/sheets-hyper-link";
 import { UniverSheetsHyperLinkUIPlugin } from "@univerjs/sheets-hyper-link-ui";
 import SheetsHyperLinkUIEnUS from "@univerjs/sheets-hyper-link-ui/locale/en-US";
 import { UniverSheetsNotePlugin } from "@univerjs/sheets-note";
@@ -53,6 +55,11 @@ import { UniverSheetsTablePlugin } from "@univerjs/sheets-table";
 import SheetsTableEnUS from "@univerjs/sheets-table/locale/en-US";
 import { UniverSheetsTableUIPlugin } from "@univerjs/sheets-table-ui";
 import SheetsTableUIEnUS from "@univerjs/sheets-table-ui/locale/en-US";
+import { UniverSheetsThreadCommentPlugin } from "@univerjs/sheets-thread-comment";
+import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
+import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
+import { UniverThreadCommentUIPlugin } from "@univerjs/thread-comment-ui";
+import ThreadCommentUIEnUS from "@univerjs/thread-comment-ui/locale/en-US";
 import { mergeLocales } from "@univerjs/presets";
 
 import "@univerjs-pro/sheets-chart-ui/lib/index.css";
@@ -70,6 +77,8 @@ import "@univerjs/sheets-hyper-link-ui/lib/index.css";
 import "@univerjs/sheets-note-ui/lib/index.css";
 import "@univerjs/sheets-sort-ui/lib/index.css";
 import "@univerjs/sheets-table-ui/lib/index.css";
+import "@univerjs/sheets-thread-comment-ui/lib/index.css";
+import "@univerjs/thread-comment-ui/lib/index.css";
 
 import "@univerjs/sheets-data-validation/facade";
 import "@univerjs-pro/sheets-pivot/facade";
@@ -78,6 +87,7 @@ import "@univerjs-pro/sheets-shape/facade";
 import "@univerjs-pro/sheets-sparkline/facade";
 import "@univerjs-pro/sheets-outline/facade";
 import "@univerjs/sheets-table/facade";
+import "@univerjs/sheets-thread-comment/facade";
 import "@univerjs-pro/range-preprocess/facade";
 
 export const sheetFeatureLocale = mergeLocales(
@@ -96,6 +106,8 @@ export const sheetFeatureLocale = mergeLocales(
   SheetsSortUIEnUS,
   SheetsTableEnUS,
   SheetsTableUIEnUS,
+  ThreadCommentUIEnUS,
+  SheetsThreadCommentUIEnUS,
   SheetsChartEnUS,
   SheetsChartUIEnUS,
   SheetsOutlineUIEnUS,
@@ -128,6 +140,9 @@ export function getSheetFeaturePlugins(): IPresetPlugin[] {
     UniverSheetsDrawingPlugin,
     UniverSheetsDrawingUIPlugin,
     UniverSheetsSortPlugin,
+    UniverThreadCommentUIPlugin,
+    UniverSheetsThreadCommentPlugin,
+    UniverSheetsThreadCommentUIPlugin,
     UniverSheetsPivotTablePlugin,
     UniverSheetsChartPlugin,
     [UniverSheetsChartUIPlugin, { enableChartElementFloatMenu: true }],
@@ -137,6 +152,7 @@ export function getSheetFeaturePlugins(): IPresetPlugin[] {
     UniverSheetsTableUIPlugin,
     UniverSheetsShapePlugin,
     UniverSheetsShapeUIPlugin,
+    UniverSheetsHyperLinkPlugin,
     UniverSheetsNotePlugin,
     UniverSheetsNoteUIPlugin,
     UniverSheetsCrosshairHighlightPlugin,
@@ -147,4 +163,9 @@ export function getSheetFeaturePlugins(): IPresetPlugin[] {
     UniverSheetsPivotTableUIPlugin,
     UniverSheetsHyperLinkUIPlugin,
   ];
+}
+
+/** Thread Comment datasource 使用 Workspace 已实现的 universer 兼容接口。 */
+export function getSheetCollaborationFeaturePlugins(): IPresetPlugin[] {
+  return [UniverThreadCommentDataSourcePlugin];
 }

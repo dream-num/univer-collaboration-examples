@@ -28,8 +28,11 @@
 - 登录用户下的 snapshot、changeset、WebSocket 和 presence 协议入口。
 - Sheet、Doc、Slide 的 History 元数据索引与持久化协议。
 - Sheet 编辑器中的 Univer Edit History UI。
-- Sheet 编辑器使用 grid Ribbon 和高级数据/UI 插件；多类型编辑器不额外创建
-  Formula、Pivot 或 History Worker。
+- 浏览器编辑器按 Univer Pro 协同示例装配：Sheet 提供高级数据功能与评论；Doc
+  提供 Drawing、Chart、Table、List、Shape、Callout、Code、Quote、Column、LaTeX、
+  Hyperlink、评论、导入和打印；Slide 提供 Drawing、Chart、Table、导入和打印；
+  Board 提供 Ink、Chart、Mind Map、Table、LaTeX 和导入；Base 使用官方核心组合。
+  多类型编辑器不额外创建 Formula、Pivot 或 History Worker。
 - 五种 Unit 按 URL 中的 Unit type 动态加载对应编辑器；Base 使用独立 Vite Worker
   承载 RPC 与公式远端模型。
 - Creator 可以在个人或团队 Scope 创建 Worktree；个人 Worktree 只对 Creator 可见，
@@ -59,6 +62,12 @@ Instance Service 前临时补充一个返回 `null` 的同名 resolver，同时�
 Docs 协同 UI；该 shim 不覆盖 SDK 已有实现。升级到公式守卫只处理 Sheet、或 SDK 为
 非 Workbook Unit 提供类型安全分支的版本后，应删除
 `src/units/base-compatibility.ts`、`WorkspaceUniverInstanceService` 及对应测试。
+
+浏览器插件清单与服务端 Runtime 清单有意不同。服务端严格采用 universer 后面的
+Univer Pro ApplyHost headless 组合，只注册 mutation replay、resource snapshot 和 OT
+所需插件；Board Chart、Exchange、Print 及所有 UI 插件不会因为客户端启用而加入服务端。
+当前 Demo 仍不提供素材库、附件存储、上传或签名 URL 服务，因此依赖远程文件 IO 的
+图片/附件流程不属于本次对齐范围。
 
 Worktree 的 `not-behind` 合入预览直接复用只读 draft：此时 Trunk 自创建 Worktree 后没有
 变化，合入结果与 AI 修改版相同。只有 Trunk 已前进时才使用服务端生成的 merge preview

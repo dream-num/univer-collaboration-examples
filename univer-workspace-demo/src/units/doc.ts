@@ -11,18 +11,28 @@ import {
   mergeLocales,
 } from "@univerjs/presets";
 import {
+  collaborationLocale,
   collaborationPlugins,
   enforceReadOnlyReview,
   loadCurrentUser,
   syncEditorTitle,
 } from "../collaboration.js";
+import {
+  docFeatureLocale,
+  getDocCollaborationFeaturePlugins,
+  getDocContentFeaturePlugins,
+} from "./doc-features.js";
 
 import "@univerjs/preset-docs-core/lib/index.css";
 
 const { univer } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
-    [LocaleType.EN_US]: mergeLocales(UniverPresetDocsCoreEnUS),
+    [LocaleType.EN_US]: mergeLocales(
+      UniverPresetDocsCoreEnUS,
+      docFeatureLocale,
+      collaborationLocale
+    ),
   },
   theme: defaultTheme,
   logLevel: LogLevel.WARN,
@@ -33,7 +43,9 @@ const { univer } = createUniver({
       UniverLicensePlugin,
       { license: import.meta.env.VITE_UNIVER_LICENSE || undefined },
     ],
+    ...getDocContentFeaturePlugins(),
     ...collaborationPlugins(),
+    ...getDocCollaborationFeaturePlugins(),
   ],
 });
 

@@ -1,5 +1,7 @@
 import { UniverBasesPlugin } from "@univerjs-pro/bases";
+import BasesEnUS from "@univerjs-pro/bases/locale/en-US";
 import { UniverBasesUIPlugin } from "@univerjs-pro/bases-ui";
+import BasesUIEnUS from "@univerjs-pro/bases-ui/locale/en-US";
 import { IAttachmentIoService } from "@univerjs-pro/collaboration-client";
 import { UniverProFormulaEnginePlugin } from "@univerjs-pro/engine-formula";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
@@ -18,8 +20,11 @@ import {
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverNetworkPlugin } from "@univerjs/network";
 import { UniverRPCMainThreadPlugin } from "@univerjs/rpc";
+import { mergeLocales } from "@univerjs/presets";
 import { UniverUIPlugin } from "@univerjs/ui";
+import UIEnUS from "@univerjs/ui/locale/en-US";
 import {
+  collaborationLocale,
   enforceReadOnlyReview,
   loadCurrentUser,
   registerRawCollaboration,
@@ -28,6 +33,8 @@ import { makeBaseSafeForCollaborationFormulaGuard } from "./base-compatibility.j
 
 import "@univerjs/ui/lib/index.css";
 import "@univerjs-pro/bases-ui/lib/index.css";
+
+import "@univerjs-pro/bases/facade";
 
 const worker = new Worker(new URL("./base-worker.ts", import.meta.url), {
   type: "module",
@@ -54,7 +61,14 @@ class WorkspaceUniverInstanceService extends UniverInstanceService {
 
 const univer = new Univer({
   locale: LocaleType.EN_US,
-  locales: {},
+  locales: {
+    [LocaleType.EN_US]: mergeLocales(
+      UIEnUS,
+      BasesEnUS,
+      BasesUIEnUS,
+      collaborationLocale
+    ),
+  },
   logLevel: LogLevel.WARN,
   override: [
     [IUndoRedoService, null],

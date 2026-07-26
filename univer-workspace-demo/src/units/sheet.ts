@@ -15,6 +15,7 @@ import {
   mergeLocales,
 } from "@univerjs/presets";
 import {
+  collaborationLocale,
   collaborationPlugins,
   enforceReadOnlyReview,
   historyPlugins,
@@ -22,6 +23,7 @@ import {
   syncEditorTitle,
 } from "../collaboration.js";
 import {
+  getSheetCollaborationFeaturePlugins,
   getSheetFeaturePlugins,
   sheetFeatureLocale,
 } from "./sheet-features.js";
@@ -35,7 +37,8 @@ const { univer } = createUniver({
       UniverPresetSheetsCoreEnUS,
       EditHistoryLoaderEnUS,
       EditHistoryViewerEnUS,
-      sheetFeatureLocale
+      sheetFeatureLocale,
+      collaborationLocale
     ),
   },
   theme: defaultTheme,
@@ -54,6 +57,7 @@ const { univer } = createUniver({
     ],
     ...getSheetFeaturePlugins(),
     ...collaborationPlugins(),
+    ...getSheetCollaborationFeaturePlugins(),
     ...historyPlugins(),
   ],
 });

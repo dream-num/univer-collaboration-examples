@@ -11,6 +11,7 @@ import {
   UniverCollaborationClientUIPlugin,
   WebBrowserSingleActiveUnitService,
 } from "@univerjs-pro/collaboration-client-ui";
+import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import { UniverEditHistoryLoaderPlugin } from "@univerjs-pro/edit-history-loader";
 import {
   CommandType,
@@ -43,6 +44,8 @@ export type ReviewCollaborationScope =
     };
 
 let reviewScope: ReviewCollaborationScope | null = null;
+
+export const collaborationLocale = CollaborationClientUIEnUS;
 
 export function configureReviewCollaboration(
   scope: ReviewCollaborationScope
