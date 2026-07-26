@@ -648,6 +648,28 @@ export class ProductStore {
     return result.changes === 1 ? this.getFolder(folderID) : null;
   }
 
+  /** Returns the contiguous subtree that will transition with the root node. */
+  listSubtreeUnitIDs(nodeID: string): string[] {
+    this._assertOpen();
+    const rows = this._database
+      .prepare(
+        `WITH RECURSIVE descendants(id, status) AS (
+           SELECT id, status FROM workspace_nodes WHERE id = ?
+           UNION ALL
+           SELECT node.id, node.status
+           FROM workspace_nodes AS node
+           JOIN descendants ON node.parent_id = descendants.id
+           WHERE node.status = descendants.status
+         )
+         SELECT unit.unit_id
+         FROM descendants
+         JOIN workspace_units AS unit ON unit.node_id = descendants.id
+         ORDER BY unit.unit_id ASC`
+      )
+      .all(nodeID) as unknown as Array<{ readonly unit_id: string }>;
+    return rows.map(({ unit_id }) => unit_id);
+  }
+
   softDeleteNode(nodeID: string): boolean {
     this._assertOpen();
     const now = Date.now();

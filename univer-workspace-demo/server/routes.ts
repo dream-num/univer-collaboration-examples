@@ -3,12 +3,16 @@ import type {
   CollabSession,
   UniverCollabService,
 } from "@univerjs/collaboration-service";
-import { CollabError } from "@univerjs/collaboration-service";
+import {
+  CollabError,
+  MAX_UNIT_LIFECYCLE_BATCH_SIZE,
+} from "@univerjs/collaboration-service";
 import { ErrorCode, UnitAction, UniverType } from "@univerjs/protocol";
 import { json, Router } from "express";
 import type { AuthService, UserStore } from "./auth.js";
 import type { DemoUser } from "./demo-user.js";
 import { protocolUser } from "./demo-user.js";
+import { createWorkspaceLifecycleCustomData } from "./collaboration.js";
 import type {
   ProductStore,
   ResourceAccessRole,
@@ -39,6 +43,7 @@ export function createApplicationRouter(
   dependencies: ApplicationRouterDependencies
 ): Router {
   const router = Router();
+  const lifecycleCoordinator = new ApplicationLifecycleCoordinator();
   router.use(json({ limit: "1mb" }));
 
   router.post("/auth/register", async (request, response) => {
@@ -199,7 +204,7 @@ export function createApplicationRouter(
     response.json({ folder: folderResponse(renamed!) });
   });
 
-  router.delete("/nodes/:nodeID", (request, response) => {
+  router.delete("/nodes/:nodeID", async (request, response) => {
     const user = currentUser(response);
     const node = requireExistingNode(
       dependencies.productStore,
@@ -210,13 +215,13 @@ export function createApplicationRouter(
     if (!role || !canDelete(role, space.type)) {
       throw new CollabError("PERMISSION_DENIED", "无权删除此内容");
     }
-    if (!dependencies.productStore.softDeleteNode(node.id)) {
-      throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
-    }
+    await lifecycleCoordinator.runExclusive(() =>
+      softDeleteNode(dependencies, node.id, user)
+    );
     response.status(204).end();
   });
 
-  router.post("/nodes/:nodeID/restore", (request, response) => {
+  router.post("/nodes/:nodeID/restore", async (request, response) => {
     const user = currentUser(response);
     const node = requireExistingNode(
       dependencies.productStore,
@@ -227,9 +232,9 @@ export function createApplicationRouter(
     if (!role || !canDelete(role, space.type)) {
       throw new CollabError("PERMISSION_DENIED", "无权恢复此内容");
     }
-    if (!dependencies.productStore.restoreNode(node.id)) {
-      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
-    }
+    await lifecycleCoordinator.runExclusive(() =>
+      restoreNode(dependencies, node.id, user)
+    );
     response.status(204).end();
   });
 
@@ -542,12 +547,12 @@ export function createApplicationRouter(
     }
   });
 
-  router.delete("/units/:resourceID", (request, response) => {
+  router.delete("/units/:resourceID", async (request, response) => {
     const user = currentUser(response);
     const resource = dependencies.productStore.getByID(
       request.params.resourceID
     );
-    if (!resource || resource.status !== "active") {
+    if (!resource) {
       throw new CollabError("UNIT_NOT_FOUND", "Resource does not exist");
     }
     const role = dependencies.productStore.getAccessRoleByID(
@@ -557,16 +562,18 @@ export function createApplicationRouter(
     if (!role || !canDelete(role, resource.spaceType)) {
       throw new CollabError("PERMISSION_DENIED", "无权删除此内容");
     }
-    dependencies.productStore.softDeleteNode(resource.id);
+    await lifecycleCoordinator.runExclusive(() =>
+      softDeleteNode(dependencies, resource.id, user)
+    );
     response.status(204).end();
   });
 
-  router.post("/units/:resourceID/restore", (request, response) => {
+  router.post("/units/:resourceID/restore", async (request, response) => {
     const user = currentUser(response);
     const resource = dependencies.productStore.getByID(
       request.params.resourceID
     );
-    if (!resource || resource.status !== "deleted") {
+    if (!resource) {
       throw new CollabError("UNIT_NOT_FOUND", "Deleted resource does not exist");
     }
     const role = dependencies.productStore.getSpaceRole(
@@ -576,9 +583,9 @@ export function createApplicationRouter(
     if (!role || !canDelete(role, resource.spaceType)) {
       throw new CollabError("PERMISSION_DENIED", "无权恢复此内容");
     }
-    if (!dependencies.productStore.restoreNode(resource.id)) {
-      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
-    }
+    await lifecycleCoordinator.runExclusive(() =>
+      restoreNode(dependencies, resource.id, user)
+    );
     response.json({
       resource: resourceResponse(
         dependencies.productStore.getByID(resource.id)!,
@@ -791,6 +798,146 @@ function applicationSession(user: DemoUser): CollabSession {
     userId: user.userId,
     customData: { user },
   };
+}
+
+async function softDeleteNode(
+  dependencies: ApplicationRouterDependencies,
+  nodeID: string,
+  user: DemoUser
+): Promise<void> {
+  const node = requireExistingNode(dependencies.productStore, nodeID);
+  requireLifecycleRootManager(
+    dependencies.productStore,
+    node,
+    user.userId,
+    "删除"
+  );
+  if (node.status !== "active") {
+    throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
+  }
+  const unitIDs = dependencies.productStore.listSubtreeUnitIDs(node.id);
+  assertLifecycleBatchSize(unitIDs);
+  const options = lifecycleCallOptions(user);
+  if (unitIDs.length > 0) {
+    await dependencies.collabService.deleteUnits(
+      { unitIDs, hardDelete: false },
+      options
+    );
+  }
+  try {
+    if (!dependencies.productStore.softDeleteNode(node.id)) {
+      throw new CollabError("UNIT_NOT_FOUND", "内容不存在");
+    }
+  } catch (error) {
+    if (unitIDs.length > 0) {
+      await bestEffort(() =>
+        dependencies.collabService.recoverUnits({ unitIDs }, options)
+      );
+    }
+    throw error;
+  }
+}
+
+async function restoreNode(
+  dependencies: ApplicationRouterDependencies,
+  nodeID: string,
+  user: DemoUser
+): Promise<void> {
+  const node = requireExistingNode(dependencies.productStore, nodeID);
+  requireLifecycleRootManager(
+    dependencies.productStore,
+    node,
+    user.userId,
+    "恢复"
+  );
+  if (node.status !== "deleted") {
+    throw new CollabError("INVALID_REQUEST", "内容不在回收站中");
+  }
+  if (node.parentID) {
+    const parent = dependencies.productStore.getFolder(node.parentID);
+    if (!parent || parent.status !== "active") {
+      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
+    }
+  }
+  const unitIDs = dependencies.productStore.listSubtreeUnitIDs(node.id);
+  assertLifecycleBatchSize(unitIDs);
+  const options = lifecycleCallOptions(user);
+  if (unitIDs.length > 0) {
+    await dependencies.collabService.recoverUnits({ unitIDs }, options);
+  }
+  try {
+    if (!dependencies.productStore.restoreNode(node.id)) {
+      throw new CollabError("INVALID_REQUEST", "请先恢复上级文件夹");
+    }
+  } catch (error) {
+    if (unitIDs.length > 0) {
+      await bestEffort(() =>
+        dependencies.collabService.deleteUnits(
+          { unitIDs, hardDelete: false },
+          options
+        )
+      );
+    }
+    throw error;
+  }
+}
+
+function lifecycleCallOptions(user: DemoUser) {
+  return {
+    session: applicationSession(user),
+    customData: createWorkspaceLifecycleCustomData(),
+  };
+}
+
+function assertLifecycleBatchSize(unitIDs: readonly string[]): void {
+  if (unitIDs.length > MAX_UNIT_LIFECYCLE_BATCH_SIZE) {
+    throw new CollabError(
+      "INVALID_REQUEST",
+      `子树包含 ${unitIDs.length} 个 Unit，超过单次生命周期操作上限 ${MAX_UNIT_LIFECYCLE_BATCH_SIZE}`
+    );
+  }
+}
+
+async function bestEffort(operation: () => Promise<unknown>): Promise<void> {
+  try {
+    await operation();
+  } catch {
+    // Preserve the failure from the second store operation.
+  }
+}
+
+class ApplicationLifecycleCoordinator {
+  private _tail: Promise<void> = Promise.resolve();
+
+  async runExclusive<T>(operation: () => Promise<T>): Promise<T> {
+    const previous = this._tail;
+    let release!: () => void;
+    this._tail = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previous;
+    try {
+      return await operation();
+    } finally {
+      release();
+    }
+  }
+}
+
+function requireLifecycleRootManager(
+  productStore: ProductStore,
+  node: WorkspaceNode,
+  userId: string,
+  operation: "删除" | "恢复"
+): void {
+  const space = productStore.getSpace(node.spaceID);
+  const role =
+    node.kind === "folder"
+      ? productStore.getSpaceRole(node.spaceID, userId)
+      : productStore.getAccessRoleByID(node.id, userId);
+  if (!space || !role || !canDelete(role, space.type)) {
+    throw new CollabError("PERMISSION_DENIED", `无权${operation}此内容`);
+  }
 }
 
 function requireBrowsableSpace(

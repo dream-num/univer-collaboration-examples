@@ -34,6 +34,15 @@ import {
 } from "./worktrees/worktree-policy.js";
 
 const DEMO_HISTORY_INTERVAL_MS = 5_000;
+const WORKSPACE_LIFECYCLE_REQUEST = Symbol("workspace-lifecycle-request");
+
+export function createWorkspaceLifecycleCustomData(): Record<string, unknown> {
+  const customData = Object.create(null) as Record<string, unknown> & {
+    [WORKSPACE_LIFECYCLE_REQUEST]?: true;
+  };
+  customData[WORKSPACE_LIFECYCLE_REQUEST] = true;
+  return customData;
+}
 
 export interface CollaborationStackOptions {
   readonly dbAdapter: IDatabaseAdapter;
@@ -164,10 +173,48 @@ export function createCollaborationStack(
     }
     await next();
   });
+  collabService.use("deleteUnits", async (context, next) => {
+    if (context.request.hardDelete) {
+      throw new CollabError(
+        "INVALID_REQUEST",
+        "The Workspace Demo does not expose hard delete"
+      );
+    }
+    requireWorkspaceLifecycleRequest(context.request.customData);
+    for (const unitID of context.request.unitIDs) {
+      requireLifecycleManager(unitID, context.session.userId);
+    }
+    await next();
+  });
+  collabService.use("recoverUnits", async (context, next) => {
+    requireWorkspaceLifecycleRequest(context.request.customData);
+    for (const unitID of context.request.unitIDs) {
+      requireLifecycleManager(unitID, context.session.userId);
+    }
+    await next();
+  });
   collabService.use("readUnitData", async (context, next) => {
     requireReadableResource(context.request.unitID, context.session.userId);
     await next();
   });
+
+  function requireLifecycleManager(unitID: string, userId: string): void {
+    const resource = options.productStore.getByUnitID(unitID);
+    const role = resource
+      ? options.productStore.getAccessRoleByID(resource.id, userId)
+      : null;
+    if (
+      !resource ||
+      !role ||
+      (role !== "owner" &&
+        !(resource.spaceType === "team" && role === "admin"))
+    ) {
+      throw new CollabError(
+        "PERMISSION_DENIED",
+        "Unit lifecycle access is denied"
+      );
+    }
+  }
   collabService.use("submitChangeset", async (context, next) => {
     requireEditableResource(
       context.request.changeset.unitID,
@@ -454,6 +501,17 @@ export function createCollaborationStack(
       await ticketStore.dispose();
     },
   };
+}
+
+function requireWorkspaceLifecycleRequest(
+  customData: Record<PropertyKey, unknown>
+): void {
+  if (customData[WORKSPACE_LIFECYCLE_REQUEST] !== true) {
+    throw new CollabError(
+      "PERMISSION_DENIED",
+      "Unit lifecycle must use the Workspace application"
+    );
+  }
 }
 
 const UNIT_RENAME_MUTATIONS = new Set([
