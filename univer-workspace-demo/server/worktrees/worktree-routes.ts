@@ -1,4 +1,5 @@
-import type { IChangeset } from "@univerjs/protocol";
+import { UniverType, type IChangeset } from "@univerjs/protocol";
+import type { IDocumentData } from "@univerjs/core";
 import { CollabError } from "@univerjs/collaboration-service";
 import { json, Router } from "express";
 import type { AuthService } from "../auth.js";
@@ -189,16 +190,39 @@ function parseCreateUnitBody(
   if (!Number.isSafeInteger(value.type)) {
     throw invalid("type must be an integer");
   }
+  const unitID = requiredString(value.unitID, "unitID");
+  const type = value.type as CreateWorkspaceWorktreeUnitInput["type"];
+  const initialData = parseInitialDocumentData(value.initialData, unitID, type);
   return {
     resourceID: requiredString(value.resourceID, "resourceID"),
-    unitID: requiredString(value.unitID, "unitID"),
+    unitID,
     spaceID: requiredString(value.spaceID, "spaceID"),
     ...(value.parentID === undefined || value.parentID === null
       ? { parentID: null }
       : { parentID: requiredString(value.parentID, "parentID") }),
     name: requiredString(value.name, "name"),
-    type: value.type as CreateWorkspaceWorktreeUnitInput["type"],
+    type,
+    ...(initialData === undefined ? {} : { initialData }),
   };
+}
+
+function parseInitialDocumentData(
+  value: unknown,
+  unitID: string,
+  type: CreateWorkspaceWorktreeUnitInput["type"]
+): IDocumentData | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value)) throw invalid("initialData must be an object");
+  if (type !== UniverType.UNIVER_DOC) {
+    throw invalid("initialData currently supports Doc Units only");
+  }
+  if (value.id !== unitID) {
+    throw invalid("initialData.id must match unitID");
+  }
+  if (value.rev !== 1) {
+    throw invalid("initialData.rev must be 1");
+  }
+  return value as unknown as IDocumentData;
 }
 
 function parseChangeset(value: unknown): IChangeset {

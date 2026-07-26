@@ -1,4 +1,5 @@
-import type { IChangeset } from "@univerjs/protocol";
+import { createHash } from "node:crypto";
+import { UniverType, type IChangeset } from "@univerjs/protocol";
 import { CollabError, type CollabSession } from "@univerjs/collaboration-service";
 import type {
   IUniverCollabWorktreeService,
@@ -318,11 +319,24 @@ export function createWorkspaceWorktreeApplication(input: {
             "Pending operation contains an unsupported Unit type"
           );
         }
-        const initial = createInitialUnit(
-          staged.type,
-          staged.unitID,
-          staged.name
-        );
+        if (
+          operation.initialData !== undefined &&
+          staged.type !== UniverType.UNIVER_DOC
+        ) {
+          throw new CollabError(
+            "INTERNAL_ERROR",
+            "Pending initialData operation must create a Doc Unit"
+          );
+        }
+        const initial = operation.initialData
+          ? {
+              kind: "data" as const,
+              input: {
+                type: UniverType.UNIVER_DOC as const,
+                data: operation.initialData,
+              },
+            }
+          : createInitialUnit(staged.type, staged.unitID, staged.name);
         if (initial.kind === "data") {
           await service.createUnitFromData(
             { worktreeID: staged.worktreeID, ...initial.input },
@@ -531,6 +545,28 @@ export function createWorkspaceWorktreeApplication(input: {
         throw new CollabError("INVALID_REQUEST", "Unsupported Unit type");
       }
       if (
+        unitInput.initialData !== undefined &&
+        unitInput.type !== UniverType.UNIVER_DOC
+      ) {
+        throw new CollabError(
+          "INVALID_REQUEST",
+          "initialData currently supports Doc Units only"
+        );
+      }
+      if (
+        unitInput.initialData !== undefined &&
+        (unitInput.initialData.id !== unitInput.unitID ||
+          unitInput.initialData.rev !== 1)
+      ) {
+        throw new CollabError(
+          "INVALID_REQUEST",
+          "initialData identity and initial revision must match the requested Unit"
+        );
+      }
+      const initialDataFingerprint = fingerprintInitialData(
+        unitInput.initialData
+      );
+      if (
         productStore.getByID(unitInput.resourceID) ||
         productStore.getByUnitID(unitInput.unitID)
       ) {
@@ -552,7 +588,8 @@ export function createWorkspaceWorktreeApplication(input: {
           staged.parentID !== (unitInput.parentID ?? null) ||
           staged.name !== requiredName(unitInput.name) ||
           staged.type !== unitInput.type ||
-          staged.createdBy !== actorUserID
+          staged.createdBy !== actorUserID ||
+          staged.initialDataFingerprint !== initialDataFingerprint
         ) {
           throw new CollabError(
             "INVALID_REQUEST",
@@ -560,15 +597,6 @@ export function createWorkspaceWorktreeApplication(input: {
           );
         }
         return hydrate(actorUserID, record);
-      }
-      if (
-        catalog.getStagedResource(unitInput.resourceID) ||
-        catalog.getStagedResourceByUnitID(unitInput.unitID)
-      ) {
-        throw new CollabError(
-          "INVALID_REQUEST",
-          "Resource or Unit identity is already in use"
-        );
       }
       const target = productStore.getSpace(unitInput.spaceID);
       const role = target
@@ -600,7 +628,7 @@ export function createWorkspaceWorktreeApplication(input: {
           throw new CollabError("UNIT_NOT_FOUND", "Target folder is unavailable");
         }
       }
-      const operation = catalog.beginOperation({
+      const operationInput: WorkspaceWorktreeOperation = {
         operationID: operationID(
           "create-unit",
           worktreeID,
@@ -617,8 +645,41 @@ export function createWorkspaceWorktreeApplication(input: {
           name: requiredName(unitInput.name),
           type: unitInput.type,
           createdBy: actorUserID,
+          ...(initialDataFingerprint === undefined
+            ? {}
+            : { initialDataFingerprint }),
         },
-      });
+        ...(unitInput.initialData === undefined
+          ? {}
+          : { initialData: unitInput.initialData }),
+      };
+      const stagedIdentityExists =
+        catalog.getStagedResource(unitInput.resourceID) !== null ||
+        catalog.getStagedResourceByUnitID(unitInput.unitID) !== null;
+      if (
+        stagedIdentityExists &&
+        catalog.getPendingOperation(operationInput.operationID) === null
+      ) {
+        throw new CollabError(
+          "INVALID_REQUEST",
+          "Resource or Unit identity is already in use"
+        );
+      }
+      let operation: PendingWorkspaceWorktreeOperation;
+      try {
+        operation = catalog.beginOperation(operationInput);
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === "Operation identity already uses different input"
+        ) {
+          throw new CollabError(
+            "INVALID_REQUEST",
+            "Unit identity already uses different input"
+          );
+        }
+        throw error;
+      }
       await runOperation(operation);
       return hydrate(actorUserID, requireCatalog(worktreeID));
     },
@@ -919,4 +980,21 @@ function operationID(
   ...identities: readonly string[]
 ): string {
   return `${kind}:${identities.join(":")}`;
+}
+
+function fingerprintInitialData(value: unknown): string | undefined {
+  if (value === undefined) return undefined;
+  return createHash("sha256")
+    .update(JSON.stringify(canonicalizeJson(value)))
+    .digest("hex");
+}
+
+function canonicalizeJson(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalizeJson);
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+      .map(([key, entry]) => [key, canonicalizeJson(entry)])
+  );
 }

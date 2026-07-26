@@ -208,6 +208,32 @@ History 是 confirmed changeset 的最终一致派生索引。Workspace Demo 使
 - `POST /api/worktrees/:worktreeID/merge`
 - `POST /api/worktrees/:worktreeID/discard`
 
+`POST /api/worktrees/:worktreeID/units/new` 除模板创建外，也允许 Doc 调用方提交完整初始数据：
+
+```json
+{
+  "resourceID": "paper-doc",
+  "unitID": "paper-doc",
+  "spaceID": "personal-space-id",
+  "parentID": null,
+  "name": "Paper",
+  "type": 1,
+  "initialData": {
+    "id": "paper-doc",
+    "rev": 1,
+    "title": "Paper",
+    "body": { "dataStream": "..." },
+    "documentStyle": { "pageSize": { "width": 960, "height": 1122.67 } }
+  }
+}
+```
+
+带 `initialData` 时只支持 Doc（`type = 1`），且 `initialData.id` 必须等于 `unitID`、`rev`
+必须为 `1`。完整数据随 create operation journal 持久化，并由 `createUnitFromData` 一次生成
+初始 snapshot；服务端不会先创建空 Doc。响应未知时应使用完全相同的
+`worktreeID / unitID / resourceID / metadata / initialData` 重试。相同 identity 的不同输入会被拒绝。
+新 resource 仍处于 `staged`，只有 Worktree merge 后才激活。
+
 ## Spike 边界
 
 当前不包含公开链接、匿名访问、组织/群组同步、团队所有权转移、节点移动、永久删除，

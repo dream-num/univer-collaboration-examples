@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { isDeepStrictEqual } from "node:util";
 import type { UniverType } from "@univerjs/protocol";
+import type { IDocumentData } from "@univerjs/core";
 import type {
   StagedResourceStatus,
   WorkspaceWorktreeScope,
@@ -38,6 +39,7 @@ export interface StagedResourceRecord {
   readonly name: string;
   readonly type: UniverType;
   readonly createdBy: string;
+  readonly initialDataFingerprint?: string;
   readonly status: StagedResourceStatus;
   readonly createdAt: number;
   readonly updatedAt: number;
@@ -81,6 +83,7 @@ export type WorkspaceWorktreeOperation =
         StagedResourceRecord,
         "status" | "createdAt" | "updatedAt"
       >;
+      readonly initialData?: IDocumentData;
     };
 
 export type PendingWorkspaceWorktreeOperation =
@@ -119,6 +122,7 @@ interface StagedRow {
   readonly name: string;
   readonly unit_type: number;
   readonly created_by: string;
+  readonly initial_data_fingerprint: string | null;
   readonly status: StagedResourceStatus;
   readonly created_at: number;
   readonly updated_at: number;
@@ -181,6 +185,7 @@ export class WorkspaceWorktreeCatalog {
         name TEXT NOT NULL,
         unit_type INTEGER NOT NULL,
         created_by TEXT NOT NULL,
+        initial_data_fingerprint TEXT,
         status TEXT NOT NULL
           CHECK (status IN ('staged', 'activation-pending', 'active', 'discarded')),
         created_at INTEGER NOT NULL,
@@ -415,6 +420,7 @@ export class WorkspaceWorktreeCatalog {
     readonly name: string;
     readonly type: UniverType;
     readonly createdBy: string;
+    readonly initialDataFingerprint?: string;
   }): StagedResourceRecord {
     const existing = this.getStagedResource(input.resourceID);
     if (existing) {
@@ -426,8 +432,9 @@ export class WorkspaceWorktreeCatalog {
       .prepare(
         `INSERT INTO workspace_staged_resources
           (resource_id, worktree_id, unit_id, space_id, parent_id, name,
-           unit_type, created_by, status, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'staged', ?, ?)`
+           unit_type, created_by, initial_data_fingerprint, status,
+           created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'staged', ?, ?)`
       )
       .run(
         input.resourceID,
@@ -438,6 +445,7 @@ export class WorkspaceWorktreeCatalog {
         input.name,
         input.type,
         input.createdBy,
+        input.initialDataFingerprint ?? null,
         now,
         now
       );
@@ -448,7 +456,8 @@ export class WorkspaceWorktreeCatalog {
     const row = this._database
       .prepare(
         `SELECT resource_id, worktree_id, unit_id, space_id, parent_id, name,
-                unit_type, created_by, status, created_at, updated_at
+                unit_type, created_by, initial_data_fingerprint, status,
+                created_at, updated_at
          FROM workspace_staged_resources WHERE resource_id = ?`
       )
       .get(resourceID) as StagedRow | undefined;
@@ -459,7 +468,8 @@ export class WorkspaceWorktreeCatalog {
     const row = this._database
       .prepare(
         `SELECT resource_id, worktree_id, unit_id, space_id, parent_id, name,
-                unit_type, created_by, status, created_at, updated_at
+                unit_type, created_by, initial_data_fingerprint, status,
+                created_at, updated_at
          FROM workspace_staged_resources WHERE unit_id = ?`
       )
       .get(unitID) as StagedRow | undefined;
@@ -470,7 +480,8 @@ export class WorkspaceWorktreeCatalog {
     const rows = this._database
       .prepare(
         `SELECT resource_id, worktree_id, unit_id, space_id, parent_id, name,
-                unit_type, created_by, status, created_at, updated_at
+                unit_type, created_by, initial_data_fingerprint, status,
+                created_at, updated_at
          FROM workspace_staged_resources
          WHERE worktree_id = ?
          ORDER BY created_at, resource_id`
@@ -557,6 +568,13 @@ export class WorkspaceWorktreeCatalog {
     return rows.map(toOperation);
   }
 
+  getPendingOperation(
+    operationID: string
+  ): PendingWorkspaceWorktreeOperation | null {
+    this._assertOpen();
+    return this._getOperation(operationID);
+  }
+
   completeOperation(operationID: string): void {
     this._assertOpen();
     this._database
@@ -640,6 +658,9 @@ function toStaged(row: StagedRow): StagedResourceRecord {
     name: row.name,
     type: row.unit_type as UniverType,
     createdBy: row.created_by,
+    ...(row.initial_data_fingerprint === null
+      ? {}
+      : { initialDataFingerprint: row.initial_data_fingerprint }),
     status: row.status,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -657,7 +678,8 @@ function assertSameStagedResource(
     existing.parentID !== input.parentID ||
     existing.name !== input.name ||
     existing.type !== input.type ||
-    existing.createdBy !== input.createdBy
+    existing.createdBy !== input.createdBy ||
+    existing.initialDataFingerprint !== input.initialDataFingerprint
   ) {
     throw new Error("Staged resource identity already uses different input");
   }

@@ -2,12 +2,13 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { UniverType } from "@univerjs/protocol";
-import { JSON1 } from "@univerjs/core";
+import { ErrorCode, UniverType } from "@univerjs/protocol";
+import { JSON1, type IDocumentData } from "@univerjs/core";
 import { CollabError } from "@univerjs/collaboration-service";
 import { afterEach, describe, expect, it } from "vitest";
 import type { WorkspaceApplication } from "../server/application.js";
 import { createWorkspaceApplication } from "../server/application.js";
+import { createInitialUnit } from "../server/unit-data.js";
 
 const applications: WorkspaceApplication[] = [];
 const directories: string[] = [];
@@ -22,6 +23,214 @@ afterEach(async () => {
 });
 
 describe("Workspace Worktree application", () => {
+  it("creates a Worktree-local Doc from complete initial data", async () => {
+    const origin = await startApplication();
+    const application = applications.at(-1)!;
+    const cookie = await login(origin);
+    const personal = await personalSpace(origin, cookie);
+    const worktreeID = randomUUID();
+    const resourceID = randomUUID();
+    const unitID = randomUUID();
+    await request(`${origin}/api/worktrees`, cookie, {
+      method: "POST",
+      body: {
+        worktreeID,
+        name: "Typst apply",
+        scope: { kind: "user" },
+      },
+    });
+    const initial = createInitialUnit(
+      UniverType.UNIVER_DOC,
+      unitID,
+      "Typst title"
+    );
+    if (initial.kind !== "data") throw new Error("Expected Doc data");
+    const initialData = {
+      ...(initial.input.data as IDocumentData),
+      documentStyle: {
+        ...(initial.input.data as IDocumentData).documentStyle,
+        marginLeft: 137,
+      },
+    };
+
+    const created = await request<{
+      worktree: {
+        units: Array<{
+          resourceID: string;
+          unitID: string;
+          resourceStatus: string;
+        }>;
+      };
+    }>(`${origin}/api/worktrees/${worktreeID}/units/new`, cookie, {
+      method: "POST",
+      body: {
+        resourceID,
+        unitID,
+        spaceID: personal.id,
+        name: "Product metadata name",
+        type: UniverType.UNIVER_DOC,
+        initialData,
+      },
+    });
+
+    expect(created.response.status).toBe(201);
+    expect(created.body.worktree.units).toEqual([
+      expect.objectContaining({
+        resourceID,
+        unitID,
+        resourceStatus: "staged",
+      }),
+    ]);
+    const unit = await application.worktreeService.getUnit(
+      {
+        worktreeID,
+        unitID,
+        type: UniverType.UNIVER_DOC,
+        revision: 0,
+      },
+      {
+        session: {
+          memberId: "typst-readback",
+          userId: "user-alice",
+          customData: Object.create(null) as Record<string, unknown>,
+        },
+      }
+    );
+    const documentData = JSON.parse(
+      new TextDecoder().decode(unit.snapshot.doc!.originalMeta)
+    ) as IDocumentData;
+    expect(unit.snapshot).toMatchObject({
+      unitID,
+      doc: { name: "Typst title" },
+    });
+    expect(documentData).toMatchObject({
+      documentStyle: { marginLeft: 137 },
+    });
+  });
+
+  it("rejects different initial data when a completed create identity is retried", async () => {
+    const origin = await startApplication();
+    const cookie = await login(origin);
+    const personal = await personalSpace(origin, cookie);
+    const worktreeID = randomUUID();
+    const resourceID = randomUUID();
+    const unitID = randomUUID();
+    await request(`${origin}/api/worktrees`, cookie, {
+      method: "POST",
+      body: {
+        worktreeID,
+        name: "Idempotent Typst apply",
+        scope: { kind: "user" },
+      },
+    });
+    const initial = createInitialUnit(
+      UniverType.UNIVER_DOC,
+      unitID,
+      "Stable title"
+    );
+    if (initial.kind !== "data") throw new Error("Expected Doc data");
+    const initialData = {
+      ...(initial.input.data as IDocumentData),
+      documentStyle: {
+        ...(initial.input.data as IDocumentData).documentStyle,
+        marginLeft: 137,
+      },
+    };
+    const body = {
+      resourceID,
+      unitID,
+      spaceID: personal.id,
+      name: "Stable metadata",
+      type: UniverType.UNIVER_DOC,
+      initialData,
+    };
+
+    const first = await request(
+      `${origin}/api/worktrees/${worktreeID}/units/new`,
+      cookie,
+      { method: "POST", body }
+    );
+    const same = await request(
+      `${origin}/api/worktrees/${worktreeID}/units/new`,
+      cookie,
+      { method: "POST", body }
+    );
+    const different = await request<{ error?: { code?: string } }>(
+      `${origin}/api/worktrees/${worktreeID}/units/new`,
+      cookie,
+      {
+        method: "POST",
+        body: {
+          ...body,
+          initialData: {
+            ...initialData,
+            documentStyle: { ...initialData.documentStyle, marginLeft: 138 },
+          },
+        },
+      }
+    );
+
+    expect(first.response.status).toBe(201);
+    expect(same.response.status).toBe(201);
+    expect(different.response.status).toBe(400);
+    expect(different.body.error?.code).toBe(ErrorCode.INVALID_ARGUMENT);
+  });
+
+  it.each([
+    {
+      label: "a mismatched ID",
+      type: UniverType.UNIVER_DOC,
+      mutate: (data: IDocumentData) => ({ ...data, id: "other-unit" }),
+    },
+    {
+      label: "a non-initial revision",
+      type: UniverType.UNIVER_DOC,
+      mutate: (data: IDocumentData) => ({ ...data, rev: 2 }),
+    },
+    {
+      label: "a non-Doc type",
+      type: UniverType.UNIVER_SHEET,
+      mutate: (data: IDocumentData) => data,
+    },
+  ])("rejects initial data with $label before staging", async ({ type, mutate }) => {
+    const origin = await startApplication();
+    const cookie = await login(origin);
+    const personal = await personalSpace(origin, cookie);
+    const worktreeID = randomUUID();
+    const resourceID = randomUUID();
+    const unitID = randomUUID();
+    await request(`${origin}/api/worktrees`, cookie, {
+      method: "POST",
+      body: { worktreeID, name: "Invalid initial data", scope: { kind: "user" } },
+    });
+    const initial = createInitialUnit(UniverType.UNIVER_DOC, unitID, "Invalid");
+    if (initial.kind !== "data") throw new Error("Expected Doc data");
+
+    const result = await request<{ error?: { code?: number } }>(
+      `${origin}/api/worktrees/${worktreeID}/units/new`,
+      cookie,
+      {
+        method: "POST",
+        body: {
+          resourceID,
+          unitID,
+          spaceID: personal.id,
+          name: "Invalid",
+          type,
+          initialData: mutate(initial.input.data as IDocumentData),
+        },
+      }
+    );
+    const worktree = await request<{ worktree: { units: unknown[] } }>(
+      `${origin}/api/worktrees/${worktreeID}`,
+      cookie
+    );
+
+    expect(result.response.status).toBe(400);
+    expect(result.body.error?.code).toBe(ErrorCode.INVALID_ARGUMENT);
+    expect(worktree.body.worktree.units).toEqual([]);
+  });
+
   it("submits structured changeset results without changing the Comb protocol", async () => {
     const origin = await startApplication();
     const cookie = await login(origin);

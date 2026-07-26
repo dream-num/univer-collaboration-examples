@@ -1,4 +1,5 @@
 import type { IChangeset, UniverType } from "@univerjs/protocol";
+import type { IDocumentData } from "@univerjs/core";
 import type {
   WorktreeMergeError,
   WorktreeStatus,
@@ -72,6 +73,7 @@ export interface CreateWorkspaceWorktreeUnitInput {
   readonly parentID?: string | null;
   readonly name: string;
   readonly type: UniverType;
+  readonly initialData?: IDocumentData;
 }
 
 export type SubmitWorkspaceChangesetResult =
