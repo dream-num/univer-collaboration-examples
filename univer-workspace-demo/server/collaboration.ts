@@ -7,7 +7,7 @@ import {
   DefaultHistoryPolicy,
   UniverHistoryService,
   type IHistoryDatabaseAdapter,
-} from "@univerjs/collaboration-history";
+} from "@univerjs/collaboration-history-service";
 import { UniverHistoryEndpoint } from "@univerjs/collaboration-history-endpoint";
 import {
   CollabError,
