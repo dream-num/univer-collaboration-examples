@@ -32,9 +32,10 @@
   提供 Drawing、Chart、Table、List、Shape、Callout、Code、Quote、Column、LaTeX、
   Hyperlink、评论、导入和打印；Slide 提供 Drawing、Chart、Table、导入和打印；
   Board 提供 Ink、Chart、Mind Map、Table、LaTeX 和导入；Base 使用官方核心组合。
-  多类型编辑器不额外创建 Formula、Pivot 或 History Worker。
-- 五种 Unit 按 URL 中的 Unit type 动态加载对应编辑器；Base 使用独立 Vite Worker
-  承载 RPC 与公式远端模型。
+  Sheet Edit History 使用独立 Vite Worker 计算历史版本中的公式；其它编辑器不额外
+  创建 Formula、Pivot 或 History Worker。
+- 五种 Unit 按 URL 中的 Unit type 动态加载对应编辑器；Base 使用另一套独立 Vite
+  Worker 承载 RPC 与公式远端模型。
 - Creator 可以在个人或团队 Scope 创建 Worktree；个人 Worktree 只对 Creator 可见，
   团队 Worktree 可选择仅 Creator 或当前团队成员可见。
 - Worktree 可以引用当前用户可编辑的现有 Unit，也可以创建仅存在于 Worktree 的

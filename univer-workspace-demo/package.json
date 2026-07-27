@@ -116,6 +116,7 @@
     "@univerjs/sheets-filter": "1.0.0-alpha.7",
     "@univerjs/sheets-filter-ui": "1.0.0-alpha.7",
     "@univerjs/sheets-find-replace": "1.0.0-alpha.7",
+    "@univerjs/sheets-formula": "1.0.0-alpha.7",
     "@univerjs/sheets-hyper-link": "1.0.0-alpha.7",
     "@univerjs/sheets-hyper-link-ui": "1.0.0-alpha.7",
     "@univerjs/sheets-note": "1.0.0-alpha.7",

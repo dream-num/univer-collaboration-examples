@@ -116,13 +116,14 @@ export function enforceReadOnlyReview(univer: Univer): void {
   });
 }
 
-export function historyPlugins(): IPresetPlugin[] {
+export function historyPlugins(workerURL: string): IPresetPlugin[] {
   return [
     [
       UniverEditHistoryLoaderPlugin,
       {
         historyListServerUrl: `${httpProtocol}://${host}/universer-api/history`,
         univerContainerId: "univer-container",
+        workerURL,
       },
     ],
   ];

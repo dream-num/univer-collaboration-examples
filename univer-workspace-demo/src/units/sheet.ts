@@ -27,6 +27,7 @@ import {
   getSheetFeaturePlugins,
   sheetFeatureLocale,
 } from "./sheet-features.js";
+import historyWorkerURL from "./history-worker.ts?worker&url";
 
 import "@univerjs/preset-sheets-core/lib/index.css";
 
@@ -58,7 +59,7 @@ const { univer } = createUniver({
     ...getSheetFeaturePlugins(),
     ...collaborationPlugins(),
     ...getSheetCollaborationFeaturePlugins(),
-    ...historyPlugins(),
+    ...historyPlugins(historyWorkerURL),
   ],
 });
 
