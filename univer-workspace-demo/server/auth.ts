@@ -14,7 +14,7 @@ import { PRESET_USERS } from "../shared/preset-users.js";
 
 const scrypt = promisify(scryptCallback);
 const COOKIE_NAME = "univer_workspace_session";
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 interface UserRow {
   readonly user_id: string;

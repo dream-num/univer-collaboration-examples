@@ -21,6 +21,21 @@ afterEach(async () => {
 });
 
 describe("univer-workspace-demo spaces", () => {
+  it("issues login sessions that remain valid for seven days", async () => {
+    const origin = await startApplication();
+    const response = await fetch(`${origin}/api/auth/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        username: "alice",
+        password: "alice-password",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toContain("Max-Age=604800");
+  });
+
   it("applies the first Base mutation in the trunk runtime", async () => {
     const origin = await startApplication();
     const application = applications.at(-1)!;
