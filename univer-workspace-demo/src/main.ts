@@ -1,5 +1,4 @@
 import { UniverInstanceType } from "@univerjs/core";
-import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
 import { PRESET_USERS } from "../shared/preset-users.js";
 import {
   resolveEditorAccess,
@@ -16,7 +15,10 @@ import {
   outstandingWorktreeCount,
   worktreeCountBadge,
 } from "./worktrees/task-count.js";
-import { resolveMergeReview } from "./worktrees/merge-review.js";
+import {
+  loadMergeReviewEvaluation,
+  resolveMergeReview,
+} from "./worktrees/merge-review.js";
 import {
   configureReviewCollaboration,
 } from "./collaboration.js";
@@ -105,15 +107,12 @@ async function renderWorktreeReviewEditor(
     return;
   }
   if (mode === "merge") {
-    const preview = await api<{
-      evaluation: {
-        readonly status: string;
-        readonly preview?: SaveSnapshotInput;
-      };
-    }>(
-      `/universer-api/worktrees/${encodeURIComponent(worktreeID)}/units/${encodeURIComponent(reviewUnitID)}/merge-preview`
-    );
-    const resolution = resolveMergeReview(worktreeID, preview.evaluation);
+    const evaluation = await loadMergeReviewEvaluation({
+      origin: window.location.origin,
+      worktreeID,
+      unitID: reviewUnitID,
+    });
+    const resolution = resolveMergeReview(worktreeID, evaluation);
     if ("unavailable" in resolution) {
       renderReviewUnavailable(
         resolution.unavailable === "conflict"

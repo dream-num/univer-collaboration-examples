@@ -1,4 +1,9 @@
 import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
+import type { WorktreeUnitMergeEvaluation } from "@univerjs/collaboration-worktree-service";
+import {
+  WorktreeClient,
+  type WorktreeFetch,
+} from "@univerjs/collaboration-worktree-client/management";
 import type { ReviewCollaborationScope } from "../collaboration.js";
 
 export interface MergeReviewEvaluation {
@@ -6,9 +11,25 @@ export interface MergeReviewEvaluation {
   readonly preview?: SaveSnapshotInput;
 }
 
+export interface LoadMergeReviewEvaluationOptions {
+  readonly origin: string;
+  readonly worktreeID: string;
+  readonly unitID: string;
+  readonly fetch?: WorktreeFetch;
+}
+
 export type MergeReviewResolution =
   | { readonly scope: ReviewCollaborationScope }
   | { readonly unavailable: "conflict" | "missing" };
+
+export function loadMergeReviewEvaluation(
+  options: LoadMergeReviewEvaluationOptions
+): Promise<WorktreeUnitMergeEvaluation> {
+  return new WorktreeClient({
+    origin: options.origin,
+    ...(options.fetch === undefined ? {} : { fetch: options.fetch }),
+  }).evaluateUnitMerge(options.worktreeID, options.unitID);
+}
 
 export function resolveMergeReview(
   worktreeID: string,
