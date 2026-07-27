@@ -14,7 +14,6 @@ import {
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import { UniverEditHistoryLoaderPlugin } from "@univerjs-pro/edit-history-loader";
 import {
-  CommandType,
   IUniverInstanceService,
   type UnitModel,
   Univer,
@@ -27,6 +26,7 @@ import {
   createWorktreeMergePreviewConfig,
 } from "@univerjs/collaboration-worktree-client";
 import { HTTPService } from "@univerjs/network";
+import { shouldCancelReadOnlyReviewCommand } from "./read-only-review.js";
 
 const secure = window.location.protocol === "https:";
 const httpProtocol = secure ? "https" : "http";
@@ -103,13 +103,7 @@ export function enforceReadOnlyReview(univer: Univer): void {
   const univerAPI = FUniver.newAPI(univer);
   univerAPI.getHooks().onSteady(() => {
     univerAPI.addEvent(univerAPI.Event.BeforeCommandExecute, (event) => {
-      if (event.options?.fromCollab || event.options?.fromChangeset) {
-        return;
-      }
-      if (
-        event.type === CommandType.COMMAND ||
-        event.type === CommandType.MUTATION
-      ) {
+      if (shouldCancelReadOnlyReviewCommand(event)) {
         event.cancel = true;
       }
     });
