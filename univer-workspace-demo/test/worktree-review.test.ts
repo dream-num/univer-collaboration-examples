@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  documentChangeKind,
   lifecycleActions,
   reviewUnitUrl,
   worktreeReviewView,
@@ -94,7 +95,9 @@ describe("Worktree review UI", () => {
     expect(html).not.toContain(
       'class="task-tree-group task-tree-group-processed" open'
     );
-    expect(html).toContain('class="task-document-item active"');
+    expect(html).toContain(
+      'class="task-document-item document-change-modified active"'
+    );
     expect(html).toContain("data-worktree-unit");
 
     const processedOnly = worktreeReviewView({
@@ -148,5 +151,55 @@ describe("Worktree review UI", () => {
     expect(html).toContain("画板 · 正式版本 r1 → AI 修改版 r2");
     expect(html).toContain("多维表格 · 正式版本 r1 → AI 修改版 r2");
     expect(html).not.toContain("文档类型 6");
+  });
+
+  it("labels and summarizes modified, added, deleted, and unchanged documents", () => {
+    const modified = worktree.units[0]!;
+    const { mergeResult: _mergeResult, ...unitWithoutMergeResult } = modified;
+    const added: ReviewWorktree["units"][number] = {
+      ...unitWithoutMergeResult,
+      unitID: "added",
+      source: "worktree" as const,
+      resourceStatus: "staged",
+      baselineTrunkRevision: null,
+      draftHeadRevision: 1,
+      readyDraftHeadRevision: 1,
+    };
+    const deleted: ReviewWorktree["units"][number] = {
+      ...unitWithoutMergeResult,
+      unitID: "deleted",
+      resourceStatus: "deleted",
+    };
+    const unchanged: ReviewWorktree["units"][number] = {
+      ...unitWithoutMergeResult,
+      unitID: "unchanged",
+      baselineTrunkRevision: 3,
+      draftHeadRevision: 3,
+      readyDraftHeadRevision: 3,
+      mergeResult: { status: "unchanged" as const },
+    };
+    const units = [modified, added, deleted, unchanged];
+    const html = worktreeReviewView({
+      worktrees: [{ ...worktree, units }],
+      selectedWorktreeID: worktree.worktreeID,
+      selectedUnitID: modified.unitID,
+      mode: "draft",
+      filter: "all",
+      scope: "all",
+      spaces: [],
+    });
+
+    expect(units.map(documentChangeKind)).toEqual([
+      "modified",
+      "added",
+      "deleted",
+      "unchanged",
+    ]);
+    expect(html).toContain("1 修改 · 1 新增 · 1 删除 · 1 未改动");
+    expect(html).toContain("document-change-badge-modified");
+    expect(html).toContain("document-change-badge-added");
+    expect(html).toContain("document-change-badge-deleted");
+    expect(html).toContain("document-change-badge-unchanged");
+    expect(html).not.toContain("review-preview-toolbar");
   });
 });

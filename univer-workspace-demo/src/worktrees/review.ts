@@ -1,6 +1,11 @@
 import { UniverType } from "@univerjs/protocol";
 
 export type ReviewMode = "trunk" | "draft" | "merge";
+export type DocumentChangeKind =
+  | "modified"
+  | "added"
+  | "deleted"
+  | "unchanged";
 export type ReviewWorktreeFilter =
   | "all"
   | "running"
@@ -243,6 +248,7 @@ function taskTreeItem(
   selectedUnit: ReviewWorktreeUnit | undefined,
   defaultOpen: boolean
 ): string {
+  const changeSummary = documentChangeSummary(worktree.units);
   return `
     <details class="task-tree-item${selected ? " active" : ""}"${defaultOpen ? " open" : ""}>
       <summary>
@@ -250,6 +256,7 @@ function taskTreeItem(
         <span class="task-tree-title">
           <strong>${escapeHtml(worktree.name)}</strong>
           <small>${escapeHtml(worktree.creatorName)} · ${formatTime(worktree.updatedAt)}</small>
+          <small class="task-change-summary">${changeSummary}</small>
         </span>
         <i class="review-status review-status-${worktree.status}">${statusLabel(worktree.status)}</i>
       </summary>
@@ -257,13 +264,14 @@ function taskTreeItem(
         ${
           worktree.units.length
             ? worktree.units
-                .map(
-                  (unit) => `
+                .map((unit) => {
+                  const changeKind = documentChangeKind(unit);
+                  return `
                     <button
                       type="button"
                       data-worktree-id="${escapeHtml(worktree.worktreeID)}"
                       data-worktree-unit="${escapeHtml(unit.unitID)}"
-                      class="task-document-item${unit.unitID === selectedUnit?.unitID ? " active" : ""}"
+                      class="task-document-item document-change-${changeKind}${unit.unitID === selectedUnit?.unitID ? " active" : ""}"
                     >
                       <span class="task-document-branch" aria-hidden="true"></span>
                       <span class="unit-type unit-type-${unit.type}">${unitTypeLabel(unit.type)}</span>
@@ -272,8 +280,9 @@ function taskTreeItem(
                         <small>${documentVersionLabel(unit)}</small>
                         ${mergeResult(unit)}
                       </span>
-                    </button>`
-                )
+                      ${documentChangeBadge(changeKind)}
+                    </button>`;
+                })
                 .join("")
             : `<div class="review-empty"><p>这个任务还没有文档。</p></div>`
         }
@@ -289,28 +298,8 @@ function worktreeDetail(
 ): string {
   const actions = lifecycleActions(worktree);
   return `
-    <header class="worktree-detail-header">
-      <div class="review-title-line">
-        <span>${escapeHtml(worktree.name)} · ${statusLabel(worktree.status)}</span>
-        <h2>${escapeHtml(selectedUnit?.name ?? worktree.name)}</h2>
-        <small>${escapeHtml(worktree.summary ?? "没有任务说明")}</small>
-      </div>
-      <div class="worktree-actions">
-        ${actions
-          .map(
-            (action) =>
-              `<button
-                type="button"
-                class="${action === "merge" || action === "ready" ? "primary-button" : "secondary-button"}"
-                data-worktree-action="${action}"
-                data-worktree-id="${escapeHtml(worktree.worktreeID)}"
-              >${actionLabel(action)}</button>`
-          )
-          .join("")}
-      </div>
-    </header>
     <div class="worktree-unit-preview">
-      ${selectedUnit ? unitPreview(worktree, selectedUnit, mode) : ""}
+      ${selectedUnit ? unitPreview(worktree, selectedUnit, mode, actions) : ""}
     </div>
     <details class="worktree-task-information">
       <summary><span aria-hidden="true">ⓘ</span><strong>任务信息</strong><span class="task-information-chevron" aria-hidden="true">⌃</span></summary>
@@ -327,15 +316,21 @@ function worktreeDetail(
 function unitPreview(
   worktree: ReviewWorktree,
   unit: ReviewWorktreeUnit,
-  requestedMode: ReviewMode
+  requestedMode: ReviewMode,
+  actions: readonly ReviewLifecycleAction[]
 ): string {
   const modes = availableModes(worktree, unit);
   const mode = modes.includes(requestedMode) ? requestedMode : modes[0]!;
+  const changeKind = documentChangeKind(unit);
   return `
-    <div class="review-preview-toolbar">
-      <div>
-        <strong>${documentVersionLabel(unit)}</strong>
-        <span>${modeDescription(mode)}</span>
+    <header class="worktree-detail-header">
+      <div class="review-title-line">
+        <span>${escapeHtml(worktree.name)} · ${statusLabel(worktree.status)}</span>
+        <div class="review-unit-heading">
+          ${documentChangeBadge(changeKind)}
+          <h2>${escapeHtml(unit.name)}</h2>
+        </div>
+        <small>${escapeHtml(worktree.summary ?? "没有任务说明")} · ${documentVersionLabel(unit)}</small>
       </div>
       <div class="review-preview-controls">
         <div class="review-mode-switch" aria-label="预览版本">
@@ -355,7 +350,20 @@ function unitPreview(
           aria-expanded="false"
         ><span aria-hidden="true">↗</span><b>沉浸预览</b></button>
       </div>
-    </div>
+      <div class="worktree-actions">
+        ${actions
+          .map(
+            (action) =>
+              `<button
+                type="button"
+                class="${action === "merge" || action === "ready" ? "primary-button" : "secondary-button"}"
+                data-worktree-action="${action}"
+                data-worktree-id="${escapeHtml(worktree.worktreeID)}"
+              >${actionLabel(action)}</button>`
+          )
+          .join("")}
+      </div>
+    </header>
     <iframe
       id="worktree-preview-frame"
       class="worktree-preview-frame"
@@ -363,6 +371,58 @@ function unitPreview(
       src="${escapeHtml(reviewUnitUrl(worktree.worktreeID, unit, mode))}"
     ></iframe>
   `;
+}
+
+export function documentChangeKind(
+  unit: ReviewWorktreeUnit
+): DocumentChangeKind {
+  if (unit.resourceStatus === "deleted") return "deleted";
+  if (unit.source === "worktree") return "added";
+  if (unit.mergeResult?.status === "unchanged") return "unchanged";
+  return documentDraftRevision(unit) === unit.baselineTrunkRevision
+    ? "unchanged"
+    : "modified";
+}
+
+function documentChangeBadge(kind: DocumentChangeKind): string {
+  const badge = {
+    modified: ["✎", "修改"],
+    added: ["＋", "新增"],
+    deleted: ["×", "删除"],
+    unchanged: ["—", "未改动"],
+  }[kind];
+  return `<span class="document-change-badge document-change-badge-${kind}">
+    <span aria-hidden="true">${badge[0]}</span>${badge[1]}
+  </span>`;
+}
+
+function documentChangeSummary(
+  units: readonly ReviewWorktreeUnit[]
+): string {
+  const counts: Record<DocumentChangeKind, number> = {
+    modified: 0,
+    added: 0,
+    deleted: 0,
+    unchanged: 0,
+  };
+  for (const unit of units) counts[documentChangeKind(unit)] += 1;
+  return (Object.keys(counts) as DocumentChangeKind[])
+    .filter((kind) => counts[kind] > 0)
+    .map((kind) => `${counts[kind]} ${documentChangeLabel(kind)}`)
+    .join(" · ");
+}
+
+function documentChangeLabel(kind: DocumentChangeKind): string {
+  return {
+    modified: "修改",
+    added: "新增",
+    deleted: "删除",
+    unchanged: "未改动",
+  }[kind];
+}
+
+function documentDraftRevision(unit: ReviewWorktreeUnit): number {
+  return unit.readyDraftHeadRevision ?? unit.draftHeadRevision;
 }
 
 function availableModes(
@@ -443,19 +503,18 @@ function unitTypeLabel(type: number): string {
 }
 
 function documentVersionLabel(unit: ReviewWorktreeUnit): string {
+  const changeKind = documentChangeKind(unit);
   const baseline =
     unit.baselineTrunkRevision === null
       ? "新文档"
       : `正式版本 r${unit.baselineTrunkRevision}`;
-  return `${unitTypeLabel(unit.type)} · ${baseline} → AI 修改版 r${unit.draftHeadRevision}`;
-}
-
-function modeDescription(mode: ReviewMode): string {
-  return {
-    trunk: "查看任务开始前的正式内容",
-    draft: "查看 AI 当前生成的内容",
-    merge: "查看合入正式版本后的结果",
-  }[mode];
+  if (changeKind === "deleted") {
+    return `${unitTypeLabel(unit.type)} · ${baseline} → 删除`;
+  }
+  if (changeKind === "unchanged") {
+    return `${unitTypeLabel(unit.type)} · ${baseline} · 未改动`;
+  }
+  return `${unitTypeLabel(unit.type)} · ${baseline} → AI 修改版 r${documentDraftRevision(unit)}`;
 }
 
 function formatTime(timestamp: number): string {

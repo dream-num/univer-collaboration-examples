@@ -134,16 +134,6 @@ async function renderWorktreeReviewEditor(
   document.documentElement.dataset.reviewReadonly = "true";
   app.innerHTML = `
     <div class="editor-shell review-editor-shell">
-      <header class="editor-header">
-        <a class="editor-brand" href="/#worktrees" target="_top">
-          ${logoIcon()}
-          <span>Univer</span>
-        </a>
-        <span class="editor-divider"></span>
-        <span id="editor-title">${escapeHtml(unit.name)}</span>
-        <span class="editor-status">只读 · ${reviewModeName(mode)}</span>
-        <span class="editor-owner">${escapeHtml(worktree.name)}</span>
-      </header>
       <main id="univer-container"></main>
     </div>
   `;
@@ -173,10 +163,6 @@ function renderReviewUnavailable(message: string): void {
       <a class="primary-button editor-route-action" href="/#worktrees" target="_top">返回智能工作台</a>
     </main>
   `;
-}
-
-function reviewModeName(mode: ReviewMode): string {
-  return { trunk: "正式版本", draft: "AI 修改版", merge: "合入预览" }[mode];
 }
 
 function renderAuth(mode: "login" | "register"): void {
