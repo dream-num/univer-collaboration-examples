@@ -1,6 +1,6 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
-import { CollabError } from "@univerjs/collaboration-service";
-import { WorktreeError } from "@univerjs/collaboration-worktree-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
+import { WorktreeError } from "@univerjs-pro/collaboration-worktree-service";
 
 export const notFoundHandler: RequestHandler = (_request, response) => {
   response.status(404).json({

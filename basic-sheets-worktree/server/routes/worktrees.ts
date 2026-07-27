@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import {
   WorktreeError,
   type UniverCollabWorktreeService,
   type WorktreeData,
-} from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-worktree-service";
 import { json, Router } from "express";
 import { DEMO_TRUNK_UNIT_ID } from "../../shared/demo.js";
 import type { DemoUser } from "../demo-user.js";

@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import type {
   CollabSession,
   UniverCollabService,
-} from "@univerjs/collaboration-service";
+} from "@univerjs-pro/collaboration-service";
 import { json, Router } from "express";
 import { UniverType } from "@univerjs/protocol";
 import type { DemoUser } from "../demo-user.js";

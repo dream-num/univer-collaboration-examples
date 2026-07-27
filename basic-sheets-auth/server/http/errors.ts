@@ -1,4 +1,4 @@
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import { ErrorCode } from "@univerjs/protocol";
 import type { ErrorRequestHandler, RequestHandler } from "express";
 

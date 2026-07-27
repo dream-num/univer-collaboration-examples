@@ -1,4 +1,4 @@
-import type { WorktreeStatus } from "@univerjs/collaboration-worktree-service";
+import type { WorktreeStatus } from "@univerjs-pro/collaboration-worktree-service";
 import { UniverType } from "@univerjs/protocol";
 import { describe, expect, it } from "vitest";
 import {

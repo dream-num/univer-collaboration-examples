@@ -7,8 +7,8 @@ import type {
 import {
   UniverType,
 } from "@univerjs/protocol";
-import type { CreateUnitFromDataInput } from "@univerjs/collaboration-service";
-import type { CreateUnitInput } from "@univerjs/collaboration-service";
+import type { CreateUnitFromDataInput } from "@univerjs-pro/collaboration-service";
+import type { CreateUnitInput } from "@univerjs-pro/collaboration-service";
 import { createTemporaryInitialSnapshot } from "./temporary-unit-snapshot.js";
 
 export const CREATABLE_UNIT_TYPES = [

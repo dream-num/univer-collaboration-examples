@@ -7,7 +7,7 @@ import {
 import type { IncomingMessage } from "node:http";
 import { promisify } from "node:util";
 import { DatabaseSync } from "node:sqlite";
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import type { Response } from "express";
 import type { DemoUser } from "./demo-user.js";
 import { PRESET_USERS } from "../shared/preset-users.js";

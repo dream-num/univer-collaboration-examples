@@ -5,7 +5,7 @@ import type {
   WorktreeStatus,
   WorktreeUnitMergeResult,
   WorktreeUnitSource,
-} from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-worktree-service";
 
 export type WorkspaceWorktreeScope =
   | { readonly kind: "user"; readonly userID: string }

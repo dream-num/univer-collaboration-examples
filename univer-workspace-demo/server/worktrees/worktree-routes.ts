@@ -1,6 +1,6 @@
 import { UniverType, type IChangeset } from "@univerjs/protocol";
 import type { IDocumentData } from "@univerjs/core";
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import { json, Router } from "express";
 import type { AuthService } from "../auth.js";
 import type {

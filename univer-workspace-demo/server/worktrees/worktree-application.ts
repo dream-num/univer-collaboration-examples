@@ -1,10 +1,10 @@
 import { createHash } from "node:crypto";
 import { UniverType, type IChangeset } from "@univerjs/protocol";
-import { CollabError, type CollabSession } from "@univerjs/collaboration-service";
+import { CollabError, type CollabSession } from "@univerjs-pro/collaboration-service";
 import type {
   IUniverCollabWorktreeService,
   WorktreeData,
-} from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-worktree-service";
 import type { UserStore } from "../auth.js";
 import type {
   ProductStore,

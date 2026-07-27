@@ -3,13 +3,13 @@ import { createServer, type Server } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import express, { Router } from "express";
-import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
-import { SQLiteWorktreeDatabaseAdapter } from "@univerjs/collaboration-worktree-database-sqlite";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
 import {
   CollabError,
   type UniverCollabService,
-} from "@univerjs/collaboration-service";
-import type { UniverCollabWorktreeService } from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-service";
+import type { UniverCollabWorktreeService } from "@univerjs-pro/collaboration-worktree-service";
 import {
   DEMO_TRUNK_UNIT_ID,
   DEMO_TRUNK_UNIT_TYPE,

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { JSON1, type IDocumentData } from "@univerjs/core";
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import { afterEach, describe, expect, it } from "vitest";
 import type { WorkspaceApplication } from "../server/application.js";
 import { createWorkspaceApplication } from "../server/application.js";

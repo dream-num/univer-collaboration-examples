@@ -2,11 +2,11 @@ import { randomUUID } from "node:crypto";
 import type {
   CollabSession,
   UniverCollabService,
-} from "@univerjs/collaboration-service";
+} from "@univerjs-pro/collaboration-service";
 import {
   CollabError,
   MAX_UNIT_LIFECYCLE_BATCH_SIZE,
-} from "@univerjs/collaboration-service";
+} from "@univerjs-pro/collaboration-service";
 import { ErrorCode, UnitAction, UniverType } from "@univerjs/protocol";
 import { json, Router } from "express";
 import type { AuthService, UserStore } from "./auth.js";

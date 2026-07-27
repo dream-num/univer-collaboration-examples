@@ -1,8 +1,8 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SQLiteDatabaseAdapter } from "@univerjs/collaboration-database-sqlite";
-import { SQLiteHistoryDatabaseAdapter } from "@univerjs/collaboration-history-database-sqlite";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { SQLiteHistoryDatabaseAdapter } from "@univerjs-pro/collaboration-history-database-sqlite";
 
 const filename = join(
   dirname(fileURLToPath(import.meta.url)),

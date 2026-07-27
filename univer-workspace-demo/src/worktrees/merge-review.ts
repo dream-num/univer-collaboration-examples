@@ -1,9 +1,9 @@
-import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
-import type { WorktreeUnitMergeEvaluation } from "@univerjs/collaboration-worktree-service";
+import type { SaveSnapshotInput } from "@univerjs-pro/collaboration-service";
+import type { WorktreeUnitMergeEvaluation } from "@univerjs-pro/collaboration-worktree-service";
 import {
   WorktreeClient,
   type WorktreeFetch,
-} from "@univerjs/collaboration-worktree-client/management";
+} from "@univerjs-pro/collaboration-worktree-client/management";
 import type { ReviewCollaborationScope } from "../collaboration.js";
 
 export interface MergeReviewEvaluation {

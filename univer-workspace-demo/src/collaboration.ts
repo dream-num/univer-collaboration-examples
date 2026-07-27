@@ -20,11 +20,11 @@ import {
   UserManagerService,
 } from "@univerjs/core";
 import { FUniver } from "@univerjs/core/facade";
-import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
+import type { SaveSnapshotInput } from "@univerjs-pro/collaboration-service";
 import {
   createWorktreeCollaborationConfig,
   createWorktreeMergePreviewConfig,
-} from "@univerjs/collaboration-worktree-client";
+} from "@univerjs-pro/collaboration-worktree-client";
 import { HTTPService } from "@univerjs/network";
 import { shouldCancelReadOnlyReviewCommand } from "./read-only-review.js";
 

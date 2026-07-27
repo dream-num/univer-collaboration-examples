@@ -8,8 +8,8 @@ import {
 import {
   createWorktreeCollaborationConfig,
   createWorktreeMergePreviewConfig,
-} from "@univerjs/collaboration-worktree-client";
-import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
+} from "@univerjs-pro/collaboration-worktree-client";
+import type { SaveSnapshotInput } from "@univerjs-pro/collaboration-service";
 import { origin } from "./consts";
 
 export type CollaborationScope =

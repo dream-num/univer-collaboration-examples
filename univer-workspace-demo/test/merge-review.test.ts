@@ -1,4 +1,4 @@
-import type { SaveSnapshotInput } from "@univerjs/collaboration-service";
+import type { SaveSnapshotInput } from "@univerjs-pro/collaboration-service";
 import { UniverType } from "@univerjs/protocol";
 import { describe, expect, it } from "vitest";
 import {

@@ -1,16 +1,16 @@
 import type { Server } from "node:http";
-import { UniverCollabEndpoint } from "@univerjs/collaboration-endpoint";
+import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import {
   UniverHistoryService,
   type IHistoryDatabaseAdapter,
-} from "@univerjs/collaboration-history-service";
-import { UniverHistoryEndpoint } from "@univerjs/collaboration-history-endpoint";
+} from "@univerjs-pro/collaboration-history-service";
+import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpoint";
 import {
   CollabError,
   UniverCollabService,
   type IDatabaseAdapter,
-} from "@univerjs/collaboration-service";
-import { createNodeTransport } from "@univerjs/collaboration-transport-node";
+} from "@univerjs-pro/collaboration-service";
+import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import type { RequestHandler } from "express";
 import type { AuthService } from "./auth.js";

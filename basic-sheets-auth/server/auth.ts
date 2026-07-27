@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import type { Response } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import type { AuthenticatedUser } from "./model.js";

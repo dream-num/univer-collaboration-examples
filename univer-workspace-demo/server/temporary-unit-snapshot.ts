@@ -1,5 +1,5 @@
 import type { IBoardData } from "@univerjs-pro/boards";
-import type { CreateUnitInput } from "@univerjs/collaboration-service";
+import type { CreateUnitInput } from "@univerjs-pro/collaboration-service";
 import type {
   IBaseSnapshot,
   ITableSnapshot,

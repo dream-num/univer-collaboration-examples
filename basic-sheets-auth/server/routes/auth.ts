@@ -1,4 +1,4 @@
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import { json, Router } from "express";
 import type { AuthService } from "../auth.js";
 import type { ApplicationStore } from "../store.js";

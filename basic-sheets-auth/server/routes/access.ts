@@ -1,4 +1,4 @@
-import { CollabError } from "@univerjs/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import { json, Router } from "express";
 import type { AuthenticatedUser, UnitRole } from "../model.js";
 import { canManageMembers, canRead } from "../model.js";

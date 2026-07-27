@@ -14,12 +14,12 @@ import {
   WorktreeClient,
   WorktreeEventClient,
   type WorktreeEventSubscription,
-} from "@univerjs/collaboration-worktree-client";
+} from "@univerjs-pro/collaboration-worktree-client";
 import type {
   WorktreeData,
   WorktreeStatus,
   WorktreeUnitMergeEvaluation,
-} from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-worktree-service";
 import { HTTPService } from "@univerjs/network";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreZhCN from "@univerjs/preset-sheets-core/locales/zh-CN";

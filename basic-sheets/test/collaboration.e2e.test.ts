@@ -6,7 +6,7 @@ import {
   deserializeToCombResponse,
   serializeCombRequest,
 } from "@univerjs-pro/collaboration-client";
-import type { DatabaseContext } from "@univerjs/collaboration-service";
+import type { DatabaseContext } from "@univerjs-pro/collaboration-service";
 import type { IChangeset, ISheetBlock } from "@univerjs/protocol";
 import { CmdRspCode, CombCmd, UniverType } from "@univerjs/protocol";
 import { afterEach, describe, expect, it, vi } from "vitest";

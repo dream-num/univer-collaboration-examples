@@ -2,15 +2,15 @@ import type { Server } from "node:http";
 import {
   MemorySessionTicketStore,
   UniverCollabEndpoint,
-} from "@univerjs/collaboration-endpoint";
+} from "@univerjs-pro/collaboration-endpoint";
 import {
   UniverCollabService,
   type IDatabaseAdapter,
-} from "@univerjs/collaboration-service";
-import { createNodeTransport } from "@univerjs/collaboration-transport-node";
-import type { IWorktreeDatabaseAdapter } from "@univerjs/collaboration-worktree-service";
-import { UniverCollabWorktreeService } from "@univerjs/collaboration-worktree-service";
-import { UniverCollabWorktreeEndpoint } from "@univerjs/collaboration-worktree-endpoint";
+} from "@univerjs-pro/collaboration-service";
+import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
+import type { IWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-service";
+import { UniverCollabWorktreeService } from "@univerjs-pro/collaboration-worktree-service";
+import { UniverCollabWorktreeEndpoint } from "@univerjs-pro/collaboration-worktree-endpoint";
 import type { RequestHandler } from "express";
 import type { DemoUser } from "./demo-user.js";
 

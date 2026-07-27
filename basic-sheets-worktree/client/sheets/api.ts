@@ -2,7 +2,7 @@ import type {
   WorktreeData,
   WorktreeStatus,
   WorktreeUnitMergeEvaluation,
-} from "@univerjs/collaboration-worktree-service";
+} from "@univerjs-pro/collaboration-worktree-service";
 import { DEMO_TRUNK_UNIT_ID } from "../../shared/demo.js";
 
 export interface DemoWorktree extends WorktreeData {
