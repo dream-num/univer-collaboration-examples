@@ -5,6 +5,7 @@
     "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "noEmit": true,
     "types": ["vite/client"]
   },

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import {
   WorktreeClient,
   WorktreeEventClient,
-} from "@univerjs-pro/collaboration-worktree-client/management";
+} from "@univerjs-pro/collaboration-worktree-client";
 import type { IWorkbookData } from "@univerjs/core";
 import { UniverType } from "@univerjs/protocol";
 import { afterEach, describe, expect, it, vi } from "vitest";

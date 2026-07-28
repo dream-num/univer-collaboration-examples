@@ -3,7 +3,7 @@ import type { WorktreeUnitMergeEvaluation } from "@univerjs-pro/collaboration-wo
 import {
   WorktreeClient,
   type WorktreeFetch,
-} from "@univerjs-pro/collaboration-worktree-client/management";
+} from "@univerjs-pro/collaboration-worktree-client";
 import type { ReviewCollaborationScope } from "../collaboration.js";
 
 export interface MergeReviewEvaluation {
