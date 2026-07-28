@@ -40,10 +40,9 @@ const worker = new Worker(new URL("./base-worker.ts", import.meta.url), {
   type: "module",
 });
 
-// alpha.7 treats UNIVER_SHEET (0) as an omitted type filter, and its
-// collaboration formula guard also resolves dirty-range Units without a type
-// before assuming they are Workbooks. Remove this override and the Base model
-// shim when those SDK call sites are type-safe.
+// 当前 SDK 把 UNIVER_SHEET (0) 当作未提供 type filter，formula guard 也会在
+// 假定 Unit 是 Workbook 前无类型地解析 dirty-range Unit。待这些调用点具备类型安全
+// 后删除此 override 和 Base model shim。
 class WorkspaceUniverInstanceService extends UniverInstanceService {
   override __addUnit(unit: UnitModel, options?: ICreateUnitOptions): void {
     makeBaseSafeForCollaborationFormulaGuard(unit);

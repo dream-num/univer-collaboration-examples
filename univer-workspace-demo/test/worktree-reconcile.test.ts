@@ -36,14 +36,13 @@ describe("Workspace Worktree reconciliation", () => {
       scope: { kind: "user" },
     });
     const initial = createInitialUnit(UniverType.UNIVER_DOC, unitID, "Retry title");
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const input = {
       resourceID: "retry-pending-initial-doc-resource",
       unitID,
       spaceID: personal.id,
       name: "Retry metadata",
       type: UniverType.UNIVER_DOC,
-      initialData: initial.input.data as IDocumentData,
+      initialData: initial.data as IDocumentData,
     };
     const addUnit = vi
       .spyOn(application.worktreeCatalog, "addUnit")
@@ -80,7 +79,6 @@ describe("Workspace Worktree reconciliation", () => {
       scope: { kind: "user" },
     });
     const initial = createInitialUnit(UniverType.UNIVER_DOC, unitID, "Invalid title");
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const beginOperation = vi.spyOn(application.worktreeCatalog, "beginOperation");
 
     await expect(
@@ -90,7 +88,7 @@ describe("Workspace Worktree reconciliation", () => {
         spaceID: personal.id,
         name: "Invalid metadata",
         type: UniverType.UNIVER_DOC,
-        initialData: { ...(initial.input.data as IDocumentData), ...override },
+        initialData: { ...(initial.data as IDocumentData), ...override },
       })
     ).rejects.toMatchObject({ code: "INVALID_REQUEST" });
     expect(beginOperation).not.toHaveBeenCalled();
@@ -109,7 +107,6 @@ describe("Workspace Worktree reconciliation", () => {
       scope: { kind: "user" },
     });
     const initial = createInitialUnit(UniverType.UNIVER_DOC, unitID, "Canonical title");
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const baseInput = {
       resourceID: "canonical-initial-doc-resource",
       unitID,
@@ -118,11 +115,11 @@ describe("Workspace Worktree reconciliation", () => {
       type: UniverType.UNIVER_DOC,
     };
     const firstData = {
-      ...(initial.input.data as IDocumentData),
+      ...(initial.data as IDocumentData),
       fingerprintProbe: { "é": 1, "e\u0301": 2 },
     } as IDocumentData;
     const reorderedData = {
-      ...(initial.input.data as IDocumentData),
+      ...(initial.data as IDocumentData),
       fingerprintProbe: { "e\u0301": 2, "é": 1 },
     } as IDocumentData;
 
@@ -157,11 +154,10 @@ describe("Workspace Worktree reconciliation", () => {
       unitID,
       "Recovered Typst title"
     );
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const initialData = {
-      ...(initial.input.data as IDocumentData),
+      ...(initial.data as IDocumentData),
       documentStyle: {
-        ...(initial.input.data as IDocumentData).documentStyle,
+        ...(initial.data as IDocumentData).documentStyle,
         marginLeft: 149,
       },
     };
@@ -425,13 +421,12 @@ describe("Workspace Worktree reconciliation", () => {
       createdBy: actorUserID,
     });
     const trunkInitial = createInitialUnit(
-        UniverType.UNIVER_SHEET,
-        "trunk-unit",
-        "Trunk sheet"
-      );
-    if (trunkInitial.kind !== "data") throw new Error("Expected data creation");
+      UniverType.UNIVER_SHEET,
+      "trunk-unit",
+      "Trunk sheet"
+    );
     await application.collabService.createUnitFromData(
-      trunkInitial.input,
+      trunkInitial,
       { session: options.session }
     );
     application.productStore.markActive("trunk-resource");
@@ -474,11 +469,10 @@ describe("Workspace Worktree reconciliation", () => {
       "local-doc",
       "Local doc"
     );
-    if (localInitial.kind !== "data") throw new Error("Expected data creation");
     await application.worktreeService.createUnitFromData(
       {
         worktreeID: "recover-members",
-        ...localInitial.input,
+        ...localInitial,
       },
       options
     );

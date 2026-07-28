@@ -330,24 +330,14 @@ export function createWorkspaceWorktreeApplication(input: {
         }
         const initial = operation.initialData
           ? {
-              kind: "data" as const,
-              input: {
-                type: UniverType.UNIVER_DOC as const,
-                data: operation.initialData,
-              },
+              type: UniverType.UNIVER_DOC as const,
+              data: operation.initialData,
             }
           : createInitialUnit(staged.type, staged.unitID, staged.name);
-        if (initial.kind === "data") {
-          await service.createUnitFromData(
-            { worktreeID: staged.worktreeID, ...initial.input },
-            options(operation.actorUserID)
-          );
-        } else {
-          await service.createUnit(
-            { worktreeID: staged.worktreeID, ...initial.input },
-            options(operation.actorUserID)
-          );
-        }
+        await service.createUnitFromData(
+          { worktreeID: staged.worktreeID, ...initial },
+          options(operation.actorUserID)
+        );
         catalog.addUnit({
           worktreeID: staged.worktreeID,
           unitID: staged.unitID,

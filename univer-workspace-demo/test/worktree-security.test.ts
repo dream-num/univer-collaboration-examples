@@ -110,13 +110,12 @@ describe("Workspace Worktree security", () => {
         createdBy: ownerUserID,
       });
       const initial = createInitialUnit(
-          UniverType.UNIVER_SHEET,
-          `shared-unit-${index}`,
-          `Shared ${index}`
-        );
-      if (initial.kind !== "data") throw new Error("Expected data creation");
+        UniverType.UNIVER_SHEET,
+        `shared-unit-${index}`,
+        `Shared ${index}`
+      );
       await application.collabService.createUnitFromData(
-        initial.input,
+        initial,
         {
           session: {
             memberId: `security-owner-${index}`,

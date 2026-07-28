@@ -1,15 +1,13 @@
+import type { IBoardData } from "@univerjs-pro/boards";
 import type { ISlideData } from "@univerjs-pro/slides";
 import type {
   IDocumentData,
   IWorkbookData,
   LocaleType,
 } from "@univerjs/core";
-import {
-  UniverType,
-} from "@univerjs/protocol";
+import { getBasesEmptySnapshot } from "@univerjs/core";
+import { UniverType } from "@univerjs/protocol";
 import type { CreateUnitFromDataInput } from "@univerjs-pro/collaboration-service";
-import type { CreateUnitInput } from "@univerjs-pro/collaboration-service";
-import { createTemporaryInitialSnapshot } from "./temporary-unit-snapshot.js";
 
 export const CREATABLE_UNIT_TYPES = [
   UniverType.UNIVER_SHEET,
@@ -30,41 +28,68 @@ export function isCreatableUnitType(value: unknown): value is CreatableUnitType 
   );
 }
 
-export type InitialUnitCreation =
-  | { readonly kind: "data"; readonly input: CreateUnitFromDataInput }
-  | { readonly kind: "snapshot"; readonly input: CreateUnitInput };
-
 export function createInitialUnit(
   type: CreatableUnitType,
   unitID: string,
   name: string
-): InitialUnitCreation {
+): CreateUnitFromDataInput {
   switch (type) {
     case UniverType.UNIVER_SHEET:
-      return {
-        kind: "data",
-        input: { type, data: createWorkbookData(unitID, name) },
-      };
+      return { type, data: createWorkbookData(unitID, name) };
     case UniverType.UNIVER_DOC: {
-      return {
-        kind: "data",
-        input: { type, data: createDocumentData(unitID, name) },
-      };
+      return { type, data: createDocumentData(unitID, name) };
     }
     case UniverType.UNIVER_SLIDE: {
-      return {
-        kind: "data",
-        input: { type, data: createSlideData(unitID, name) },
-      };
+      return { type, data: createSlideData(unitID, name) };
     }
-    case UniverType.UNIVER_BOARD:
+    case UniverType.UNIVER_BOARD: {
+      return { type, data: createBoardData(unitID, name) };
+    }
     case UniverType.UNIVER_BASE: {
       return {
-        kind: "snapshot",
-        input: createTemporaryInitialSnapshot(type, unitID, name),
+        type,
+        data: {
+          ...getBasesEmptySnapshot(unitID),
+          rev: 1,
+          name,
+        },
       };
     }
   }
+}
+
+function createBoardData(unitID: string, name: string): IBoardData {
+  const pageID = "page-1";
+  const page = {
+    id: pageID,
+    pageType: "page",
+    name: "Board",
+    elementOrder: [],
+    elements: {},
+    background: { type: "solid", color: "#ffffff" },
+  } as IBoardData["pages"][string];
+  return {
+    id: unitID,
+    rev: 1,
+    name,
+    appVersion: "",
+    locale: "enUS",
+    defaultPageSize: { width: 1920, height: 1080 },
+    pageOrder: [pageID],
+    pages: { [pageID]: page },
+    activePageId: pageID,
+    slideOrder: [pageID],
+    slides: { [pageID]: page },
+    activeSlideId: pageID,
+    boardSettings: {
+      collaboratorCursorsVisible: true,
+      gridVisible: false,
+      quickAddEnabled: true,
+      preciseSelection: false,
+      showDimensions: false,
+      showToolbar: true,
+    },
+  };
 }
 
 function createDocumentData(unitID: string, name: string): IDocumentData {

@@ -92,7 +92,7 @@ export const docFeatureLocale = mergeLocales(
 
 /**
  * Doc 的内容模型与编辑能力，顺序与 Univer Pro Doc 协同示例一致。
- * Mention 依赖未发布的 alpha.7 包，因此不在当前可发布依赖面内。
+ * Mention 依赖未纳入当前发布 cohort 的包，因此不在当前依赖面内。
  */
 export function getDocContentFeaturePlugins(): IPresetPlugin[] {
   return [

@@ -44,11 +44,10 @@ describe("Workspace Worktree application", () => {
       unitID,
       "Typst title"
     );
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const initialData = {
-      ...(initial.input.data as IDocumentData),
+      ...(initial.data as IDocumentData),
       documentStyle: {
-        ...(initial.input.data as IDocumentData).documentStyle,
+        ...(initial.data as IDocumentData).documentStyle,
         marginLeft: 137,
       },
     };
@@ -128,11 +127,10 @@ describe("Workspace Worktree application", () => {
       unitID,
       "Stable title"
     );
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
     const initialData = {
-      ...(initial.input.data as IDocumentData),
+      ...(initial.data as IDocumentData),
       documentStyle: {
-        ...(initial.input.data as IDocumentData).documentStyle,
+        ...(initial.data as IDocumentData).documentStyle,
         marginLeft: 137,
       },
     };
@@ -204,7 +202,6 @@ describe("Workspace Worktree application", () => {
       body: { worktreeID, name: "Invalid initial data", scope: { kind: "user" } },
     });
     const initial = createInitialUnit(UniverType.UNIVER_DOC, unitID, "Invalid");
-    if (initial.kind !== "data") throw new Error("Expected Doc data");
 
     const result = await request<{ error?: { code?: number } }>(
       `${origin}/api/worktrees/${worktreeID}/units/new`,
@@ -217,7 +214,7 @@ describe("Workspace Worktree application", () => {
           spaceID: personal.id,
           name: "Invalid",
           type,
-          initialData: mutate(initial.input.data as IDocumentData),
+          initialData: mutate(initial.data as IDocumentData),
         },
       }
     );
@@ -512,7 +509,7 @@ describe("Workspace Worktree application", () => {
     { label: "Board", type: UniverType.UNIVER_BOARD, envelope: "board" },
     { label: "Base", type: UniverType.UNIVER_BASE, envelope: "workbook" },
   ])(
-    "creates and activates a Worktree-local $label from a protocol snapshot",
+    "creates and activates a Worktree-local $label from Unit data",
     async ({ label, type, envelope }) => {
       const origin = await startApplication();
       const cookie = await login(origin);

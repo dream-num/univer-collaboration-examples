@@ -15,8 +15,8 @@
 - `owner` 可以邀请和设置所有非 Owner 角色；`admin` 只能管理
   `editor/viewer`，不能修改或移除其他管理员。
 - 创建、打开、软删除、恢复 Sheet、Doc、Slide、Board、Base。
-- Sheet、Doc、Slide 通过 `UniverCollabService.createUnitFromData` 创建；Board、Base
-  暂由 Demo 生成空白 revision-1 协议 snapshot，再调用低层 `createUnit`。
+- Sheet、Doc、Slide、Board、Base 都通过
+  `UniverCollabService.createUnitFromData` 创建。
 - 产品资源元数据和协同数据写入同一个 SQLite 文件中的独立表。
 - 用户、空间、目录节点、团队成员和个人文档定向分享成员持久化到 SQLite。
 - 所有者可按用户授予 `editor/viewer`、调整角色或移除成员；被邀请者可从
@@ -48,17 +48,13 @@
 - Worktree 创建、加入 Unit 和本地 Unit 创建使用 SQLite operation journal；
   启动时恢复半程操作，并补齐已提交 merge/discard 的产品侧状态。
 
-Board 和 Base 的临时 snapshot 编码器只支持 Demo 创建的空白初始数据，并集中位于
-`server/temporary-unit-snapshot.ts`。升级到包含
-[univer-pro PR #5259](https://github.com/dream-num/univer-pro/pull/5259) 的发布版本后，
-应删除该文件并把两类 Unit 切回 `createUnitFromData`。alpha.7 中 Board 没有公开的协同
-重命名 mutation，Base 重命名也不是简单名称 mutation，因此这两类 Unit 暂以产品目录
-名称为权威；编辑器标题不会用 snapshot 内的旧名称覆盖它。Sheet、Doc、Slide 的重命名
-仍进入协同版本与 History。
+Board 没有公开的协同重命名 mutation，Base 重命名也不是简单名称 mutation，因此
+这两类 Unit 暂以产品目录名称为权威；编辑器标题不会用 snapshot 内的旧名称覆盖它。
+Sheet、Doc、Slide 的重命名仍进入协同版本与 History。
 
 Base 的浏览器主线程和 Base Vite Worker 都注册 Base 模型；协同 Service 的 Node RPC
 Worker 也注册 `UniverRemoteBasesPlugin`，因此首次 Base 修改可以在主线程和 Worker
-之间完成公式与 JSON1 数据同步。alpha.7 的 Collaboration Client UI 公式守卫会把未指定
+之间完成公式与 JSON1 数据同步。当前 Collaboration Client UI 公式守卫会把未指定
 类型取得的 Base 当成 Workbook，并直接调用 `getSheetBySheetId`。Demo 在 Base 模型加入
 Instance Service 前临时补充一个返回 `null` 的同名 resolver，同时关闭 Base 不需要的
 Docs 协同 UI；该 shim 不覆盖 SDK 已有实现。升级到公式守卫只处理 Sheet、或 SDK 为
@@ -75,7 +71,7 @@ Worktree 的 `not-behind` 合入预览直接复用只读 draft：此时 Trunk �
 变化，合入结果与 AI 修改版相同。只有 Trunk 已前进时才使用服务端生成的 merge preview
 snapshot；冲突仍保持不可预览。
 
-Doc 和 Slide 已保存 History 元数据，但 alpha.7 viewer 仅支持 Sheet，因此暂不展示
+Doc 和 Slide 已保存 History 元数据，但当前 viewer 仅支持 Sheet，因此暂不展示
 可视化历史入口。相关证据和后续方向见
 [`docs/issues`](../../docs/issues/README.md)。
 
@@ -145,9 +141,8 @@ WorkspaceWorktreeCatalog
 个人空间 Owner 和可选的定向 `workspace_node_members` 计算。团队文档没有独立成员表，
 因此不会产生空间角色和文档角色冲突。
 
-创建 Unit 时先在目标空间目录中写入状态为 `creating` 的产品节点。Sheet、Doc、Slide
-调用 `createUnitFromData`，Board、Base 调用带初始 snapshot 的 `createUnit`，成功后标记
-为 `active`。Service middleware 只允许这个流程
+创建 Unit 时先在目标空间目录中写入状态为 `creating` 的产品节点。五类 Unit 都调用
+`createUnitFromData`，成功后标记为 `active`。Service middleware 只允许这个流程
 创建 Unit，并在读取、提交和应用 changeset 时确认产品节点仍为 `active`，且当前
 Session 拥有有效空间或文档角色。`viewer` 的提交会在 Service middleware 中被拒绝，
 不能依赖前端只读状态保障安全；协议兼容 Authz API 同时把角色映射为 Univer
@@ -156,8 +151,8 @@ Session 拥有有效空间或文档角色。`viewer` 的提交会在 Service mid
 
 Sheet、Doc、Slide 重命名通过对应 Unit 类型的协同 mutation 提交；changeset confirmed 后，
 `changesetCommitted` 事件把名称同步到产品资源表。因此名称修改会进入协同版本与
-History。Board、Base 在 alpha.7 阶段只更新产品资源表，待公开 transformer 和稳定的
-协同重命名入口一并可用后再收敛为同一语义。
+History。Board、Base 当前只更新产品资源表，待稳定的协同重命名入口可用后再收敛为
+同一语义。
 
 删除资源或文件夹前，ProductStore 用一次递归查询取得按 `unitID` 排序、且会随根节点
 改变状态的连续子树 Unit 批次。应用在改变任一存储前按

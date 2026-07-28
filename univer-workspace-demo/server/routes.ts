@@ -522,14 +522,7 @@ export function createApplicationRouter(
         session: applicationSession(user),
         customData: { resourceID },
       };
-      if (initial.kind === "data") {
-        await dependencies.collabService.createUnitFromData(
-          initial.input,
-          options
-        );
-      } else {
-        await dependencies.collabService.createUnit(initial.input, options);
-      }
+      await dependencies.collabService.createUnitFromData(initial, options);
       const resource = dependencies.productStore.markActive(resourceID);
       response.status(201).json({
         resource: resourceResponse(

@@ -6,7 +6,6 @@ import {
   CREATABLE_UNIT_TYPES,
   createInitialUnit,
 } from "../server/unit-data.js";
-import { assertBlankBase } from "../server/temporary-unit-snapshot.js";
 
 describe("createInitialUnit", () => {
   it("makes all five supported Unit types creatable", () => {
@@ -26,78 +25,51 @@ describe("createInitialUnit", () => {
       "Agent Doc"
     );
 
-    expect(unit.kind).toBe("data");
-    if (unit.kind !== "data") throw new Error("Expected data creation");
-    expect(validateDocumentAfterApply(unit.input.data as IDocumentData)).toEqual({
+    expect(unit.type).toBe(UniverType.UNIVER_DOC);
+    expect(validateDocumentAfterApply(unit.data as IDocumentData)).toEqual({
       ok: true,
       errors: [],
     });
   });
 
-  it("encodes a blank Board as a revision-1 Board snapshot", () => {
+  it("creates blank revision-1 Board data", () => {
     const unit = createInitialUnit(
       UniverType.UNIVER_BOARD,
       "board-1",
       "Agent Board"
     );
 
-    expect(unit.kind).toBe("snapshot");
-    if (unit.kind !== "snapshot") throw new Error("Expected snapshot creation");
-    expect(unit.input.sheetBlocks).toBeUndefined();
-    expect(unit.input.snapshot).toMatchObject({
-      unitID: "board-1",
-      rev: 1,
+    expect(unit).toMatchObject({
       type: UniverType.UNIVER_BOARD,
-      board: {
-        unitID: "board-1",
+      data: {
+        id: "board-1",
         rev: 1,
         name: "Agent Board",
+        pageOrder: ["page-1"],
       },
     });
-    const board = JSON.parse(
-      new TextDecoder().decode(unit.input.snapshot.board!.originalMeta)
-    ) as { id: string; rev: number; pageOrder: string[] };
-    expect(board).toMatchObject({ id: "board-1", rev: 1 });
-    expect(board.pageOrder).toHaveLength(1);
   });
 
-  it("encodes a blank Base as workbook-shaped metadata without blocks", () => {
+  it("creates blank revision-1 Base data from the SDK factory", () => {
     const unit = createInitialUnit(
       UniverType.UNIVER_BASE,
       "base-1",
       "Agent Base"
     );
 
-    expect(unit.kind).toBe("snapshot");
-    if (unit.kind !== "snapshot") throw new Error("Expected snapshot creation");
-    expect(unit.input.sheetBlocks).toBeUndefined();
-    expect(unit.input.snapshot).toMatchObject({
-      unitID: "base-1",
-      rev: 1,
+    expect(unit).toMatchObject({
       type: UniverType.UNIVER_BASE,
-      workbook: {
-        unitID: "base-1",
+      data: {
+        id: "base-1",
         rev: 1,
         name: "Agent Base",
-        sheetOrder: ["table-1"],
-        blockMeta: {
-          "table-1": { sheetID: "table-1", blocks: [] },
-        },
+        tableOrder: ["table-1"],
       },
     });
-    expect(unit.input.snapshot.workbook!.sheets["table-1"]).toMatchObject({
-      rowCount: 5,
-      columnCount: 1,
-    });
-  });
-
-  it("rejects non-empty Base cell data in the temporary encoder", () => {
-    const base = {
-      tables: { "table-1": { cellData: { 0: { 0: { v: "value" } } } } },
-    } as unknown as IBaseSnapshot;
-
-    expect(() => assertBlankBase(base)).toThrow(
-      "only supports blank initial cell data"
-    );
+    const base = unit.data as IBaseSnapshot;
+    const table = base.tables["table-1"]!;
+    expect(table.recordOrder).toHaveLength(5);
+    expect(table.fieldOrder).toHaveLength(1);
+    expect(Object.keys(table.cellData ?? {})).toHaveLength(5);
   });
 });
