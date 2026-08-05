@@ -101,7 +101,8 @@ export function collaborationPlugins(
 export function enforceReadOnlyReview(univer: Univer): void {
   if (document.documentElement.dataset.reviewReadonly !== "true") return;
   const univerAPI = FUniver.newAPI(univer);
-  univerAPI.getHooks().onSteady(() => {
+  univerAPI.addEvent(univerAPI.Event.LifeCycleChanged, ({ stage }) => {
+    if (stage !== univerAPI.Enum.LifecycleStages.Steady) return;
     univerAPI.addEvent(univerAPI.Event.BeforeCommandExecute, (event) => {
       if (shouldCancelReadOnlyReviewCommand(event)) {
         event.cancel = true;
