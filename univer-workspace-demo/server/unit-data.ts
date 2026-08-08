@@ -81,14 +81,6 @@ function createBoardData(unitID: string, name: string): IBoardData {
     slideOrder: [pageID],
     slides: { [pageID]: page },
     activeSlideId: pageID,
-    boardSettings: {
-      collaboratorCursorsVisible: true,
-      gridVisible: false,
-      quickAddEnabled: true,
-      preciseSelection: false,
-      showDimensions: false,
-      showToolbar: true,
-    },
   };
 }
 
