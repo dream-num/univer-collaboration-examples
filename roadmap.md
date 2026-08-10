@@ -2,19 +2,21 @@
 
 ## 1. 目标
 
-`univer-collaboration` 提供四个相互独立、可直接运行的全栈示例：
+`univer-collaboration` 提供五个相互独立、可直接运行的全栈示例：
 
-1. `basic-sheets`：证明现有 Univer 协同前端可以用极少改动切换到新后端。
-2. `basic-sheets-auth`：展示业务用户、JWT Cookie、WebSocket session ticket 和文档 ACL 的接入方式。
-3. `basic-sheets-worktree`：展示 Worktree-local Sheet 的 draft、ready 和 merge。
-4. `univer-workspace-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
+1. `quick-start`：用固定用户、固定 Sheet 和 Memory Adapter 展示最小实时协同。
+2. `basic-sheets`：证明现有 Univer 协同前端可以用极少改动切换到持久化新后端。
+3. `basic-sheets-auth`：展示业务用户、JWT Cookie、WebSocket session ticket 和文档 ACL 的接入方式。
+4. `basic-sheets-worktree`：展示 Worktree-local Sheet 的 draft、ready 和 merge。
+5. `univer-workspace-demo`：展示如何基于新后端构建支持全部现有文档类型的在线办公套件。
 
-四个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、
+五个示例由浅入深，但不存在代码依赖关系。读者进入任意目录，都可以独立理解、
 启动和修改该示例。
 
 本文记录各 example 的稳定目标、验收要求和尚未完成的实施顺序。动态实现状态由
 各自 README 维护，不在这里复制状态清单：
 
+- [`quick-start`](./quick-start/README.md)
 - [`basic-sheets`](./basic-sheets/README.md)
 - [`basic-sheets-auth`](./basic-sheets-auth/README.md)
 - [`basic-sheets-worktree`](./basic-sheets-worktree/README.md)
@@ -28,6 +30,7 @@
 examples/
 ├── README.md
 ├── roadmap.md
+├── quick-start/
 ├── basic-sheets/
 ├── basic-sheets-auth/
 ├── basic-sheets-worktree/
@@ -36,15 +39,17 @@ examples/
 
 ### 2.2 独立性
 
-- 每个示例拥有自己的前端、后端、SQLite schema、seed、测试、启动命令和 README。
-- 四个示例不共享业务代码；可以复用仓库级 TypeScript、lint 和构建配置。
-- 每个示例都应支持一条命令启动，并提供独立的数据库初始化和重置命令。
-- 示例数据存放在各自的 `.data/` 目录，不提交运行时数据库文件。
+- 每个示例拥有自己的前端、后端、启动命令和 README；复杂示例另带自动化测试。
+- 五个示例不共享业务代码；可以复用仓库级 TypeScript、lint 和构建配置。
+- 每个示例都应支持一条命令启动；使用 SQLite 的示例提供独立的数据库初始化和重置命令。
+- 持久化示例的数据存放在各自的 `.data/` 目录，不提交运行时数据库文件。
 
 ### 2.3 数据与正确性
 
-- 四个示例全部使用 SQLite Database Adapter，不使用内存数据库。
-- 页面刷新和服务重启后，文档、changeset、revision、权限和业务元数据仍然存在。
+- `quick-start` 使用 Memory Database Adapter，避免第一次运行前准备数据库；其他示例使用
+  SQLite Database Adapter。
+- 除 `quick-start` 外，页面刷新和服务重启后，文档、changeset、revision、权限和业务
+  元数据仍然存在。
 - `userId` 是稳定业务主键，也是 confirmed changeset 的作者；`username` 只用于登录和展示。
 - `memberId` 由 UniverCollabEndpoint 为 Session 生成，不能由前端作为可信身份提供。
 - 前端不能提供可信 revision、confirmed author 或服务端 customData。

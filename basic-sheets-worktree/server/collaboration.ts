@@ -66,20 +66,6 @@ export function createWorktreeCollaborationStack(
   });
   transport.use(worktreeEndpoint);
   transport.use(trunkEndpoint);
-  transport.use(async (context, next) => {
-    if (context.kind === "http") {
-      if (!context.response.writableEnded) {
-        context.response.statusCode = 404;
-        context.response.end("Not Found");
-      }
-      return;
-    }
-    if (context.kind === "websocket-open") {
-      context.connection.close(1008, "Unknown collaboration endpoint");
-      return;
-    }
-    await next();
-  });
 
   let attachedServer: Server | undefined;
   let disposed = false;
