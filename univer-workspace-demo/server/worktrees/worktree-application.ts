@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { UniverType, type IChangeset } from "@univerjs/protocol";
-import { CollabError, type CollabSession } from "@univerjs-pro/collaboration-service";
+import {
+  CollabError,
+  type CollabContext,
+  type CollabMemberContext,
+} from "@univerjs-pro/collaboration-service";
 import type {
   IUniverCollabWorktreeService,
   WorktreeData,
@@ -89,13 +93,13 @@ export function createWorkspaceWorktreeApplication(input: {
 }): WorkspaceWorktreeApplication {
   const { catalog, productStore, userStore, service } = input;
 
-  const session = (userID: string): CollabSession => ({
-    memberId: `workspace-app-${userID}`,
-    userId: userID,
-    customData: Object.create(null) as Record<string, unknown>,
+  const context = (userID: string): CollabContext => ({
+    userID,
+    customData: orchestrationCustomData() as Record<string, unknown>,
   });
-  const options = (userID: string) => ({
-    session: session(userID),
+  const memberContext = (userID: string): CollabMemberContext => ({
+    userID,
+    memberID: `workspace-app-${userID}`,
     customData: orchestrationCustomData() as Record<string, unknown>,
   });
 
@@ -202,7 +206,7 @@ export function createWorkspaceWorktreeApplication(input: {
       (
         await service.getWorktree(
           { worktreeID: record.worktreeID },
-          { session: session(actorUserID) }
+          context(actorUserID)
         )
       ).worktree;
     const units = aggregate.units.map((unit): WorkspaceWorktreeUnit => {
@@ -280,7 +284,7 @@ export function createWorkspaceWorktreeApplication(input: {
                 worktreeID: operation.worktree.worktreeID,
                 units: operation.worktree.units.map(({ unitID }) => unitID),
               },
-              options(operation.actorUserID)
+              context(operation.actorUserID)
             )
           ).worktree;
         } catch (error) {
@@ -288,7 +292,7 @@ export function createWorkspaceWorktreeApplication(input: {
           worktree = (
             await service.getWorktree(
               { worktreeID: operation.worktree.worktreeID },
-              options(operation.actorUserID)
+              context(operation.actorUserID)
             )
           ).worktree;
         }
@@ -307,7 +311,7 @@ export function createWorkspaceWorktreeApplication(input: {
             worktreeID: operation.unit.worktreeID,
             unitID: operation.unit.unitID,
           },
-          options(operation.actorUserID)
+          context(operation.actorUserID)
         );
         catalog.addUnit(operation.unit);
         break;
@@ -336,7 +340,7 @@ export function createWorkspaceWorktreeApplication(input: {
           : createInitialUnit(staged.type, staged.unitID, staged.name);
         await service.createUnitFromData(
           { worktreeID: staged.worktreeID, ...initial },
-          options(operation.actorUserID)
+          context(operation.actorUserID)
         );
         catalog.addUnit({
           worktreeID: staged.worktreeID,
@@ -693,7 +697,7 @@ export function createWorkspaceWorktreeApplication(input: {
       }
       const current = await service.getWorktree(
         { worktreeID },
-        { session: session(actorUserID) }
+        context(actorUserID)
       );
       const unit = current.worktree.units.find(
         (candidate) => candidate.unitID === unitID
@@ -710,7 +714,7 @@ export function createWorkspaceWorktreeApplication(input: {
       });
       const result = await service.submitChangeset(
         { worktreeID, changeset },
-        options(actorUserID)
+        memberContext(actorUserID)
       );
       if (!("error" in result)) {
         return result;
@@ -733,7 +737,7 @@ export function createWorkspaceWorktreeApplication(input: {
       validateAllEditable(actorUserID, record);
       const result = await service.markReady(
         { worktreeID },
-        options(actorUserID)
+        context(actorUserID)
       );
       return hydrate(actorUserID, record, result.worktree);
     },
@@ -751,7 +755,7 @@ export function createWorkspaceWorktreeApplication(input: {
       }
       const result = await service.reopenWorktree(
         { worktreeID },
-        options(actorUserID)
+        context(actorUserID)
       );
       return hydrate(actorUserID, record, result.worktree);
     },
@@ -769,7 +773,7 @@ export function createWorkspaceWorktreeApplication(input: {
       }
       const result = await service.mergeWorktree(
         { worktreeID },
-        options(actorUserID)
+        memberContext(actorUserID)
       );
       await activateMergedStagedResources(
         catalog,
@@ -796,7 +800,7 @@ export function createWorkspaceWorktreeApplication(input: {
       }
       const result = await service.discardWorktree(
         { worktreeID },
-        options(actorUserID)
+        context(actorUserID)
       );
       discardStagedResources(catalog, worktreeID);
       catalog.markProcessed(worktreeID);
@@ -819,7 +823,7 @@ export function createWorkspaceWorktreeApplication(input: {
       for (const record of records) {
         const aggregate = await service.getWorktree(
           { worktreeID: record.worktreeID },
-          { session: session(record.creatorUserID) }
+          context(record.creatorUserID)
         );
         if (aggregate.worktree.status === "merged") {
           await activateMergedStagedResources(

@@ -48,15 +48,15 @@ export function createCollaborationStack(
   const commentService = new UniverCommentService({
     database: options.commentDbAdapter,
     userProvider: {
-      async getUsers(userIds) {
-        return userIds.includes(options.user.userId)
+      async getUsers(userIDs) {
+        return userIDs.includes(options.user.userId)
           ? [protocolUser(options.user)]
           : [];
       },
     },
   });
   commentService.use("deleteComment", async (context, next) => {
-    if (context.target.authorUserID !== context.session.userId) {
+    if (context.target.authorUserID !== context.userID) {
       throw new CollabError(
         "PERMISSION_DENIED",
         "Only the Comment author can delete it in this demo"
@@ -72,8 +72,8 @@ export function createCollaborationStack(
     collabService,
     dbAdapter: options.historyDbAdapter,
     userProvider: {
-      async getUsers(userIds) {
-        return userIds.includes(options.user.userId)
+      async getUsers(userIDs) {
+        return userIDs.includes(options.user.userId)
           ? [protocolUser(options.user)]
           : [];
       },
@@ -94,7 +94,7 @@ export function createCollaborationStack(
         type: UniverType.UNIVER_SHEET,
         revision: 0,
       },
-      { session: context.session }
+      { userID: context.session.userID }
     );
     await next();
   });
@@ -102,7 +102,7 @@ export function createCollaborationStack(
   // Demo 使用固定身份；生产应用应在这里把认证结果写入 Transport Context。
   transport.use(async (context, next) => {
     if (context.kind === "http") {
-      context.userId = options.user.userId;
+      context.userID = options.user.userId;
       context.customData.user = options.user;
     }
     await next();

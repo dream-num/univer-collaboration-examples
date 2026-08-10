@@ -59,7 +59,7 @@ export function createWorktreeCollaborationStack(
   // Demo 使用固定身份；生产应用应在这里接入自己的认证结果。
   transport.use(async (context, next) => {
     if (context.kind === "http") {
-      context.userId = options.user.userId;
+      context.userID = options.user.userId;
       context.customData.user = options.user;
     }
     await next();

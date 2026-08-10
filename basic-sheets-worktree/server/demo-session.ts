@@ -1,16 +1,14 @@
 import { randomUUID } from "node:crypto";
 import type {
-  CollabCallOptions,
-  CollabSession,
+  CollabMemberContext,
 } from "@univerjs-pro/collaboration-service";
 import type { DemoUser } from "./demo-user.js";
 
-export function demoCallOptions(user: DemoUser): CollabCallOptions {
+export function demoCallOptions(user: DemoUser): CollabMemberContext {
   const customData = { user };
-  const session: CollabSession = {
-    memberId: `http-${randomUUID()}`,
-    userId: user.userId,
+  return {
+    memberID: `http-${randomUUID()}`,
+    userID: user.userId,
     customData,
   };
-  return { session, customData };
 }

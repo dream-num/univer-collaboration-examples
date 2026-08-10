@@ -45,8 +45,8 @@ export function createCollaborationStack(
     collabService,
     dbAdapter: options.historyDbAdapter,
     userProvider: {
-      async getUsers(userIds) {
-        return userIds.flatMap((userId) => {
+      async getUsers(userIDs) {
+        return userIDs.flatMap((userId) => {
           const user = options.store.getUser(userId);
           return user ? [protocolUser(user)] : [];
         });
@@ -56,7 +56,7 @@ export function createCollaborationStack(
 
   collabService.use("createUnit", async (context, next) => {
     const role = options.store.getRole(
-      context.session.userId,
+      context.userID,
       context.request.snapshot.unitID
     );
     if (role !== "owner") {
@@ -70,7 +70,7 @@ export function createCollaborationStack(
   collabService.use("readUnitData", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.unitID
     );
     await next();
@@ -78,7 +78,7 @@ export function createCollaborationStack(
   collabService.use("submitChangeset", async (context, next) => {
     requireEdit(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.changeset.unitID
     );
     await next();
@@ -86,7 +86,7 @@ export function createCollaborationStack(
   collabService.use("applyChangeset", async (context, next) => {
     requireEdit(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.changeset.unitID
     );
     await next();
@@ -95,7 +95,7 @@ export function createCollaborationStack(
   historyService.use("getHistoryList", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.unitID
     );
     await next();
@@ -103,7 +103,7 @@ export function createCollaborationStack(
   historyService.use("listHistoryCreators", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.unitID
     );
     await next();
@@ -111,7 +111,7 @@ export function createCollaborationStack(
   historyService.use("getHistoryChangesets", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.unitID
     );
     await next();
@@ -119,7 +119,7 @@ export function createCollaborationStack(
   historyService.use("indexUnitCreated", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.unitID
     );
     await next();
@@ -127,7 +127,7 @@ export function createCollaborationStack(
   historyService.use("indexChangeset", async (context, next) => {
     requireRead(
       options.store,
-      context.session.userId,
+      context.userID,
       context.request.changeset.unitID
     );
     await next();
@@ -141,18 +141,18 @@ export function createCollaborationStack(
     const user = context.session.customData.user as
       | AuthenticatedUser
       | undefined;
-    context.member.name = user?.name ?? context.session.userId;
+    context.member.name = user?.name ?? context.session.userID;
     await next();
   });
   endpoint.use("joinUnit", async (context, next) => {
-    requireRead(options.store, context.session.userId, context.unitID);
+    requireRead(options.store, context.session.userID, context.unitID);
     await collabService.getUnit(
       {
         unitID: context.unitID,
         type: UniverType.UNIVER_SHEET,
         revision: 0,
       },
-      { session: context.session }
+      { userID: context.session.userID }
     );
     await next();
   });
@@ -164,7 +164,7 @@ export function createCollaborationStack(
         const user = await options.authService.requireUser(
           context.incomingMessage
         );
-        context.userId = user.userId;
+        context.userID = user.userId;
         context.customData.user = user;
       } catch {
         context.response.statusCode = 401;

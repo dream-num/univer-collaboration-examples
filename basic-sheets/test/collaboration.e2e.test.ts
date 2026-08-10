@@ -488,8 +488,9 @@ async function readLatestWorkbook(
   expectedRevision: number
 ) {
   const context: DatabaseContext = {
-    session: { memberId: "inspector", userId: "inspector", customData: {} },
-    request: { customData: {} },
+    userID: "inspector",
+    customData: {},
+    request: {},
   };
   const snapshot = await app.database.getSnapshot(context, unitID, { revision: 0 });
   expect(snapshot).toMatchObject({ unitID, rev: expectedRevision });

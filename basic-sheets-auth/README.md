@@ -60,7 +60,8 @@ pnpm example:basic-sheets-auth
 
 前端 Authz 结果负责只读反馈，安全边界仍在服务端：
 
-- Transport 验证每个协同 HTTP 请求的 JWT，并把可信 `userId` 写入 Session。
+- Transport 验证每个协同 HTTP 请求的 JWT，并把应用的 `userId` 映射到
+  `ctx.userID`；Endpoint 签发 ticket 并在 WebSocket 建连时创建 Session。
 - Endpoint JOIN 前检查读取权限。
 - Collaboration Service 在 create/read/submit/apply 生命周期检查 ACL。
 - History Service 在读取和索引生命周期检查 ACL。

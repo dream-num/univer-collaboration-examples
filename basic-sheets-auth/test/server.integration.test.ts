@@ -152,11 +152,8 @@ describe("basic-sheets-auth server integration", () => {
         },
       },
       {
-        session: {
-          memberId: "viewer-member",
-          userId: "user-bob",
-          customData: {},
-        },
+        userID: "user-bob",
+        memberID: "viewer-member",
       }
     );
     expect(viewerSubmit).toMatchObject({
@@ -223,11 +220,8 @@ describe("basic-sheets-auth server integration", () => {
         },
       },
       {
-        session: {
-          memberId: "editor-member",
-          userId: "user-bob",
-          customData: {},
-        },
+        userID: "user-bob",
+        memberID: "editor-member",
       }
     );
     expect(editorSubmit).toMatchObject({

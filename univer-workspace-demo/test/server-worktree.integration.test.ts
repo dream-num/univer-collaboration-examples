@@ -88,11 +88,8 @@ describe("Workspace Worktree application", () => {
         revision: 0,
       },
       {
-        session: {
-          memberId: "typst-readback",
-          userId: "user-alice",
-          customData: Object.create(null) as Record<string, unknown>,
-        },
+        userID: "user-alice",
+        customData: Object.create(null) as Record<string, unknown>,
       }
     );
     const documentData = JSON.parse(

@@ -49,9 +49,9 @@ describe("univer-workspace-demo spaces", () => {
       UniverType.UNIVER_BASE,
       "Agent Base"
     );
-    const session = {
-      memberId: "base-runtime-test",
-      userId: "user-alice",
+    const context = {
+      memberID: "base-runtime-test",
+      userID: "user-alice",
       customData: Object.create(null) as Record<string, unknown>,
     };
     const result = await application.collabService.submitChangeset(
@@ -80,7 +80,7 @@ describe("univer-workspace-demo spaces", () => {
           ],
         },
       },
-      { session }
+      context
     );
 
     expect(result.status).toBe("committed");

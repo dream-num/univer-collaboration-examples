@@ -88,7 +88,7 @@ pnpm --filter @univerjs/collaboration-example-basic-sheets reset
 Transport 为每个协同 HTTP 请求设置：
 
 ```ts
-context.userId = "demo-user";
+context.userID = "demo-user";
 ```
 
 `/universer-api/user`、authz 和 Unit 创建由 Express Router 实现；History 由可选的
@@ -96,7 +96,7 @@ context.userId = "demo-user";
 默认实现
 提供；Comment 由 `UniverCommentEndpoint → UniverCommentService →
 SQLiteCommentDatabaseAdapter` 提供。其中用户接口返回固定的 `Demo User`，authz 查询固定返回 allowed。
-所有浏览器窗口因此拥有相同 `userId`，但 WebSocket `memberId` 不同，仍可测试房间、
+所有浏览器窗口因此拥有相同 `userID`，但 WebSocket `memberID` 不同，仍可测试房间、
 Presence、ACK 和广播。
 
 Comment Service 的 User Provider 把作者补全为 `Demo User`；删除 middleware 演示

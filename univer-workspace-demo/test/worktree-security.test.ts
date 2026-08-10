@@ -30,11 +30,8 @@ describe("Workspace Worktree security", () => {
       application.worktreeService.createWorktree(
         { worktreeID: "raw-management", units: [] },
         {
-          session: {
-            memberId: "raw-alice",
-            userId: "user-alice",
-            customData: Object.create(null) as Record<string, unknown>,
-          },
+          userID: "user-alice",
+          customData: Object.create(null) as Record<string, unknown>,
         }
       )
     ).rejects.toMatchObject({ code: "PERMISSION_DENIED" });
@@ -117,11 +114,8 @@ describe("Workspace Worktree security", () => {
       await application.collabService.createUnitFromData(
         initial,
         {
-          session: {
-            memberId: `security-owner-${index}`,
-            userId: ownerUserID,
-            customData: Object.create(null) as Record<string, unknown>,
-          },
+          userID: ownerUserID,
+          customData: Object.create(null) as Record<string, unknown>,
         }
       );
       application.productStore.markActive(`shared-resource-${index}`);
@@ -288,11 +282,8 @@ describe("Workspace Worktree security", () => {
             revision: 0,
           },
           {
-            session: {
-              memberId: "security-alice",
-              userId: "user-alice",
-              customData: Object.create(null) as Record<string, unknown>,
-            },
+            userID: "user-alice",
+            customData: Object.create(null) as Record<string, unknown>,
           }
         )
       ).snapshot.unitID
@@ -309,11 +300,8 @@ describe("Workspace Worktree security", () => {
           revision: 0,
         },
         {
-          session: {
-            memberId: "security-alice",
-            userId: "user-alice",
-            customData: Object.create(null) as Record<string, unknown>,
-          },
+          userID: "user-alice",
+          customData: Object.create(null) as Record<string, unknown>,
         }
       )
     ).rejects.toMatchObject({ code: "UNIT_NOT_FOUND" });

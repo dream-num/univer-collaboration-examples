@@ -172,7 +172,7 @@ Client API 擅自修复，记录见 `docs/issues/known-issues`。
 - `submit` middleware 在加载 Unit 和 OT 前拒绝 `viewer/none`。
 - `apply` middleware 再次读取当前角色，避免编辑过程中权限被撤销后仍提交成功。
 - `admin/editor` 可以编辑，`viewer` 只读。
-- 权限缓存只能放在当前 `request.customData`，不能放在共享的 `session.customData`。
+- 权限缓存只能放在当前调用的 `ctx.customData`；不要跨调用共享本次权限判断。
 - 后端分别返回未认证、token 过期、无读取权限和无编辑权限错误；前端显示对应状态。
 
 ### 4.5 SQLite 数据

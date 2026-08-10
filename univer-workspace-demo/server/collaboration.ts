@@ -139,11 +139,11 @@ export function createCollaborationStack(
     const stagedRole = staged
       ? options.productStore.getSpaceRole(
           staged.spaceID,
-          context.session.userId
+          context.userID
         )
       : null;
     if (
-      isOrchestrated(context.request.customData) &&
+      isOrchestrated(context.customData) &&
       staged &&
       isSpaceEditor(stagedRole) &&
       staged.type === context.request.snapshot.type &&
@@ -156,13 +156,13 @@ export function createCollaborationStack(
     const role = resource
       ? options.productStore.getAccessRoleByID(
           resource.id,
-          context.session.userId
+          context.userID
         )
       : null;
     if (
       !resource ||
       resource.status !== "creating" ||
-      resource.createdBy !== context.session.userId ||
+      resource.createdBy !== context.userID ||
       !role ||
       role === "viewer"
     ) {
@@ -180,21 +180,21 @@ export function createCollaborationStack(
         "The Workspace Demo does not expose hard delete"
       );
     }
-    requireWorkspaceLifecycleRequest(context.request.customData);
+    requireWorkspaceLifecycleRequest(context.customData);
     for (const unitID of context.request.unitIDs) {
-      requireLifecycleManager(unitID, context.session.userId);
+      requireLifecycleManager(unitID, context.userID);
     }
     await next();
   });
   collabService.use("recoverUnits", async (context, next) => {
-    requireWorkspaceLifecycleRequest(context.request.customData);
+    requireWorkspaceLifecycleRequest(context.customData);
     for (const unitID of context.request.unitIDs) {
-      requireLifecycleManager(unitID, context.session.userId);
+      requireLifecycleManager(unitID, context.userID);
     }
     await next();
   });
   collabService.use("readUnitData", async (context, next) => {
-    requireReadableResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.userID);
     await next();
   });
 
@@ -218,35 +218,35 @@ export function createCollaborationStack(
   collabService.use("submitChangeset", async (context, next) => {
     requireEditableResource(
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   collabService.use("applyChangeset", async (context, next) => {
     requireEditableResource(
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   collabService.use("commitChangeset", async (context, next) => {
     requireEditableResource(
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
 
   historyService.use("getHistoryList", async (context, next) => {
-    requireReadableResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.userID);
     await next();
   });
   historyService.use("listHistoryCreators", async (context, next) => {
-    requireReadableResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.userID);
     await next();
   });
   historyService.use("getHistoryChangesets", async (context, next) => {
-    requireReadableResource(context.request.unitID, context.session.userId);
+    requireReadableResource(context.request.unitID, context.userID);
     await next();
   });
 
@@ -257,7 +257,7 @@ export function createCollaborationStack(
   endpoint.use("joinUnit", async (context, next) => {
     const { resource } = requireReadableResource(
       context.unitID,
-      context.session.userId
+      context.session.userID
     );
     await collabService.getUnit(
       {
@@ -265,7 +265,10 @@ export function createCollaborationStack(
         type: resource.type,
         revision: 0,
       },
-      { session: context.session }
+      {
+        userID: context.session.userID,
+        customData: context.session.customData,
+      }
     );
     await next();
   });
@@ -363,12 +366,12 @@ export function createCollaborationStack(
 
   worktreeService.use("readWorktreeData", async (context, next) => {
     const recoveringCreate =
-      isOrchestrated(context.request.customData) &&
+      isOrchestrated(context.customData) &&
       options.worktreeCatalog.listPendingOperations().some(
         (operation) =>
           operation.kind === "create-worktree" &&
           operation.worktree.worktreeID === context.request.worktreeID &&
-          operation.actorUserID === context.session.userId
+          operation.actorUserID === context.userID
       );
     if (recoveringCreate) {
       await next();
@@ -376,15 +379,15 @@ export function createCollaborationStack(
     }
     requireWorktreeReview(
       context.request.worktreeID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   const requireOrchestratedRequest = async (
-    context: { readonly request: { readonly customData: Record<string, unknown> } },
+    context: { readonly customData: Record<string, unknown> },
     next: () => Promise<void>
   ) => {
-    requireOrchestrated(context.request.customData);
+    requireOrchestrated(context.customData);
     await next();
   };
   worktreeService.use("createWorktree", requireOrchestratedRequest);
@@ -398,34 +401,34 @@ export function createCollaborationStack(
     requireWorktreeUnitRead(
       context.request.worktreeID,
       context.request.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   worktreeService.use("submitChangeset", async (context, next) => {
-    requireOrchestrated(context.request.customData);
+    requireOrchestrated(context.customData);
     requireWorktreeUnitEdit(
       context.request.worktreeID,
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   worktreeService.use("applyChangeset", async (context, next) => {
-    requireOrchestrated(context.request.customData);
+    requireOrchestrated(context.customData);
     requireWorktreeUnitEdit(
       context.request.worktreeID,
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
   worktreeService.use("commitChangeset", async (context, next) => {
-    requireOrchestrated(context.request.customData);
+    requireOrchestrated(context.customData);
     requireWorktreeUnitEdit(
       context.request.worktreeID,
       context.request.changeset.unitID,
-      context.session.userId
+      context.userID
     );
     await next();
   });
@@ -433,7 +436,7 @@ export function createCollaborationStack(
   transport.use(async (context, next) => {
     if (context.kind === "http") {
       const user = options.authService.requireUser(context.incomingMessage);
-      context.userId = user.userId;
+      context.userID = user.userId;
       context.customData.user = user;
     }
     await next();

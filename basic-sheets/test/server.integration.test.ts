@@ -119,7 +119,8 @@ describe("basic-sheets server integration", () => {
       content: JSON.stringify({ dataStream: "Persistent comment\r\n" }),
       mentions: [],
     }, {
-      session: { memberId: "test-member", userId: "demo-user", customData: {} },
+      userID: "demo-user",
+      memberID: "test-member",
     });
 
     await running.app.close();

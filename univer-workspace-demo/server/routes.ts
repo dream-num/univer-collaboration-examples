@@ -1,8 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type {
-  CollabSession,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import type { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import {
   CollabError,
   MAX_UNIT_LIFECYCLE_BATCH_SIZE,
@@ -436,14 +433,18 @@ export function createApplicationRouter(
       });
       return;
     }
-    const session = applicationSession(user);
+    const context = {
+      userID: user.userId,
+      memberID: `app-${randomUUID()}`,
+      customData: { user },
+    };
     const current = await dependencies.collabService.getUnit(
       {
         unitID: resource.unitID,
         type: resource.type,
         revision: 0,
       },
-      { session }
+      context
     );
     const result = await dependencies.collabService.submitChangeset(
       {
@@ -455,7 +456,7 @@ export function createApplicationRouter(
           sid: randomUUID(),
           reqId: 1,
           userID: user.userId,
-          memberID: session.memberId,
+          memberID: context.memberID,
           mutations: [
             {
               id: renameMutationID(resource.type),
@@ -464,7 +465,7 @@ export function createApplicationRouter(
           ],
         },
       },
-      { session }
+      context
     );
     if (result.status === "rejected" || result.status === "retry") {
       throw result.error;
@@ -519,7 +520,7 @@ export function createApplicationRouter(
         optionalName(request.body?.name)
       );
       const options = {
-        session: applicationSession(user),
+        userID: user.userId,
         customData: { resourceID },
       };
       await dependencies.collabService.createUnitFromData(initial, options);
@@ -785,14 +786,6 @@ function currentUser(response: {
   return response.locals.user as DemoUser;
 }
 
-function applicationSession(user: DemoUser): CollabSession {
-  return {
-    memberId: `app-${randomUUID()}`,
-    userId: user.userId,
-    customData: { user },
-  };
-}
-
 async function softDeleteNode(
   dependencies: ApplicationRouterDependencies,
   nodeID: string,
@@ -877,7 +870,7 @@ async function restoreNode(
 
 function lifecycleCallOptions(user: DemoUser) {
   return {
-    session: applicationSession(user),
+    userID: user.userId,
     customData: createWorkspaceLifecycleCustomData(),
   };
 }

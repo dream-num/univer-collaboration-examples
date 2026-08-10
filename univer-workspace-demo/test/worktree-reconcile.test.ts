@@ -186,11 +186,8 @@ describe("Workspace Worktree reconciliation", () => {
     const unit = await recovered.worktreeService.getUnit(
       { worktreeID, unitID, type: UniverType.UNIVER_DOC, revision: 0 },
       {
-        session: {
-          memberId: "reconcile-initial-doc",
-          userId: actorUserID,
-          customData: Object.create(null) as Record<string, unknown>,
-        },
+        userID: actorUserID,
+        customData: Object.create(null) as Record<string, unknown>,
       }
     );
     const documentData = JSON.parse(
@@ -242,11 +239,8 @@ describe("Workspace Worktree reconciliation", () => {
     await application.worktreeService.mergeWorktree(
       { worktreeID: "reconcile-revoked" },
       {
-        session: {
-          memberId: "reconcile-bob",
-          userId: "user-bob",
-          customData: Object.create(null) as Record<string, unknown>,
-        },
+        memberID: "reconcile-bob",
+        userID: "user-bob",
         customData: orchestrationCustomData() as Record<string, unknown>,
       }
     );
@@ -271,11 +265,8 @@ describe("Workspace Worktree reconciliation", () => {
       "Alice"
     );
     const callOptions = {
-      session: {
-        memberId: "reconcile-effects-alice",
-        userId: actorUserID,
-        customData: Object.create(null) as Record<string, unknown>,
-      },
+      memberID: "reconcile-effects-alice",
+      userID: actorUserID,
       customData: orchestrationCustomData() as Record<string, unknown>,
     };
 
@@ -376,11 +367,8 @@ describe("Workspace Worktree reconciliation", () => {
     const { application, databaseFilename } = await createApplication();
     const actorUserID = "user-alice";
     const options = {
-      session: {
-        memberId: "reconcile-user-alice",
-        userId: actorUserID,
-        customData: Object.create(null) as Record<string, unknown>,
-      },
+      memberID: "reconcile-user-alice",
+      userID: actorUserID,
       customData: orchestrationCustomData() as Record<string, unknown>,
     };
 
@@ -427,7 +415,10 @@ describe("Workspace Worktree reconciliation", () => {
     );
     await application.collabService.createUnitFromData(
       trunkInitial,
-      { session: options.session }
+      {
+        userID: options.userID,
+        customData: options.customData,
+      }
     );
     application.productStore.markActive("trunk-resource");
 

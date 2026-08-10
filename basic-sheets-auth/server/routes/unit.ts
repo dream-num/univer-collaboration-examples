@@ -1,8 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type {
-  CollabSession,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import type { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { json, Router } from "express";
 import { UniverType } from "@univerjs/protocol";
 import type { AuthenticatedUser } from "../model.js";
@@ -32,7 +29,7 @@ export function createUnitRouter(dependencies: {
             data: createEmptyWorkbookData(unitID, name),
           },
           {
-            session: callerSession(user),
+            userID: user.userId,
             customData: { user },
           }
         );
@@ -48,12 +45,4 @@ export function createUnitRouter(dependencies: {
     }
   );
   return router;
-}
-
-function callerSession(user: AuthenticatedUser): CollabSession {
-  return {
-    memberId: `http-${randomUUID()}`,
-    userId: user.userId,
-    customData: { user },
-  };
 }

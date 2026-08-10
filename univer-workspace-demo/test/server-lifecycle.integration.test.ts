@@ -70,7 +70,7 @@ describe("Workspace Demo Unit lifecycle", () => {
     expect(deleteUnits).toHaveBeenCalledWith(
       { unitIDs: expectedUnitIDs, hardDelete: false },
       expect.objectContaining({
-        session: expect.objectContaining({ userId: "user-alice" }),
+        userID: "user-alice",
         customData: expect.any(Object),
       })
     );
@@ -86,7 +86,7 @@ describe("Workspace Demo Unit lifecycle", () => {
     expect(recoverUnits).toHaveBeenCalledWith(
       { unitIDs: expectedUnitIDs },
       expect.objectContaining({
-        session: expect.objectContaining({ userId: "user-alice" }),
+        userID: "user-alice",
         customData: expect.any(Object),
       })
     );
