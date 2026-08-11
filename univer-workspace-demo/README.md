@@ -36,14 +36,14 @@
   创建 Formula、Pivot 或 History Worker。
 - 五种 Unit 按 URL 中的 Unit type 动态加载对应编辑器；Base 使用另一套独立 Vite
   Worker 承载 RPC 与公式远端模型。
-- Creator 可以在个人或团队 Scope 创建 Worktree；个人 Worktree 只对 Creator 可见，
+- Creator 可以在个人或团队范围内创建 Worktree；个人 Worktree 只对 Creator 可见，
   团队 Worktree 可选择仅 Creator 或当前团队成员可见。
 - Worktree 可以引用当前用户可编辑的现有 Unit，也可以创建仅存在于 Worktree 的
   Sheet、Doc、Slide、Board、Base；本地 Unit 只在 merge 成功后激活为产品资源。
 - `#/worktrees` 提供只读 Review 页面，显示 trunk、draft 和 merge preview，并支持
   ready、reopen、merge、discard 生命周期操作；侧栏智能工作台入口显示正在进行与
   待确认的任务总数，没有待处理任务时不显示徽标。
-- Worktree 内容读取、提交、ready 和逐 Unit merge 都实时复核产品 ACL；visibility
+- Worktree 内容读取、提交、ready 和逐 Unit merge 都实时复核产品 ACL；可见性配置
   只控制发现与 Review，不授予 Unit 权限。
 - Worktree 创建、加入 Unit 和本地 Unit 创建使用 SQLite operation journal；
   启动时恢复半程操作，并补齐已提交 merge/discard 的产品侧状态。
@@ -163,14 +163,14 @@ History。Board、Base 当前只更新产品资源表，待稳定的协同重命
 软删除或恢复，协同 snapshot、changeset 和 revision 在软删除期间保留，但普通协同
 读写不可见。
 
-产品表与协同表属于两个独立事务边界。第二步产品操作失败时，应用 best-effort 执行
+产品表与协同表属于两个独立事务边界。第二步产品操作失败时，应用尝试执行
 第一步协同操作的逆操作；删除批次不会包含操作前已经在回收站中的后代，因此补偿不会
 把它们意外恢复。`createApplicationRouter` 拥有一个进程内生命周期协调器，全局串行化
 完整的协同与产品双存储操作；取得锁后会重新读取根节点，删除只接受 `active`，恢复只
 接受 `deleted` 且上级可恢复，并根据最新空间成员或资源成员关系重新计算根节点删除权限。
 因此排队期间权限被撤销的请求会在接触任一存储前失败，重复请求和重叠的父子树也不会
-让后到请求反向补偿先到请求。这只是单 Router 进程内的互斥与 best-effort 补偿，不是
-durable 分布式事务；
+让后到请求反向补偿先到请求。这只是单 Router 进程内的互斥和失败补偿，不是可靠的
+分布式事务；
 多进程部署仍需应用级持久化协调方案。它也不承担跨模块永久清理。删除会清除相关用户
 的最近打开记录，恢复后不会自动重新进入最近列表。
 

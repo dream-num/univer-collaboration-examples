@@ -6,7 +6,7 @@
 - 使用 grid Ribbon 和与 Basic Sheets 一致的高级 Sheet 数据/UI 插件；Worktree
   viewer 不创建 Worker。
 - 浏览器继续使用现有 Univer Pro Collaboration Client。
-- `@univerjs-pro/collaboration-worktree-client` 只提供 scoped URL、管理 API 和状态事件。
+- `@univerjs-pro/collaboration-worktree-client` 只提供 Worktree 专用 URL、管理 API 和状态事件。
 - 左侧栏在主线、活动 Worktree 和已处理历史之间组织导航。
 - 页面可以命名并创建 Worktree；Worktree 从固定 Trunk Sheet 建立基线。
 - ready Unit 落后主线时默认显示静态合入预览，并可切换回 Worktree 版本。
