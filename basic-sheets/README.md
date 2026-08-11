@@ -23,7 +23,7 @@ HTTP Server WebSocket upgrade
 ```
 
 Express 承载同源静态资源和应用层接口。History、snapshot 读取、changeset
-submit、session ticket 等协议 HTTP，以及 Comb WebSocket，进入对应
+submit、session ticket 等协议 HTTP，以及协同 WebSocket，进入对应
 Transport Endpoint。框架本身仍不依赖 Express。
 
 后端按 Express composition root 组织：
@@ -124,7 +124,7 @@ client/
 
 - `?unit=<unitID>&type=2` 驱动 Unit 自动加载。
 - Collaboration Client、Collaboration UI 和 Edit History Loader。
-- snapshot、Comb、session ticket、authz 和 history URL。
+- snapshot、changeset submit、协同 WebSocket、session ticket、authz 和 history URL。
 - Pro Formula、Pivot 与 History RPC Worker。
 - Conditional Formatting、Data Validation、Filter、Sort、Drawing、Note、
   Hyperlink、Outline、Pivot、Chart、Sparkline、Table、Shape 和 Thread Comment。
