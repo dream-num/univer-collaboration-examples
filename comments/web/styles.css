@@ -1,0 +1,30 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+#example {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+#toolbar:empty,
+#status:empty {
+  display: none;
+}
+#toolbar {
+  grid-row: 1;
+}
+#status {
+  grid-row: 2;
+  padding: 8px 12px;
+  color: #374151;
+  background: #f3f4f6;
+}
+#app {
+  grid-row: 3;
+  min-height: 0;
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@univerjs/collaboration-example-quick-start",
+  "name": "@univerjs/collaboration-example-worktree",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,6 +20,10 @@
     "@univerjs-pro/collaboration-service": "workspace:*",
     "@univerjs-pro/collaboration-transport-node": "workspace:*",
     "@univerjs-pro/engine-formula-rust-binding": "1.0.0-insiders.20260811-001a0e5",
+    "@univerjs-pro/collaboration-worktree-client": "workspace:*",
+    "@univerjs-pro/collaboration-worktree-database-memory": "workspace:*",
+    "@univerjs-pro/collaboration-worktree-endpoint": "workspace:*",
+    "@univerjs-pro/collaboration-worktree-service": "workspace:*",
     "@univerjs-pro/license": "1.0.0-insiders.20260811-b742876",
     "@univerjs/core": "1.0.0-insiders.20260811-b742876",
     "@univerjs/preset-sheets-core": "1.0.0-insiders.20260811-b742876",

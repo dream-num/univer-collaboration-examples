@@ -1,15 +1,15 @@
 # Examples
 
-示例按“最简协同 → 持久化与可选能力 → 业务认证 / Worktree → 完整办公套件”逐步增加应用层能力，彼此
-不共享业务代码。
+所有示例使用相同的 `web/main.ts + server/main.ts` 最小结构，并且可以独立运行。建议先从
+[`quick-start`](./quick-start/README.md) 建立协同主链路，再按当前问题选择其他示例。
 
-| 示例 | 状态 | 数据库 | 身份与权限 | 重点 |
-|---|---|---|---|---|
-| [`quick-start`](./quick-start/README.md) | 可运行 | Memory | 固定 `demo-user`，固定 allowed | 两个源码文件跑通 Sheet 实时协同 |
-| [`basic-sheets`](./basic-sheets/README.md) | 可运行 | SQLite | 固定 `demo-user`，固定 allowed | 上游式 Univer Sheet 前端、实时协同、持久化、历史恢复 |
-| [`basic-sheets-auth`](./basic-sheets-auth/README.md) | 可运行 | SQLite | HttpOnly JWT + 持久化 ACL | 在 Basic Sheets 上增加用户系统和 `owner/editor/viewer` middleware |
-| [`basic-sheets-worktree`](./basic-sheets-worktree/README.md) | 可运行 | SQLite trunk + Worktree | 固定 `demo-user` | Worktree-local Sheet、draft/ready/merge 和重启恢复 |
-| [`univer-workspace-demo`](./univer-workspace-demo/README.md) | 可运行的产品纵切面 | SQLite | HttpOnly 会话、空间 RBAC 与个人文档定向分享 | Sheet / Doc / Slide、个人/团队目录、与我共享、最近使用、递归回收站与 Sheet History |
+| 示例                                               | 内容                                         |
+| -------------------------------------------------- | -------------------------------------------- |
+| [`quick-start`](./quick-start/README.md)           | 最小 Sheet 实时协同链路                      |
+| [`database-adapter`](./database-adapter/README.md) | SQLite 持久化与重启恢复                      |
+| [`permissions`](./permissions/README.md)           | 可信身份与服务端权限边界                     |
+| [`history`](./history/README.md)                   | 版本历史服务与浏览器入口                     |
+| [`comments`](./comments/README.md)                 | Thread Comment 服务与前端入口                |
+| [`worktree`](./worktree/README.md)                 | draft、ready、reopen 和 merge 的完整生命周期 |
 
-每个 example 的当前实现事实以对应 README 为准；未完成需求与后续顺序见
-[`roadmap.md`](./roadmap.md)。
+示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。
