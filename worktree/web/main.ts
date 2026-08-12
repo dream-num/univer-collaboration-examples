@@ -78,6 +78,7 @@ createUniver({
         socketService: BrowserCollaborationSocketService,
         authzUrl: `${baseURL}/authz`,
         ...collaboration,
+        sendChangesetTimeout: 200,
       },
     ],
     UniverCollaborationClientUIPlugin,

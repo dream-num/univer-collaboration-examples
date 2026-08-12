@@ -41,6 +41,7 @@ createUniver({
       UniverCollaborationClientPlugin,
       {
         socketService: BrowserCollaborationSocketService,
+        sendChangesetTimeout: 200,
         authzUrl: `${baseURL}/authz`,
         snapshotServerUrl: `${baseURL}/snapshot`,
         collabSubmitChangesetUrl: `${baseURL}/comb`,
