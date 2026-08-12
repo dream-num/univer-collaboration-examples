@@ -49,11 +49,11 @@ const worktreeEndpoint = new UniverCollabWorktreeEndpoint(worktreeService, {
 });
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
-  if (context.kind === "http") context.userID = "demo-user";
+  context.userID = "demo-user";
   await next();
 });
-transport.use(endpoint);
-transport.use(worktreeEndpoint);
+transport.register(endpoint);
+transport.register(worktreeEndpoint);
 
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },

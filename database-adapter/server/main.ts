@@ -44,10 +44,10 @@ endpoint.use("connect", async (context, next) => {
   await next();
 });
 transport.use(async (context, next) => {
-  if (context.kind === "http") context.userID = "demo-user";
+  context.userID = "demo-user";
   await next();
 });
-transport.use(endpoint);
+transport.register(endpoint);
 
 try {
   await service.getUnit(

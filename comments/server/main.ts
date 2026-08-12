@@ -58,13 +58,13 @@ const commentService = new UniverCommentService({
 });
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
-  if (context.kind === "http") context.userID = "demo-user";
+  context.userID = "demo-user";
   await next();
 });
-transport.use(
+transport.register(
   new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }),
 );
-transport.use(endpoint);
+transport.register(endpoint);
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
   { userID: "demo-user" },

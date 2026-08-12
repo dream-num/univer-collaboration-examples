@@ -75,7 +75,6 @@ endpoint.use("joinUnit", async (context, next) => {
   await next();
 });
 transport.use(async (context, next) => {
-  if (context.kind !== "http") return next();
   const user = currentUser(context.incomingMessage);
   if (!user) {
     context.response.statusCode = 401;
@@ -85,7 +84,7 @@ transport.use(async (context, next) => {
   context.userID = user.userId;
   await next();
 });
-transport.use(endpoint);
+transport.register(endpoint);
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
   { userID: users.editor.userId },

@@ -63,11 +63,11 @@ historyService.attach(service);
 
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
-  if (context.kind === "http") context.userID = "demo-user";
+  context.userID = "demo-user";
   await next();
 });
-transport.use(new UniverHistoryEndpoint(historyService));
-transport.use(endpoint);
+transport.register(new UniverHistoryEndpoint(historyService));
+transport.register(endpoint);
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
   { userID: "demo-user" },
