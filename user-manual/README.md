@@ -1,51 +1,47 @@
-# Univer Collaboration SDK 用户手册
+# Univer Collaboration SDK User Manual
 
-> 适用于 `1.0.0-insiders.20260818-b79e2bb` release cohort。手册与本仓库示例使用同一组
-> 精确版本的 `@univerjs/*` 和 `@univerjs-pro/*` package。
+English | [简体中文](./README.zh-CN.md)
 
-Univer Collaboration SDK 提供 Univer 文档的服务端协同核心能力，内置 OT、协同版本管理、
-快照与实时同步。
-通过 Database Adapter、middleware 和事件机制，开发者可以自主选择数据库和基础设施，
-接入现有的身份、权限及业务逻辑，灵活构建符合自身业务需求的协同服务。
+> Applies to the `1.0.0-insiders.20260818-b79e2bb` release cohort. The manual and the examples in this repository use the same exact versions of all `@univerjs/*` and `@univerjs-pro/*` packages.
 
-## 先建立一条主线
+The Univer Collaboration SDK provides the server-side collaboration core for Univer documents, including OT, collaboration revision management, snapshots, and real-time synchronization. Through Database Adapters, middleware, and events, developers can choose their own database and infrastructure, integrate existing identity, authorization, and business logic, and build a collaboration service for their product requirements.
+
+## Establish the main path first
 
 ```text
 Univer Collaboration Client
-→ Node Transport              接收 HTTP/WebSocket，运行应用的 HTTP middleware
-→ UniverCollabEndpoint        处理前端协议、Session 和实时房间
-→ UniverCollabService         处理协同数据、OT、revision 和 Unit 生命周期
-→ Database Adapter            原子保存 snapshot、changeset 和 revision
+→ Node Transport              Receives HTTP/WebSocket and runs application HTTP middleware
+→ UniverCollabEndpoint        Handles frontend protocol, Sessions, and real-time rooms
+→ UniverCollabService         Handles collaboration data, OT, revisions, and the Unit lifecycle
+→ Database Adapter            Atomically stores snapshots, changesets, and revisions
 ```
 
-这四层是一套服务端组装，不是四种可替代的接入方式。第一次接入时，先让这条链路完整运行，
-再按产品需求增加 History、Thread Comment 或 Worktree。
+These four layers form one server assembly; they are not four interchangeable integration options. For the first integration, make the complete path work before adding History, Thread Comment, or Worktree for product requirements.
 
-## 推荐阅读顺序
+## Recommended reading order
 
-1. [快速开始](./quick-start.md)：运行 Quick Start 示例，用两个浏览器确认完整协同链路。
-2. [搭建协同服务](./integration.md)：独立启动服务，再通过 middleware 接入应用逻辑。
-3. [身份与 middleware](./identity-and-middleware.md)：理解 HTTP、WebSocket Session 和三层扩展点。
-4. [生产运行](./production.md)：选择持久化、部署网络入口、正确启停并定位问题。
-5. [可选能力](./extensions.md)：按需增加 History、Thread Comment 和 Worktree。
+1. [Quick Start](./quick-start.md): run the Quick Start example and use two browsers to verify the complete collaboration path.
+2. [Build a collaboration service](./integration.md): start a standalone service, then integrate application logic through middleware.
+3. [Identity and middleware](./identity-and-middleware.md): understand HTTP, WebSocket Sessions, and the three extension layers.
+4. [Production operation](./production.md): choose persistence, deploy the network entry, start and stop correctly, and diagnose problems.
+5. [Optional capabilities](./extensions.md): add History, Thread Comment, and Worktree as needed.
 
-## 三类文档分别解决什么问题
+## What each documentation type is for
 
-| 资源 | 适合什么时候读 |
+| Resource | When to read it |
 | --- | --- |
-| 用户手册 | 完成跨 package 的接入任务，建立整体心智模型 |
-| [`examples`](../examples/README.md) | 运行和对照一套真实的服务端与前端代码 |
-| Package README | 查某个 package 的 API、middleware action、配置和资源所有权 |
+| User manual | Complete integration tasks across packages and establish the overall mental model |
+| [`examples`](../examples/README.md) | Run and compare real server and frontend code |
+| Package README | Look up a package's API, middleware actions, configuration, and resource ownership |
 
-用户手册不会重复列出每个 package 的完整 API。遇到具体 action、路由或构造参数时，再查看
-对应 Package README。
+The user manual does not repeat every package's complete API. When you need a specific action, route, or constructor option, consult the corresponding Package README.
 
-## 应用仍然需要提供什么
+## What the application must still provide
 
-- 从 Cookie、Session 或 Bearer token 得到稳定的业务 `userID`。
-- 保存用户、ACL、租户、目录、名称、分享关系等产品数据。
-- 提供“新建文档”等应用 API，并在其中创建协同 Unit。
-- 在 Transport、Endpoint 和 Service middleware 中接入认证、权限、日志、trace 或外部集成。
-- 选择持久化、备份、反向代理和部署拓扑。
+- Resolve a stable business `userID` from a Cookie, Session, or Bearer token.
+- Store product data such as users, ACLs, tenants, directories, names, and sharing relationships.
+- Provide application APIs such as “create document” and create the collaboration Unit in them.
+- Integrate authentication, authorization, logging, tracing, or external systems through Transport, Endpoint, and Service middleware.
+- Choose persistence, backups, reverse proxy configuration, and deployment topology.
 
-前端传来的用户字段、`memberID` 或 revision 不能替代这些服务端边界。
+User fields, `memberID`, or revisions supplied by the frontend cannot replace these server-side boundaries.

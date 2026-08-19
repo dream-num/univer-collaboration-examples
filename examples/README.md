@@ -1,15 +1,16 @@
 # Examples
 
-所有示例使用相同的 `web/main.ts + server/main.ts` 最小结构，并且可以独立运行。建议先从
-[`quick-start`](./quick-start/README.md) 建立协同主链路，再按当前问题选择其他示例。
+English | [简体中文](./README.zh-CN.md)
 
-| 示例                                               | 内容                                         |
-| -------------------------------------------------- | -------------------------------------------- |
-| [`quick-start`](./quick-start/README.md)           | 最小 Sheet 实时协同链路                      |
-| [`database-adapter`](./database-adapter/README.md) | SQLite 持久化与重启恢复                      |
-| [`permissions`](./permissions/README.md)           | 可信身份与服务端权限边界                     |
-| [`history`](./history/README.md)                   | 版本历史服务与浏览器入口                     |
-| [`comments`](./comments/README.md)                 | Thread Comment 服务与前端入口                |
-| [`worktree`](./worktree/README.md)                 | draft、ready、reopen 和 merge 的完整生命周期 |
+All examples use the same minimal `web/main.ts + server/main.ts` structure and can run independently. Start with [`quick-start`](./quick-start/README.md) to establish the main collaboration path, then choose another example for your current problem.
 
-示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。
+| Example | What it demonstrates |
+| --- | --- |
+| [`quick-start`](./quick-start/README.md) | Minimal real-time Sheet collaboration path |
+| [`database-adapter`](./database-adapter/README.md) | SQLite persistence and restart recovery |
+| [`permissions`](./permissions/README.md) | Trusted identity and server-side permission boundaries |
+| [`history`](./history/README.md) | Version history service and browser entry |
+| [`comments`](./comments/README.md) | Thread Comment service and frontend entry |
+| [`worktree`](./worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
+
+The examples cover only teaching and copyable assembly. They do not include file spaces, multi-type product editors, or a complete office suite.

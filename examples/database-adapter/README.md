@@ -1,14 +1,13 @@
 # Database Adapter
 
-在 Quick Start 的基础上把 Memory Adapter 换成 SQLite，展示协同数据如何在服务重启后
-继续保留。
+English | [简体中文](./README.zh-CN.md)
+
+Replaces the Memory Adapter from Quick Start with SQLite to show how collaboration data survives a service restart.
 
 ```bash
 pnpm example:database-adapter
 ```
 
-打开 <http://127.0.0.1:3010/?unit=persistent-sheet&type=2>。数据写入 `.data/collaboration.sqlite`，再次启动仍会读取同一个
-Unit。需要清空演示数据时运行 `pnpm --filter @univerjs/collaboration-example-database-adapter reset`。
+Open <http://127.0.0.1:3010/?unit=persistent-sheet&type=2>. Data is written to `.data/collaboration.sqlite`, and the same Unit is loaded after another start. To clear the demo data, run `pnpm --filter @univerjs/collaboration-example-database-adapter reset`.
 
-只需要对照 Quick Start 阅读 `server/main.ts`：主要变化就是把 Memory Adapter 换成 SQLite，
-并在 Unit 不存在时创建一次。
+Read only `server/main.ts` alongside Quick Start: the main change is replacing the Memory Adapter with SQLite and creating the Unit once when it does not exist.

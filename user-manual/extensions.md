@@ -1,22 +1,20 @@
-# 可选能力
+# Optional Capabilities
 
-先完成 Collaboration 主线，再按产品需求选择可选能力。History、Thread Comment 和 Worktree
-都有独立的 Service、middleware 和 Database Adapter，但可以复用同一个 Transport、应用
-认证以及 SQLite 文件。
+English | [简体中文](./extensions.zh-CN.md)
 
-| 需求 | 增加什么 | 先运行的 example |
+Complete the main Collaboration path first, then select optional capabilities for product requirements. History, Thread Comment, and Worktree each have an independent Service, middleware, and Database Adapter, but they can reuse the same Transport, application authentication, and SQLite file.
+
+| Requirement | What to add | Example to run first |
 | --- | --- | --- |
-| 面向用户的版本历史 | History Service + Endpoint + Adapter | [History](../examples/history/README.md) |
+| User-facing version history | History Service + Endpoint + Adapter | [History](../examples/history/README.md) |
 | Sheet/Doc Thread Comment | Comment Service + Endpoint + Adapter | [Comments](../examples/comments/README.md) |
-| 隔离 draft、评审并合入 trunk | Worktree Service + Endpoint + Client + Adapter | [Worktree](../examples/worktree/README.md) |
+| Isolated draft, review, and merge into trunk | Worktree Service + Endpoint + Client + Adapter | [Worktree](../examples/worktree/README.md) |
 
-每个 example 的 `server/main.ts` 和 `web/main.ts` 是推荐的组装参考。具体构造参数、API、
-middleware action 和资源释放以对应 Package README 为准。
+Each example's `server/main.ts` and `web/main.ts` are the recommended assembly references. Consult the corresponding Package README for exact constructor options, APIs, middleware actions, and resource disposal.
 
 ## History
 
-History 把 confirmed revisions 分组为面向用户的历史条目，并补全创建者资料。它是协同数据
-的派生索引，Collaboration Service 保存的 confirmed changesets 才是 Unit 状态的权威来源。
+History groups confirmed revisions into user-facing history entries and completes creator profiles. It is a derived index of collaboration data; confirmed changesets stored by the Collaboration Service remain the authoritative source of Unit state.
 
 ```text
 Transport
@@ -24,17 +22,13 @@ Transport
 └─→ UniverCollabEndpoint  → UniverCollabService  → core Adapter
 ```
 
-接入时先组装 core，再创建 History Service 并 `attach(collabService)`，最后把 History
-Endpoint 和主 Endpoint 注册到同一个 Transport。History Service 有独立 middleware；
-User Provider 只补全姓名和头像，不是权限边界。
+Assemble core first, then create the History Service and call `attach(collabService)`. Finally, register the History Endpoint and the main Endpoint on the same Transport. The History Service has independent middleware. The User Provider only completes names and avatars; it is not an authorization boundary.
 
-`attach()` 适合进程内更新派生索引，失败不会回滚已经确认的协同数据。若要求历史索引严格
-不丢失，应在协同提交事务中写 transactional outbox，再由可重复执行的任务更新 History。
+`attach()` is suitable for updating the derived index in process. Failure does not roll back already confirmed collaboration data. If the history index must never be lost, write a transactional outbox in the collaboration commit transaction and update History with a repeatable task.
 
 ## Thread Comment
 
-Comment Service 保存评论正文、回复、编辑和 solved 状态；会随 Sheet/Doc 结构变化的 root
-anchor 仍属于主协同 snapshot/changeset。两部分都要纳入产品的数据生命周期。
+The Comment Service stores comment content, replies, edits, and solved state. Root anchors that change with the Sheet/Doc structure remain part of the main collaboration snapshot and changesets. Both parts must be included in the product data lifecycle.
 
 ```text
 Transport
@@ -42,19 +36,13 @@ Transport
 └─→ UniverCollabEndpoint  → UniverCollabService  → core Adapter
 ```
 
-Comment Endpoint 通过主 Endpoint 的 Unit room 发布 `comment_update`，因此创建时要把主
-Endpoint 作为 `roomHost`。读取评论是普通 HTTP；写评论会关联已经 JOIN 的在线 Session。
-所有路由使用当前 Transport HTTP 请求的 `userID/customData` 调用 Comment Service，Comment
-权限安装在 Comment Service middleware。
+The Comment Endpoint publishes `comment_update` through the main Endpoint's Unit room, so pass the main Endpoint as `roomHost` when constructing it. Reading comments is ordinary HTTP; writing comments is associated with an online Session that has already JOINed. Every route calls the Comment Service with the current Transport HTTP request's `userID/customData`; install Comment authorization in Comment Service middleware.
 
-实时更新失败不会回滚已经提交的评论，客户端可以重新 list 恢复。当前实时广播仍只覆盖
-一个主 Endpoint 进程。
+A real-time delivery failure does not roll back a committed comment; the client can recover by listing comments again. Real-time broadcast currently still covers only one main Endpoint process.
 
 ## Worktree
 
-Worktree 为一个或多个 Unit 提供隔离的协同 draft，以及 ready、reopen、discard、合入评估
-和逐 Unit merge。它复用 trunk Service 的 OT 和提交引擎，但 draft changesets、状态和实时
-房间都按 `(worktreeID, unitID)` 隔离。
+Worktree provides an isolated collaborative draft for one or more Units, together with ready, reopen, discard, merge evaluation, and per-Unit merge. It reuses the trunk Service's OT and submit engine, while draft changesets, state, and real-time rooms are isolated by `(worktreeID, unitID)`.
 
 ```text
 Transport
@@ -62,9 +50,7 @@ Transport
 └─→ trunk Endpoint    → trunk Service    → core Adapter
 ```
 
-trunk Endpoint 与 Worktree Endpoint 必须共享同一个 session ticket store；当前提供的内存
-实现适用于它们位于同一进程的推荐拓扑。除此之外，两套 Endpoint、Service 和 Adapter 都是
-独立生命周期对象。
+The trunk Endpoint and Worktree Endpoint must share the same session ticket store. The provided memory implementation is suitable for the recommended topology in which both run in one process. Apart from that shared store, the two Endpoint, Service, and Adapter sets have independent lifecycles.
 
 ```text
 create → draft → ready → merging → merged
@@ -74,17 +60,13 @@ create → draft → ready → merging → merged
 draft / ready → discarded
 ```
 
-只有 `draft` 可以继续提交。`markReady` 冻结各 Unit 当前 draft revision；多 Unit merge 按
-Unit 推进，不保证跨 Unit 原子性，产品 UI 应展示每个 Unit 的 merge result。
+Only `draft` accepts further submissions. `markReady` freezes each Unit's current draft revision. Multi-Unit merge advances per Unit and is not atomic across Units; the product UI should show the merge result of every Unit.
 
-Worktree middleware 与 trunk Service middleware 相互独立：前者保护 draft 可见性、编辑和
-merge，最终写入 trunk 时仍会进入 trunk Service 自己的权限 middleware。Worktree 的实时
-房间、状态事件和广播当前同样只保证单 Endpoint 进程。
+Worktree middleware and trunk Service middleware are independent. The former protects draft visibility, editing, and merge; final writes to trunk still enter the trunk Service's own authorization middleware. Worktree real-time rooms, state events, and broadcasts currently also guarantee only one Endpoint process.
 
-## 共同的存储和生命周期规则
+## Shared storage and lifecycle rules
 
-- core、History、Comment 和 Worktree SQLite Adapter 可以使用同一个数据库文件，但它们是
-  不同契约和资源对象，需要分别创建和释放。
-- 可选 Service 不继承主 Service middleware；应用必须分别安装所需的读取和写入策略。
-- core hard delete 不会自动清理其他模块的数据，跨模块删除和保留策略由应用协调。
-- 所有 Collaboration 和 Univer package 必须使用同一匹配 release cohort 的精确版本。
+- Core, History, Comment, and Worktree SQLite Adapters can use the same database file, but they are different contracts and resource objects and must be created and disposed independently.
+- Optional Services do not inherit middleware from the main Service; the application must install the required read and write policies on each one.
+- Core hard delete does not automatically clean up data from other modules. The application coordinates cross-module deletion and retention policies.
+- All Collaboration and Univer packages must use exact versions from the same matching release cohort.

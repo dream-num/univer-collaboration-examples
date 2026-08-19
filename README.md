@@ -1,23 +1,25 @@
 # Univer Collaboration SDK
 
-本仓库提供 Univer Collaboration SDK 的公开用户手册和可运行示例。
+English | [简体中文](./README.zh-CN.md)
 
-## 从这里开始
+This repository provides the public user manual and runnable examples for the Univer Collaboration SDK.
 
-1. 阅读[快速开始](./user-manual/quick-start.md)，用两个浏览器确认 HTTP、WebSocket 和 OT 主链路。
-2. 查看[完整用户手册](./user-manual/README.md)，了解服务端组装、身份、middleware 和生产运行。
-3. 按问题选择[可运行示例](./examples/README.md)，对照最小的前后端源码。
+## Start here
 
-## 运行示例
+1. Read the [Quick Start](./user-manual/quick-start.md) and use two browsers to verify the HTTP, WebSocket, and OT path.
+2. Read the [complete user manual](./user-manual/README.md) to understand server assembly, identity, middleware, and production operation.
+3. Choose a [runnable example](./examples/README.md) for your current problem and compare the minimal frontend and backend source.
 
-准备 Node.js 24 及以上版本和 pnpm：
+## Run the examples
+
+Prepare Node.js 24 or later and pnpm:
 
 ```bash
 pnpm install
 pnpm example:quick-start
 ```
 
-其他示例使用同样的命令形式：
+The other examples use the same command form:
 
 ```bash
 pnpm example:database-adapter
@@ -27,5 +29,4 @@ pnpm example:comments
 pnpm example:worktree
 ```
 
-固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
-[身份与 middleware](./user-manual/identity-and-middleware.md)和[生产运行](./user-manual/production.md)。
+Fixed users, demo authorization, and local secrets are for teaching only and are not production configuration. Before integrating in production, read [Identity and middleware](./user-manual/identity-and-middleware.md) and [Production operation](./user-manual/production.md).

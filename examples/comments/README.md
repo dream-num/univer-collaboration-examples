@@ -1,14 +1,13 @@
 # Comments
 
-在基础协同 Sheet 上增加 Thread Comment 的服务端存储、协议 Endpoint 和前端入口。
+English | [简体中文](./README.zh-CN.md)
+
+Adds server-side Thread Comment storage, the protocol Endpoint, and the frontend entry to a collaborative Sheet.
 
 ```bash
 pnpm example:comments
 ```
 
-打开 <http://127.0.0.1:3010/?unit=comments-sheet&type=2>，选择单元格并使用评论入口。`server/main.ts` 展示了
-Comment Service 的独立 Adapter，以及 Comment Endpoint 如何通过 `roomHost` 复用主协同
-Endpoint 的 Session 和 Unit room。
+Open <http://127.0.0.1:3010/?unit=comments-sheet&type=2>, select a cell, and use the comment entry. `server/main.ts` shows the independent Comment Service Adapter and how the Comment Endpoint reuses the main collaboration Endpoint's Session and Unit room through `roomHost`.
 
-评论 anchor 仍随 Sheet 协同数据变化，评论正文和 solved 状态由 Comment Service 保存；两者
-必须一起纳入业务数据生命周期。
+Comment anchors still change with Sheet collaboration data, while comment content and solved state are stored by the Comment Service. Both must be included in the product data lifecycle.

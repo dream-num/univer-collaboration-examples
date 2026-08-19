@@ -1,20 +1,18 @@
-# 生产运行
+# Production Operation
 
-上线前需要同时确认持久化、网络入口、身份、进程模型和资源释放。数据库提交成功与实时消息
-送达是两种不同保证：Database Adapter 保存权威数据，WebSocket 负责低延迟反馈，客户端在
-断线后通过 HTTP 补齐 confirmed changesets。
+English | [简体中文](./production.zh-CN.md)
 
-## 选择 Database Adapter
+Before going live, verify persistence, network ingress, identity, process topology, and resource disposal together. A successful database commit and real-time message delivery are different guarantees: the Database Adapter stores authoritative data, WebSocket provides low-latency feedback, and the client fetches missing confirmed changesets through HTTP after disconnection.
 
-| Adapter | 适合场景 | 需要知道的限制 |
+## Choose a Database Adapter
+
+| Adapter | Suitable scenarios | Limits to understand |
 | --- | --- | --- |
-| Memory | 测试、本地教学、临时数据 | 进程退出后数据丢失，进程之间不共享 |
-| SQLite | 本地应用和中小规模单 Node 部署 | Node.js 22+；应用负责目录、文件、备份和运行参数 |
-| 自定义 Adapter | 已有共享数据库或更大部署 | 必须实现 `IDatabaseAdapter` 并通过共享 contract tests |
+| Memory | Tests, local teaching, temporary data | Data is lost when the process exits and is not shared between processes |
+| SQLite | Local applications and small-to-medium single-Node deployments | Node.js 22+; the application owns directories, files, backups, and runtime options |
+| Custom Adapter | An existing shared database or larger deployment | Must implement `IDatabaseAdapter` and pass the shared contract tests |
 
-SQLite Adapter 保证初始 snapshot、revision CAS、提交幂等、snapshot 可见性和 Unit 生命周期
-写入的原子契约。它只保存协同核心数据，不保存用户、ACL、目录、History、Comment 或
-Worktree 数据。
+The SQLite Adapter guarantees the atomic contracts for initial snapshots, revision CAS, submission idempotency, snapshot visibility, and Unit lifecycle writes. It stores only core collaboration data, not users, ACLs, directories, History, Comment, or Worktree data.
 
 ```ts
 import { mkdir } from 'node:fs/promises';
@@ -28,10 +26,9 @@ const database = new SQLiteDatabaseAdapter({
 });
 ```
 
-空库会自动初始化 schema；不完整或不支持的 schema 会被拒绝，不会自动迁移旧结构。SQLite
-Adapter 不主动修改 `journal_mode`，WAL、checkpoint、备份和恢复策略由应用管理。
+An empty database initializes its schema automatically. An incomplete or unsupported schema is rejected and is not migrated automatically. The SQLite Adapter does not change `journal_mode`; the application manages WAL, checkpoints, backup, and restore policies.
 
-## 推荐的第一版拓扑
+## Recommended initial topology
 
 ```text
 Browser
@@ -39,51 +36,44 @@ Browser
 Reverse proxy
   │
 One Node application process
-  ├── Product API、authentication 和 ACL
+  ├── Product API, authentication, and ACL
   ├── Transport + Endpoint
   ├── Collaboration Service
   └── SQLite Adapter → persistent volume
 ```
 
-Session、Unit room、Presence、ACK 和广播当前只在一个 Endpoint 进程内共享。多个 Service
-实例使用正确的 Database Adapter 时仍可通过 revision CAS 保证数据正确，但多个 Endpoint
-进程不会自动共享在线成员和实时房间；sticky session 也不能补齐这项能力。因此当前应按
-单 Endpoint 进程部署实时入口。
+Sessions, Unit rooms, Presence, ACK, and broadcasts are currently shared only within one Endpoint process. Multiple Service instances with a correct Database Adapter still preserve data correctness through revision CAS, but multiple Endpoint processes do not automatically share online members or real-time rooms; sticky sessions do not provide that missing capability. Deploy the real-time ingress as one Endpoint process for now.
 
-## 反向代理和网络
+## Reverse proxy and network
 
-代理至少需要转发以下协议入口：
+The proxy must forward at least these protocol entries:
 
-- `/universer-api/snapshot`：snapshot、block 和缺失 changesets；
-- `/universer-api/comb`：HTTP changeset 提交；
-- `/universer-api/user/session-ticket`：一次性 WebSocket ticket；
-- `/universer-api/comb/connect`：WebSocket upgrade 和实时消息。
+- `/universer-api/snapshot`: snapshots, blocks, and missing changesets;
+- `/universer-api/comb`: HTTP changeset submission;
+- `/universer-api/user/session-ticket`: one-time WebSocket ticket;
+- `/universer-api/comb/connect`: WebSocket upgrade and real-time messages.
 
-代理必须保留 query string，并为 `/comb/connect` 开启 WebSocket upgrade。HTTPS 页面使用
-WSS；跨域部署还要同时处理 Cookie/credentials、CORS 和 WebSocket origin。
+The proxy must preserve the query string and enable WebSocket upgrade for `/comb/connect`. HTTPS pages use WSS. Cross-origin deployment must also handle Cookie/credentials, CORS, and WebSocket origin together.
 
-Transport 的 HTTP body 和 WebSocket message 默认上限均为 16 MiB。应用框架和代理的限制
-不能更小于实际 snapshot 或 changeset；WebSocket idle timeout 也要允许客户端保持长连接。
+Transport's default HTTP body and WebSocket message limits are both 16 MiB. Application framework and proxy limits must not be smaller than actual snapshots or changesets, and the WebSocket idle timeout must allow clients to keep long-lived connections.
 
-## 数据、事件和备份
+## Data, events, and backups
 
-| 结果 | 保证方式 |
+| Result | Guarantee |
 | --- | --- |
-| confirmed changeset 和 revision | Database Adapter 原子持久化 |
-| 客户端重复提交 | `(unitID, sid, reqId)` 幂等 |
-| ACK、Presence 和广播 | 当前 Endpoint 进程内实时发送；失败后由客户端通过 HTTP 恢复 |
-| Service event 和 History `attach()` | 进程内执行；失败不回滚已提交数据 |
-| webhook、消息队列等可靠外部投递 | 应用与具体 Adapter 使用 transactional outbox |
+| Confirmed changeset and revision | Atomically persisted by the Database Adapter |
+| Duplicate client submission | Idempotent by `(unitID, sid, reqId)` |
+| ACK, Presence, and broadcast | Sent in real time within the current Endpoint process; the client recovers through HTTP after failure |
+| Service events and History `attach()` | Run in process; failure does not roll back committed data |
+| Reliable external delivery such as webhooks or queues | Application and concrete Adapter use a transactional outbox |
 
-备份范围不能只有 core SQLite 表。产品用户、ACL、目录以及启用的 History、Comment、
-Worktree 都有独立存储边界。hard delete 或跨模块清理也应由应用统一协调。
+Backups must cover more than the core SQLite tables. Product users, ACLs, directories, and enabled History, Comment, and Worktree capabilities all have independent storage boundaries. The application should also coordinate hard delete and cross-module cleanup.
 
-## 启动、就绪和停止
+## Startup, readiness, and shutdown
 
-启动时先准备数据库目录和配置，再创建 Adapter、Service、Endpoint、Transport，最后开始
-监听端口。就绪检查应确认 schema 初始化和完整组装已经成功，而不只是进程仍在运行。
+At startup, prepare database directories and configuration first; then create Adapter, Service, Endpoint, and Transport; finally start listening. Readiness checks should confirm that schema initialization and the complete assembly succeeded, not merely that the process is alive.
 
-停止时先从负载均衡器移除实例并停止新流量，再按以下顺序释放：
+For shutdown, first remove the instance from the load balancer and stop new traffic, then dispose in this order:
 
 ```text
 Transport
@@ -93,23 +83,20 @@ Transport
 → Collaboration Database Adapter
 ```
 
-Transport 拥有并释放它注册的 Endpoint；Endpoint 不释放 Service；Service 不释放应用注入
-的 Adapter。突然终止不会写入半个数据库事务，但客户端可能没有收到响应，并会使用原幂等
-键重试。
+Transport owns and disposes its registered Endpoints. Endpoint does not dispose Service. Service does not dispose an application-injected Adapter. Abrupt termination does not write half a database transaction, but the client may not receive a response and will retry with the original idempotency key.
 
-## 按现象定位问题
+## Diagnose by symptom
 
-| 现象 | 首先检查 |
+| Symptom | Check first |
 | --- | --- |
-| 所有协议请求都是 `401` | Transport HTTP middleware 是否识别 Cookie/Header，并在成功后调用 `next()` |
-| session ticket 成功，WebSocket 返回 `401` | ticket 是否过期、已消费，连接 URL 是否携带刚取得的 ticket |
-| HTTP 可加载，始终没有在线协同 | Node server 和代理是否转发 `/comb/connect` upgrade |
-| 能加载但 JOIN 被拒绝 | Endpoint `joinUnit` middleware 和 Session 中的 `userID` |
-| 能进入房间但 snapshot 被拒绝 | Service `readUnitData`；JOIN 权限不能替代读取权限 |
-| 能读取但不能编辑 | Service `submitChangeset` 和前端只读提示对应的应用 Authz API |
-| 编辑者本地成功，其他窗口不更新 | 是否部署了多个 Endpoint 进程，或提交是否发生在另一个 Service 进程 |
-| 重启后 Unit 消失 | 是否仍使用 Memory Adapter，SQLite 文件是否位于持久化卷 |
-| 协议请求返回 `404` | Express 是否恢复完整 `request.originalUrl`，Endpoint 是否已注册 |
+| Every protocol request is `401` | Whether Transport HTTP middleware recognizes the Cookie/Header and calls `next()` after success |
+| Session ticket succeeds but WebSocket returns `401` | Whether the ticket expired or was consumed, and whether the connection URL carries the newly issued ticket |
+| HTTP loads but online collaboration never starts | Whether the Node server and proxy forward the `/comb/connect` upgrade |
+| Loading works but JOIN is rejected | Endpoint `joinUnit` middleware and the Session's `userID` |
+| The room is entered but snapshot is rejected | Service `readUnitData`; JOIN permission cannot replace read permission |
+| Reading works but editing does not | Service `submitChangeset` and the application Authz API used for the frontend read-only hint |
+| An edit succeeds locally but other windows do not update | Whether multiple Endpoint processes are deployed, or the submit occurred in another Service process |
+| Unit disappears after restart | Whether the Memory Adapter is still in use and whether the SQLite file is on a persistent volume |
+| Protocol request returns `404` | Whether Express restores the complete `request.originalUrl` and the Endpoint is registered |
 
-定位时按 Transport HTTP → session ticket → WebSocket upgrade → Endpoint JOIN → Service read/
-submit → Database 的顺序检查，通常比从客户端错误栈反推更快。
+Diagnose in Transport HTTP → session ticket → WebSocket upgrade → Endpoint JOIN → Service read/submit → Database order. This is usually faster than reasoning backward from a client error stack.

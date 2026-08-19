@@ -1,9 +1,10 @@
-# 搭建协同服务
+# Build a Collaboration Service
 
-本章先启动一个独立的、可持久化的协同服务，再通过 Transport、Endpoint 和 Service
-middleware 接入应用的用户、日志、权限和其他业务逻辑。
+English | [简体中文](./integration.zh-CN.md)
 
-## 1. 安装服务端 package
+This chapter first starts a standalone persistent collaboration service, then integrates application users, logging, authorization, and other business logic through Transport, Endpoint, and Service middleware.
+
+## 1. Install server packages
 
 ```bash
 pnpm add \
@@ -14,13 +15,11 @@ pnpm add \
   @univerjs/protocol
 ```
 
-SQLite Adapter 支持 Node.js 22 及以上；本仓库的可运行示例统一要求 Node.js 24 及以上。
-所有 Univer 与 Collaboration package 必须使用
-同一匹配 release cohort 的精确版本。
+The SQLite Adapter supports Node.js 22 or later; runnable examples in this repository uniformly require Node.js 24 or later. All Univer and Collaboration packages must use exact versions from the same matching release cohort.
 
-## 2. 启动基本服务
+## 2. Start the basic service
 
-下面使用 SQLite 保存数据，并用固定的 `local-user` 跑通独立 Node 服务：
+The following service stores data in SQLite and uses a fixed `local-user` to establish a standalone Node service:
 
 ```ts
 import { mkdir } from 'node:fs/promises';
@@ -40,7 +39,8 @@ const collabService = new UniverCollabService({ dbAdapter: database });
 const collabEndpoint = new UniverCollabEndpoint(collabService);
 const transport = createNodeTransport();
 
-// 固定用户只用于先独立跑通服务，下一节会替换为应用认证。
+// The fixed user only establishes the standalone service first. Replace it
+// with application authentication in the next section.
 transport.use(async (ctx, next) => {
   ctx.userID = 'local-user';
   await next();
@@ -57,22 +57,18 @@ server.on('upgrade', (request, socket, head) => {
 server.listen(3010);
 ```
 
-这四个对象组成完整服务端。Transport 是网络入口，Endpoint 处理 Univer 前端协议，Service
-处理协同数据，Database Adapter 保存权威状态。普通 HTTP request 和 WebSocket upgrade 都
-必须交给 Transport；否则 snapshot 可以读取，但实时 Session 无法建立。
+These four objects form the complete server. Transport is the network ingress, Endpoint handles the Univer frontend protocol, Service handles collaboration data, and Database Adapter stores authoritative state. Both ordinary HTTP requests and WebSocket upgrades must be forwarded to Transport; otherwise snapshots can load but real-time Sessions cannot be established.
 
-固定用户不适合正式环境。确认基本服务能够启动后，再用下一节的 middleware 接入应用。
+The fixed user is not suitable for production. After confirming that the basic service starts, integrate the application through middleware in the next section.
 
-## 3. 使用 middleware 接入应用
+## 3. Integrate the application with middleware
 
-下面假设应用提供 `authenticate()`、`applicationAcl` 和 `logger`。在正式服务中，删除上一节
-固定 `local-user` 的 middleware，改为按 Transport、Endpoint、Service 的顺序安装以下
-middleware，再调用 `transport.register(collabEndpoint)`。
+Assume the application provides `authenticate()`, `applicationAcl`, and `logger`. In the production service, remove the fixed `local-user` middleware from the previous section. Install the following middleware in Transport, Endpoint, Service order, then call `transport.register(collabEndpoint)`.
 
 ```ts
 import { CollabError } from '@univerjs-pro/collaboration-service';
 
-// 每个 Collaboration HTTP 请求进入 SDK 时先经过认证 middleware。
+// Authenticate every Collaboration HTTP request before it enters the SDK.
 transport.use(async (ctx, next) => {
   const user = await authenticate(ctx.incomingMessage);
   if (!user) {
@@ -86,7 +82,7 @@ transport.use(async (ctx, next) => {
   await next();
 });
 
-// 认证成功后，每个 Collaboration HTTP 请求经过日志 middleware。
+// Log every Collaboration HTTP request after successful authentication.
 transport.use(async (ctx, next) => {
   const startedAt = performance.now();
   try {
@@ -101,8 +97,8 @@ transport.use(async (ctx, next) => {
   }
 });
 
-// WebSocket Session 首次 JOIN 一个 Unit、尚未进入实时房间时经过这里。
-// ctx.session 的身份来自签发 session ticket 的那次 Transport HTTP 请求。
+// Run when a WebSocket Session first JOINs a Unit, before it enters the room.
+// ctx.session identity comes from the Transport HTTP request that issued the ticket.
 collabEndpoint.use('joinUnit', async (ctx, next) => {
   if (!await applicationAcl.canRead(ctx.session.userID, ctx.unitID)) {
     throw new CollabError('PERMISSION_DENIED', 'Cannot join this Unit');
@@ -110,8 +106,8 @@ collabEndpoint.use('joinUnit', async (ctx, next) => {
   await next();
 });
 
-// Endpoint 通过 HTTP 读取 snapshot、block 或 changesets，Service 读库前经过这里。
-// ctx.userID/customData 来自当前 Transport HTTP 请求，不是 WebSocket Session。
+// Run before Service reads the database for an HTTP snapshot, block, or changeset read.
+// ctx.userID/customData come from this Transport HTTP request, not the WebSocket Session.
 collabService.use('readUnitData', async (ctx, next) => {
   if (!await applicationAcl.canRead(ctx.userID, ctx.request.unitID)) {
     throw new CollabError('PERMISSION_DENIED', 'Unit is not accessible');
@@ -119,7 +115,7 @@ collabService.use('readUnitData', async (ctx, next) => {
   await next();
 });
 
-// Endpoint 通过 HTTP 提交 changeset，Service 进入提交生命周期时经过这里。
+// Run when Endpoint submits a changeset over HTTP and Service enters submission.
 collabService.use('submitChangeset', async (ctx, next) => {
   const unitID = ctx.request.changeset.unitID;
   if (!await applicationAcl.canEdit(ctx.userID, unitID)) {
@@ -131,23 +127,19 @@ collabService.use('submitChangeset', async (ctx, next) => {
 transport.register(collabEndpoint);
 ```
 
-这里用认证、日志和权限说明三层 middleware 的作用，但 middleware 并不只用于权限控制，
-也可用于 trace、限流、指标和外部系统集成。示例只展示读取、JOIN 和提交；应用还应根据
-自身策略保护 Unit 创建、删除和恢复等 Service action。
+Authentication, logging, and authorization illustrate the three middleware layers, but middleware is also suitable for tracing, rate limiting, metrics, and external integrations. The example shows only read, JOIN, and submit. The application should also protect Service actions such as Unit create, delete, and recover according to its own policy.
 
-完整 action、触发时机和重试语义见 `@univerjs-pro/collaboration-service` 和
-`@univerjs-pro/collaboration-endpoint` README。
+See the `@univerjs-pro/collaboration-service` and `@univerjs-pro/collaboration-endpoint` READMEs for the complete actions, trigger timing, and retry semantics.
 
-## 4. 创建第一个 Unit
+## 4. Create the first Unit
 
-Collaboration 协议负责打开和编辑已有 Unit，不负责产品的“新建文档”流程。应用通常先创建
-产品记录和 ACL，再调用 Service 创建协同 Unit：
+The Collaboration protocol opens and edits an existing Unit; it does not implement the product's “create document” flow. An application usually creates the product record and ACL first, then creates the collaboration Unit through Service:
 
 ```ts
 import { randomUUID } from 'node:crypto';
 import { UniverType } from '@univerjs/protocol';
 
-// workbookData 和 user 来自应用的“新建文档”流程。
+// workbookData and user come from the application's “create document” flow.
 const unitID = randomUUID();
 
 await collabService.createUnitFromData(
@@ -162,13 +154,11 @@ await collabService.createUnitFromData(
 );
 ```
 
-`unitID` 在一个 Service 和数据库范围内必须唯一，初始 revision 必须为 `1`。产品记录、ACL
-和协同 Unit 属于不同存储边界；应用需要用事务或补偿逻辑处理跨存储失败。
+`unitID` must be unique within one Service and database, and the initial revision must be `1`. Product records, ACLs, and collaboration Units have different storage boundaries; the application must handle cross-storage failure with transactions or compensation.
 
-直接使用更多 Service API 封装应用 API 或后台任务属于高级集成，参见
-`@univerjs-pro/collaboration-service` README。
+Wrapping more Service APIs as application APIs or background tasks is an advanced integration; see the `@univerjs-pro/collaboration-service` README.
 
-## 5. 配置 Univer 前端
+## 5. Configure the Univer frontend
 
 ```bash
 pnpm add \
@@ -201,7 +191,7 @@ const { univerAPI } = createUniver({
       collabSubmitChangesetUrl: '/universer-api/comb',
       collabWebSocketUrl: `${wsOrigin}/universer-api/comb/connect`,
       wsSessionTicketUrl: '/universer-api/user/session-ticket',
-      // 应用提供 Authz API 时再配置：
+      // Configure only when the application provides an Authz API:
       // authzUrl: '/universer-api/authz',
     }],
     UniverCollaborationClientUIPlugin,
@@ -211,28 +201,21 @@ const { univerAPI } = createUniver({
 await univerAPI.getCollaboration().loadSheetAsync(unitID);
 ```
 
-Collaboration plugins 必须在 `createUniver({ plugins })` 时注册。Doc、Slide、Board 和 Base
-使用对应 loader，类型必须与服务端创建 Unit 时保存的类型一致。
+Collaboration plugins must be registered in `createUniver({ plugins })`. Doc, Slide, Board, and Base use their corresponding loaders, and the type must match the type stored when the server created the Unit.
 
-`authzUrl` 是应用提供的前端权限查询接口，可用于呈现只读 UI；它不是本 SDK Endpoint 的
-路由，也不能替代服务端 Service middleware。若应用不使用该能力，可以不配置。
+`authzUrl` is the application's frontend authorization query API and can render a read-only UI. It is not an SDK Endpoint route and cannot replace server-side Service middleware. Omit it when the application does not use this capability.
 
-## 6. 集成已有 Web 框架
+## 6. Integrate an existing Web framework
 
-已有 Express、Fastify 或 Nest 应用时，不需要改变前面的 SDK 组装。只把 Collaboration
-协议路径的原始 Node request 交给 `transport.handleRequest()`，并把底层 HTTP server 的
-`upgrade` 事件交给 `transport.handleUpgrade()`。
+An existing Express, Fastify, or Nest application does not change the SDK assembly above. Forward the original Node request for Collaboration protocol paths to `transport.handleRequest()`, and forward the underlying HTTP server's `upgrade` event to `transport.handleUpgrade()`.
 
-Express 挂载会改写 `request.url`，转交前需要恢复 `request.originalUrl`；同时要在
-`express.json()` 等 body parser 消费请求流之前交给 Transport。具体代码见
-`@univerjs-pro/collaboration-transport-node` README。
+Express mounting rewrites `request.url`, so restore `request.originalUrl` before forwarding. Transport must also receive the request stream before `express.json()` or another body parser consumes it. See the `@univerjs-pro/collaboration-transport-node` README for exact code.
 
-## 7. 验证和停止
+## 7. Verify and stop
 
-用两个独立浏览器身份打开同一 `unitID`，依次确认：能加载 snapshot、能建立 WebSocket、能
-JOIN、编辑后另一个窗口能收到变更、重启服务后数据仍在。
+Open the same `unitID` with two independent browser identities and verify, in order: snapshot loads, WebSocket connects, JOIN succeeds, edits appear in the other window, and data remains after restarting the service.
 
-停止接收新流量后，按网络入口到持久化层反向释放：
+After stopping new traffic, dispose from the network ingress back toward persistence:
 
 ```ts
 await transport.dispose();
@@ -240,8 +223,6 @@ await collabService.dispose();
 await database.dispose();
 ```
 
-Transport 释放它注册的 Endpoint；Endpoint 不释放 Service；Service 不释放应用注入的
-Database Adapter。
+Transport disposes its registered Endpoint. Endpoint does not dispose Service. Service does not dispose the application-injected Database Adapter.
 
-下一步阅读[身份与 middleware](./identity-and-middleware.md)，进一步理解 HTTP context、
-WebSocket Session 和各 lifecycle action。
+Next, read [Identity and middleware](./identity-and-middleware.md) to understand HTTP context, WebSocket Sessions, and lifecycle actions in more detail.

@@ -1,67 +1,60 @@
-# 身份与 middleware
+# Identity and Middleware
 
-Middleware 是应用把认证、权限、日志、trace、限流和外部集成接入协同生命周期的位置。三层
-middleware 看到的请求不同：Transport 处理 HTTP 入口，Endpoint 处理实时 Session，Service
-处理权威协同数据操作。
+English | [简体中文](./identity-and-middleware.zh-CN.md)
 
-## 三层分别控制什么
+Middleware is where an application integrates authentication, authorization, logging, tracing, rate limiting, and external systems into the collaboration lifecycle. Each of the three layers sees a different request: Transport handles HTTP ingress, Endpoint handles real-time Sessions, and Service handles authoritative collaboration data operations.
 
-| 层 | 什么时候运行 | 适合做什么 |
+## What each layer controls
+
+| Layer | When it runs | Suitable uses |
 | --- | --- | --- |
-| Transport HTTP middleware | 每个进入 SDK 的普通 HTTP 请求 | 认证、CORS、trace、入口日志 |
-| Endpoint middleware | WebSocket connect、JOIN 和 Presence | 实时房间策略、成员展示、Presence 校验或过滤 |
-| Service middleware | 读取、创建、提交、删除和恢复等数据生命周期 | ACL、配额、审计、指标、外部系统集成 |
+| Transport HTTP middleware | Every ordinary HTTP request entering the SDK | Authentication, CORS, tracing, ingress logging |
+| Endpoint middleware | WebSocket connect, JOIN, and Presence | Real-time room policies, member display, Presence validation or filtering |
+| Service middleware | Data lifecycle operations such as read, create, submit, delete, and recover | ACL, quotas, audit, metrics, external integrations |
 
-Endpoint 的 `joinUnit` 只决定 Session 能否进入实时房间，不能替代 Service 的读取权限。
-snapshot、block 和缺失 changesets 都可以通过 HTTP 读取，不要求客户端已经 JOIN。
+Endpoint `joinUnit` only decides whether a Session may enter a real-time room; it cannot replace Service read authorization. Snapshots, blocks, and missing changesets can all be read through HTTP without requiring the client to have JOINed.
 
-## 两条上下文路径
+## Two context paths
 
-普通文档数据请求使用当前 HTTP 请求的上下文：
+Ordinary document data requests use the current HTTP request context:
 
 ```text
 HTTP snapshot / block / fetch-missing / new-changes / delete / recover
-→ Transport middleware 设置 ctx.userID 和 ctx.customData
-→ Endpoint 调用 Service API
-→ Service middleware 读取同一 userID 和 customData
+→ Transport middleware sets ctx.userID and ctx.customData
+→ Endpoint calls the Service API
+→ Service middleware reads the same userID and customData
 ```
 
-WebSocket Session 则通过一次性 ticket 继承签发时的 HTTP 上下文：
+A WebSocket Session inherits the HTTP context that issued its one-time ticket:
 
 ```text
 GET /universer-api/user/session-ticket
-→ Transport middleware 设置 ctx.userID 和 ctx.customData
-→ Endpoint 保存关联并返回 opaque ticket
-→ WebSocket open 一次性消费 ticket
-→ Endpoint 创建 Session { userID, memberID, customData }
-→ Endpoint middleware 通过 ctx.session 读取
+→ Transport middleware sets ctx.userID and ctx.customData
+→ Endpoint stores the association and returns an opaque ticket
+→ WebSocket open consumes the ticket once
+→ Endpoint creates Session { userID, memberID, customData }
+→ Endpoint middleware reads through ctx.session
 ```
 
-ticket 字符串本身不包含 `userID/customData`。所有 HTTP 路由中，只有 session-ticket 会把
-当前 Transport context 延长到 WebSocket Session；其他 HTTP 请求的 `customData` 只属于
-当前请求。Service middleware 获取当前 HTTP 请求的数据，不会自动合并 Session
-`customData`。
+The ticket string itself does not contain `userID/customData`. Of all HTTP routes, only session-ticket extends the current Transport context into a WebSocket Session. Other HTTP requests' `customData` belongs only to the current request. Service middleware receives data from the current HTTP request and does not automatically merge Session `customData`.
 
-## 三种标识不要混用
+## Do not mix these three identifiers
 
-| 标识 | 含义 | 来源和生命周期 |
+| Identifier | Meaning | Source and lifecycle |
 | --- | --- | --- |
-| `userID` | 稳定的应用用户身份，也是 confirmed changeset 作者 | 应用在每个 HTTP 请求中提供 |
-| `memberID` | 当前 WebSocket Session 的在线成员 ID | Endpoint 创建；重连后变化 |
-| `sid + reqId` | changeset 提交幂等键 | Collaboration Client 创建；重试时复用 |
+| `userID` | Stable application user identity and confirmed changeset author | Provided by the application on every HTTP request |
+| `memberID` | Online member ID of the current WebSocket Session | Created by Endpoint; changes after reconnect |
+| `sid + reqId` | Idempotency key for a changeset submission | Created by the Collaboration Client; reused on retry |
 
-应用决定如何认证并把业务主键写入 `ctx.userID`。SDK 不规定 Cookie、Bearer token、用户表
-或角色模型。浏览器 payload 中的用户字段、`memberID` 和 confirmed revision 都不能替代
-服务端上下文。
+The application decides how to authenticate and writes its business primary key to `ctx.userID`. The SDK does not prescribe Cookies, Bearer tokens, user tables, or role models. User fields, `memberID`, and confirmed revisions in browser payloads cannot replace the server context.
 
-`new-changes` 是 HTTP 请求，但 ACK 和广播通过 WebSocket 发送。Endpoint 会用 payload 中的
-`memberID` 定位在线 Session，再校验该 Session 的 `userID` 与当前 HTTP `ctx.userID` 一致，
-并确认它已经 JOIN 目标 Unit。应用不需要自己关联两条通道。
+`new-changes` is an HTTP request, while ACK and broadcast are sent over WebSocket. Endpoint uses the payload's `memberID` to locate the online Session, verifies that the Session's `userID` matches the current HTTP `ctx.userID`, and confirms that it has JOINed the target Unit. The application does not need to associate the two channels itself.
 
-## 按 Transport、Endpoint、Service 的顺序安装
+## Install in Transport, Endpoint, Service order
 
 ```ts
-// 每个 Collaboration HTTP 请求进入 SDK 时运行；可认证、建立 trace 或记录网络日志。
+// Runs when every Collaboration HTTP request enters the SDK; authenticate,
+// establish a trace, or record network logs here.
 transport.use(async (ctx, next) => {
   const user = await auth.requireUser(ctx.incomingMessage);
   ctx.userID = user.userId;
@@ -69,8 +62,8 @@ transport.use(async (ctx, next) => {
   await next();
 });
 
-// Session 首次 JOIN Unit、尚未进入实时房间时运行。
-// userID/customData 来自签发 ticket 的 Transport HTTP 请求。
+// Runs when a Session first JOINs a Unit, before it enters the real-time room.
+// userID/customData come from the Transport HTTP request that issued the ticket.
 endpoint.use('joinUnit', async (ctx, next) => {
   if (!await acl.canRead(ctx.session.userID, ctx.unitID)) {
     throw new CollabError('PERMISSION_DENIED', 'Cannot join this Unit');
@@ -78,8 +71,8 @@ endpoint.use('joinUnit', async (ctx, next) => {
   await next();
 });
 
-// Endpoint 通过 HTTP 提交 changeset，Service 进入逻辑提交生命周期时运行。
-// userID/customData 来自当前 Transport HTTP 请求。
+// Runs when Endpoint submits a changeset over HTTP and Service enters the
+// logical submit lifecycle. userID/customData come from the current Transport request.
 collabService.use('submitChangeset', async (ctx, next) => {
   const unitID = ctx.request.changeset.unitID;
   if (!await acl.canEdit(ctx.userID, unitID)) {
@@ -92,30 +85,22 @@ collabService.use('submitChangeset', async (ctx, next) => {
 });
 ```
 
-同一 action 的 middleware 按注册顺序执行，`await next()` 进入下一个 middleware。认证失败
-时应直接结束 HTTP response，不调用 `next()`；预期的协同拒绝使用 `CollabError`。
+Middleware registered for the same action runs in registration order, and `await next()` enters the next middleware. Authentication failures should end the HTTP response directly without calling `next()`; use `CollabError` for expected collaboration rejections.
 
-## customData 适合放什么
+## What belongs in customData
 
-`customData` 是当前请求或 Session 内的可变对象，适合放：
+`customData` is a mutable object scoped to the current request or Session. Suitable values include:
 
-- 当前用户、tenant 和 trace ID；
-- 同一次调用复用的 ACL 查询结果；
-- 计时起点、logger child 或临时服务对象。
+- Current user, tenant, and trace ID;
+- ACL query results reused within the same call;
+- Timing start points, logger children, or temporary service objects.
 
-它不会自动写入协同数据库、发送给浏览器或记录日志。需要持久化的业务数据应由应用显式
-写入自己的存储。
+It is not automatically written to the collaboration database, sent to the browser, or logged. Business data that must persist should be written explicitly to application storage.
 
-## 重试和外部副作用
+## Retries and external side effects
 
-Service action 描述生命周期阶段，不描述业务用途。同一个 action 可以同时安装权限、日志
-和指标 middleware。选择 action 时要先查看对应 Package README 中的触发时机、可见字段和
-重试语义。
+A Service action describes a lifecycle stage, not a business purpose. The same action can carry authorization, logging, and metrics middleware together. Before choosing an action, check its trigger timing, visible fields, and retry semantics in the corresponding Package README.
 
-主 Service 的 `applyChangeset` 和 `commitChangeset` 可能因 revision 竞争重复执行，必须保持
-可重试，不能在其中发送不可撤销的 webhook、扣费或消息。数据库提交后的进程内处理使用
-Service event；要求可靠投递到外部系统时，由 Database Adapter 和应用使用 transactional
-outbox。
+The main Service's `applyChangeset` and `commitChangeset` can run repeatedly because of revision contention. They must be retryable and must not send irreversible webhooks, charges, or messages. Use Service events for in-process work after database commit. For reliable delivery to external systems, use a transactional outbox in the Database Adapter and application.
 
-History、Comment 和 Worktree 有各自独立的 Service middleware。保护主 Collaboration
-Service 不会自动保护这些可选能力，接入方式见[可选能力](./extensions.md)。
+History, Comment, and Worktree each have independent Service middleware. Protecting the main Collaboration Service does not automatically protect these optional capabilities; see [Optional capabilities](./extensions.md).

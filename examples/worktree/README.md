@@ -1,13 +1,13 @@
 # Worktree
 
-展示如何在独立 draft 中协同编辑，并通过 ready、reopen 和 merge 管理修改进入 trunk 的过程。
+English | [简体中文](./README.zh-CN.md)
+
+Shows how to collaborate in an isolated draft and use ready, reopen, and merge to manage how changes enter trunk.
 
 ```bash
 pnpm example:worktree
 ```
 
-打开 <http://127.0.0.1:3010/?unit=worktree-sheet&type=2&worktree=demo-worktree>。示例会创建固定的 `demo-worktree`，默认进入 draft；工具栏可
-在 trunk/draft 间切换，并依次执行 Ready、Reopen 和 Merge。
+Open <http://127.0.0.1:3010/?unit=worktree-sheet&type=2&worktree=demo-worktree>. The example creates the fixed `demo-worktree` and enters draft by default. The toolbar switches between trunk and draft and runs Ready, Reopen, and Merge in sequence.
 
-只需要阅读 `server/main.ts` 和 `web/main.ts`。Worktree 有独立 Service、Adapter 和协同路径，
-只与 trunk Endpoint 共享一次性 ticket store。
+Read only `server/main.ts` and `web/main.ts`. Worktree has its own Service, Adapter, and collaboration path and shares only the one-time ticket store with the trunk Endpoint.
