@@ -1,15 +1,31 @@
-# Examples
+# Univer Collaboration SDK
 
-所有示例使用相同的 `web/main.ts + server/main.ts` 最小结构，并且可以独立运行。建议先从
-[`quick-start`](./quick-start/README.md) 建立协同主链路，再按当前问题选择其他示例。
+本仓库提供 Univer Collaboration SDK 的公开用户手册和可运行示例。
 
-| 示例                                               | 内容                                         |
-| -------------------------------------------------- | -------------------------------------------- |
-| [`quick-start`](./quick-start/README.md)           | 最小 Sheet 实时协同链路                      |
-| [`database-adapter`](./database-adapter/README.md) | SQLite 持久化与重启恢复                      |
-| [`permissions`](./permissions/README.md)           | 可信身份与服务端权限边界                     |
-| [`history`](./history/README.md)                   | 版本历史服务与浏览器入口                     |
-| [`comments`](./comments/README.md)                 | Thread Comment 服务与前端入口                |
-| [`worktree`](./worktree/README.md)                 | draft、ready、reopen 和 merge 的完整生命周期 |
+## 从这里开始
 
-示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。
+1. 阅读[快速开始](./user-manual/quick-start.md)，用两个浏览器确认 HTTP、WebSocket 和 OT 主链路。
+2. 查看[完整用户手册](./user-manual/README.md)，了解服务端组装、身份、middleware 和生产运行。
+3. 按问题选择[可运行示例](./examples/README.md)，对照最小的前后端源码。
+
+## 运行示例
+
+准备 Node.js 24 及以上版本和 pnpm：
+
+```bash
+pnpm install
+pnpm example:quick-start
+```
+
+其他示例使用同样的命令形式：
+
+```bash
+pnpm example:database-adapter
+pnpm example:permissions
+pnpm example:history
+pnpm example:comments
+pnpm example:worktree
+```
+
+固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
+[身份与 middleware](./user-manual/identity-and-middleware.md)和[生产运行](./user-manual/production.md)。
