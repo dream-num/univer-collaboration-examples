@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-> Applies to the `1.0.0-insiders.20260818-b79e2bb` release cohort. The manual and the examples in this repository use the same exact versions of all `@univerjs/*` and `@univerjs-pro/*` packages.
+> Applies to the `1.0.0-insiders.20260819-8595af2` release cohort. The manual and the examples in this repository use the same exact versions of all `@univerjs/*` and `@univerjs-pro/*` packages.
 
 The Univer Collaboration SDK provides the server-side collaboration core for Univer documents, including OT, collaboration revision management, snapshots, and real-time synchronization. Through Database Adapters, middleware, and events, developers can choose their own database and infrastructure, integrate existing identity, authorization, and business logic, and build a collaboration service for their product requirements.
 
