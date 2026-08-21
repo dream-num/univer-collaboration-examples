@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-> Applies to the `1.0.0-insiders.20260819-8595af2` release cohort. The manual and the examples in this repository use the same exact versions of all `@univerjs/*` and `@univerjs-pro/*` packages.
+> Applies to the `1.0.0-insiders.20260821-c2f0ba5` release cohort. The manual and the examples in this repository use the same exact versions of all `@univerjs/*` and `@univerjs-pro/*` packages.
 
 The Univer Collaboration SDK provides the server-side collaboration core for Univer documents, including OT, collaboration revision management, snapshots, and real-time synchronization. Through Database Adapters, middleware, and events, developers can choose their own database and infrastructure, integrate existing identity, authorization, and business logic, and build a collaboration service for their product requirements.
 
@@ -16,7 +16,7 @@ Univer Collaboration Client
 → Database Adapter            Atomically stores snapshots, changesets, and revisions
 ```
 
-These four layers form one server assembly; they are not four interchangeable integration options. For the first integration, make the complete path work before adding History, Thread Comment, or Worktree for product requirements.
+These four layers form one server assembly; they are not four interchangeable integration options. For the first integration, make the complete path work before adding History, Thread Comment, Worktree, or server-side Office import/export for product requirements.
 
 ## Recommended reading order
 
@@ -24,7 +24,7 @@ These four layers form one server assembly; they are not four interchangeable in
 2. [Build a collaboration service](./integration.md): start a standalone service, then integrate application logic through middleware.
 3. [Identity and middleware](./identity-and-middleware.md): understand HTTP, WebSocket Sessions, and the three extension layers.
 4. [Production operation](./production.md): choose persistence, deploy the network entry, start and stop correctly, and diagnose problems.
-5. [Optional capabilities](./extensions.md): add History, Thread Comment, and Worktree as needed.
+5. [Optional capabilities](./extensions.md): add History, Thread Comment, Worktree, or server-side Office import/export as needed.
 
 ## What each documentation type is for
 

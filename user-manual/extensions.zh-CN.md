@@ -4,13 +4,15 @@
 
 先完成 Collaboration 主线，再按产品需求选择可选能力。History、Thread Comment 和 Worktree
 都有独立的 Service、middleware 和 Database Adapter，但可以复用同一个 Transport、应用
-认证以及 SQLite 文件。
+认证以及 SQLite 文件。服务端 Office 导入导出则组合应用拥有的 HTTP 路由与文件/任务基础设施、
+Collaboration Service snapshot API 和 `exchange-node`。
 
 | 需求 | 增加什么 | 先运行的 example |
 | --- | --- | --- |
 | 面向用户的版本历史 | History Service + Endpoint + Adapter | [History](../examples/history/README.zh-CN.md) |
 | Sheet/Doc Thread Comment | Comment Service + Endpoint + Adapter | [Comments](../examples/comments/README.zh-CN.md) |
 | 隔离 draft、评审并合入 trunk | Worktree Service + Endpoint + Client + Adapter | [Worktree](../examples/worktree/README.zh-CN.md) |
+| 服务端 Office 导入导出 | Exchange Node + 应用路由 + Unit materialization | [Exchange](../examples/exchange/README.zh-CN.md) |
 
 每个 example 的 `server/main.ts` 和 `web/main.ts` 是推荐的组装参考。具体构造参数、API、
 middleware action 和资源释放以对应 Package README 为准。
@@ -82,6 +84,40 @@ Unit 推进，不保证跨 Unit 原子性，产品 UI 应展示每个 Unit 的 m
 Worktree middleware 与 trunk Service middleware 相互独立：前者保护 draft 可见性、编辑和
 merge，最终写入 trunk 时仍会进入 trunk Service 自己的权限 middleware。Worktree 的实时
 房间、状态事件和广播当前同样只保证单 Endpoint 进程。
+
+## 服务端 Office 导入导出
+
+应用可以使用 `@univerjs-pro/exchange-node` 转换 Office 文件。导入得到 Protocol snapshot
+及其 Sheet blocks，可通过 `createUnitFromSnapshot()` 持久化；导出需要同一个 confirmed
+revision 上的完整 snapshot。先用 `getUnitLoadDataWithBlocks()` 读取自包含恢复材料，再用
+`UnitSnapshotMaterializer` 重放 confirmed tail：
+
+```ts
+import { UnitSnapshotMaterializer } from '@univerjs-pro/collaboration-service';
+import { exportSnapshotToBuffer } from '@univerjs-pro/exchange-node';
+
+const loadData = await collabService.getUnitLoadDataWithBlocks(
+  { unitID, type, revision: 0 },
+  { userID }
+);
+const materializer = new UnitSnapshotMaterializer();
+try {
+  const complete = await materializer.materializeSnapshot(loadData);
+  const output = await exportSnapshotToBuffer(complete, exportOptions);
+  // complete.snapshot.rev === loadData.targetRevision
+} finally {
+  await materializer.dispose();
+}
+```
+
+`revision: 0` 在调用开始时把当前数据库 head 固定为本次 `targetRevision`。返回值包含最近持久化
+snapshot、该 snapshot 引用的全部 Sheet blocks，以及抵达目标所需的连续 confirmed tail。
+`UnitSnapshotMaterializer` 在内存中补全 snapshot，返回结果不会自动保存；调用方应在使用完毕后
+释放 materializer。
+
+Collaboration SDK 不提供 Exchange Endpoint。上传、导入导出、任务轮询、签名下载、权限、
+配额、对象存储和 worker 隔离均由应用拥有。前端 Exchange plugins 所需的最小协议见 Exchange
+example。
 
 ## 共同的存储和生命周期规则
 

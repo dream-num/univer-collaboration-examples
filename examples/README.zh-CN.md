@@ -13,5 +13,7 @@
 | [`history`](./history/README.zh-CN.md)                   | 版本历史服务与浏览器入口                     |
 | [`comments`](./comments/README.zh-CN.md)                 | Thread Comment 服务与前端入口                |
 | [`worktree`](./worktree/README.zh-CN.md)                 | draft、ready、reopen 和 merge 的完整生命周期 |
+| [`exchange`](./exchange/README.zh-CN.md)                 | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
 
-示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。
+示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。exchange 示例
+特意使用内存文件与任务存储，不代替生产文件服务。

@@ -2,13 +2,14 @@
 
 English | [简体中文](./extensions.zh-CN.md)
 
-Complete the main Collaboration path first, then select optional capabilities for product requirements. History, Thread Comment, and Worktree each have an independent Service, middleware, and Database Adapter, but they can reuse the same Transport, application authentication, and SQLite file.
+Complete the main Collaboration path first, then select optional capabilities for product requirements. History, Thread Comment, and Worktree each have an independent Service, middleware, and Database Adapter, but they can reuse the same Transport, application authentication, and SQLite file. Server-side Office exchange instead combines application-owned HTTP routes and file/task infrastructure with Collaboration Service snapshot APIs and `exchange-node`.
 
 | Requirement | What to add | Example to run first |
 | --- | --- | --- |
 | User-facing version history | History Service + Endpoint + Adapter | [History](../examples/history/README.md) |
 | Sheet/Doc Thread Comment | Comment Service + Endpoint + Adapter | [Comments](../examples/comments/README.md) |
 | Isolated draft, review, and merge into trunk | Worktree Service + Endpoint + Client + Adapter | [Worktree](../examples/worktree/README.md) |
+| Server-side Office import and export | Exchange Node + application routes + Unit materialization | [Exchange](../examples/exchange/README.md) |
 
 Each example's `server/main.ts` and `web/main.ts` are the recommended assembly references. Consult the corresponding Package README for exact constructor options, APIs, middleware actions, and resource disposal.
 
@@ -63,6 +64,32 @@ draft / ready → discarded
 Only `draft` accepts further submissions. `markReady` freezes each Unit's current draft revision. Multi-Unit merge advances per Unit and is not atomic across Units; the product UI should show the merge result of every Unit.
 
 Worktree middleware and trunk Service middleware are independent. The former protects draft visibility, editing, and merge; final writes to trunk still enter the trunk Service's own authorization middleware. Worktree real-time rooms, state events, and broadcasts currently also guarantee only one Endpoint process.
+
+## Server-side Office import and export
+
+The application can convert Office files with `@univerjs-pro/exchange-node`. Import produces a Protocol snapshot and its Sheet blocks, which can be persisted through `createUnitFromSnapshot()`. Export needs a complete snapshot at one confirmed revision. Read its self-contained recovery material through `getUnitLoadDataWithBlocks()`, then replay the confirmed tail with `UnitSnapshotMaterializer`:
+
+```ts
+import { UnitSnapshotMaterializer } from '@univerjs-pro/collaboration-service';
+import { exportSnapshotToBuffer } from '@univerjs-pro/exchange-node';
+
+const loadData = await collabService.getUnitLoadDataWithBlocks(
+  { unitID, type, revision: 0 },
+  { userID }
+);
+const materializer = new UnitSnapshotMaterializer();
+try {
+  const complete = await materializer.materializeSnapshot(loadData);
+  const output = await exportSnapshotToBuffer(complete, exportOptions);
+  // complete.snapshot.rev === loadData.targetRevision
+} finally {
+  await materializer.dispose();
+}
+```
+
+`revision: 0` fixes the current database head as this call's `targetRevision`. The load result contains the nearest persisted snapshot, all Sheet blocks referenced by that snapshot, and the continuous confirmed tail needed to reach the target. `UnitSnapshotMaterializer` completes the snapshot in memory and does not save the result automatically. Dispose the materializer after use.
+
+The Collaboration SDK does not provide an Exchange Endpoint. The application owns upload, import/export, task polling, signed download, authorization, quotas, object storage, and worker isolation. See the Exchange example for the minimal protocol expected by the frontend Exchange plugins.
 
 ## Shared storage and lifecycle rules
 

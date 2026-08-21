@@ -39,7 +39,8 @@ pnpm example:quick-start
   [Database Adapter example](../examples/database-adapter/README.zh-CN.md)。
 - 要看登录和读写权限：运行 `pnpm example:permissions`，并阅读
   [Permissions example](../examples/permissions/README.zh-CN.md)。
-- 要增加版本历史、评论或 Worktree：查看[可选能力](./extensions.zh-CN.md)。
+- 要增加版本历史、评论、Worktree 或服务端 Office 导入导出：查看
+  [可选能力](./extensions.zh-CN.md)。
 
 如果两个窗口没有同步，不要先改 OT 或 Service API。按[生产运行](./production.zh-CN.md#按现象定位问题)
 从 HTTP、ticket、WebSocket、JOIN 和 submit 逐层检查。

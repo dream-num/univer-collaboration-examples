@@ -27,6 +27,7 @@ pnpm example:permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree
+pnpm example:exchange
 ```
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production configuration. Before integrating in production, read [Identity and middleware](./user-manual/identity-and-middleware.md) and [Production operation](./user-manual/production.md).

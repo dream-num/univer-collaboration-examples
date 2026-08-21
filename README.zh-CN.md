@@ -27,6 +27,7 @@ pnpm example:permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree
+pnpm example:exchange
 ```
 
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读

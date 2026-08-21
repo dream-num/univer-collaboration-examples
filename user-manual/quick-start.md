@@ -31,6 +31,6 @@ To keep the code short, the example fixes the user to `demo-user` and makes all 
 - To build your own service, continue with [Build a collaboration service](./integration.md).
 - To verify that data survives a restart first, run `pnpm example:database-adapter` and read the [Database Adapter example](../examples/database-adapter/README.md).
 - To see login and read/write permissions, run `pnpm example:permissions` and read the [Permissions example](../examples/permissions/README.md).
-- To add version history, comments, or Worktree, see [Optional capabilities](./extensions.md).
+- To add version history, comments, Worktree, or server-side Office import/export, see [Optional capabilities](./extensions.md).
 
 If the two windows do not synchronize, do not change OT or the Service API first. Follow [Production operation](./production.md#diagnose-by-symptom) and check HTTP, ticket, WebSocket, JOIN, and submit layer by layer.

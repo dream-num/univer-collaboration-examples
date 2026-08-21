@@ -14,7 +14,8 @@
     "example:permissions": "pnpm --filter @univerjs/collaboration-example-permissions build && pnpm --filter @univerjs/collaboration-example-permissions start",
     "example:history": "pnpm --filter @univerjs/collaboration-example-history build && pnpm --filter @univerjs/collaboration-example-history start",
     "example:comments": "pnpm --filter @univerjs/collaboration-example-comments build && pnpm --filter @univerjs/collaboration-example-comments start",
-    "example:worktree": "pnpm --filter @univerjs/collaboration-example-worktree build && pnpm --filter @univerjs/collaboration-example-worktree start"
+    "example:worktree": "pnpm --filter @univerjs/collaboration-example-worktree build && pnpm --filter @univerjs/collaboration-example-worktree start",
+    "example:exchange": "pnpm --filter @univerjs/collaboration-example-exchange build && pnpm --filter @univerjs/collaboration-example-exchange start"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@univerjs/collaboration-example-comments",
+  "name": "@univerjs/collaboration-example-exchange",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,28 +15,27 @@
     "@univerjs-pro/collaboration": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-client": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-client-ui": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs-pro/collaboration-comment-database-memory": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs-pro/collaboration-comment-endpoint": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs-pro/collaboration-comment-service": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-database-memory": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-endpoint": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-service": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/collaboration-transport-node": "1.0.0-insiders.20260821-c2f0ba5",
+    "@univerjs-pro/exchange-client": "1.0.0-insiders.20260821-c2f0ba5",
+    "@univerjs-pro/exchange-node": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs-pro/license": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs-pro/thread-comment-datasource": "1.0.0-insiders.20260821-c2f0ba5",
+    "@univerjs-pro/sheets-exchange-client": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs/core": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs/preset-sheets-core": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs/presets": "1.0.0-insiders.20260821-c2f0ba5",
     "@univerjs/protocol": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs/sheets-thread-comment-ui": "1.0.0-insiders.20260821-c2f0ba5",
-    "@univerjs/thread-comment-ui": "1.0.0-insiders.20260821-c2f0ba5",
     "express": "^5.1.0",
+    "multer": "^2.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/multer": "^2.0.0",
     "vite": "^8.0.0"
   }
 }

@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-> 适用于 `1.0.0-insiders.20260819-8595af2` release cohort。手册与本仓库示例使用同一组
+> 适用于 `1.0.0-insiders.20260821-c2f0ba5` release cohort。手册与本仓库示例使用同一组
 > 精确版本的 `@univerjs/*` 和 `@univerjs-pro/*` package。
 
 Univer Collaboration SDK 提供 Univer 文档的服务端协同核心能力，内置 OT、协同版本管理、
@@ -21,7 +21,7 @@ Univer Collaboration Client
 ```
 
 这四层是一套服务端组装，不是四种可替代的接入方式。第一次接入时，先让这条链路完整运行，
-再按产品需求增加 History、Thread Comment 或 Worktree。
+再按产品需求增加 History、Thread Comment、Worktree 或服务端 Office 导入导出。
 
 ## 推荐阅读顺序
 
@@ -29,7 +29,8 @@ Univer Collaboration Client
 2. [搭建协同服务](./integration.zh-CN.md)：独立启动服务，再通过 middleware 接入应用逻辑。
 3. [身份与 middleware](./identity-and-middleware.zh-CN.md)：理解 HTTP、WebSocket Session 和三层扩展点。
 4. [生产运行](./production.zh-CN.md)：选择持久化、部署网络入口、正确启停并定位问题。
-5. [可选能力](./extensions.zh-CN.md)：按需增加 History、Thread Comment 和 Worktree。
+5. [可选能力](./extensions.zh-CN.md)：按需增加 History、Thread Comment、Worktree 或服务端
+   Office 导入导出。
 
 ## 三类文档分别解决什么问题
 
