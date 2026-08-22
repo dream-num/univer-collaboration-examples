@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-> 适用于 `1.0.0-insiders.20260821-c2f0ba5` release cohort。手册与本仓库示例使用同一组
+> 适用于 `1.0.0-insiders.20260822-0c0c0dd` release cohort。手册与本仓库示例使用同一组
 > 精确版本的 `@univerjs/*` 和 `@univerjs-pro/*` package。
 
 Univer Collaboration SDK 提供 Univer 文档的服务端协同核心能力，内置 OT、协同版本管理、
