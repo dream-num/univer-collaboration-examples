@@ -2,13 +2,33 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-This repository provides the public user manual and runnable examples for the Univer Collaboration SDK.
+This repository contains only runnable examples for the Univer Collaboration SDK. The public
+documentation is maintained on [office.univer.ai](https://office.univer.ai/collaboration/overview).
 
 ## Start here
 
-1. Read the [Quick Start](./user-manual/quick-start.md) and use two browsers to verify the HTTP, WebSocket, and OT path.
-2. Read the [complete user manual](./user-manual/README.md) to understand server assembly, identity, middleware, and production operation.
-3. Choose a [runnable example](./examples/README.md) for your current problem and compare the minimal frontend and backend source.
+1. Follow the documentation site's [Quick Start](https://office.univer.ai/collaboration/quick-start)
+   and use two browsers to verify the HTTP, WebSocket, and OT path.
+2. Choose an example below for the capability you want to explore, then compare its minimal
+   frontend and backend source.
+3. Use the [Collaboration documentation](https://office.univer.ai/collaboration/overview) for
+   architecture, middleware, identity, persistence, and production guidance.
+
+## Choose an example
+
+All examples use the same minimal `web/main.ts + server/main.ts` structure and can run
+independently. Start with [`quick-start`](./examples/quick-start/README.md) to establish the main
+collaboration path, then choose another example for the capability you want to explore.
+
+| Example | What it demonstrates |
+| --- | --- |
+| [`quick-start`](./examples/quick-start/README.md) | Minimal real-time Sheet collaboration path |
+| [`database-adapter`](./examples/database-adapter/README.md) | SQLite persistence and restart recovery |
+| [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
+| [`history`](./examples/history/README.md) | Version history service and browser entry |
+| [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
+| [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
+| [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 
 ## Run the examples
 
@@ -30,4 +50,12 @@ pnpm example:worktree
 pnpm example:exchange
 ```
 
-Fixed users, demo authorization, and local secrets are for teaching only and are not production configuration. Before integrating in production, read [Identity and middleware](./user-manual/identity-and-middleware.md) and [Production operation](./user-manual/production.md).
+The examples cover only teaching and copyable assembly. They do not include file spaces,
+multi-type product editors, or a complete office suite. The exchange example intentionally uses
+an in-memory file/task store rather than a production file service.
+
+Fixed users, demo authorization, and local secrets are for teaching only and are not production
+configuration. Before integrating in production, read
+[Identity and authorization](https://office.univer.ai/collaboration/identity-and-authorization),
+[Middleware and Events](https://office.univer.ai/collaboration/middleware-and-events), and
+[Database Adapters](https://office.univer.ai/collaboration/database-adapters).
