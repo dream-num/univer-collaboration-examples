@@ -42,7 +42,7 @@ const { univer } = createUniver({
   plugins: [
     [
       UniverLicensePlugin,
-      { license: import.meta.env.VITE_UNIVER_LICENSE || undefined },
+      { license: import.meta.env.UNIVER_LICENSE || undefined },
     ],
     UniverCollaborationPlugin,
     [
