@@ -1268,51 +1268,51 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-comment-database-memory@1.0.0-beta.2':
-    resolution: {integrity: sha512-N1YH6IScfBEAlwrFMmGck9lIDAe+5KqYaho3QNBo+h8uovnz0B4FkGpeyaBPXERHeStg49IFYoiWUzyV1ud5sw==}
+    resolution: {integrity: sha512-LVNswhRj4RZ6wXUx9HuG/18PBC5TEe9NA0ak2yWG9mwzq+L3HZbMC8te34GZ4MUx/EjfAWVhtupQC9FDyCVglg==}
 
   '@univerjs-pro/collaboration-comment-endpoint@1.0.0-beta.2':
-    resolution: {integrity: sha512-Y6RMEztuTnJNSiKhhjsBYY3tw7l861ReZWNccc5mpidz8B2oisoGdgdvrnknFYXJKdlHnMSYUTpB2lS9dys3fw==}
+    resolution: {integrity: sha512-p3rfALGoebynfmupfnlKs6arz20oYdpxZjr1vwtpWs/I53sP/ooKsg5ud9rsi4w7Nh8Nz5aJUhe5TxfgMGKo9A==}
 
   '@univerjs-pro/collaboration-comment-service@1.0.0-beta.2':
-    resolution: {integrity: sha512-aF9Hm5RT9WySdGOy+UZWFWM1oCB6q+s8T+PoUWvBgbAPLX7WsSj0mEFqU2y8Epx5iwnmG6zM0Rzwk02d0ybDPw==}
+    resolution: {integrity: sha512-X/bxTIhsxiGinnT61wdhOnbQ/aejM4RYwgL8Y86h338CNnsDpE3L8fKRAmx1zLDDmuHZswO/BvBh1qkiJOlhZg==}
 
   '@univerjs-pro/collaboration-database-memory@1.0.0-beta.2':
-    resolution: {integrity: sha512-2vY11PFrB2Eht8DFYWMrBMCGjvXQYxcbPu796Dtg7gYY/QDkEN2SIARcz19/ioEvCYV0HAup5U8J24gZZFW0Mw==}
+    resolution: {integrity: sha512-PoTOuB4dSVF0HtRzalQaXs/CvY6aKR/lQr97dnBPvbIQBq4MzKIGDYCvh4aCH3Q7h8j5JIAOTIx5bjc84+PlOg==}
 
   '@univerjs-pro/collaboration-database-sqlite@1.0.0-beta.2':
-    resolution: {integrity: sha512-zn8H6sfrCbikk3zhpaBaie4Gh+MWVDqXPeLYWuevuaPqynaXyX7kwrKj+j+fpW0diZKpniAoI9S37t70qq2UWQ==}
+    resolution: {integrity: sha512-J9tJGSKE/Msqe35GB+v5ZMAiSwFz6HycIIRE0z4tYZqOEcbUwNg2pcdsUoVDrxO/MP09vsFuL5Jsa1qZMS4KMA==}
     engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-endpoint@1.0.0-beta.2':
-    resolution: {integrity: sha512-OQgGqOO+Mee+KYFlYATFkTFMGO4xaXFEOM5TiBDQCJcKDSuNkIZPB40AwfIWpOLhe2/TCUQNQanUZBapdlp9qw==}
+    resolution: {integrity: sha512-IcEYJMTqqHR6TgX57KggNBRGZXW5bg4kmZkH54LCsfKklSkLcbYm2OqvCq2WdmEzlgmCqyWV2Ef4YU1ytGIhIg==}
 
   '@univerjs-pro/collaboration-history-database-sqlite@1.0.0-beta.2':
-    resolution: {integrity: sha512-4wCvgi9qnHNCOh7LRPpqG9D6GDgBvHY0VNzwtpgPrrg3vJZa2wJq3nRV9LjwK3GhhANW8Ba8cniGtqbM6YRd8Q==}
+    resolution: {integrity: sha512-DThviAb5rXscHNe2m3wpT342GwSmBzXpHPkjM5pr+hvV2T34E8OJQc0eECYRCzsAhBCupq91FcRV2pHjOQsBdg==}
     engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-history-endpoint@1.0.0-beta.2':
-    resolution: {integrity: sha512-GFYe1DaKtvLrzjG1KP6BraC92cNqFwzN/vfxZu2+x0LkJ6jLcHcTAJMWZgZXYoxDCc5E7g5BPq5ViC/hS+89xQ==}
+    resolution: {integrity: sha512-vxROQ3+NOlifTPGeP0QKS4ykczW0NtRnfITcEnaykS8G0OgTmDNZdgnCcDqDG9uGCrqK1dORDrPXhm3k82xtwQ==}
 
   '@univerjs-pro/collaboration-history-service@1.0.0-beta.2':
-    resolution: {integrity: sha512-3Rz7or2Srl7mhtObxMa/ojj9ZrUjO222/vDs+szklgy9UF/v0KACSOCoIpwZGlIicSQCETabiNMVIRN6a1VzhA==}
+    resolution: {integrity: sha512-tGmTGt8w7XZSFb818jPqH8urF+GTxG1IJs2gHBdS/gI6AHubaiCz44RRMkK1zcc2Tqf320Lk678XaeYWkSvGNw==}
 
   '@univerjs-pro/collaboration-service@1.0.0-beta.2':
-    resolution: {integrity: sha512-8lyQYlepsyQqaLmMsxa8LAxak+jRjZpx5XoTw7ZauFU004Moq7hk8A3vtQ0XaE3yf1OXRKWjIWiwVooGH4FfQg==}
+    resolution: {integrity: sha512-XFecDwkgQUhDeXb73UkNK91Kp2VRC/XKHsZTUQWIWBx90z6URFyngjn3SdQuOuxCn+txwhnjwZ/qhIHhb4d1Jg==}
 
   '@univerjs-pro/collaboration-transport-node@1.0.0-beta.2':
-    resolution: {integrity: sha512-xj9h45w9/e+EIuWst1TxlFvawU6NjFyBXkKoMsupr6SMrkcdRgfEX/xcMAb7mKJytmRdGG6MItcWlOVviOtMpg==}
+    resolution: {integrity: sha512-6VJ9t2WPYUXYGNYRjnfcngf++3dnDWg647utDLi+g74QnYtkV5Qd6QMTna/27rBHSCMh+x6T9jhAHHxe3WHr3Q==}
 
   '@univerjs-pro/collaboration-worktree-client@1.0.0-beta.2':
-    resolution: {integrity: sha512-+WfN4e0IuMpGPe00t92VsTm7LG3/o3H4a4p6Z5T6G4mjUAqZRQPy9mh4USLl/8potW1ik7n5LdeEH8pmX8G6nA==}
+    resolution: {integrity: sha512-kGz2t00Dn4a7IjuHpiuWdqKOzzwhHUIuwmgjHoIxQLEdY3rE/UnvkL/PjqYfFbp1V1FA+AyBFqonoDS/G8aSfQ==}
 
   '@univerjs-pro/collaboration-worktree-database-memory@1.0.0-beta.2':
-    resolution: {integrity: sha512-hdGJS2nK81I+nDX5f7E2RCrnibPQtSs2Ej+clY+lVtzCHdtDX/fAyb02qK1agKVnUoCuglrUfCoCqOVnPEaSTA==}
+    resolution: {integrity: sha512-d8JUsY4gf+XihWkiPoTOyK72Czq2HTTjkmrtU0EIMPTnBxlF2vn5H9DSdDgsjPgRfxTNGQnVqY/D5eT6IwQ6cw==}
 
   '@univerjs-pro/collaboration-worktree-endpoint@1.0.0-beta.2':
-    resolution: {integrity: sha512-6tBkoL9cdPkGr3o0Hn5Vg+qjGak5wIiyVCrK2UHoFGI2Bh/Z8fARE9jAtbDzJ0Sw9DWUreyPhlZRpgg+nQamaA==}
+    resolution: {integrity: sha512-M6KGGU0uoW4cntufKZPqwGOdHctQJV2c+Sur0UOJVRYredgUOzoUwdbqDzq7+rSgwpa0bBKH4QzIjpk+8SP3Tw==}
 
   '@univerjs-pro/collaboration-worktree-service@1.0.0-beta.2':
-    resolution: {integrity: sha512-1YgWhoz6DrZL93VFItqDWFJjYco6KZvQSRmOGDODp3o22VIRXdhnfSbRzTat7Eej9vTNlp0ocoQx5G8FBY0ieg==}
+    resolution: {integrity: sha512-K7+fuja/bWPkWdyHfJis4Xdbp3pGtDHzKhcENSLLG37Y8paX3fo/ATaF6/W3pFYzO93xwJl5wjzhnFBfMDowYg==}
 
   '@univerjs-pro/collaboration@1.0.0-beta.2':
     resolution: {integrity: sha512-lJRRRvPzspxsnPon6g1eb1b7qwa5RsiSKfpN2qLr4ctCHtlPj96W0TPTRfGSaRpHjXpYkM/1ohFGQEAceQEiHg==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration/-/collaboration-1.0.0-beta.2.tgz}
