@@ -11,3 +11,5 @@ pnpm example:permissions
 Open <http://127.0.0.1:3010>. The page provides two fixed demo accounts: `editor` can edit, while `viewer` can only read. Switching accounts writes a local demo Cookie; production applications should replace it with their own Session or Bearer token.
 
 Identity extraction, both roles, and every permission check are written sequentially in `server/main.ts`. All authorization decisions happen on the server; frontend hints are not a security boundary.
+
+The collaborative Unit is stored in `.data/collaboration.sqlite` and reused after a server restart.

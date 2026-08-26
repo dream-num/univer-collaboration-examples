@@ -1,7 +1,9 @@
+import { mkdir } from "node:fs/promises";
 import { createServer, type IncomingMessage } from "node:http";
+import { dirname } from "node:path";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
-import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import {
   CollabError,
@@ -11,6 +13,7 @@ import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node"
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
 const UNIT_ID = "permissions-sheet";
+const filename = ".data/collaboration.sqlite";
 const users = {
   editor: { userId: "user-editor", username: "editor", role: "editor" },
   viewer: { userId: "user-viewer", username: "viewer", role: "viewer" },
@@ -50,7 +53,8 @@ const unitData: IWorkbookData = {
   resources: [],
 };
 
-const database = new MemoryDatabaseAdapter();
+await mkdir(dirname(filename), { recursive: true });
+const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
@@ -85,10 +89,19 @@ transport.use(async (context, next) => {
   await next();
 });
 transport.register(endpoint);
-await service.createUnitFromData(
-  { type: UniverType.UNIVER_SHEET, data: unitData },
-  { userID: users.editor.userId },
-);
+try {
+  await service.getUnitLoadData(
+    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
+    { userID: users.editor.userId },
+  );
+} catch (error) {
+  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
+    throw error;
+  await service.createUnitFromData(
+    { type: UniverType.UNIVER_SHEET, data: unitData },
+    { userID: users.editor.userId },
+  );
+}
 
 const app = express();
 app.get("/login/:username", (request, response) => {

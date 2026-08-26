@@ -51,6 +51,9 @@ pnpm example:exchange
 示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。exchange 示例
 特意使用内存文件与任务存储，不代替生产文件服务。
 
+`quick-start` 为保持最短装配刻意保留 Memory Adapter；其他示例都把协同数据写入各自的
+`.data/collaboration.sqlite`，服务重启后仍会保留。
+
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
 [身份与权限](https://office.univer.ai/zh-CN/collaboration/identity-and-authorization)、
 [Middleware 与 Event](https://office.univer.ai/zh-CN/collaboration/middleware-and-events)和

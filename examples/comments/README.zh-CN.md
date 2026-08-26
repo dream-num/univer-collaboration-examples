@@ -14,3 +14,5 @@ Endpoint 的 Session 和 Unit room。
 
 评论 anchor 仍随 Sheet 协同数据变化，评论正文和 solved 状态由 Comment Service 保存；两者
 必须一起纳入业务数据生命周期。
+core 与 Comment SQLite Adapter 共享 `.data/collaboration.sqlite`，两类数据都会在服务重启
+后保留。

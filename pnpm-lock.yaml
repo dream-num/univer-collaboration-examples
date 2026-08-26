@@ -26,7 +26,7 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-comment-database-memory':
+      '@univerjs-pro/collaboration-comment-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-comment-endpoint':
@@ -35,7 +35,7 @@ importers:
       '@univerjs-pro/collaboration-comment-service':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
-      '@univerjs-pro/collaboration-database-memory':
+      '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-endpoint':
@@ -166,7 +166,7 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-database-memory':
+      '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-endpoint':
@@ -239,7 +239,7 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-database-memory':
+      '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-endpoint':
@@ -315,7 +315,7 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-database-memory':
+      '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-endpoint':
@@ -431,7 +431,7 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-database-memory':
+      '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-endpoint':
@@ -446,7 +446,7 @@ importers:
       '@univerjs-pro/collaboration-worktree-client':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)(rxjs@7.8.2)
-      '@univerjs-pro/collaboration-worktree-database-memory':
+      '@univerjs-pro/collaboration-worktree-database-sqlite':
         specifier: 1.0.0-beta.2
         version: 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-worktree-endpoint':
@@ -1270,6 +1270,10 @@ packages:
   '@univerjs-pro/collaboration-comment-database-memory@1.0.0-beta.2':
     resolution: {integrity: sha512-LVNswhRj4RZ6wXUx9HuG/18PBC5TEe9NA0ak2yWG9mwzq+L3HZbMC8te34GZ4MUx/EjfAWVhtupQC9FDyCVglg==}
 
+  '@univerjs-pro/collaboration-comment-database-sqlite@1.0.0-beta.2':
+    resolution: {integrity: sha512-fn5dQCSOK4Ysb1wiclWHJcZuTNVSe2Nfzf3bUvQG4PzND4CjyPtlicIGi+F48u/7rjmZZNFl9Y+D94XS8V46Zg==}
+    engines: {node: '>=22'}
+
   '@univerjs-pro/collaboration-comment-endpoint@1.0.0-beta.2':
     resolution: {integrity: sha512-p3rfALGoebynfmupfnlKs6arz20oYdpxZjr1vwtpWs/I53sP/ooKsg5ud9rsi4w7Nh8Nz5aJUhe5TxfgMGKo9A==}
 
@@ -1307,6 +1311,10 @@ packages:
 
   '@univerjs-pro/collaboration-worktree-database-memory@1.0.0-beta.2':
     resolution: {integrity: sha512-d8JUsY4gf+XihWkiPoTOyK72Czq2HTTjkmrtU0EIMPTnBxlF2vn5H9DSdDgsjPgRfxTNGQnVqY/D5eT6IwQ6cw==}
+
+  '@univerjs-pro/collaboration-worktree-database-sqlite@1.0.0-beta.2':
+    resolution: {integrity: sha512-+YjzmTucy5rZa0J9HR5YRPgAWYoao3MJCE/IU47AH34/G/+2XL1uOBOc8zQ34J82EVbJbTAlK5/mQsSvxIVFzA==}
+    engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-worktree-endpoint@1.0.0-beta.2':
     resolution: {integrity: sha512-M6KGGU0uoW4cntufKZPqwGOdHctQJV2c+Sur0UOJVRYredgUOzoUwdbqDzq7+rSgwpa0bBKH4QzIjpk+8SP3Tw==}
@@ -3146,6 +3154,14 @@ snapshots:
     transitivePeerDependencies:
       - react
 
+  '@univerjs-pro/collaboration-comment-database-sqlite@1.0.0-beta.2(react@19.2.8)':
+    dependencies:
+      '@univerjs-pro/collaboration-comment-service': 1.0.0-beta.2(react@19.2.8)
+      '@univerjs/protocol': 1.0.0-beta.2
+      libsql: 0.5.29
+    transitivePeerDependencies:
+      - react
+
   '@univerjs-pro/collaboration-comment-endpoint@1.0.0-beta.2(react@19.2.8)':
     dependencies:
       '@univerjs-pro/collaboration-comment-service': 1.0.0-beta.2(react@19.2.8)
@@ -3293,6 +3309,15 @@ snapshots:
       '@univerjs-pro/collaboration-service': 1.0.0-beta.2(react@19.2.8)
       '@univerjs-pro/collaboration-worktree-service': 1.0.0-beta.2(react@19.2.8)
       '@univerjs/protocol': 1.0.0-beta.2
+    transitivePeerDependencies:
+      - react
+
+  '@univerjs-pro/collaboration-worktree-database-sqlite@1.0.0-beta.2(react@19.2.8)':
+    dependencies:
+      '@univerjs-pro/collaboration-service': 1.0.0-beta.2(react@19.2.8)
+      '@univerjs-pro/collaboration-worktree-service': 1.0.0-beta.2(react@19.2.8)
+      '@univerjs/protocol': 1.0.0-beta.2
+      libsql: 0.5.29
     transitivePeerDependencies:
       - react
 

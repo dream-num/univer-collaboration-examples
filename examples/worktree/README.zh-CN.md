@@ -12,4 +12,5 @@ pnpm example:worktree
 在 trunk/draft 间切换，并依次执行 Ready、Reopen 和 Merge。
 
 只需要阅读 `server/main.ts` 和 `web/main.ts`。Worktree 有独立 Service、Adapter 和协同路径，
-只与 trunk Endpoint 共享一次性 ticket store。
+只与 trunk Endpoint 共享一次性 ticket store。trunk 与 Worktree SQLite Adapter 共享
+`.data/collaboration.sqlite`，数据与 Worktree 状态都会在服务重启后保留。

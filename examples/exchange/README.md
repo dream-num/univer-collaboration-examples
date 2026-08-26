@@ -23,10 +23,10 @@ Read these files together:
   `getUnitLoadDataWithBlocks()` and completes it with `UnitSnapshotMaterializer` before conversion.
 - `web/main.ts` configures the collaboration and exchange plugins.
 
-Files, tasks, Units, and the Memory Adapter are all process-local and disappear when the process
-stops. The fixed user, permissive authorization, in-memory file store, 25 MiB upload limit, and
-unsigned local download URL are teaching choices, not production configuration. A production
-application should authenticate every route, authorize Unit creation and export, use durable object
-storage and a task queue, enforce quotas, validate files, expire downloads, and run conversions in
-isolated workers. Exchange HTTP routes belong to the application; the Collaboration SDK does not
-provide an Exchange Endpoint.
+Collaboration Units are stored in `.data/collaboration.sqlite` and survive server restarts. Uploaded
+files and tasks remain process-local and disappear when the process stops. The fixed user,
+permissive authorization, in-memory file store, 25 MiB upload limit, and unsigned local download URL
+are teaching choices, not production configuration. A production application should authenticate
+every route, authorize Unit creation and export, use durable object storage and a task queue, enforce
+quotas, validate files, expire downloads, and run conversions in isolated workers. Exchange HTTP
+routes belong to the application; the Collaboration SDK does not provide an Exchange Endpoint.

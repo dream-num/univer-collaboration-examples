@@ -54,6 +54,10 @@ The examples cover only teaching and copyable assembly. They do not include file
 multi-type product editors, or a complete office suite. The exchange example intentionally uses
 an in-memory file/task store rather than a production file service.
 
+`quick-start` intentionally keeps the Memory Adapter for the shortest possible setup. Every other
+example stores its collaboration data in its own `.data/collaboration.sqlite` file so state survives
+server restarts.
+
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read
 [Identity and authorization](https://office.univer.ai/collaboration/identity-and-authorization),

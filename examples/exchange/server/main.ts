@@ -1,15 +1,21 @@
+import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
+import { dirname } from "node:path";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
-import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
-import { UniverCollabService } from "@univerjs-pro/collaboration-service";
+import {
+  CollabError,
+  UniverCollabService,
+} from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { createExchangeRouter } from "./exchange.js";
 
 const UNIT_ID = "exchange-sheet";
 const USER_ID = "demo-user";
+const filename = ".data/collaboration.sqlite";
 const unitData: IWorkbookData = {
   id: UNIT_ID,
   rev: 1,
@@ -34,7 +40,8 @@ const unitData: IWorkbookData = {
   resources: [],
 };
 
-const database = new MemoryDatabaseAdapter();
+await mkdir(dirname(filename), { recursive: true });
+const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
@@ -45,10 +52,19 @@ transport.use(async (context, next) => {
 });
 transport.register(endpoint);
 
-await service.createUnitFromData(
-  { type: UniverType.UNIVER_SHEET, data: unitData },
-  { userID: USER_ID },
-);
+try {
+  await service.getUnitLoadData(
+    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
+    { userID: USER_ID },
+  );
+} catch (error) {
+  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
+    throw error;
+  await service.createUnitFromData(
+    { type: UniverType.UNIVER_SHEET, data: unitData },
+    { userID: USER_ID },
+  );
+}
 
 const app = express();
 app.use(

@@ -13,3 +13,5 @@ pnpm example:permissions
 
 身份读取、两种角色和所有权限检查都顺序写在 `server/main.ts`。权限判断全部发生在服务端，
 前端提示不是安全边界。
+
+协同 Unit 写入 `.data/collaboration.sqlite`，服务重启后会继续复用。

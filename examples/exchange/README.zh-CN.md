@@ -22,8 +22,8 @@ XLS/XLSX/CSV/TSV 导入为新的协同 Unit；通过 **File → Save As** 把当
   `UnitSnapshotMaterializer` 补全后交给转换器。
 - `web/main.ts`：配置协同与 exchange 前端插件。
 
-文件、任务、Unit 和 Memory Adapter 都只保存在当前进程，进程停止后全部丢失。固定用户、
-全允许授权、内存文件存储、25 MiB 上传限制以及未签名的本地下载 URL 都只用于教学，不是生产
-配置。生产应用应认证所有路由、校验 Unit 创建和导出权限，使用持久对象存储与任务队列，设置
-配额、校验文件、让下载 URL 过期，并在隔离 worker 中执行转换。Exchange HTTP 路由属于应用，
-Collaboration SDK 不提供 Exchange Endpoint。
+协同 Unit 写入 `.data/collaboration.sqlite`，服务重启后仍会保留；上传文件和任务仍只存在于
+当前进程，进程停止后会丢失。固定用户、全允许授权、内存文件存储、25 MiB 上传限制以及未签名
+的本地下载 URL 都只用于教学，不是生产配置。生产应用应认证所有路由、校验 Unit 创建和导出
+权限，使用持久对象存储与任务队列，设置配额、校验文件、让下载 URL 过期，并在隔离 worker 中
+执行转换。Exchange HTTP 路由属于应用，Collaboration SDK 不提供 Exchange Endpoint。

@@ -1,20 +1,29 @@
+import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
+import { dirname } from "node:path";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
-import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import {
   MemorySessionTicketStore,
   UniverCollabEndpoint,
 } from "@univerjs-pro/collaboration-endpoint";
-import { UniverCollabService } from "@univerjs-pro/collaboration-service";
+import {
+  CollabError,
+  UniverCollabService,
+} from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import { MemoryWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-memory";
+import { SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
 import { UniverCollabWorktreeEndpoint } from "@univerjs-pro/collaboration-worktree-endpoint";
-import { UniverCollabWorktreeService } from "@univerjs-pro/collaboration-worktree-service";
+import {
+  UniverCollabWorktreeService,
+  WorktreeError,
+} from "@univerjs-pro/collaboration-worktree-service";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
 const UNIT_ID = "worktree-sheet";
 const WORKTREE_ID = "demo-worktree";
+const filename = ".data/collaboration.sqlite";
 const unitData: IWorkbookData = {
   id: UNIT_ID,
   rev: 1,
@@ -35,9 +44,10 @@ const unitData: IWorkbookData = {
   resources: [],
 };
 
-const database = new MemoryDatabaseAdapter();
+await mkdir(dirname(filename), { recursive: true });
+const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
-const worktreeDatabase = new MemoryWorktreeDatabaseAdapter();
+const worktreeDatabase = new SQLiteWorktreeDatabaseAdapter({ filename });
 const worktreeService = new UniverCollabWorktreeService({
   trunk: { service, dbAdapter: database },
   dbAdapter: worktreeDatabase,
@@ -55,14 +65,35 @@ transport.use(async (context, next) => {
 transport.register(endpoint);
 transport.register(worktreeEndpoint);
 
-await service.createUnitFromData(
-  { type: UniverType.UNIVER_SHEET, data: unitData },
-  { userID: "demo-user" },
-);
-await worktreeService.createWorktree(
-  { worktreeID: WORKTREE_ID, units: [UNIT_ID] },
-  { userID: "demo-user" },
-);
+try {
+  await service.getUnitLoadData(
+    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
+    { userID: "demo-user" },
+  );
+} catch (error) {
+  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
+    throw error;
+  await service.createUnitFromData(
+    { type: UniverType.UNIVER_SHEET, data: unitData },
+    { userID: "demo-user" },
+  );
+}
+try {
+  await worktreeService.getWorktree(
+    { worktreeID: WORKTREE_ID },
+    { userID: "demo-user" },
+  );
+} catch (error) {
+  if (
+    !(error instanceof WorktreeError) ||
+    error.code !== "WORKTREE_NOT_FOUND"
+  )
+    throw error;
+  await worktreeService.createWorktree(
+    { worktreeID: WORKTREE_ID, units: [UNIT_ID] },
+    { userID: "demo-user" },
+  );
+}
 
 const app = express();
 app.post(
