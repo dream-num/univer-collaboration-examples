@@ -27,6 +27,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
 | [`history`](./examples/history/README.md) | Version history service and browser entry |
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
+| [`office-app`](./examples/office-app/README.md) | Bilingual five-Unit workspace with users, roles, comments, history, trash, and Office exchange |
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 
@@ -46,13 +47,14 @@ pnpm example:database-adapter
 pnpm example:permissions
 pnpm example:history
 pnpm example:comments
+pnpm example:office-app
 pnpm example:worktree
 pnpm example:exchange
 ```
 
-The examples cover only teaching and copyable assembly. They do not include file spaces,
-multi-type product editors, or a complete office suite. The exchange example intentionally uses
-an in-memory file/task store rather than a production file service.
+The examples cover only teaching and copyable assembly. `office-app` demonstrates a compact file
+space and multi-type editor, but it is not a production office suite. The standalone exchange
+example intentionally uses an in-memory file/task store rather than a production file service.
 
 `quick-start` intentionally keeps the Memory Adapter for the shortest possible setup. Every other
 example stores its collaboration data in its own `.data/collaboration.sqlite` file so state survives

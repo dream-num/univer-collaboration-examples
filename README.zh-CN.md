@@ -25,6 +25,7 @@
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
+| [`office-app`](./examples/office-app/README.zh-CN.md) | 含用户、角色、评论、历史、回收站和 Office 交换的双语五类 Unit 工作区 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
 
@@ -44,12 +45,13 @@ pnpm example:database-adapter
 pnpm example:permissions
 pnpm example:history
 pnpm example:comments
+pnpm example:office-app
 pnpm example:worktree
 pnpm example:exchange
 ```
 
-示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。exchange 示例
-特意使用内存文件与任务存储，不代替生产文件服务。
+示例只承担教学和可复制装配。`office-app` 展示精简文件空间和多类型编辑器，但不是生产办公
+套件。独立的 exchange 示例特意使用内存文件与任务存储，不代替生产文件服务。
 
 `quick-start` 为保持最短装配刻意保留 Memory Adapter；其他示例都把协同数据写入各自的
 `.data/collaboration.sqlite`，服务重启后仍会保留。
