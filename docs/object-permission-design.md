@@ -1,6 +1,7 @@
 # Unit 内部对象权限方案
 
-> 状态：方案草案，尚未实现。
+> 状态：Office App 已基于 Collaboration SDK 的正式能力实现 Sheet 安全闭环；其他
+> Unit 的服务端闭环与权限刷新仍待后续完成。
 
 ## 目标
 
@@ -16,14 +17,20 @@ action。
 
 ## 当前能力
 
-- Sheet、Doc、Slide、Board 和 Base 都支持 Unit 根对象权限查询。
-- 标准客户端当前只有 Sheet 会为内部对象请求服务端权限：
+- Sheet、Doc、Slide、Board 和 Base 都定义了 Unit 根对象及内部对象权限点，并在前端
+  命令层消费这些权限点。
+- 标准 Collaboration Client 当前只有 Sheet 会为内部对象自动请求服务端权限：
   - `UnitObject.Worksheet`
   - `UnitObject.SelectRange`
-- 其他 Unit 虽然定义了 `DocumentSection`、`SlideElement`、`BaseTable`、
-  `BoardElement` 等枚举，但当前标准客户端不会为它们请求 Authz HTTP 接口。
-- 当前 Collaboration SDK 尚不能从 mutation 推导 Worksheet/Range 权限需求，因此
-  内部对象权限还没有形成完整的服务端安全闭环。
+- Doc、Slide、Board 和 Base 的内部权限点包括 `DocumentSection`、`SlideElement`、
+  `BaseTable`、`BoardElement` 等；当前标准 Collaboration Client 不会为这些内部对象
+  自动请求 Authz HTTP 接口。
+- Collaboration SDK 会在 `applyChangeset` context 中，根据当前 confirmed head 和
+  Sheet mutations 提供 Worksheet/SelectRange 的 `permissionRequirements`。
+
+Office App 使用同一个 ACL resolver 处理 Authz HTTP 查询和 `applyChangeset` 强制检查，
+并实现 permission object、collaborator 存储以及标准 Authz HTTP 接口。mutation 语义和
+保护范围分析完全由 SDK 负责，应用不再包含对应 workaround。
 
 第一阶段只实现 Sheet 的 Worksheet 和 SelectRange，不提前实现其他 Unit 的内部对象。
 
@@ -71,10 +78,8 @@ SDK 已经能够在 `applyChangeset` middleware context 中提供：
 - `ctx.changeset.unitID`
 - `ctx.changeset.mutations`
 
-其中 `unitID` 已经可以通过 `ctx.changeset.unitID` 获取，不需要再增加一个重复的顶层
-字段。缺少的是 SDK 根据当前 Runtime、保护规则和 mutations 计算出的权限需求。
-
-建议扩展现有 `ApplyChangesetMiddlewareContext`：
+其中 `unitID` 可以通过 `ctx.changeset.unitID` 获取，不需要重复的顶层字段。当前
+`ApplyChangesetMiddlewareContext` 还提供：
 
 ```ts
 interface PermissionRequirement {
@@ -87,7 +92,7 @@ interface PermissionRequirement {
 }
 
 interface ApplyChangesetMiddlewareContext {
-  // Existing fields are omitted.
+  // 省略其他已有字段。
   readonly permissionRequirements: readonly PermissionRequirement[];
 }
 ```
@@ -154,6 +159,11 @@ effectiveAllowed = unitAllowed && objectAllowed
 
 Unit viewer 不会因为某个 Range ACL 获得整个 Unit 的 Edit 权限；Unit editor 可以被
 Worksheet 或 Range 保护规则进一步限制。
+
+Office App 的演示策略将内部对象权限包在 Unit 权限之内：对象 `View` 先要求 Unit
+`View`，其余对象写入和管理 action 先要求 Unit `Edit`。这是为了区分 Unit 成员管理与
+permission object 管理：Unit editor 可以创建并管理自己创建的保护对象，但不能管理
+Unit 成员。
 
 ## 二、客户端 UI 权限查询
 
@@ -223,14 +233,14 @@ Sheet 内部权限配置包含两类数据，不能混为一个存储：
 
 ```text
 IAuthzIoService.create()
-→ 服务端创建 ACL 对象并返回 permissionId
+→ 服务端创建可立即使用的 ACL 对象并返回 permissionId
 → 客户端提交 AddRangeProtection mutation
 → mutation 把 permissionId、subUnitId 和 ranges 写入 Unit 内容
 ```
 
 如果 ACL 对象创建成功但 protection mutation 提交失败，会产生未被 Unit snapshot 引用
-的 permission object。第一版可以把它视为 pending/orphan，并通过超时或引用扫描清理；
-不要复用已发放的 `permissionId`。
+的 permission object。应用可以按需通过引用扫描清理；这不是标准 Authz 协议的一部分，
+examples 不为此增加 permission object 状态机。
 
 权限对象的 collaborators 或策略变化后，服务端需要通过标准权限变更事件通知在线客户
 端重新请求对应 `permissionId`。如果 Collaboration SDK 尚未公开安全的权限刷新发布
@@ -249,7 +259,6 @@ permission_objects
 - name
 - strategies
 - scope
-- state                // pending / active / orphan / deleted
 - created_at
 - updated_at
 
@@ -267,19 +276,17 @@ subUnitId 和 Range 坐标继续以 Unit snapshot 中的 protection rule 为准�
 
 ## 实施顺序
 
-1. 在 Collaboration SDK 中定义 `PermissionRequirement`，由 Sheet Runtime 从当前 head
-   和 mutation 推导 requirements。
-2. 扩展 `applyChangeset` middleware context，并覆盖 CAS retry、保护规则并发变化、
-   同 changeset 删除保护后修改内容等测试。
-3. 在 examples 中实现 permission object/协作者存储和统一 ACL resolver。
-4. 扩展 `batch_allowed`，区分 Unit 根对象与 Worksheet/SelectRange permission object。
-5. 实现标准 Authz permission object 和 collaborator HTTP 接口。
-6. 接入服务端 `applyChangeset` middleware 强制检查。
-7. 实现标准权限刷新通知后，再启用客户端 Worksheet/Range 权限管理 UI。
-8. 完成浏览器正常路径和伪造 mutation 的服务端拒绝测试。
-
-在第 6 步完成前，Worksheet/Range 权限只能视为客户端 UI 限制，不能声明为安全的对象
-级权限实现。
+1. 已在 SDK 完成：定义 `PermissionRequirement`，由 Sheet Runtime 从当前 head 和
+   mutation 推导 requirements。
+2. 已在 SDK 完成：`applyChangeset` middleware context 暴露
+   `permissionRequirements`，并在每次 CAS retry 时重新计算。
+3. 已在 examples 完成：permission object/协作者存储和统一 ACL resolver。
+4. 已在 examples 完成：`batch_allowed` 区分 Unit 根对象与 Worksheet/SelectRange。
+5. 已在 examples 完成：标准 Authz permission object 和 collaborator HTTP 接口。
+6. 已完成：`applyChangeset` middleware 使用 SDK 提供的 requirements 强制检查。
+7. 待 SDK/客户端：标准权限刷新通知。当前修改 ACL 后需重载编辑器获取新权限。
+8. 已完成基础验收：浏览器创建保护、Owner/Editor/Viewer 行为、未保护区域编辑、显式
+   collaborator 更新、伪造 mutation 服务端拒绝、保护删除后的对象状态。
 
 ## 暂不处理
 

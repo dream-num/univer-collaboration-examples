@@ -9,8 +9,9 @@ import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpo
 import { UniverHistoryService } from "@univerjs-pro/collaboration-history-service";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import type { IUser } from "@univerjs/protocol";
+import { UnitAction, type IUser } from "@univerjs/protocol";
 import type { User } from "../../shared/api-types";
+import type { AuthzService } from "../authz/authz.service";
 import { config } from "../config";
 import type { UnitRepository } from "../units/units.repository";
 import {
@@ -22,6 +23,7 @@ import {
 
 export function createCollaboration(options: {
   repository: UnitRepository;
+  authz: AuthzService;
   currentUser: (request: IncomingMessage) => User | undefined;
 }) {
   const database = new SQLiteDatabaseAdapter({
@@ -32,8 +34,13 @@ export function createCollaboration(options: {
 
   service.on("changesetCommitted", (event) => {
     options.repository.touchUnit(event.changeset.unitID, event.committedAt);
+    for (const requirement of event.permissionRequirements) {
+      if (requirement.action === UnitAction.Delete) {
+        options.authz.deleteObject(requirement.unitID, requirement.objectID);
+      }
+    }
   });
-  registerCollaborationAccess(service, options.repository);
+  registerCollaborationAccess(service, options.repository, options.authz);
 
   const userProvider = {
     async getUsers(userIDs: readonly string[]): Promise<readonly IUser[]> {

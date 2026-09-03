@@ -57,7 +57,7 @@ export function registerHistory(
     });
   } else if (unitType === 2) {
     univer.registerPlugin(UniverSheetsHistoryUIPlugin, {
-      historyListServerUrl: historyServerUrl,
+      historyServerUrl,
       univerContainerId,
     });
   } else if (unitType === 3) {

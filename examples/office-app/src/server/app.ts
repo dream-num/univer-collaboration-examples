@@ -5,8 +5,10 @@ import Database from "libsql";
 import { createAuthRepository } from "./auth/auth.repository";
 import { createAuthHttp } from "./auth/auth.routes";
 import { createAuthService } from "./auth/auth.service";
+import { createAuthzRepository } from "./authz/authz.repository";
+import { createAuthzRouter } from "./authz/authz.routes";
+import { AuthzError, createAuthzService } from "./authz/authz.service";
 import { createCollaboration } from "./collaboration";
-import { createAuthzRouter } from "./collaboration/access-control";
 import { createCollaborationUsersRouter } from "./collaboration/users.routes";
 import { config } from "./config";
 import {
@@ -34,8 +36,13 @@ export async function createApp(): Promise<AppRuntime> {
   const authService = createAuthService(createAuthRepository(database));
   const auth = createAuthHttp(authService);
   const repository = createUnitRepository(database);
+  const authz = createAuthzService({
+    repository: createAuthzRepository(database),
+    units: repository,
+  });
   const collaboration = createCollaboration({
     repository,
+    authz,
     currentUser: auth.currentUser,
   });
   const units = createUnitOperations({
@@ -85,7 +92,7 @@ export async function createApp(): Promise<AppRuntime> {
   );
   app.use(
     "/universer-api/authz",
-    createAuthzRouter({ requireUser: auth.requireUser, repository }),
+    createAuthzRouter({ requireUser: auth.requireUser, service: authz }),
   );
   app.use(
     "/universer-api/user",
@@ -124,7 +131,8 @@ export async function createApp(): Promise<AppRuntime> {
       if (
         error instanceof UnitError ||
         error instanceof MemberError ||
-        error instanceof ExchangeHttpError
+        error instanceof ExchangeHttpError ||
+        error instanceof AuthzError
       ) {
         response.status(error.status).json({
           code: error.code,

@@ -5,9 +5,8 @@ import {
   CollabError,
   UniverCollabService,
 } from "@univerjs-pro/collaboration-service";
-import { ErrorCode, UnitAction, UniverType } from "@univerjs/protocol";
-import { Router, type Request, type Response, type Router as ExpressRouter } from "express";
-import type { User } from "../../shared/api-types";
+import { UnitAction, UniverType } from "@univerjs/protocol";
+import type { AuthzService } from "../authz/authz.service";
 import { isUnitActionAllowed } from "../permissions";
 import type { UnitRepository } from "../units/units.repository";
 
@@ -22,6 +21,7 @@ const commentTypes = new Set<UniverType>([
 export function registerCollaborationAccess(
   service: UniverCollabService,
   repository: UnitRepository,
+  authz: AuthzService,
 ) {
   service.use("readUnitData", async (context, next) => {
     if (!isUnitActionAllowed(
@@ -48,7 +48,28 @@ export function registerCollaborationAccess(
   };
 
   service.use("submitChangeset", requireEdit);
-  service.use("applyChangeset", requireEdit);
+  service.use("applyChangeset", async (context, next) => {
+    if (!isUnitActionAllowed(
+      repository.resolveRole(context.userID, context.request.changeset.unitID),
+      UnitAction.Edit,
+    )) {
+      throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+    }
+    for (const requirement of context.permissionRequirements) {
+      if (!authz.isAllowed(context.userID, {
+        unitID: requirement.unitID,
+        objectID: requirement.objectID,
+        objectType: requirement.objectType,
+        actions: [requirement.action],
+      })) {
+        throw new CollabError(
+          "PERMISSION_DENIED",
+          `Cannot apply mutation ${requirement.mutationID}`,
+        );
+      }
+    }
+    await next();
+  });
   service.use("deleteUnits", async (context, next) => {
     if (
       context.request.unitIDs.some(
@@ -152,39 +173,4 @@ export function registerHistoryAccess(
   service.use("getHistoryList", requireRead);
   service.use("listHistoryCreators", requireRead);
   service.use("getHistoryChangesets", requireRead);
-}
-
-export function createAuthzRouter(options: {
-  requireUser: (request: Request, response: Response) => User | undefined;
-  repository: UnitRepository;
-}): ExpressRouter {
-  const router = Router();
-  router.post("/-/object/-/batch_allowed", (request, response) => {
-    const user = options.requireUser(request, response);
-    if (!user) return;
-    const body = request.body as {
-      requests?: Array<{
-        unitID: string;
-        objectID: string;
-        objectType: number;
-        actions: number[];
-      }>;
-    };
-
-    response.json({
-      error: { code: ErrorCode.OK, message: "" },
-      objectActions: (body.requests ?? []).map((item) => {
-        const role = options.repository.resolveRole(user.userId, item.unitID);
-        return {
-          unitID: item.unitID,
-          objectID: item.objectID,
-          actions: item.actions.map((action) => ({
-            action,
-            allowed: isUnitActionAllowed(role, action),
-          })),
-        };
-      }),
-    });
-  });
-  return router;
 }
