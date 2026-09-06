@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -12,6 +13,7 @@ import {
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
+const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "persistent-sheet";
 const filename = ".data/collaboration.sqlite";
 const unitData: IWorkbookData = {
@@ -39,12 +41,12 @@ const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
-endpoint.use("connect", async (context, next) => {
-  context.member.name = "Demo User";
+transport.use(async (context, next) => {
+  context.userID = USER_ID;
   await next();
 });
-transport.use(async (context, next) => {
-  context.userID = "demo-user";
+endpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
   await next();
 });
 transport.register(endpoint);
@@ -52,14 +54,14 @@ transport.register(endpoint);
 try {
   await service.getUnitLoadData(
     { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 } catch (error) {
   if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
     throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 }
 

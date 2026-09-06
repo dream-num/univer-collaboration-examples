@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -14,7 +15,7 @@ import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { createExchangeRouter } from "./exchange.js";
 
 const UNIT_ID = "exchange-sheet";
-const USER_ID = "demo-user";
+const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const filename = ".data/collaboration.sqlite";
 const unitData: IWorkbookData = {
   id: UNIT_ID,
@@ -48,6 +49,10 @@ const transport = createNodeTransport();
 
 transport.use(async (context, next) => {
   context.userID = USER_ID;
+  await next();
+});
+endpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
   await next();
 });
 transport.register(endpoint);

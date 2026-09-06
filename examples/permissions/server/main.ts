@@ -88,6 +88,12 @@ transport.use(async (context, next) => {
   context.userID = user.userId;
   await next();
 });
+endpoint.use("connect", async (context, next) => {
+  context.member.name =
+    Object.values(users).find((user) => user.userId === context.session.userID)
+      ?.username ?? context.session.userID;
+  await next();
+});
 transport.register(endpoint);
 try {
   await service.getUnitLoadData(

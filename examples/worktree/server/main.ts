@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -21,6 +22,7 @@ import {
 } from "@univerjs-pro/collaboration-worktree-service";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
+const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "worktree-sheet";
 const WORKTREE_ID = "demo-worktree";
 const filename = ".data/collaboration.sqlite";
@@ -59,7 +61,15 @@ const worktreeEndpoint = new UniverCollabWorktreeEndpoint(worktreeService, {
 });
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
-  context.userID = "demo-user";
+  context.userID = USER_ID;
+  await next();
+});
+endpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
+  await next();
+});
+worktreeEndpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
   await next();
 });
 transport.register(endpoint);
@@ -68,20 +78,20 @@ transport.register(worktreeEndpoint);
 try {
   await service.getUnitLoadData(
     { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 } catch (error) {
   if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
     throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 }
 try {
   await worktreeService.getWorktree(
     { worktreeID: WORKTREE_ID },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 } catch (error) {
   if (
@@ -91,7 +101,7 @@ try {
     throw error;
   await worktreeService.createWorktree(
     { worktreeID: WORKTREE_ID, units: [UNIT_ID] },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 }
 
