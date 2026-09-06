@@ -120,7 +120,6 @@ input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(228,88,50,
   .member-form { grid-template-columns: 1fr; }
 }
 
-.presence-status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; white-space: nowrap; }
 .online-members { position: relative; flex: 0 0 auto; font-size: 12px; }
 .online-members summary { display: flex; align-items: center; gap: 8px; border-radius: 8px; padding: 3px 5px; cursor: pointer; list-style: none; white-space: nowrap; }
 .online-members summary::-webkit-details-marker { display: none; }

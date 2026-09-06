@@ -32,7 +32,6 @@ export function registerBaseUnit(
   univer.registerPlugin(UniverBasesUIPlugin, {
     override: [[IAttachmentIoService, null]],
     workbench: {
-      collaborationStatus: false,
       footer: false,
     },
   });

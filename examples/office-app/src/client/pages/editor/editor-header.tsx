@@ -1,7 +1,7 @@
+import type { IMember } from "@univerjs/protocol";
 import type { AppUnit, Locale } from "../../../shared/api-types";
 import { LanguageSwitch } from "../../components/language-switch";
 import { messages } from "../../locales";
-import type { EditorPresence } from "../../univer/types";
 import { OnlineMembers } from "./online-members";
 
 export function EditorHeader({
@@ -9,17 +9,15 @@ export function EditorHeader({
   locale,
   onLocaleChange,
   onMembers,
-  presence,
+  onlineMembers,
   userId,
-  onReconnect,
 }: {
   unit: AppUnit | undefined;
   locale: Locale;
   onLocaleChange: (locale: Locale) => void;
   onMembers: () => void;
-  presence: EditorPresence;
+  onlineMembers: readonly IMember[];
   userId: string;
-  onReconnect: () => void;
 }) {
   const t = messages[locale];
 
@@ -31,7 +29,7 @@ export function EditorHeader({
         <strong>{unit?.name ?? t.opening}</strong>
         {unit && <small>{t[unit.role]}</small>}
       </div>
-      <OnlineMembers presence={presence} userId={userId} locale={locale} onReconnect={onReconnect} />
+      <OnlineMembers members={onlineMembers} userId={userId} locale={locale} />
       <LanguageSwitch locale={locale} onChange={onLocaleChange} />
       {unit?.role === "creator" && (
         <button

@@ -2,42 +2,28 @@ import { useMemo } from "react";
 import type { IMember } from "@univerjs/protocol";
 import type { Locale } from "../../../shared/api-types";
 import { messages } from "../../locales";
-import type { EditorPresence } from "../../univer/types";
 
 export function OnlineMembers({
-  presence,
+  members,
   userId,
   locale,
-  onReconnect,
 }: {
-  presence: EditorPresence;
+  members: readonly IMember[];
   userId: string;
   locale: Locale;
-  onReconnect: () => void;
 }) {
   const t = messages[locale];
   const users = useMemo(() => {
     const grouped = new Map<string, { member: IMember; connections: number }>();
-    for (const member of presence.members) {
+    for (const member of members) {
       const existing = grouped.get(member.userID);
       if (existing) existing.connections++;
       else grouped.set(member.userID, { member, connections: 1 });
     }
     return [...grouped.values()];
-  }, [presence.members]);
+  }, [members]);
 
-  if (presence.status !== "online") {
-    return (
-      <div className="presence-status" role="status">
-        <span>{presence.status === "offline" ? t.presenceOffline : t.presenceConnecting}</span>
-        {presence.status === "offline" && (
-          <button className="text-button" type="button" onClick={onReconnect}>
-            {t.reconnect}
-          </button>
-        )}
-      </div>
-    );
-  }
+  if (users.length === 0) return null;
 
   return (
     <details className="online-members">

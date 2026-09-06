@@ -1,3 +1,4 @@
+import "@univerjs-pro/collaboration-client/facade";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import {
   IAuthzIoService,
@@ -9,6 +10,7 @@ import {
   Univer,
   UserManagerService,
 } from "@univerjs/core";
+import { FUniver } from "@univerjs/core/facade";
 import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
@@ -22,7 +24,6 @@ import { registerCollaboration } from "./features/collaboration";
 import { registerComments } from "./features/comments";
 import { registerExchangeAndPrint } from "./features/exchange";
 import { registerHistory } from "./features/history";
-import { observePresence } from "./features/presence";
 import { univerLocales } from "./locales";
 import type {
   EditorLocale,
@@ -58,21 +59,20 @@ export async function mountUniverEditor(
     avatar: "",
   });
 
-  const presence = observePresence(
-    univer,
+  const univerAPI = FUniver.newAPI(univer);
+  const membersSubscription = univerAPI.getCollaboration().subscribeCollaborators(
     options.unitId,
-    options.unitType,
-    options.onPresenceChange,
+    options.onMembersChange,
   );
 
   return {
     dispose: () => {
-      presence.dispose();
+      membersSubscription.dispose();
+      univerAPI.dispose();
       commentWorkaround?.dispose();
       univer.dispose();
     },
     setLocale: (locale) => univer.setLocale(toUniverLocale(locale)),
-    reconnect: () => presence.reconnect(),
   };
 }
 

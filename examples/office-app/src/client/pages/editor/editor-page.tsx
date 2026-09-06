@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import type { IMember } from "@univerjs/protocol";
 import type { AppUnit, Locale, User } from "../../../shared/api-types";
 import { api } from "../../api-client";
 import { messages } from "../../locales";
-import type { EditorPresence, MountedUniverEditor } from "../../univer/types";
+import type { MountedUniverEditor } from "../../univer/types";
 import { EditorHeader } from "./editor-header";
 import { MembersDialog } from "./members-dialog";
 
@@ -20,7 +21,7 @@ export function EditorPage({
   const [error, setError] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
   const [editor, setEditor] = useState<MountedUniverEditor>();
-  const [presence, setPresence] = useState<EditorPresence>({ status: "connecting", members: [] });
+  const [onlineMembers, setOnlineMembers] = useState<readonly IMember[]>([]);
   const params = useMemo(() => new URLSearchParams(location.search), []);
   const unitId = params.get("unit") ?? "";
 
@@ -34,7 +35,7 @@ export function EditorPage({
     if (!unit) return;
     let disposer: { dispose(): void } | undefined;
     let cancelled = false;
-    setPresence({ status: "connecting", members: [] });
+    setOnlineMembers([]);
 
     import("../../univer/mount-editor")
       .then(({ mountUniverEditor }) =>
@@ -44,8 +45,8 @@ export function EditorPage({
           locale,
           unitType: unit.type,
           unitId: unit.unitId,
-          onPresenceChange: (next) => {
-            if (!cancelled) setPresence(next);
+          onMembersChange: (members) => {
+            if (!cancelled) setOnlineMembers(members);
           },
         }),
       )
@@ -89,9 +90,8 @@ export function EditorPage({
         locale={locale}
         onLocaleChange={onLocaleChange}
         onMembers={() => setMembersOpen(true)}
-        presence={presence}
+        onlineMembers={onlineMembers}
         userId={user.userId}
-        onReconnect={() => editor?.reconnect()}
       />
       <div id="univer-editor" aria-label={unit?.name ?? t.opening} />
       {unit && membersOpen && (

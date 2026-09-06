@@ -13,16 +13,10 @@ export interface MountUniverEditorOptions {
   locale: EditorLocale;
   unitType: number;
   unitId: string;
-  onPresenceChange: (presence: EditorPresence) => void;
+  onMembersChange: (members: readonly IMember[]) => void;
 }
 
 export interface MountedUniverEditor {
   dispose(): void;
   setLocale(locale: EditorLocale): void;
-  reconnect(): void;
-}
-
-export interface EditorPresence {
-  status: "connecting" | "online" | "offline";
-  members: readonly IMember[];
 }

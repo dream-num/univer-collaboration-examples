@@ -148,10 +148,11 @@ context.customData.currentUser = 当前请求的只读用户摘要
 Endpoint `connect` 从受信任 Session 的用户摘要设置 `member.name = displayName`，
 并保留 `member.avatar = ""`。前端 `UserManagerService` 使用相同的 `userID`、姓名和空头像。
 
-五类编辑器共用顶部在线成员列表，通过公开 `MemberService` 订阅当前房间，按 `userID`
-合并同一用户的多个连接，并显示连接数；光标仍按 `memberID` 区分。空头像显示姓名首字符。
-在线成员与拥有访问权限的成员分别展示，连接状态来自当前 `CollaborationSession`。
-断线时隐藏在线名单并提供重连入口，离开编辑器时释放订阅。
+五类编辑器共用顶部在线成员列表，通过 Facade `subscribeCollaborators(unitID, callback)`
+订阅当前房间，按 `userID` 合并同一用户的多个连接，并显示连接数；光标仍按 `memberID`
+区分。空头像显示姓名首字符。
+在线成员与拥有访问权限的成员分别展示。自己的同步状态、离线提示和重连入口使用 SDK
+内置 UI，Base 保留默认状态显示。离开编辑器时释放成员订阅和应用创建的 Facade 实例。
 
 Sheet、Doc、Slide、Board 的远端光标／选区由 SDK 渲染。
 当前 Base SDK 没有远端光标／选区能力，只展示在线成员。
