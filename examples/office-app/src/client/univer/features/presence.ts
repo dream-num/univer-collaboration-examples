@@ -5,7 +5,6 @@ import {
 } from "@univerjs-pro/collaboration-client";
 import type { Univer, UniverInstanceType } from "@univerjs/core";
 import { filter, Subscription, switchMap } from "rxjs";
-import { clearDisconnectedPresence } from "../../../workarounds/client/disconnected-presence";
 import type { EditorPresence } from "../types";
 
 export function observePresence(
@@ -45,14 +44,10 @@ export function observePresence(
         status = nextStatus === SessionStatus.ONLINE
           ? "online"
           : nextStatus === SessionStatus.OFFLINE ? "offline" : "connecting";
-        if (status !== "online") {
-          clearDisconnectedPresence(members, unitId);
-        }
         publish();
       },
       complete() {
         status = "offline";
-        clearDisconnectedPresence(members, unitId);
         publish();
       },
     }));

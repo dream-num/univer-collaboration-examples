@@ -154,8 +154,7 @@ Endpoint `connect` 从受信任 Session 的用户摘要设置 `member.name = dis
 断线时隐藏在线名单并提供重连入口，离开编辑器时释放订阅。
 
 Sheet、Doc、Slide、Board 的远端光标／选区由 SDK 渲染。
-当前 Base SDK 没有远端光标／选区能力，只展示在线成员。当前安装基线重连会残留旧成员缓存，
-临时清理逻辑集中在 `src/workarounds/client/disconnected-presence.ts`。
+当前 Base SDK 没有远端光标／选区能力，只展示在线成员。
 
 ## 统一角色解析
 
