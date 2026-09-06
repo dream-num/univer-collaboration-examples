@@ -62,13 +62,12 @@ const { univer } = createUniver({
     UniverThreadCommentDataSourcePlugin,
   ],
 });
+
+const currentUser = (await fetch(`${baseURL}/demo/me`).then((response) =>
+  response.json(),
+)) as { userID: string };
 univer.__getInjector().get(UserManagerService).setCurrentUser({
-  userID: "demo-user",
-  name: "Demo User",
+  userID: currentUser.userID,
+  name: currentUser.userID,
   avatar: "",
-  anonymous: false,
-  canBindAnonymous: false,
-  phone: "",
-  email: "",
-  createTimestamp: 0,
 });

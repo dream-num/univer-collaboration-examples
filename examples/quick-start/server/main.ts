@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
@@ -7,6 +8,7 @@ import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
+const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "quick-start-sheet";
 const unitData: IWorkbookData = {
   id: UNIT_ID,
@@ -34,14 +36,18 @@ const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
 
 transport.use(async (context, next) => {
-  context.userID = "demo-user";
+  context.userID = USER_ID;
+  await next();
+});
+endpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
   await next();
 });
 transport.register(endpoint);
 
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
-  { userID: "demo-user" },
+  { userID: USER_ID },
 );
 
 const app = express();

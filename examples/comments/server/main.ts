@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -15,6 +16,7 @@ import {
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
+const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "comments-sheet";
 const filename = ".data/collaboration.sqlite";
 const unitData: IWorkbookData = {
@@ -46,26 +48,26 @@ const commentService = new UniverCommentService({
   database: commentDatabase,
   userProvider: {
     async getUsers(userIDs) {
-      return userIDs.includes("demo-user")
-        ? [
-            {
-              userID: "demo-user",
-              name: "Demo User",
-              avatar: "",
-              anonymous: false,
-              canBindAnonymous: false,
-              phone: "",
-              email: "",
-              createTimestamp: 0,
-            },
-          ]
-        : [];
+      return userIDs.map((userID) => ({
+        userID,
+        name: userID,
+        avatar: "",
+        anonymous: false,
+        canBindAnonymous: false,
+        phone: "",
+        email: "",
+        createTimestamp: 0,
+      }));
     },
   },
 });
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
-  context.userID = "demo-user";
+  context.userID = USER_ID;
+  await next();
+});
+endpoint.use("connect", async (context, next) => {
+  context.member.name = context.session.userID;
   await next();
 });
 transport.register(
@@ -75,18 +77,21 @@ transport.register(endpoint);
 try {
   await service.getUnitLoadData(
     { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 } catch (error) {
   if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
     throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "demo-user" },
+    { userID: USER_ID },
   );
 }
 
 const app = express();
+app.get("/universer-api/demo/me", (_request, response) => {
+  response.json({ userID: USER_ID });
+});
 app.post(
   "/universer-api/authz/-/object/-/batch_allowed",
   express.json(),
