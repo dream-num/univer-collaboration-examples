@@ -71,6 +71,12 @@ export function createCollaboration(options: {
   });
 
   const endpoint = new UniverCollabEndpoint(service);
+  endpoint.use("connect", async (context, next) => {
+    const user = context.session.customData.currentUser as User;
+    context.member.name = user.displayName;
+    context.member.avatar = "";
+    await next();
+  });
   registerEndpointAccess(endpoint, options.repository);
   transport.register(endpoint);
 

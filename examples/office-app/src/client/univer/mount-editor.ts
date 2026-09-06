@@ -22,6 +22,7 @@ import { registerCollaboration } from "./features/collaboration";
 import { registerComments } from "./features/comments";
 import { registerExchangeAndPrint } from "./features/exchange";
 import { registerHistory } from "./features/history";
+import { observePresence } from "./features/presence";
 import { univerLocales } from "./locales";
 import type {
   EditorLocale,
@@ -55,19 +56,23 @@ export async function mountUniverEditor(
     userID: options.user.userId,
     name: options.user.displayName,
     avatar: "",
-    anonymous: false,
-    canBindAnonymous: false,
-    phone: "",
-    email: "",
-    createTimestamp: 0,
   });
+
+  const presence = observePresence(
+    univer,
+    options.unitId,
+    options.unitType,
+    options.onPresenceChange,
+  );
 
   return {
     dispose: () => {
+      presence.dispose();
       commentWorkaround?.dispose();
       univer.dispose();
     },
     setLocale: (locale) => univer.setLocale(toUniverLocale(locale)),
+    reconnect: () => presence.reconnect(),
   };
 }
 

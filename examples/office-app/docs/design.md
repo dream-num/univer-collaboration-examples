@@ -143,6 +143,20 @@ context.customData.currentUser = 当前请求的只读用户摘要
 
 未认证请求在进入任何 Collaboration、Comment、History 或 Exchange Endpoint 前返回 401。
 
+### Presence
+
+Endpoint `connect` 从受信任 Session 的用户摘要设置 `member.name = displayName`，
+并保留 `member.avatar = ""`。前端 `UserManagerService` 使用相同的 `userID`、姓名和空头像。
+
+五类编辑器共用顶部在线成员列表，通过公开 `MemberService` 订阅当前房间，按 `userID`
+合并同一用户的多个连接，并显示连接数；光标仍按 `memberID` 区分。空头像显示姓名首字符。
+在线成员与拥有访问权限的成员分别展示，连接状态来自当前 `CollaborationSession`。
+断线时隐藏在线名单并提供重连入口，离开编辑器时释放订阅。
+
+Sheet、Doc、Slide、Board 的远端光标／选区由 SDK 渲染。
+当前 Base SDK 没有远端光标／选区能力，只展示在线成员。当前安装基线重连会残留旧成员缓存，
+临时清理逻辑集中在 `src/workarounds/client/disconnected-presence.ts`。
+
 ## 统一角色解析
 
 应用只实现一个 `resolveRole(userID, unitID)`：

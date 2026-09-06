@@ -1,3 +1,5 @@
+import type { IMember } from "@univerjs/protocol";
+
 export interface EditorUser {
   userId: string;
   displayName: string;
@@ -11,9 +13,16 @@ export interface MountUniverEditorOptions {
   locale: EditorLocale;
   unitType: number;
   unitId: string;
+  onPresenceChange: (presence: EditorPresence) => void;
 }
 
 export interface MountedUniverEditor {
   dispose(): void;
   setLocale(locale: EditorLocale): void;
+  reconnect(): void;
+}
+
+export interface EditorPresence {
+  status: "connecting" | "online" | "offline";
+  members: readonly IMember[];
 }
