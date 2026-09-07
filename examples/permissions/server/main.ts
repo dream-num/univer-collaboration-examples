@@ -1,42 +1,22 @@
 import { mkdir } from "node:fs/promises";
-import { createServer, type IncomingMessage } from "node:http";
+import { createServer } from "node:http";
 import { dirname } from "node:path";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
-import {
-  CollabError,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import { ErrorCode, UniverType } from "@univerjs/protocol";
+import { ErrorCode, UnitAction, UniverType, type IAllowedRequest } from "@univerjs/protocol";
+import { isAllowed, UNIT_ID, UNIT_NAME } from "./permissions";
+import { currentUser, signIn, signOut, users } from "./users";
 
-const UNIT_ID = "permissions-sheet";
-const filename = ".data/collaboration.sqlite";
-const users = {
-  editor: { userId: "user-editor", username: "editor", role: "editor" },
-  viewer: { userId: "user-viewer", username: "viewer", role: "viewer" },
-} as const;
-type DemoUser = (typeof users)[keyof typeof users];
-
-function currentUser(request: IncomingMessage): DemoUser | undefined {
-  const name = request.headers.cookie?.match(
-    /(?:^|;\s*)demo_user=(editor|viewer)(?:;|$)/u,
-  )?.[1] as keyof typeof users | undefined;
-  return name ? users[name] : undefined;
-}
-function canRead(userID: string) {
-  return userID === users.editor.userId || userID === users.viewer.userId;
-}
-function canEdit(userID: string) {
-  return userID === users.editor.userId;
-}
+const filename = process.env.DATABASE_PATH ?? ".data/collaboration.sqlite";
 
 const unitData: IWorkbookData = {
   id: UNIT_ID,
   rev: 1,
-  name: "Permissions Sheet",
+  name: UNIT_NAME,
   appVersion: "",
   locale: LocaleType.EN_US,
   sheetOrder: ["sheet-1"],
@@ -46,7 +26,11 @@ const unitData: IWorkbookData = {
       name: "Sheet 1",
       rowCount: 100,
       columnCount: 26,
-      cellData: { 0: { 0: { v: "Try editor and viewer" } } },
+      cellData: {
+        0: { 0: { v: "Item" }, 1: { v: "Budget" } },
+        1: { 0: { v: "Design" }, 1: { v: 2400 } },
+        2: { 0: { v: "Engineering" }, 1: { v: 6800 } },
+      },
     },
   },
   styles: {},
@@ -58,26 +42,7 @@ const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
-service.use("readUnitData", async (context, next) => {
-  if (!canRead(context.userID))
-    throw new CollabError("PERMISSION_DENIED", "Cannot read this Unit");
-  await next();
-});
-service.use("submitChangeset", async (context, next) => {
-  if (!canEdit(context.userID))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
-  await next();
-});
-service.use("applyChangeset", async (context, next) => {
-  if (!canEdit(context.userID))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
-  await next();
-});
-endpoint.use("joinUnit", async (context, next) => {
-  if (!canRead(context.session.userID))
-    throw new CollabError("PERMISSION_DENIED", "Cannot join this Unit");
-  await next();
-});
+// Transport identifies the user; Endpoint sets the member profile.
 transport.use(async (context, next) => {
   const user = currentUser(context.incomingMessage);
   if (!user) {
@@ -89,70 +54,74 @@ transport.use(async (context, next) => {
   await next();
 });
 endpoint.use("connect", async (context, next) => {
-  context.member.name =
-    Object.values(users).find((user) => user.userId === context.session.userID)
-      ?.username ?? context.session.userID;
+  const user = users.find((user) => user.userId === context.session.userID)!;
+  context.member.name = user.username;
+  context.member.avatar = user.avatar;
+  await next();
+});
+
+// Enforce document permissions when reading and submitting changes.
+service.use("readUnitData", async (context, next) => {
+  if (!isAllowed(context.userID, context.request.unitID, UnitAction.View))
+    throw new CollabError("PERMISSION_DENIED", "Cannot read this Unit");
+  await next();
+});
+service.use("submitChangeset", async (context, next) => {
+  if (!isAllowed(context.userID, context.request.changeset.unitID, UnitAction.Edit))
+    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+  await next();
+});
+endpoint.use("joinUnit", async (context, next) => {
+  if (!isAllowed(context.session.userID, context.unitID, UnitAction.View))
+    throw new CollabError("PERMISSION_DENIED", "Cannot join this Unit");
   await next();
 });
 transport.register(endpoint);
 try {
   await service.getUnitLoadData(
     { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: users.editor.userId },
+    { userID: "user-editor" },
   );
 } catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
+  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: users.editor.userId },
+    { userID: "user-editor" },
   );
 }
 
 const app = express();
-app.get("/login/:username", (request, response) => {
-  if (
-    request.params.username !== "editor" &&
-    request.params.username !== "viewer"
-  )
-    return void response.sendStatus(404);
-  response.setHeader(
-    "Set-Cookie",
-    `demo_user=${request.params.username}; Path=/; HttpOnly; SameSite=Lax`,
-  );
-  response.redirect(`/?unit=${UNIT_ID}&type=${UniverType.UNIVER_SHEET}`);
+app.post("/login/:username", (request, response) => {
+  const user = users.find((user) => user.username === request.params.username);
+  if (!user) return void response.sendStatus(404);
+  signIn(request, response, user);
+  response.redirect(303, `/?unit=${UNIT_ID}&type=${UniverType.UNIVER_SHEET}`);
+});
+app.post("/logout", (request, response) => {
+  signOut(request, response);
+  response.redirect(303, "/");
 });
 app.get("/universer-api/demo/me", (request, response) => {
   const user = currentUser(request);
-  user
-    ? response.json({ username: user.username, role: user.role })
-    : response.sendStatus(401);
+  if (!user) return void response.sendStatus(401);
+  response.json(user);
 });
-app.post(
-  "/universer-api/authz/-/object/-/batch_allowed",
-  express.json(),
-  (request, response) => {
-    const user = currentUser(request);
-    if (!user) return void response.sendStatus(401);
-    const body = request.body as {
-      requests: Array<{ unitID: string; objectID: string; actions: unknown[] }>;
-    };
-    response.json({
-      error: { code: ErrorCode.OK, message: "" },
-      objectActions: body.requests.map((item) => ({
-        unitID: item.unitID,
-        objectID: item.objectID,
-        actions: item.actions.map((action) => ({
-          action,
-          allowed: canEdit(user.userId),
-        })),
+// Univer uses these permissions to control toolbar actions and editing.
+app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
+  const user = currentUser(request);
+  if (!user) return void response.sendStatus(401);
+  const { requests } = request.body as { requests: IAllowedRequest[] };
+  response.json({
+    error: { code: ErrorCode.OK, message: "" },
+    objectActions: requests.map((item) => ({
+      unitID: item.unitID,
+      objectID: item.objectID,
+      actions: item.actions.map((action) => ({
+        action,
+        allowed: isAllowed(user.userId, item.unitID, action),
       })),
-    });
-  },
-);
-app.get("/", (request, response, next) => {
-  if (!currentUser(request)) return void response.redirect("/login/editor");
-  next();
+    })),
+  });
 });
 app.use("/universer-api", (request, response) => {
   request.url = request.originalUrl;
@@ -160,9 +129,7 @@ app.use("/universer-api", (request, response) => {
 });
 app.use(express.static("dist/web"));
 const server = createServer(app);
-server.on("upgrade", (request, socket, head) =>
-  transport.handleUpgrade(request, socket, head),
-);
+server.on("upgrade", (request, socket, head) => transport.handleUpgrade(request, socket, head));
 const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3010);
 server.listen(port, host, () =>

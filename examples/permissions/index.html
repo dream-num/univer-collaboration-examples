@@ -3,13 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Collaboration Permissions</title>
+    <title>Permissions · Univer</title>
   </head>
   <body>
     <div id="example">
-      <div id="toolbar"></div>
-      <div id="status"></div>
-      <div id="app"></div>
+      <header>
+        <h1>Permissions</h1>
+        <span id="current-user"></span>
+        <form id="sign-out" action="/logout" method="post" hidden>
+          <button>Sign out</button>
+        </form>
+      </header>
+      <section class="controls" aria-label="Document permissions">
+        <div class="accounts">
+          <form action="/login/Alice" method="post">
+            <button data-user-id="user-editor">Alice · Editor</button>
+          </form>
+          <form action="/login/Bob" method="post">
+            <button data-user-id="user-viewer">Bob · Viewer</button>
+          </form>
+          <form action="/login/Casey" method="post">
+            <button data-user-id="user-guest">Casey · No access</button>
+          </form>
+        </div>
+      </section>
+      <main>
+        <div id="app"></div>
+        <div id="state" role="status">Loading…</div>
+      </main>
     </div>
     <script type="module" src="/web/main.ts"></script>
   </body>
