@@ -1,4 +1,4 @@
-import type { IMember } from "@univerjs/protocol";
+import type { FUniver } from "@univerjs/core/facade";
 
 export interface EditorUser {
   userId: string;
@@ -13,10 +13,10 @@ export interface MountUniverEditorOptions {
   locale: EditorLocale;
   unitType: number;
   unitId: string;
-  onMembersChange: (members: readonly IMember[]) => void;
 }
 
 export interface MountedUniverEditor {
+  readonly univerAPI: FUniver;
   dispose(): void;
   setLocale(locale: EditorLocale): void;
 }

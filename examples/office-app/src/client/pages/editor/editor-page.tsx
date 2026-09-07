@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import type { IMember } from "@univerjs/protocol";
 import type { AppUnit, Locale, User } from "../../../shared/api-types";
 import { api } from "../../api-client";
 import { messages } from "../../locales";
-import type { MountedUniverEditor } from "../../univer/types";
 import { EditorHeader } from "./editor-header";
 import { MembersDialog } from "./members-dialog";
+import { useCollaborationMembers } from "./use-collaboration-members";
+import { useUniverEditor } from "./use-univer-editor";
 
 export function EditorPage({
   user,
@@ -20,10 +20,15 @@ export function EditorPage({
   const [unit, setUnit] = useState<AppUnit>();
   const [error, setError] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
-  const [editor, setEditor] = useState<MountedUniverEditor>();
-  const [onlineMembers, setOnlineMembers] = useState<readonly IMember[]>([]);
   const params = useMemo(() => new URLSearchParams(location.search), []);
   const unitId = params.get("unit") ?? "";
+  const { editor, error: editorError } = useUniverEditor({
+    unit,
+    user,
+    locale,
+    container: "univer-editor",
+  });
+  const onlineMembers = useCollaborationMembers(editor?.univerAPI, unit?.unitId);
 
   useEffect(() => {
     api<{ unit: AppUnit }>(`/api/units/${encodeURIComponent(unitId)}`)
@@ -31,50 +36,7 @@ export function EditorPage({
       .catch(() => setError(true));
   }, [unitId]);
 
-  useEffect(() => {
-    if (!unit) return;
-    let disposer: { dispose(): void } | undefined;
-    let cancelled = false;
-    setOnlineMembers([]);
-
-    import("../../univer/mount-editor")
-      .then(({ mountUniverEditor }) =>
-        mountUniverEditor({
-          container: "univer-editor",
-          user,
-          locale,
-          unitType: unit.type,
-          unitId: unit.unitId,
-          onMembersChange: (members) => {
-            if (!cancelled) setOnlineMembers(members);
-          },
-        }),
-      )
-      .then((mounted) => {
-        if (cancelled) {
-          mounted.dispose();
-        } else {
-          disposer = mounted;
-          setEditor(mounted);
-        }
-      })
-      .catch((mountError) => {
-        console.error(mountError);
-        setError(true);
-      });
-
-    return () => {
-      cancelled = true;
-      setEditor(undefined);
-      disposer?.dispose();
-    };
-  }, [unit, user.displayName, user.userId]);
-
-  useEffect(() => {
-    editor?.setLocale(locale);
-  }, [editor, locale]);
-
-  if (error) {
+  if (error || editorError) {
     return (
       <main className="editor-error">
         <p>{t.genericError}</p>

@@ -60,14 +60,10 @@ export async function mountUniverEditor(
   });
 
   const univerAPI = FUniver.newAPI(univer);
-  const membersSubscription = univerAPI.getCollaboration().subscribeCollaborators(
-    options.unitId,
-    options.onMembersChange,
-  );
 
   return {
+    univerAPI,
     dispose: () => {
-      membersSubscription.dispose();
       univerAPI.dispose();
       commentWorkaround?.dispose();
       univer.dispose();
