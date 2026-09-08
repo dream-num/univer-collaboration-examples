@@ -32,10 +32,7 @@ createUniver({
   collaboration: true,
   presets: [UniverSheetsCorePreset({ container: "app" })],
   plugins: [
-    [
-      UniverLicensePlugin,
-      { license: import.meta.env.UNIVER_LICENSE || undefined },
-    ],
+    [UniverLicensePlugin, { license: import.meta.env.UNIVER_LICENSE || undefined }],
     UniverCollaborationPlugin,
     [
       UniverCollaborationClientPlugin,

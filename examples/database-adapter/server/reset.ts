@@ -1,4 +1,6 @@
 import { rm } from "node:fs/promises";
-const filename = ".data/collaboration.sqlite";
-await rm(filename, { force: true });
-console.info(`Removed ${filename}`);
+
+for (const filename of [".data/collaboration.sqlite", ".data/custom-collaboration.sqlite"]) {
+  await rm(filename, { force: true });
+  console.info(`Removed ${filename}`);
+}

@@ -6,14 +6,12 @@ import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
-import {
-  CollabError,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
 // import { CustomMemoryDatabaseAdapter } from "./custom-database-adapter/custom-memory-database-adapter.js";
+// import { CustomSQLiteDatabaseAdapter } from "./custom-database-adapter/custom-sqlite-database-adapter.js";
 
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "persistent-sheet";
@@ -39,9 +37,11 @@ const unitData: IWorkbookData = {
 };
 
 await mkdir(dirname(filename), { recursive: true });
-// To try custom Memory, enable its import above and replace the default Adapter with the next line.
+// To switch Adapters, uncomment its import and constructor, and comment out the current constructor.
+// Custom SQLite and the built-in Adapter use different schemas and need separate database files.
 const database = new SQLiteDatabaseAdapter({ filename });
 // const database = new CustomMemoryDatabaseAdapter();
+// const database = new CustomSQLiteDatabaseAdapter({ filename: ".data/custom-collaboration.sqlite" });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
@@ -61,8 +61,7 @@ try {
     { userID: USER_ID },
   );
 } catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
+  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
     { userID: USER_ID },
@@ -70,32 +69,26 @@ try {
 }
 
 const app = express();
-app.post(
-  "/universer-api/authz/-/object/-/batch_allowed",
-  express.json(),
-  (request, response) => {
-    const body = request.body as {
-      requests: Array<{ unitID: string; objectID: string; actions: unknown[] }>;
-    };
-    response.json({
-      error: { code: ErrorCode.OK, message: "" },
-      objectActions: body.requests.map((item) => ({
-        unitID: item.unitID,
-        objectID: item.objectID,
-        actions: item.actions.map((action) => ({ action, allowed: true })),
-      })),
-    });
-  },
-);
+app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
+  const body = request.body as {
+    requests: Array<{ unitID: string; objectID: string; actions: unknown[] }>;
+  };
+  response.json({
+    error: { code: ErrorCode.OK, message: "" },
+    objectActions: body.requests.map((item) => ({
+      unitID: item.unitID,
+      objectID: item.objectID,
+      actions: item.actions.map((action) => ({ action, allowed: true })),
+    })),
+  });
+});
 app.use("/universer-api", (request, response) => {
   request.url = request.originalUrl;
   transport.handleRequest(request, response);
 });
 app.use(express.static("dist/web"));
 const server = createServer(app);
-server.on("upgrade", (request, socket, head) =>
-  transport.handleUpgrade(request, socket, head),
-);
+server.on("upgrade", (request, socket, head) => transport.handleUpgrade(request, socket, head));
 const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3010);
 server.listen(port, host, () =>

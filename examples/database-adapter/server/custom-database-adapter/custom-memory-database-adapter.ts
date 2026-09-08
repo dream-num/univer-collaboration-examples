@@ -28,7 +28,8 @@ interface StoredUnit {
 }
 
 /**
- * An in-memory IDatabaseAdapter example. Data belongs to this instance only.
+ * An in-memory IDatabaseAdapter. Data is scoped to this instance and lost on process exit.
+ * Reads and writes copy protocol objects to isolate stored data from caller mutations.
  */
 export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
   private readonly _units = new Map<string, StoredUnit>();
@@ -39,8 +40,8 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
   }
 
   /**
-   * Return the snapshot with the largest rev at or below the target revision.
-   * Return null if the Unit is not active or no snapshot matches.
+   * Returns the nearest snapshot at or below the target revision, or null if none matches
+   * or the Unit is not active.
    */
   async getSnapshot(
     _ctx: DatabaseContext,
@@ -59,7 +60,6 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       targetRevision = Math.min(requestedRevision, unit.record.headRevision);
     }
 
-    // Find the largest snapshot rev that does not exceed targetRevision.
     let nearest: ISnapshot | null = null;
     for (const snapshot of unit.snapshots.values()) {
       if (snapshot.rev > targetRevision) {
@@ -78,22 +78,19 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     range: { readonly from: number; readonly to: number },
   ): Promise<ChangesetRange> {
     if (range.from < 0 || range.to < 0) {
-      throw new CollabError(
-        "INVALID_REQUEST",
-        "Changeset range revisions cannot be negative",
-      );
+      throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
     const unit = this._getActiveUnit(unitID);
     if (!unit) {
       return { changesets: [], latestRevision: 0 };
     }
 
-    // to = 0 reads through the current head; otherwise use the requested upper bound.
+    // to = 0 reads through the current head; other values are capped at the head.
     let toRevision = unit.record.headRevision;
     if (range.to !== 0) {
       toRevision = Math.min(range.to, unit.record.headRevision);
     }
-    // Changesets are appended in consecutive revision order, so no sorting is needed.
+    // Changesets are appended in consecutive revision order, which filtering preserves.
     const changesets = unit.changesets.filter(
       ({ revision }) => revision > range.from && revision <= toRevision,
     );
@@ -108,9 +105,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     blockID: string,
   ): Promise<ISheetBlock | null> {
-    return structuredClone(
-      this._getActiveUnit(unitID)?.sheetBlocks.get(blockID) ?? null,
-    );
+    return structuredClone(this._getActiveUnit(unitID)?.sheetBlocks.get(blockID) ?? null);
   }
 
   async createUnit(
@@ -131,18 +126,12 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     }
 
     if (this._hardDeletedUnitIDs.has(record.unitID)) {
-      throw new CollabError(
-        "INVALID_REQUEST",
-        "A hard-deleted unit ID cannot be reused",
-      );
+      throw new CollabError("INVALID_REQUEST", "A hard-deleted unit ID cannot be reused");
     }
     const existing = this._units.get(record.unitID);
     if (existing) {
       if (existing.status !== "active") {
-        throw new CollabError(
-          "INVALID_REQUEST",
-          "A deleted unit ID cannot be reused",
-        );
+        throw new CollabError("INVALID_REQUEST", "A deleted unit ID cannot be reused");
       }
       return {
         status: "already-exists",
@@ -167,11 +156,9 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     const unit = this._requireActiveUnit(input.changeset.unitID);
     const { changeset } = structuredClone(input);
     const expectedHeadRevision = changeset.revision - 1;
-    // Check the expected head revision so concurrent commits cannot overwrite each other.
-    // A database implementation must perform the version CAS, changeset insert, and head update
-    // in one transaction. Return revision-mismatch so the Service can reload and retry.
-    // Roll back all writes on failure: the changeset and head must never be published separately.
-    // This in-memory implementation keeps the check and writes synchronous, with no await.
+    // Checking the head, saving the changeset, and updating the head must be atomic.
+    // This memory implementation uses synchronous execution; a database needs one transaction.
+    // Return revision-mismatch when the head differs so the Service can reload and retry.
     if (unit.record.headRevision !== expectedHeadRevision) {
       return {
         status: "revision-mismatch",
@@ -196,10 +183,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       snapshot.rev < 1 ||
       snapshot.rev > unit.record.headRevision
     ) {
-      throw new CollabError(
-        "INVALID_REQUEST",
-        "Snapshot does not match the stored unit head",
-      );
+      throw new CollabError("INVALID_REQUEST", "Snapshot does not match the stored unit head");
     }
     for (const block of sheetBlocks) {
       unit.sheetBlocks.set(block.id, block);
@@ -211,7 +195,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     _ctx: DatabaseContext,
     input: DeleteUnitsDatabaseInput,
   ): Promise<DeleteUnitsDatabaseResult> {
-    // Validate the whole batch before changing anything; a missing Unit must fail the batch.
+    // Validate the entire batch first so a missing ID cannot leave earlier Units deleted.
     const unitsToDelete: StoredUnit[] = [];
     const units: { unitID: string; status: DeleteUnitDatabaseStatus }[] = [];
     for (const unitID of new Set(input.unitIDs)) {
@@ -228,10 +212,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       if (input.hardDelete) {
         status = "hard-deleted";
       } else {
-        status =
-          unit.status === "soft-deleted"
-            ? "already-soft-deleted"
-            : "soft-deleted";
+        status = unit.status === "soft-deleted" ? "already-soft-deleted" : "soft-deleted";
       }
       units.push({ unitID, status });
       unitsToDelete.push(unit);
@@ -239,7 +220,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
 
     for (const unit of unitsToDelete) {
       if (input.hardDelete) {
-        // Remove all Unit data and retain only its ID to prevent recreation after hard deletion.
+        // Retain the Unit ID after deletion to prevent recreating it within this instance.
         this._units.delete(unit.record.unitID);
         this._hardDeletedUnitIDs.add(unit.record.unitID);
       } else {
@@ -253,21 +234,15 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     _ctx: DatabaseContext,
     input: RecoverUnitsDatabaseInput,
   ): Promise<RecoverUnitsDatabaseResult> {
-    // Validate every Unit before recovering any of them, just as in deletion.
+    // Validate the entire batch first so an unrecoverable Unit cannot leave a partial recovery.
     const unitsToRecover: StoredUnit[] = [];
     for (const unitID of new Set(input.unitIDs)) {
       if (this._hardDeletedUnitIDs.has(unitID)) {
-        throw new CollabError(
-          "INVALID_REQUEST",
-          "A hard-deleted unit cannot be recovered",
-        );
+        throw new CollabError("INVALID_REQUEST", "A hard-deleted unit cannot be recovered");
       }
       const unit = this._units.get(unitID);
       if (!unit) {
-        throw new CollabError(
-          "UNIT_NOT_FOUND",
-          "Cannot recover a missing unit",
-        );
+        throw new CollabError("UNIT_NOT_FOUND", "Cannot recover a missing unit");
       }
       unitsToRecover.push(unit);
     }
