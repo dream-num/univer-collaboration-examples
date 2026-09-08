@@ -1,0 +1,303 @@
+import {
+  CollabError,
+  type ChangesetRange,
+  type CommitChangesetInput,
+  type CommitChangesetResult,
+  type CreateUnitDatabaseInput,
+  type CreateUnitDatabaseResult,
+  type DatabaseContext,
+  type DeleteUnitDatabaseStatus,
+  type DeleteUnitsDatabaseInput,
+  type DeleteUnitsDatabaseResult,
+  type IDatabaseAdapter,
+  type RecoverUnitDatabaseStatus,
+  type RecoverUnitsDatabaseInput,
+  type RecoverUnitsDatabaseResult,
+  type SaveSnapshotInput,
+  type SubmitDatabaseContext,
+  type UnitRecord,
+} from "@univerjs-pro/collaboration-service";
+import type { IChangeset, ISheetBlock, ISnapshot } from "@univerjs/protocol";
+
+interface StoredUnit {
+  record: UnitRecord;
+  status: "active" | "soft-deleted";
+  readonly snapshots: Map<number, ISnapshot>;
+  readonly changesets: IChangeset[];
+  readonly sheetBlocks: Map<string, ISheetBlock>;
+}
+
+/**
+ * An in-memory IDatabaseAdapter example. Data belongs to this instance only.
+ */
+export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
+  private readonly _units = new Map<string, StoredUnit>();
+  private readonly _hardDeletedUnitIDs = new Set<string>();
+
+  async getUnit(_ctx: DatabaseContext, unitID: string): Promise<UnitRecord | null> {
+    return structuredClone(this._getActiveUnit(unitID)?.record ?? null);
+  }
+
+  /**
+   * Return the snapshot with the largest rev at or below the target revision.
+   * Return null if the Unit is not active or no snapshot matches.
+   */
+  async getSnapshot(
+    _ctx: DatabaseContext,
+    unitID: string,
+    options?: { readonly revision?: number },
+  ): Promise<ISnapshot | null> {
+    const unit = this._getActiveUnit(unitID);
+    if (!unit) {
+      return null;
+    }
+
+    // An omitted revision or 0 targets the current head; higher values are capped at the head.
+    const requestedRevision = options?.revision ?? 0;
+    let targetRevision = unit.record.headRevision;
+    if (requestedRevision !== 0) {
+      targetRevision = Math.min(requestedRevision, unit.record.headRevision);
+    }
+
+    // Find the largest snapshot rev that does not exceed targetRevision.
+    let nearest: ISnapshot | null = null;
+    for (const snapshot of unit.snapshots.values()) {
+      if (snapshot.rev > targetRevision) {
+        continue;
+      }
+      if (!nearest || snapshot.rev > nearest.rev) {
+        nearest = snapshot;
+      }
+    }
+    return structuredClone(nearest);
+  }
+
+  async getChangesets(
+    _ctx: DatabaseContext,
+    unitID: string,
+    range: { readonly from: number; readonly to: number },
+  ): Promise<ChangesetRange> {
+    if (range.from < 0 || range.to < 0) {
+      throw new CollabError(
+        "INVALID_REQUEST",
+        "Changeset range revisions cannot be negative",
+      );
+    }
+    const unit = this._getActiveUnit(unitID);
+    if (!unit) {
+      return { changesets: [], latestRevision: 0 };
+    }
+
+    // to = 0 reads through the current head; otherwise use the requested upper bound.
+    let toRevision = unit.record.headRevision;
+    if (range.to !== 0) {
+      toRevision = Math.min(range.to, unit.record.headRevision);
+    }
+    // Changesets are appended in consecutive revision order, so no sorting is needed.
+    const changesets = unit.changesets.filter(
+      ({ revision }) => revision > range.from && revision <= toRevision,
+    );
+    return {
+      changesets: structuredClone(changesets),
+      latestRevision: unit.record.headRevision,
+    };
+  }
+
+  async getSheetBlock(
+    _ctx: DatabaseContext,
+    unitID: string,
+    blockID: string,
+  ): Promise<ISheetBlock | null> {
+    return structuredClone(
+      this._getActiveUnit(unitID)?.sheetBlocks.get(blockID) ?? null,
+    );
+  }
+
+  async createUnit(
+    _ctx: DatabaseContext,
+    input: CreateUnitDatabaseInput,
+  ): Promise<CreateUnitDatabaseResult> {
+    const { record, snapshot, sheetBlocks = [] } = structuredClone(input);
+    if (
+      record.headRevision !== 1 ||
+      snapshot.rev !== 1 ||
+      snapshot.unitID !== record.unitID ||
+      snapshot.type !== record.type
+    ) {
+      throw new CollabError(
+        "INVALID_REQUEST",
+        "Initial record and snapshot must match at revision 1",
+      );
+    }
+
+    if (this._hardDeletedUnitIDs.has(record.unitID)) {
+      throw new CollabError(
+        "INVALID_REQUEST",
+        "A hard-deleted unit ID cannot be reused",
+      );
+    }
+    const existing = this._units.get(record.unitID);
+    if (existing) {
+      if (existing.status !== "active") {
+        throw new CollabError(
+          "INVALID_REQUEST",
+          "A deleted unit ID cannot be reused",
+        );
+      }
+      return {
+        status: "already-exists",
+        record: structuredClone(existing.record),
+      };
+    }
+
+    this._units.set(record.unitID, {
+      record,
+      status: "active",
+      snapshots: new Map([[1, snapshot]]),
+      changesets: [],
+      sheetBlocks: new Map(sheetBlocks.map((block) => [block.id, block])),
+    });
+    return { status: "created", record: structuredClone(record) };
+  }
+
+  async commitChangeset(
+    _ctx: SubmitDatabaseContext,
+    input: CommitChangesetInput,
+  ): Promise<CommitChangesetResult> {
+    const unit = this._requireActiveUnit(input.changeset.unitID);
+    const { changeset } = structuredClone(input);
+    const expectedHeadRevision = changeset.revision - 1;
+    // Check the expected head revision so concurrent commits cannot overwrite each other.
+    // A database implementation must perform the version CAS, changeset insert, and head update
+    // in one transaction. Return revision-mismatch so the Service can reload and retry.
+    // Roll back all writes on failure: the changeset and head must never be published separately.
+    // This in-memory implementation keeps the check and writes synchronous, with no await.
+    if (unit.record.headRevision !== expectedHeadRevision) {
+      return {
+        status: "revision-mismatch",
+        actualHeadRevision: unit.record.headRevision,
+      };
+    }
+
+    unit.changesets.push(changeset);
+    unit.record = { ...unit.record, headRevision: changeset.revision };
+    return {
+      status: "committed",
+      changeset: structuredClone(changeset),
+      headRevision: changeset.revision,
+    };
+  }
+
+  async saveSnapshot(_ctx: DatabaseContext, input: SaveSnapshotInput): Promise<void> {
+    const unit = this._requireActiveUnit(input.snapshot.unitID);
+    const { snapshot, sheetBlocks = [] } = structuredClone(input);
+    if (
+      snapshot.type !== unit.record.type ||
+      snapshot.rev < 1 ||
+      snapshot.rev > unit.record.headRevision
+    ) {
+      throw new CollabError(
+        "INVALID_REQUEST",
+        "Snapshot does not match the stored unit head",
+      );
+    }
+    for (const block of sheetBlocks) {
+      unit.sheetBlocks.set(block.id, block);
+    }
+    unit.snapshots.set(snapshot.rev, snapshot);
+  }
+
+  async deleteUnits(
+    _ctx: DatabaseContext,
+    input: DeleteUnitsDatabaseInput,
+  ): Promise<DeleteUnitsDatabaseResult> {
+    // Validate the whole batch before changing anything; a missing Unit must fail the batch.
+    const unitsToDelete: StoredUnit[] = [];
+    const units: { unitID: string; status: DeleteUnitDatabaseStatus }[] = [];
+    for (const unitID of new Set(input.unitIDs)) {
+      const unit = this._units.get(unitID);
+      if (!unit) {
+        if (input.hardDelete && this._hardDeletedUnitIDs.has(unitID)) {
+          units.push({ unitID, status: "already-hard-deleted" });
+          continue;
+        }
+        throw new CollabError("UNIT_NOT_FOUND", "Cannot delete a missing unit");
+      }
+
+      let status: DeleteUnitDatabaseStatus;
+      if (input.hardDelete) {
+        status = "hard-deleted";
+      } else {
+        status =
+          unit.status === "soft-deleted"
+            ? "already-soft-deleted"
+            : "soft-deleted";
+      }
+      units.push({ unitID, status });
+      unitsToDelete.push(unit);
+    }
+
+    for (const unit of unitsToDelete) {
+      if (input.hardDelete) {
+        // Remove all Unit data and retain only its ID to prevent recreation after hard deletion.
+        this._units.delete(unit.record.unitID);
+        this._hardDeletedUnitIDs.add(unit.record.unitID);
+      } else {
+        unit.status = "soft-deleted";
+      }
+    }
+    return { units };
+  }
+
+  async recoverUnits(
+    _ctx: DatabaseContext,
+    input: RecoverUnitsDatabaseInput,
+  ): Promise<RecoverUnitsDatabaseResult> {
+    // Validate every Unit before recovering any of them, just as in deletion.
+    const unitsToRecover: StoredUnit[] = [];
+    for (const unitID of new Set(input.unitIDs)) {
+      if (this._hardDeletedUnitIDs.has(unitID)) {
+        throw new CollabError(
+          "INVALID_REQUEST",
+          "A hard-deleted unit cannot be recovered",
+        );
+      }
+      const unit = this._units.get(unitID);
+      if (!unit) {
+        throw new CollabError(
+          "UNIT_NOT_FOUND",
+          "Cannot recover a missing unit",
+        );
+      }
+      unitsToRecover.push(unit);
+    }
+
+    const units: { unitID: string; status: RecoverUnitDatabaseStatus }[] = [];
+    for (const unit of unitsToRecover) {
+      units.push({
+        unitID: unit.record.unitID,
+        status: unit.status === "active" ? "already-active" : "recovered",
+      });
+      unit.status = "active";
+    }
+    return { units };
+  }
+
+  async dispose(): Promise<void> {
+    this._units.clear();
+    this._hardDeletedUnitIDs.clear();
+  }
+
+  private _getActiveUnit(unitID: string): StoredUnit | undefined {
+    const unit = this._units.get(unitID);
+    return unit?.status === "active" ? unit : undefined;
+  }
+
+  private _requireActiveUnit(unitID: string): StoredUnit {
+    const unit = this._getActiveUnit(unitID);
+    if (!unit) {
+      throw new CollabError("UNIT_NOT_FOUND", "Unit is not active");
+    }
+    return unit;
+  }
+}

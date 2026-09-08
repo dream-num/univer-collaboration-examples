@@ -13,6 +13,8 @@ import {
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
+// import { CustomMemoryDatabaseAdapter } from "./custom-database-adapter/custom-memory-database-adapter.js";
+
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "persistent-sheet";
 const filename = ".data/collaboration.sqlite";
@@ -37,7 +39,9 @@ const unitData: IWorkbookData = {
 };
 
 await mkdir(dirname(filename), { recursive: true });
+// To try custom Memory, enable its import above and replace the default Adapter with the next line.
 const database = new SQLiteDatabaseAdapter({ filename });
+// const database = new CustomMemoryDatabaseAdapter();
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
