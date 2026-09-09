@@ -1,0 +1,57 @@
+# 综合集成示例
+
+[English](./README.md)
+
+这是一个组合 Univer Collaboration SDK 多项能力的中英文可运行示例，展示用户认证、Unit 列表、
+创建者/编辑者/查看者三种角色、五类 Unit 协同、评论、版本历史、软删除与恢复，以及本地 Office
+导入导出的接入方式。
+
+本示例用于学习和参考 SDK 集成，不代表覆盖全部 SDK 能力，也不作为生产应用模板。
+
+## 运行
+
+在仓库根目录执行：
+
+```bash
+pnpm install
+pnpm example:all-integration
+```
+
+打开 <http://127.0.0.1:3015>，注册用户后即可新建 Unit，或将 Office 文件导入为 Unit。应用表与 Collaboration、Comment、
+History Adapter 的表共用 `.data/office-app.sqlite`；物理文件共用不改变各组件的表所有权。
+数据库文件名沿用更名前的 `office-app`，以保留已有本地数据。
+
+## 源码目录
+
+```text
+src/
+├── client/          React shell、页面、Univer 装配和语言包
+├── server/          Express 组合入口和按功能划分的服务端模块
+│   ├── auth/        Session 认证
+│   ├── units/       Unit metadata、成员、内容和生命周期
+│   ├── collaboration/  SDK Service、Endpoint、ACL 和 History 索引
+│   └── exchange/    本地 Office 导入导出
+└── shared/          前后端共用的少量 API 和 Unit 契约
+```
+
+这是 examples，因此功能目录刻意保持扁平：routes 只转换 HTTP，service 编排用例，repository
+管理应用 SQL；没有额外引入 DI 容器、ORM 或通用领域层。
+
+## 能力矩阵
+
+| 能力 | Sheet | Doc | Slide | Board | Base |
+| --- | --- | --- | --- | --- | --- |
+| 创建、协同、历史 | 支持 | 支持 | 支持 | 支持 | 支持 |
+| Thread Comments | 支持 | 支持 | 不支持 | 不支持 | 不支持 |
+| 导入 | XLS/XLSX/CSV/TSV | DOC/DOCX | PPT/PPTX | 不支持 | XLS/XLSX/CSV/TSV |
+| 导出 | XLSX/CSV/TSV | DOCX | PPTX | 不支持 | XLSX/CSV/TSV |
+
+History 索引使用 `historyService.attach(collabService)`。这是刻意保持精简的进程内便利装配：进程
+在 Collaboration commit 和 History 写入之间崩溃时可能漏索引。生产环境应使用 transactional
+outbox 和显式 History 索引 API。
+
+示例按 Sheet、Doc、Slide、Board、Base 分别注册对应的原生 History UI 插件，
+通过 `historyServerUrl` 连接 `UniverHistoryEndpoint`。
+
+本示例用于教学，不是生产身份或 Unit 管理基础设施。Session 虽然只保存 hash，但没有邮箱验证、密码
+找回、限流、对象存储、transactional outbox 或多进程实时 fanout。

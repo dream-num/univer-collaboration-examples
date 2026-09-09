@@ -16,9 +16,9 @@ documentation is maintained on [office.univer.ai](https://office.univer.ai/colla
 
 ## Choose an example
 
-All examples use the same minimal `web/main.ts + server/main.ts` structure and can run
-independently. Start with [`quick-start`](./examples/quick-start/README.md) to establish the main
-collaboration path, then choose another example for the capability you want to explore.
+Each example can run independently. Start with [`quick-start`](./examples/quick-start/README.md)
+to establish the main collaboration path, then choose a focused example for the capability you want
+to explore. Finally, use `all-integration` to see how multiple capabilities fit together.
 
 | Example | What it demonstrates |
 | --- | --- |
@@ -31,6 +31,8 @@ collaboration path, then choose another example for the capability you want to e
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 | [`multi-node`](./examples/multi-node/README.md) | File creation and listing with Nginx consistent hashing by unitID across two collaboration nodes |
+| [`all-integration`](./examples/all-integration/README.md) | Combined integration example: users, roles, five Unit types, comments, history, trash, and Office exchange |
+| [`all-integration`](./examples/all-integration/README.md) | Combined integration example: users, roles, five Unit types, comments, history, trash, and Office exchange |
 
 ## Run the examples
 
@@ -52,6 +54,7 @@ pnpm example:comments
 pnpm example:worktree
 pnpm example:exchange
 pnpm example:multi-node
+pnpm example:all-integration
 ```
 
 The examples cover only teaching and copyable assembly. They do not include file spaces
@@ -62,6 +65,16 @@ an in-memory file/task store rather than a production file service.
 collaboration data in their own `.data/collaboration.sqlite` file so state survives server restarts.
 `multi-node` requires Docker Compose and builds inside its containers. Its shared SQLite database
 lives in a Docker volume.
+pnpm example:all-integration
+```
+
+The examples cover only teaching and copyable assembly. `all-integration` combines multiple SDK
+capabilities for reference; it does not cover every capability or serve as a production application
+template. The standalone exchange
+example intentionally uses an in-memory file/task store rather than a production file service.
+
+`quick-start` intentionally keeps the Memory Adapter for the shortest possible setup. Every other
+example uses SQLite so state survives server restarts; see each example's README for its database path.
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read
