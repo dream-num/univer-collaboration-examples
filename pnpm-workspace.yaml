@@ -3,3 +3,8 @@ packages:
 
 onlyBuiltDependencies:
   - better-sqlite3
+
+packageExtensions:
+  '@univerjs/preset-sheets-core@1.0.0-beta.2':
+    dependencies:
+      '@univerjs/presets': 1.0.0-beta.2
