@@ -1,6 +1,7 @@
 # Branch policy
 
-- `main` is the only long-lived branch. It currently targets the publicly released `1.0.0-beta.2` SDK; fixes compatible with that version target `main`.
-- `next/post-1.0.0-beta.2` collects SDK upgrades and features after `1.0.0-beta.2`. It may install internal insiders versions through `.npmrc`; related pull requests target this branch.
-- Create short-lived feature branches from the appropriate target branch and delete them after merging.
-- When the next public release containing these changes is available, update the version baseline, merge `next/post-1.0.0-beta.2` into `main`, and delete the next branch. Do not maintain a permanent `dev` branch.
+- `main` is the only long-lived branch and targets the current publicly released SDK.
+- `next/*` branches collect upgrades and features for upcoming releases and may install insiders dependencies.
+- Create short-lived feature branches from the appropriate baseline, target that baseline in pull requests, and delete feature branches after merging.
+- Once the corresponding SDK version is publicly released, merge the next branch into `main` and delete it. Do not maintain a permanent `dev` branch.
+- Each example's `package.json` defines its exact SDK versions.
