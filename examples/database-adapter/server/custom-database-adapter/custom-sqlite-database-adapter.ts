@@ -369,9 +369,9 @@ function toUnitRecord(row: UnitRow): UnitRecord {
 }
 
 // MessagePack preserves complete protocol objects and nested Uint8Array values without field-specific conversions.
-function encodePayload(value: ISnapshot | IChangeset | ISheetBlock): Buffer {
+function encodePayload(value: ISnapshot | IChangeset | ISheetBlock): Uint8Array {
   // Omit unset object fields so MessagePack does not restore undefined values as null.
-  return Buffer.from(encode(value, { ignoreUndefined: true }));
+  return encode(value, { ignoreUndefined: true });
 }
 
 function decodePayload<T>(payload: Uint8Array): T {
