@@ -92,7 +92,6 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       return null;
     }
 
-    // Only an omitted to is unbounded; zero is a regular revision, not an alias for the head.
     return structuredClone(unit.changesets.filter(
       ({ revision }) => revision > range.from && (range.to === undefined || revision <= range.to),
     ));
