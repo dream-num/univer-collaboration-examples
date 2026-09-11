@@ -93,7 +93,8 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
-    // 写入契约保证 snapshot 不超过 head；最新读取和 active 检查在同一次索引查询中完成。
+    // Writes guarantee snapshots never exceed the head revision.
+    // Read the latest snapshot and check active status in the same indexed query.
     const row = this._database
       .prepare(`
         SELECT s.payload FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
