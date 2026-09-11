@@ -1,0 +1,53 @@
+name: univer-collaboration-multi-node
+
+x-app: &app
+  image: univer-collaboration-multi-node:local
+  build:
+    context: ../..
+    dockerfile: examples/multi-node/Dockerfile
+    args:
+      UNIVER_LICENSE: ${UNIVER_LICENSE:-}
+  init: true
+  volumes:
+    - collaboration-data:/data
+
+x-runtime: &runtime
+  HOST: 0.0.0.0
+  PORT: "3010"
+  DATABASE_PATH: /data/collaboration.sqlite
+
+x-health: &health
+  test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3010/healthz').then(r => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1))"]
+  interval: 3s
+  timeout: 3s
+  retries: 20
+
+services:
+  node-a:
+    <<: *app
+    environment:
+      <<: *runtime
+      NODE_ID: node-a
+    healthcheck: *health
+
+  node-b:
+    <<: *app
+    environment:
+      <<: *runtime
+      NODE_ID: node-b
+    healthcheck: *health
+
+  nginx:
+    image: nginx:1.30.4-alpine
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-3010}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      node-a:
+        condition: service_healthy
+      node-b:
+        condition: service_healthy
+
+volumes:
+  collaboration-data:

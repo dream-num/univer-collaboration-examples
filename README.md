@@ -29,6 +29,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
+| [`multi-node`](./examples/multi-node/README.md) | File creation and listing with Nginx consistent hashing by unitID across two collaboration nodes |
 
 ## Run the examples
 
@@ -48,15 +49,17 @@ pnpm example:history
 pnpm example:comments
 pnpm example:worktree
 pnpm example:exchange
+pnpm example:multi-node
 ```
 
 The examples cover only teaching and copyable assembly. They do not include file spaces,
 multi-type product editors, or a complete office suite. The exchange example intentionally uses
 an in-memory file/task store rather than a production file service.
 
-`quick-start` intentionally keeps the Memory Adapter for the shortest possible setup. Every other
-example stores its collaboration data in its own `.data/collaboration.sqlite` file so state survives
-server restarts.
+`quick-start` uses the Memory Adapter to keep setup minimal. The other single-node examples store
+collaboration data in their own `.data/collaboration.sqlite` file so state survives server restarts.
+`multi-node` requires Docker Compose and builds inside its containers. Its shared SQLite database
+lives in a Docker volume.
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read

@@ -1,0 +1,76 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #243044;
+}
+
+#example { position: fixed; inset: 0; display: flex; background: #fff; }
+#sidebar, #sidebar * { box-sizing: border-box; }
+#sidebar {
+  width: 248px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px 14px;
+  background: #f8fafb;
+  border-right: 1px solid #e6e9ee;
+}
+#create-file { display: flex; flex-direction: column; padding: 0 4px 24px; }
+#sidebar button, #file-name { font: inherit; font-size: 13px; }
+#sidebar button { cursor: pointer; }
+#sidebar button:disabled { opacity: .55; cursor: wait; }
+#new-file {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: #315ce7;
+  color: #fff;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 4px #234bc21a;
+}
+#new-file:hover { background: #274dcc; }
+#new-file span { font-size: 21px; font-weight: 400; }
+#create-file label { margin: 16px 0 7px; font-size: 11px; font-weight: 500; color: #68758a; }
+#file-name { width: 100%; height: 36px; padding: 0 10px; border: 1px solid #dfe4eb; border-radius: 6px; background: #fff; color: #354157; }
+#sidebar :focus-visible { outline: 2px solid #6685ee; outline-offset: 3px; }
+#files-heading { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 10px; }
+#files-heading h2 { margin: 0; font-size: 12px; font-weight: 600; }
+#file-count { margin-left: 5px; color: #8a95a5; font-weight: 400; }
+#refresh-files { border: 0; background: transparent; color: #6e7b90; padding: 5px 0 5px 8px; font-size: 11px !important; }
+#refresh-files:hover { color: #315ce7; }
+#picker { flex: 1; min-height: 0; overflow-y: auto; }
+#picker a { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 4px; padding: 10px; border-radius: 7px; color: #536078; text-decoration: none; }
+#picker a::before { content: "▦"; color: #8390a5; font-size: 20px; }
+#picker a:hover { background: #edf0f5; }
+#picker a[aria-current="page"] { background: #e9efff; color: #2e53c3; }
+#picker a[aria-current="page"]::before { color: #4268da; }
+.file-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.node-badge { flex-shrink: 0; font-size: 10px; font-weight: 500; color: #748198; padding: 3px 5px; border: 1px solid #dfe5ee; border-radius: 4px; white-space: nowrap; }
+#picker .empty-list { margin: 10px 8px; color: #8792a3; font-size: 12px; }
+#sidebar-footer { margin-top: 16px; padding: 14px 8px 2px; border-top: 1px solid #e6e9ee; font-size: 11px; color: #8a95a5; }
+.connection-dot { display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #8a95a5; }
+#workspace { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+#toolbar { min-height: 76px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; border-bottom: 1px solid #e9edf2; }
+#toolbar > div { min-width: 0; }
+#document-title { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
+#toolbar p { margin: 5px 0 0; color: #8a95a5; font-size: 12px; }
+#document-node { padding: 5px 8px; font-size: 11px; }
+#status:empty { display: none; }
+#status { padding: 10px 24px; background: #fff3f1; color: #b3493f; font-size: 13px; }
+#empty-state { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; background: #fdfefe; }
+.sheet-icon { width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 20px; border: 1px solid #e6ebf5; border-radius: 16px; background: #f3f6fd; color: #6986d8; font-size: 38px; }
+#empty-state h2 { margin: 0; color: #354157; font-size: 20px; font-weight: 500; letter-spacing: -.4px; }
+#empty-state p { margin: 10px 0 0; color: #8a95a5; font-size: 13px; line-height: 1.6; }
+#app { flex: 1; min-height: 0; position: relative; }
+#app[hidden], #empty-state[hidden], #document-node[hidden] { display: none; }
+@media (max-width: 700px) {
+  #sidebar { width: 200px; padding: 14px 8px; }
+  #toolbar { padding: 14px 16px; }
+  #toolbar p { display: none; }
+}
