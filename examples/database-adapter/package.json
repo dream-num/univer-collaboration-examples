@@ -9,7 +9,6 @@
   "scripts": {
     "build": "vite build && vite build --ssr server/main.ts --outDir dist/server && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test test/*.test.ts",
     "start": "node dist/server/main.js",
     "reset": "node --import tsx server/reset.ts"
   },
