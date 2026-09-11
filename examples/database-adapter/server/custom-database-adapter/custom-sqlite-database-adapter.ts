@@ -88,21 +88,21 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<ISnapshot | null> {
-    const revision = options?.revision ?? null;
-    if (revision !== null && revision < 0) {
+    const revision = options?.revision;
+    if (revision !== undefined && revision < 0) {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
-    // Check active status and read the head in one query to keep them consistent across connections.
+    // Writes guarantee snapshots never exceed the head revision.
+    // Read the latest snapshot and check active status in the same indexed query.
     const row = this._database
       .prepare(`
         SELECT s.payload FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ? AND u.deleted = 0
-          AND s.revision <= CASE WHEN ? IS NULL THEN u.head_revision
-                                ELSE MIN(?, u.head_revision) END
+          ${revision === undefined ? "" : "AND s.revision <= ?"}
         ORDER BY s.revision DESC LIMIT 1
       `)
-      .get(unitID, revision, revision) as PayloadRow | undefined;
+      .get(unitID, ...(revision === undefined ? [] : [revision])) as PayloadRow | undefined;
     return row ? decodePayload<ISnapshot>(row.payload) : null;
   }
 
@@ -111,8 +111,8 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<SnapshotInfo | null> {
-    const revision = options?.revision ?? null;
-    if (revision !== null && revision < 0) {
+    const revision = options?.revision;
+    if (revision !== undefined && revision < 0) {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
@@ -122,11 +122,10 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         SELECT s.unit_id AS unitID, u.type, s.revision AS rev
         FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ? AND u.deleted = 0
-          AND s.revision <= CASE WHEN ? IS NULL THEN u.head_revision
-                                ELSE MIN(?, u.head_revision) END
+          ${revision === undefined ? "" : "AND s.revision <= ?"}
         ORDER BY s.revision DESC LIMIT 1
       `)
-      .get(unitID, revision, revision) as SnapshotInfo | undefined;
+      .get(unitID, ...(revision === undefined ? [] : [revision])) as SnapshotInfo | undefined;
     return row ?? null;
   }
 
@@ -145,11 +144,11 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         SELECT c.payload
         FROM units u LEFT JOIN changesets c ON c.unit_id = u.unit_id
           AND c.revision > ?
-          AND (? IS NULL OR c.revision <= ?)
+          ${range.to === undefined ? "" : "AND c.revision <= ?"}
         WHERE u.unit_id = ? AND u.deleted = 0
         ORDER BY c.revision ASC
       `)
-      .all(range.from, range.to ?? null, range.to ?? null, unitID) as {
+      .all(range.from, ...(range.to === undefined ? [] : [range.to]), unitID) as {
       payload: Uint8Array | null;
     }[];
     if (rows.length === 0) {
