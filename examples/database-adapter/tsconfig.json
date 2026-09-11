@@ -7,5 +7,5 @@
     "types": ["vite/client", "node"],
     "noEmit": true
   },
-  "include": ["web/**/*.ts", "server/**/*.ts", "vite.config.ts"]
+  "include": ["web/**/*.ts", "server/**/*.ts", "test/**/*.ts", "vite.config.ts"]
 }

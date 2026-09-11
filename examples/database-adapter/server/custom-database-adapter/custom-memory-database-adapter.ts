@@ -23,6 +23,7 @@ interface StoredUnit {
   record: UnitRecord;
   status: "active" | "soft-deleted";
   readonly snapshots: Map<number, ISnapshot>;
+  latestSnapshotRevision: number;
   readonly changesets: IChangeset[];
   readonly sheetBlocks: Map<string, ISheetBlock>;
 }
@@ -70,6 +71,10 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       return null;
     }
     const targetRevision = options?.revision ?? unit.record.headRevision;
+    // 最新快照按 revision 维护，补存旧快照不会使最新读取回退。
+    if (targetRevision >= unit.latestSnapshotRevision) {
+      return unit.snapshots.get(unit.latestSnapshotRevision) ?? null;
+    }
     let nearestRevision = -1;
     for (const revision of unit.snapshots.keys()) {
       if (revision <= targetRevision && revision > nearestRevision) {
@@ -92,9 +97,10 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       return null;
     }
 
-    return structuredClone(unit.changesets.filter(
-      ({ revision }) => revision > range.from && (range.to === undefined || revision <= range.to),
-    ));
+    // CAS 保证数组下标 0 对应 revision 2，只复制请求区间内的 changesets。
+    const start = Math.max(0, Math.floor(range.from) - 1);
+    const end = Math.min(unit.changesets.length, Math.floor(range.to ?? unit.record.headRevision) - 1);
+    return start < end ? structuredClone(unit.changesets.slice(start, end)) : [];
   }
 
   async getSheetBlock(
@@ -140,6 +146,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       record,
       status: "active",
       snapshots: new Map([[1, snapshot]]),
+      latestSnapshotRevision: 1,
       changesets: [],
       sheetBlocks: new Map(sheetBlocks.map((block) => [block.id, block])),
     });
@@ -186,6 +193,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       unit.sheetBlocks.set(block.id, block);
     }
     unit.snapshots.set(snapshot.rev, snapshot);
+    unit.latestSnapshotRevision = Math.max(unit.latestSnapshotRevision, snapshot.rev);
   }
 
   async deleteUnits(
