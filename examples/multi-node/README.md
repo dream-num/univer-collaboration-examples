@@ -16,7 +16,7 @@ This example routes tickets, WebSockets, and collaboration submissions by unitID
 
 Sessions and real-time broadcasts currently operate within a single server process, so tickets, WebSockets, and collaboration submissions for a document must reach the same node. If scaling or failover sends requests to different nodes, the Service and a database adapter that satisfies its contract still ensure consistency of committed collaboration data, but real-time broadcasts may be incomplete.
 
-A cross-node broadcast component is in development to support real-time message delivery between nodes. Even after this support becomes available, we will continue to recommend routing by unitID to reduce message forwarding and coordination overhead between nodes.
+A cross-node broadcast component is in development to support real-time message delivery between nodes. Even after this support becomes available, we will continue to recommend routing by unitID to reduce coordination overhead between nodes.
 
 ## Run the example
 
