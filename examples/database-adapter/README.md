@@ -17,3 +17,7 @@ Custom Adapter examples:
 
 - [Memory](./server/custom-database-adapter/custom-memory-database-adapter.ts)
 - [SQLite](./server/custom-database-adapter/custom-sqlite-database-adapter.ts)
+
+Both custom Adapters implement the RC contract: `getSnapshotInfo` reads only snapshot metadata,
+`getChangesets` returns an array or `null` for inactive Units, and omitted revision bounds are unlimited.
+An explicit revision of `0` is a regular bound, not an alias for the current head.

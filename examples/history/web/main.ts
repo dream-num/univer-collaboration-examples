@@ -9,10 +9,9 @@ import {
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import {
   ToggleEditHistoryOperation,
-  UniverEditHistoryLoaderPlugin,
-} from "@univerjs-pro/edit-history-loader";
-import EditHistoryLoaderEnUS from "@univerjs-pro/edit-history-loader/locale/en-US";
-import EditHistoryViewerEnUS from "@univerjs-pro/edit-history-viewer/locale/en-US";
+  UniverSheetsHistoryUIPlugin,
+} from "@univerjs-pro/sheets-history-ui";
+import SheetsHistoryUIEnUS from "@univerjs-pro/sheets-history-ui/locale/en-US";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
@@ -20,7 +19,7 @@ import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
-import "@univerjs-pro/edit-history-viewer/lib/index.css";
+import "@univerjs-pro/sheets-history-ui/lib/index.css";
 
 document.querySelector<HTMLElement>("#toolbar")!.innerHTML =
   '<button id="history">History</button>';
@@ -34,8 +33,7 @@ const { univerAPI } = createUniver({
       UniverPresetSheetsCoreEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
-      EditHistoryLoaderEnUS,
-      EditHistoryViewerEnUS,
+      SheetsHistoryUIEnUS,
     ),
   },
   theme: defaultTheme,
@@ -62,8 +60,8 @@ const { univerAPI } = createUniver({
     ],
     UniverCollaborationClientUIPlugin,
     [
-      UniverEditHistoryLoaderPlugin,
-      { historyListServerUrl: `${baseURL}/history`, univerContainerId: "app" },
+      UniverSheetsHistoryUIPlugin,
+      { historyServerUrl: `${baseURL}/history`, univerContainerId: "app" },
     ],
   ],
 });

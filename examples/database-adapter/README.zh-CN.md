@@ -18,3 +18,7 @@ Unit。需要清空数据时，先停止服务，再运行 `pnpm --filter @unive
 
 - [Memory](./server/custom-database-adapter/custom-memory-database-adapter.ts)
 - [SQLite](./server/custom-database-adapter/custom-sqlite-database-adapter.ts)
+
+两个自定义 Adapter 均实现 RC 契约：`getSnapshotInfo` 只读取快照元信息；
+`getChangesets` 返回数组，Unit 非 active 时返回 `null`；省略 revision 上界表示不限制。
+显式传入 `0` 是普通上界，不再表示当前 head。
