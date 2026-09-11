@@ -15,6 +15,3 @@ History 作为可选派生能力：`server/main.ts` 先组装 core，再 attach 
 History 索引与 core 数据使用不同 Adapter，本示例让它们共享
 `.data/collaboration.sqlite`。两者都会在重启后保留，生产环境也需要分别纳入持久化和备份
 策略。
-
-前端注册 `@univerjs-pro/sheets-history-ui` 的 `UniverSheetsHistoryUIPlugin`，
-通过 `historyServerUrl` 配置 `/universer-api/history`。
