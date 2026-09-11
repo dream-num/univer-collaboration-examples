@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 Deploying multiple nodes distributes collaboration workloads for different documents across servers, reducing the load on each node and increasing overall capacity for concurrent collaboration.
 
-This example uses Nginx to route requests to two collaboration server nodes and provides a simple Sheet creation and file list UI to observe routing and try collaborative editing. You can choose another gateway or load balancer that supports consistent hashing by unitID to fit your existing infrastructure.
+This example uses Nginx to route requests to two collaboration server nodes and provides a simple Sheet creation and file list UI to observe routing and try collaborative editing. For your deployment, you can choose another gateway or load balancer to fit your existing infrastructure. When using a container orchestration platform such as Kubernetes, let the platform manage service replicas and configure the gateway to route requests using consistent hashing by unitID.
 
 ## Why route by document?
 
