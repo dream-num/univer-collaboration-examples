@@ -1,6 +1,5 @@
 import {
   CollabError,
-  type ChangesetRange,
   type CommitChangesetInput,
   type CommitChangesetResult,
   type CreateUnitDatabaseInput,
@@ -14,6 +13,7 @@ import {
   type RecoverUnitsDatabaseInput,
   type RecoverUnitsDatabaseResult,
   type SaveSnapshotInput,
+  type SnapshotInfo,
   type SubmitDatabaseContext,
   type UnitRecord,
 } from "@univerjs-pro/collaboration-service";
@@ -39,65 +39,62 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     return structuredClone(this._getActiveUnit(unitID)?.record ?? null);
   }
 
-  /**
-   * Returns the nearest snapshot at or below the target revision, or null if none matches
-   * or the Unit is not active.
-   */
   async getSnapshot(
     _ctx: DatabaseContext,
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<ISnapshot | null> {
+    return structuredClone(this._getSnapshot(unitID, options));
+  }
+
+  async getSnapshotInfo(
+    _ctx: DatabaseContext,
+    unitID: string,
+    options?: { readonly revision?: number },
+  ): Promise<SnapshotInfo | null> {
+    const snapshot = this._getSnapshot(unitID, options);
+    return snapshot
+      ? { unitID: snapshot.unitID, type: snapshot.type, rev: snapshot.rev }
+      : null;
+  }
+
+  private _getSnapshot(
+    unitID: string,
+    options?: { readonly revision?: number },
+  ): ISnapshot | null {
+    if (options?.revision !== undefined && options.revision < 0) {
+      throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
+    }
     const unit = this._getActiveUnit(unitID);
     if (!unit) {
       return null;
     }
-
-    // An omitted revision or 0 targets the current head; higher values are capped at the head.
-    const requestedRevision = options?.revision ?? 0;
-    let targetRevision = unit.record.headRevision;
-    if (requestedRevision !== 0) {
-      targetRevision = Math.min(requestedRevision, unit.record.headRevision);
-    }
-
-    let nearest: ISnapshot | null = null;
-    for (const snapshot of unit.snapshots.values()) {
-      if (snapshot.rev > targetRevision) {
-        continue;
-      }
-      if (!nearest || snapshot.rev > nearest.rev) {
-        nearest = snapshot;
+    const targetRevision = options?.revision ?? unit.record.headRevision;
+    let nearestRevision = -1;
+    for (const revision of unit.snapshots.keys()) {
+      if (revision <= targetRevision && revision > nearestRevision) {
+        nearestRevision = revision;
       }
     }
-    return structuredClone(nearest);
+    return unit.snapshots.get(nearestRevision) ?? null;
   }
 
   async getChangesets(
     _ctx: DatabaseContext,
     unitID: string,
-    range: { readonly from: number; readonly to: number },
-  ): Promise<ChangesetRange> {
-    if (range.from < 0 || range.to < 0) {
+    range: { readonly from: number; readonly to?: number },
+  ): Promise<readonly IChangeset[] | null> {
+    if (range.from < 0 || (range.to !== undefined && range.to < 0)) {
       throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
     const unit = this._getActiveUnit(unitID);
     if (!unit) {
-      return { changesets: [], latestRevision: 0 };
+      return null;
     }
 
-    // to = 0 reads through the current head; other values are capped at the head.
-    let toRevision = unit.record.headRevision;
-    if (range.to !== 0) {
-      toRevision = Math.min(range.to, unit.record.headRevision);
-    }
-    // Changesets are appended in consecutive revision order, which filtering preserves.
-    const changesets = unit.changesets.filter(
-      ({ revision }) => revision > range.from && revision <= toRevision,
-    );
-    return {
-      changesets: structuredClone(changesets),
-      latestRevision: unit.record.headRevision,
-    };
+    return structuredClone(unit.changesets.filter(
+      ({ revision }) => revision > range.from && (range.to === undefined || revision <= range.to),
+    ));
   }
 
   async getSheetBlock(

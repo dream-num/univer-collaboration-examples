@@ -2,7 +2,6 @@ import { decode, encode } from "@msgpack/msgpack";
 import Database from "better-sqlite3";
 import {
   CollabError,
-  type ChangesetRange,
   type CommitChangesetInput,
   type CommitChangesetResult,
   type CreateUnitDatabaseInput,
@@ -14,6 +13,7 @@ import {
   type RecoverUnitsDatabaseInput,
   type RecoverUnitsDatabaseResult,
   type SaveSnapshotInput,
+  type SnapshotInfo,
   type SubmitDatabaseContext,
   type UnitRecord,
 } from "@univerjs-pro/collaboration-service";
@@ -88,8 +88,8 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<ISnapshot | null> {
-    const revision = options?.revision ?? 0;
-    if (revision < 0) {
+    const revision = options?.revision ?? null;
+    if (revision !== null && revision < 0) {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
@@ -98,7 +98,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       .prepare(`
         SELECT s.payload FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ? AND u.deleted = 0
-          AND s.revision <= CASE WHEN ? = 0 THEN u.head_revision
+          AND s.revision <= CASE WHEN ? IS NULL THEN u.head_revision
                                 ELSE MIN(?, u.head_revision) END
         ORDER BY s.revision DESC LIMIT 1
       `)
@@ -106,36 +106,58 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     return row ? decodePayload<ISnapshot>(row.payload) : null;
   }
 
+  async getSnapshotInfo(
+    _ctx: DatabaseContext,
+    unitID: string,
+    options?: { readonly revision?: number },
+  ): Promise<SnapshotInfo | null> {
+    const revision = options?.revision ?? null;
+    if (revision !== null && revision < 0) {
+      throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
+    }
+
+    // Use the same selection as getSnapshot without reading or decoding the snapshot payload.
+    const row = this._database
+      .prepare(`
+        SELECT s.unit_id AS unitID, u.type, s.revision AS rev
+        FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
+        WHERE u.unit_id = ? AND u.deleted = 0
+          AND s.revision <= CASE WHEN ? IS NULL THEN u.head_revision
+                                ELSE MIN(?, u.head_revision) END
+        ORDER BY s.revision DESC LIMIT 1
+      `)
+      .get(unitID, revision, revision) as SnapshotInfo | undefined;
+    return row ?? null;
+  }
+
   async getChangesets(
     _ctx: DatabaseContext,
     unitID: string,
-    range: { readonly from: number; readonly to: number },
-  ): Promise<ChangesetRange> {
-    if (range.from < 0 || range.to < 0) {
+    range: { readonly from: number; readonly to?: number },
+  ): Promise<readonly IChangeset[] | null> {
+    if (range.from < 0 || (range.to !== undefined && range.to < 0)) {
       throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
 
-    // LEFT JOIN returns the head even for an empty range, keeping history and head consistent.
+    // LEFT JOIN distinguishes an inactive Unit (null) from an active Unit with an empty range ([]).
     const rows = this._database
       .prepare(`
-        SELECT u.head_revision AS headRevision, c.payload
+        SELECT c.payload
         FROM units u LEFT JOIN changesets c ON c.unit_id = u.unit_id
           AND c.revision > ?
-          AND c.revision <= CASE WHEN ? = 0 THEN u.head_revision
-                                ELSE MIN(?, u.head_revision) END
+          AND (? IS NULL OR c.revision <= ?)
         WHERE u.unit_id = ? AND u.deleted = 0
         ORDER BY c.revision ASC
       `)
-      .all(range.from, range.to, range.to, unitID) as {
-      headRevision: number;
+      .all(range.from, range.to ?? null, range.to ?? null, unitID) as {
       payload: Uint8Array | null;
     }[];
-    return {
-      changesets: rows.flatMap((row) =>
-        row.payload === null ? [] : [decodePayload<IChangeset>(row.payload)],
-      ),
-      latestRevision: rows[0]?.headRevision ?? 0,
-    };
+    if (rows.length === 0) {
+      return null;
+    }
+    return rows.flatMap((row) =>
+      row.payload === null ? [] : [decodePayload<IChangeset>(row.payload)],
+    );
   }
 
   async getSheetBlock(
