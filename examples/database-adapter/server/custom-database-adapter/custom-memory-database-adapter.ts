@@ -52,7 +52,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<SnapshotInfo | null> {
-    // 快照策略只需要标量信息，不能为判断是否生成快照而克隆完整 payload。
+    // Snapshot policy needs only metadata; avoid cloning the payload to decide whether to snapshot.
     const snapshot = this._getSnapshot(unitID, options);
     return snapshot
       ? { unitID: snapshot.unitID, type: snapshot.type, rev: snapshot.rev }
@@ -93,7 +93,7 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
       return null;
     }
 
-    // 省略 to 才表示无上界；0 是普通 revision，不能作为读取 head 的标记。
+    // Only an omitted to is unbounded; zero is a regular revision, not an alias for the head.
     return structuredClone(unit.changesets.filter(
       ({ revision }) => revision > range.from && (range.to === undefined || revision <= range.to),
     ));

@@ -116,7 +116,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
-    // 与 getSnapshot 使用同一选择条件，但不读取或解码快照 payload。
+    // Use the same selection as getSnapshot without reading or decoding the snapshot payload.
     const row = this._database
       .prepare(`
         SELECT s.unit_id AS unitID, u.type, s.revision AS rev
@@ -139,7 +139,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
 
-    // LEFT JOIN 在一次读取中区分非 active Unit（null）和 active Unit 的空区间（[]）。
+    // LEFT JOIN distinguishes an inactive Unit (null) from an active Unit with an empty range ([]).
     const rows = this._database
       .prepare(`
         SELECT c.payload

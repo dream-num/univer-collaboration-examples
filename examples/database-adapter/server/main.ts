@@ -82,13 +82,9 @@ app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (reque
     })),
   });
 });
-app.use("/universer-api", (request, response) => {
-  request.url = request.originalUrl;
-  transport.handleRequest(request, response);
-});
 app.use(express.static("dist/web"));
 const server = createServer(app);
-server.on("upgrade", (request, socket, head) => transport.handleUpgrade(request, socket, head));
+transport.attach(server);
 const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3010);
 server.listen(port, host, () =>
