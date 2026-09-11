@@ -52,7 +52,6 @@ export class CustomMemoryDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     options?: { readonly revision?: number },
   ): Promise<SnapshotInfo | null> {
-    // Snapshot policy needs only metadata; avoid cloning the payload to decide whether to snapshot.
     const snapshot = this._getSnapshot(unitID, options);
     return snapshot
       ? { unitID: snapshot.unitID, type: snapshot.type, rev: snapshot.rev }
