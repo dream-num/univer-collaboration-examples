@@ -56,6 +56,9 @@ importers:
       '@univerjs/core':
         specifier: 1.0.0-rc.0
         version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs/drawing':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
       '@univerjs/preset-sheets-core':
         specifier: 1.0.0-rc.0
         version: 1.0.0-rc.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
