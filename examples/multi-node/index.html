@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collaboration Multi-node Routing</title>
+  </head>
+  <body>
+    <div id="example">
+      <aside id="sidebar" aria-label="Files">
+        <div id="create-file">
+          <button id="new-file" type="button"><span aria-hidden="true">＋</span> New Sheet</button>
+          <label for="file-name">File name</label>
+          <input id="file-name" value="Untitled Sheet" maxlength="80" />
+        </div>
+        <div id="files-heading">
+          <h2>Files <span id="file-count"></span></h2>
+          <button id="refresh-files" type="button">Refresh</button>
+        </div>
+        <nav id="picker" aria-label="Choose a file"></nav>
+        <div id="sidebar-footer"><span class="connection-dot"></span> Collaboration example</div>
+      </aside>
+      <main id="workspace">
+        <header id="toolbar">
+          <div><h1 id="document-title">Your workspace</h1><p>Open the same file in another tab to collaborate.</p></div>
+          <span id="document-node" class="node-badge" hidden></span>
+        </header>
+        <div id="status" role="status" aria-live="polite"></div>
+        <div id="empty-state">
+          <div class="sheet-icon" aria-hidden="true">▦</div>
+          <h2>A place to work together</h2>
+          <p>Create a Sheet or choose a file from the sidebar.</p>
+        </div>
+        <div id="app" hidden></div>
+      </main>
+    </div>
+    <script type="module" src="/web/main.ts"></script>
+  </body>
+</html>

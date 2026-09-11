@@ -310,6 +310,67 @@ importers:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
 
+  examples/multi-node:
+    dependencies:
+      '@univerjs-pro/collaboration':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client-ui':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-database-sqlite':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)
+      '@univerjs-pro/collaboration-endpoint':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)
+      '@univerjs-pro/collaboration-service':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)
+      '@univerjs-pro/collaboration-transport-node':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0
+      '@univerjs-pro/license':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs/core':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs/preset-sheets-core':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs/presets':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0(react@19.2.8)(rxjs@7.8.2)
+      '@univerjs/protocol':
+        specifier: 1.0.0-rc.0
+        version: 1.0.0-rc.0
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+      libsql:
+        specifier: 0.5.29
+        version: 0.5.29
+      react:
+        specifier: ^19.0.0
+        version: 19.2.8
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.8(react@19.2.8)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      vite:
+        specifier: ^8.0.0
+        version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
+
   examples/permissions:
     dependencies:
       '@univerjs-pro/collaboration':
@@ -1397,6 +1458,11 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.0-insiders.20260910-22fe9c7':
+    resolution: {integrity: sha512-lOURv1xJBouU2yiCmRSJ4SarVsmMk15rfOdI4hgw2uA3In5CHyHDY6aCCeFvG6xVzb3OtFnjpDF2pQwlEFtM1w==}
+    cpu: [x64]
+    os: [darwin]
+
   '@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.0-insiders.20260910-22fe9c7':
     resolution: {integrity: sha512-DBJTCVaRA1JQr8LO+1AqiW8IfTE3SFldODlYhUrO5LKcmkF6n7rwZHBmrwo13Vzpax34up5d7xwME2StnDfkcg==}
     cpu: [arm64]
@@ -1440,6 +1506,11 @@ packages:
   '@univerjs-pro/exchange-node-binding-darwin-arm64@0.1.2':
     resolution: {integrity: sha512-LDzF5PsNd8SkSkYONdcV1sj0/5yLQlIFwbEmniQ/Mfej4zeMXXlFzeUexaSWy564/VfnfNUsX8bDQ810lsBEhg==}
     cpu: [arm64]
+    os: [darwin]
+
+  '@univerjs-pro/exchange-node-binding-darwin-x64@0.1.2':
+    resolution: {integrity: sha512-5rJ6wvCAnqB5fEuqYsVBIUkUM2/KSfi5yfSOcMMIkeuf14hYHxxj6YBkdDvvsJvzg478KOXu/j9DwfVXYnATuA==}
+    cpu: [x64]
     os: [darwin]
 
   '@univerjs-pro/exchange-node-binding-linux-arm64-gnu@0.1.2':
@@ -3559,6 +3630,9 @@ snapshots:
   '@univerjs-pro/engine-formula-rust-binding-darwin-arm64@1.0.0-insiders.20260910-22fe9c7':
     optional: true
 
+  '@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.0-insiders.20260910-22fe9c7':
+    optional: true
+
   '@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.0-insiders.20260910-22fe9c7':
     optional: true
 
@@ -3571,6 +3645,7 @@ snapshots:
   '@univerjs-pro/engine-formula-rust-binding@1.0.0-insiders.20260910-22fe9c7':
     optionalDependencies:
       '@univerjs-pro/engine-formula-rust-binding-darwin-arm64': 1.0.0-insiders.20260910-22fe9c7
+      '@univerjs-pro/engine-formula-rust-binding-darwin-x64': 1.0.0-insiders.20260910-22fe9c7
       '@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu': 1.0.0-insiders.20260910-22fe9c7
       '@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu': 1.0.0-insiders.20260910-22fe9c7
       '@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc': 1.0.0-insiders.20260910-22fe9c7
@@ -3629,6 +3704,9 @@ snapshots:
   '@univerjs-pro/exchange-node-binding-darwin-arm64@0.1.2':
     optional: true
 
+  '@univerjs-pro/exchange-node-binding-darwin-x64@0.1.2':
+    optional: true
+
   '@univerjs-pro/exchange-node-binding-linux-arm64-gnu@0.1.2':
     optional: true
 
@@ -3641,6 +3719,7 @@ snapshots:
   '@univerjs-pro/exchange-node-binding@0.1.2':
     optionalDependencies:
       '@univerjs-pro/exchange-node-binding-darwin-arm64': 0.1.2
+      '@univerjs-pro/exchange-node-binding-darwin-x64': 0.1.2
       '@univerjs-pro/exchange-node-binding-linux-arm64-gnu': 0.1.2
       '@univerjs-pro/exchange-node-binding-linux-x64-gnu': 0.1.2
       '@univerjs-pro/exchange-node-binding-win32-x64-msvc': 0.1.2
