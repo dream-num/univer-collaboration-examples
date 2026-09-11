@@ -1,4 +1,4 @@
-import { LocaleType, LogLevel, UserManagerService } from "@univerjs/core";
+import { IImageIoService, LocaleType, LogLevel, UserManagerService } from "@univerjs/core";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -9,6 +9,7 @@ import {
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
+import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
@@ -58,6 +59,7 @@ const { univer } = createUniver({
       },
     ],
     UniverCollaborationClientUIPlugin,
+    [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
     UniverSheetsThreadCommentUIPlugin,
     UniverThreadCommentDataSourcePlugin,
   ],
