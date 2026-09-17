@@ -21,6 +21,7 @@
 | 示例 | 内容 |
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.zh-CN.md) | 最小 Sheet 实时协同链路 |
+| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
@@ -41,6 +42,7 @@ pnpm example:quick-start
 其他示例使用同样的命令形式：
 
 ```bash
+pnpm example:all-unit
 pnpm example:database-adapter
 pnpm example:permissions
 pnpm example:history
@@ -50,7 +52,7 @@ pnpm example:exchange
 pnpm example:multi-node
 ```
 
-示例只承担教学和可复制装配，不包含文件空间、多类型产品编辑器或完整办公套件。exchange 示例
+示例只承担教学和可复制装配，不包含文件空间或完整办公套件。exchange 示例
 特意使用内存文件与任务存储，不代替生产文件服务。
 
 `quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`，服务重启后仍会保留。

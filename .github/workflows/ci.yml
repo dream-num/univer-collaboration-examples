@@ -38,3 +38,6 @@ jobs:
 
       - name: Build examples
         run: pnpm build
+
+      - name: Test All Unit persistence
+        run: pnpm --filter @univerjs/collaboration-example-all-unit test

@@ -1,0 +1,12 @@
+import "@univerjs/preset-docs-core/lib/index.css";
+import "@univerjs/preset-docs-drawing/lib/index.css";
+import "@univerjs/preset-docs-hyper-link/lib/index.css";
+import "@univerjs-pro/chart-ui/lib/index.css";
+import "@univerjs-pro/shape-editor-ui/lib/index.css";
+import "@univerjs-pro/docs-callout-ui/lib/index.css";
+import "@univerjs-pro/docs-chart-ui/lib/index.css";
+import "@univerjs-pro/docs-code-ui/lib/index.css";
+import "@univerjs-pro/docs-latex-ui/lib/index.css";
+import "@univerjs-pro/docs-shape-ui/lib/index.css";
+import "@univerjs-pro/docs-table-ui/lib/index.css";
+import "@univerjs-pro/collaboration-client-ui/lib/index.css";
