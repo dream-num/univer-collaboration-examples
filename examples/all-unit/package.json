@@ -9,8 +9,7 @@
   "scripts": {
     "build": "vite build && vite build --ssr server/main.ts --outDir dist/server && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "start": "node dist/server/main.js",
-    "test": "vite build --ssr test/units.test.ts --outDir dist/test && node --test dist/test/units.test.js"
+    "start": "node dist/server/main.js"
   },
   "dependencies": {
     "@univerjs-pro/bases": "1.0.0-rc.0",

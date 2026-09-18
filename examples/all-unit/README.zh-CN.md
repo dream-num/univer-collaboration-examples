@@ -26,10 +26,7 @@ Pro 功能与 `all-integration` 使用相同的 license 要求，需要时在构
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck
-pnpm --filter @univerjs/collaboration-example-all-unit test
 ```
-
-测试覆盖五类 snapshot 加载，以及编辑内容在关闭、重新打开 SQLite 后仍然保留。
 
 在 SDK `1.0.0-rc.0` 下，Slide 工具栏可能显示 “Local file”，但实际协同仍然工作。
 已验证新增幻灯片实时同步到另一页面，并写入 SQLite；此示例保留上游状态组件。

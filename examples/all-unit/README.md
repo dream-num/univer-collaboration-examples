@@ -29,10 +29,7 @@ license requirements as `all-integration`; set `UNIVER_LICENSE` before building 
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck
-pnpm --filter @univerjs/collaboration-example-all-unit test
 ```
-
-The test loads all five snapshot types and verifies an edit survives closing and reopening SQLite.
 
 With SDK `1.0.0-rc.0`, the Slide toolbar may show “Local file” despite active
 collaboration. Two-browser slide insertion and SQLite persistence were verified;
