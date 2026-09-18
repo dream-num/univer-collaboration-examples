@@ -21,8 +21,8 @@
 | 示例 | 内容 |
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.zh-CN.md) | 最小 Sheet 实时协同链路 |
-| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
+| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
@@ -42,8 +42,8 @@ pnpm example:quick-start
 其他示例使用同样的命令形式：
 
 ```bash
-pnpm example:all-unit
 pnpm example:database-adapter
+pnpm example:all-unit
 pnpm example:permissions
 pnpm example:history
 pnpm example:comments

@@ -11,13 +11,13 @@
     "typecheck": "pnpm -r typecheck",
     "example:quick-start": "pnpm --filter @univerjs/collaboration-example-quick-start build && pnpm --filter @univerjs/collaboration-example-quick-start start",
     "example:database-adapter": "pnpm --filter @univerjs/collaboration-example-database-adapter build && pnpm --filter @univerjs/collaboration-example-database-adapter start",
+    "example:all-unit": "pnpm --filter @univerjs/collaboration-example-all-unit build && pnpm --filter @univerjs/collaboration-example-all-unit start",
     "example:permissions": "pnpm --filter @univerjs/collaboration-example-permissions build && pnpm --filter @univerjs/collaboration-example-permissions start",
     "example:history": "pnpm --filter @univerjs/collaboration-example-history build && pnpm --filter @univerjs/collaboration-example-history start",
     "example:comments": "pnpm --filter @univerjs/collaboration-example-comments build && pnpm --filter @univerjs/collaboration-example-comments start",
     "example:worktree": "pnpm --filter @univerjs/collaboration-example-worktree build && pnpm --filter @univerjs/collaboration-example-worktree start",
     "example:exchange": "pnpm --filter @univerjs/collaboration-example-exchange build && pnpm --filter @univerjs/collaboration-example-exchange start",
-    "example:multi-node": "docker compose -f examples/multi-node/compose.yaml up --build --force-recreate",
-    "example:all-unit": "pnpm --filter @univerjs/collaboration-example-all-unit build && pnpm --filter @univerjs/collaboration-example-all-unit start"
+    "example:multi-node": "docker compose -f examples/multi-node/compose.yaml up --build --force-recreate"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
