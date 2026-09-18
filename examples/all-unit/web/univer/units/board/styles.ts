@@ -1,0 +1,13 @@
+import "@univerjs/design/lib/index.css";
+import "@univerjs/ui/lib/index.css";
+import "@univerjs/docs-ui/lib/index.css";
+import "@univerjs/drawing-ui/lib/index.css";
+import "@univerjs-pro/chart-ui/lib/index.css";
+import "@univerjs-pro/shape-editor-ui/lib/index.css";
+import "@univerjs-pro/ink-ui/lib/index.css";
+import "@univerjs-pro/docs-latex-ui/lib/index.css";
+import "@univerjs-pro/boards-ui/lib/index.css";
+import "@univerjs-pro/boards-chart-ui/lib/index.css";
+import "@univerjs-pro/boards-mind-ui/lib/index.css";
+import "@univerjs-pro/boards-table-ui/lib/index.css";
+import "@univerjs-pro/collaboration-client-ui/lib/index.css";

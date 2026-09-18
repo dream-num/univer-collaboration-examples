@@ -24,6 +24,7 @@ collaboration path, then choose another example for the capability you want to e
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.md) | Minimal real-time Sheet collaboration path |
 | [`database-adapter`](./examples/database-adapter/README.md) | SQLite persistence and restart recovery |
+| [`all-unit`](./examples/all-unit/README.md) | Five fixed Unit types, sidebar switching, and SQLite persistence |
 | [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
 | [`history`](./examples/history/README.md) | Version history service and browser entry |
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
@@ -44,6 +45,7 @@ The other examples use the same command form:
 
 ```bash
 pnpm example:database-adapter
+pnpm example:all-unit
 pnpm example:permissions
 pnpm example:history
 pnpm example:comments
@@ -52,8 +54,8 @@ pnpm example:exchange
 pnpm example:multi-node
 ```
 
-The examples cover only teaching and copyable assembly. They do not include file spaces,
-multi-type product editors, or a complete office suite. The exchange example intentionally uses
+The examples cover only teaching and copyable assembly. They do not include file spaces
+or a complete office suite. The exchange example intentionally uses
 an in-memory file/task store rather than a production file service.
 
 `quick-start` uses the Memory Adapter to keep setup minimal. The other single-node examples store

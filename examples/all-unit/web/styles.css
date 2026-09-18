@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body { margin: 0; display: flex; height: 100dvh; font-family: system-ui, sans-serif; color: #253047; }
+#sidebar { width: 180px; flex-shrink: 0; padding: 20px 12px; background: #f6f7fb; border-right: 1px solid #e1e4eb; overflow: auto; }
+#sidebar h1 { margin: 0 12px 24px; font-size: 20px; }
+#units { display: grid; gap: 6px; }
+#units a { display: block; padding: 12px; border-radius: 6px; color: inherit; text-decoration: none; }
+#units a:hover { background: #e9edf5; }
+#units a[aria-current] { background: #e0e8ff; color: #234fb5; font-weight: 600; }
+#sidebar p { margin: 24px 12px; color: #667085; font-size: 12px; line-height: 1.6; }
+#workspace { position: relative; flex: 1; min-width: 0; }
+#editor { height: 100%; }
+#status { position: absolute; z-index: 1; margin: 20px; }
+@media (max-width: 640px) { #sidebar { width: 110px; padding: 16px 6px; } #sidebar p { display: none; } }

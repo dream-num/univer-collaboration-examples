@@ -1,0 +1,10 @@
+import "@univerjs/design/lib/index.css";
+import "@univerjs/ui/lib/index.css";
+import "@univerjs/docs-ui/lib/index.css";
+import "@univerjs/drawing-ui/lib/index.css";
+import "@univerjs-pro/chart-ui/lib/index.css";
+import "@univerjs-pro/shape-editor-ui/lib/index.css";
+import "@univerjs-pro/slides-ui/lib/index.css";
+import "@univerjs-pro/slides-chart-ui/lib/index.css";
+import "@univerjs-pro/slides-table-ui/lib/index.css";
+import "@univerjs-pro/collaboration-client-ui/lib/index.css";
