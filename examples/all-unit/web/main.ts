@@ -14,7 +14,7 @@ async function main() {
   const selected = units.find((unit) => unit.unitId === url.searchParams.get("unit")) ?? units[0];
   if (!selected) throw new Error("No units available");
 
-  // 协同插件从 URL 读取 Unit 身份，必须在装配前使用服务端列表校正。
+  // The collaboration plugin reads Unit identity from the URL; normalize it against the server catalog before setup.
   url.searchParams.set("unit", selected.unitId);
   url.searchParams.set("type", String(selected.type));
   history.replaceState(null, "", url);
@@ -41,7 +41,7 @@ async function main() {
 }
 
 window.addEventListener("pagehide", () => editor?.dispose());
-// 从浏览器往返缓存恢复时，重新建立已经释放的协同连接。
+// Recreate the disposed collaboration connection when restoring from the back-forward cache.
 window.addEventListener("pageshow", (event) => {
   if (event.persisted) location.reload();
 });

@@ -47,7 +47,7 @@ const server = createServer(app);
 transport.attach(server);
 
 async function dispose() {
-  // Transport 拥有 Endpoint；Service 与注入的数据库由应用依次释放。
+  // Transport owns Endpoint; the application disposes Service before the injected database.
   await transport.dispose();
   if (server.listening) {
     await new Promise<void>((resolve, reject) => {

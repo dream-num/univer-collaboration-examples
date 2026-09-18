@@ -70,7 +70,7 @@ export function registerSheetUnit(univer: Univer, options: MountUniverEditorOpti
   univer.registerPlugin(UniverUIPlugin, {
     container: options.container,
     ribbonType: "grid",
-    // 此示例所有用户均可编辑，不提供权限管理入口。
+    // All users can edit in this example, so permission management controls are hidden.
     menu: {
       "sheet.contextMenu.permission": { hidden: true },
       [AddRangeProtectionFromToolbarCommand.id]: { hidden: true },

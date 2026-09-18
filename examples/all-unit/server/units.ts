@@ -27,7 +27,7 @@ export async function ensureUnits(service: IUniverCollabService): Promise<void> 
         { userID: DEMO_USER.userId },
       );
     } catch (error) {
-      // 仅初始化缺失的 Unit；重启不覆盖数据，也不把读取失败当作空库。
+      // Initialize only missing Units; preserve existing data and propagate other read failures.
       if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
       await service.createUnitFromData(initialData(unit), { userID: DEMO_USER.userId });
     }
