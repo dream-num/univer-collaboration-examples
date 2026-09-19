@@ -42,7 +42,7 @@ Both examples implement `IDatabaseAdapter`. Start with the Memory version to und
 | Implementation | Focus |
 | --- | --- |
 | [CustomMemoryDatabaseAdapter](./server/custom-database-adapter/custom-memory-database-adapter.ts) | Uses Maps to demonstrate reads, revision checks, deletion, and recovery; data is lost when the process exits |
-| [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | Uses `better-sqlite3` and MessagePack to demonstrate schema, transactions, and protocol object storage; data survives restarts |
+| [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | Uses `libsql` and MessagePack to demonstrate schema, transactions, and protocol object storage; data survives restarts |
 
 To try one, uncomment its import and constructor in `server/main.ts`, comment out the current constructor, and rerun the startup command. Custom SQLite uses `.data/custom-collaboration.sqlite`; its schema differs from the built-in Adapter, so it must use a separate file.
 

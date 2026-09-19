@@ -1,81 +1,231 @@
-import { decode, encode } from "@msgpack/msgpack";
-import Database from "better-sqlite3";
-import {
-  CollabError,
-  type CommitChangesetInput,
-  type CommitChangesetResult,
-  type CreateUnitDatabaseInput,
-  type CreateUnitDatabaseResult,
-  type DatabaseContext,
-  type DeleteUnitsDatabaseInput,
-  type DeleteUnitsDatabaseResult,
-  type IDatabaseAdapter,
-  type RecoverUnitsDatabaseInput,
-  type RecoverUnitsDatabaseResult,
-  type SaveSnapshotInput,
-  type SnapshotInfo,
-  type SubmitDatabaseContext,
-  type UnitRecord,
+import type { Buffer } from "node:buffer";
+import { Decoder, Encoder } from "@msgpack/msgpack";
+import Database from "libsql";
+import { CollabError } from "@univerjs-pro/collaboration-service";
+import type {
+  CommitChangesetInput,
+  CommitChangesetResult,
+  CreateUnitDatabaseInput,
+  CreateUnitDatabaseResult,
+  DatabaseContext,
+  DeleteUnitsDatabaseInput,
+  DeleteUnitsDatabaseResult,
+  IDatabaseAdapter,
+  RecoverUnitsDatabaseInput,
+  RecoverUnitsDatabaseResult,
+  SaveSnapshotInput,
+  SnapshotInfo,
+  SubmitDatabaseContext,
+  UnitRecord,
 } from "@univerjs-pro/collaboration-service";
 import type { IChangeset, ISheetBlock, ISnapshot } from "@univerjs/protocol";
 
 interface UnitRow extends UnitRecord {
+  readonly creatorID: string;
+  readonly createdAt: number;
   readonly deleted: number;
 }
 
 interface PayloadRow {
-  readonly payload: Uint8Array;
+  readonly payload: ArrayBuffer | Buffer;
 }
 
-/**
- * An IDatabaseAdapter that persists collaboration data using better-sqlite3.
- * SQL runs synchronously on the current thread; async methods satisfy the Promise interface.
- */
+export interface CustomSQLiteDatabaseAdapterOptions {
+  readonly filename: string;
+}
+
+/** A custom collaboration database adapter backed by libSQL. */
 export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   private readonly _database: Database.Database;
+  private readonly _encoder = new Encoder({ ignoreUndefined: true });
+  private readonly _decoder = new Decoder();
 
-  /** Creates the database file if missing; the caller must create its parent directory first. */
-  constructor(options: { readonly filename: string }) {
+  private readonly _getUnitStatement: Database.Statement;
+  private readonly _getSnapshotStatement: Database.Statement;
+  private readonly _getSnapshotAtRevisionStatement: Database.Statement;
+  private readonly _getSnapshotInfoStatement: Database.Statement;
+  private readonly _getSnapshotInfoAtRevisionStatement: Database.Statement;
+  private readonly _getChangesetsStatement: Database.Statement;
+  private readonly _getChangesetsInRangeStatement: Database.Statement;
+  private readonly _getSheetBlockStatement: Database.Statement;
+  private readonly _writeSheetBlockStatement: Database.Statement;
+  private readonly _writeSnapshotStatement: Database.Statement;
+  private readonly _insertUnitStatement: Database.Statement;
+  private readonly _insertChangesetStatement: Database.Statement;
+  private readonly _updateHeadRevisionStatement: Database.Statement;
+  private readonly _hasTombstoneStatement: Database.Statement;
+  private readonly _insertTombstoneStatement: Database.Statement;
+  private readonly _deleteUnitStatement: Database.Statement;
+  private readonly _softDeleteUnitStatement: Database.Statement;
+  private readonly _recoverUnitStatement: Database.Statement;
+
+  constructor(options: CustomSQLiteDatabaseAdapterOptions) {
     this._database = new Database(options.filename);
+
     try {
       this._database.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
-      this._database
-        .transaction(() => {
-          this._database.exec(`
-            CREATE TABLE IF NOT EXISTS units (
-              unit_id TEXT PRIMARY KEY NOT NULL,
-              type INTEGER NOT NULL,
-              head_revision INTEGER NOT NULL CHECK (head_revision >= 1),
-              deleted INTEGER NOT NULL DEFAULT 0 CHECK (deleted IN (0, 1))
-            );
-            CREATE TABLE IF NOT EXISTS tombstones (
-              unit_id TEXT PRIMARY KEY NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS snapshots (
-              unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
-              revision INTEGER NOT NULL CHECK (revision >= 1),
-              payload BLOB NOT NULL,
-              PRIMARY KEY (unit_id, revision)
-            );
-            CREATE TABLE IF NOT EXISTS changesets (
-              unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
-              revision INTEGER NOT NULL CHECK (revision >= 2),
-              payload BLOB NOT NULL,
-              PRIMARY KEY (unit_id, revision)
-            );
-            CREATE TABLE IF NOT EXISTS sheet_blocks (
-              unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
-              block_id TEXT NOT NULL,
-              payload BLOB NOT NULL,
-              PRIMARY KEY (unit_id, block_id)
-            );
-          `);
-        })
-        .immediate();
+      this._initializeTables();
+
+      this._getUnitStatement = this._database.prepare(`
+        SELECT unit_id AS unitID, type, head_revision AS headRevision,
+          creator_id AS creatorID, created_at_ms AS createdAt, deleted
+        FROM units
+        WHERE unit_id = ?
+      `);
+
+      this._getSnapshotStatement = this._database.prepare(`
+        SELECT s.payload
+        FROM snapshots s
+        JOIN units u ON u.unit_id = s.unit_id
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+        ORDER BY s.revision DESC
+        LIMIT 1
+      `);
+      this._getSnapshotAtRevisionStatement = this._database.prepare(`
+        SELECT s.payload
+        FROM snapshots s
+        JOIN units u ON u.unit_id = s.unit_id
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+          AND s.revision <= ?
+        ORDER BY s.revision DESC
+        LIMIT 1
+      `);
+
+      this._getSnapshotInfoStatement = this._database.prepare(`
+        SELECT s.unit_id AS unitID, u.type, s.revision AS rev
+        FROM snapshots s
+        JOIN units u ON u.unit_id = s.unit_id
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+        ORDER BY s.revision DESC
+        LIMIT 1
+      `);
+      this._getSnapshotInfoAtRevisionStatement = this._database.prepare(`
+        SELECT s.unit_id AS unitID, u.type, s.revision AS rev
+        FROM snapshots s
+        JOIN units u ON u.unit_id = s.unit_id
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+          AND s.revision <= ?
+        ORDER BY s.revision DESC
+        LIMIT 1
+      `);
+
+      this._getChangesetsStatement = this._database.prepare(`
+        SELECT c.payload
+        FROM units u
+        LEFT JOIN changesets c ON c.unit_id = u.unit_id
+          AND c.revision > ?
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+        ORDER BY c.revision ASC
+      `);
+      this._getChangesetsInRangeStatement = this._database.prepare(`
+        SELECT c.payload
+        FROM units u
+        LEFT JOIN changesets c ON c.unit_id = u.unit_id
+          AND c.revision > ?
+          AND c.revision <= ?
+        WHERE u.unit_id = ?
+          AND u.deleted = 0
+        ORDER BY c.revision ASC
+      `);
+
+      this._getSheetBlockStatement = this._database.prepare(`
+        SELECT b.payload FROM sheet_blocks b JOIN units u ON u.unit_id = b.unit_id
+        WHERE u.unit_id = ? AND u.deleted = 0 AND b.block_id = ?
+      `);
+
+      this._writeSheetBlockStatement = this._database.prepare(`
+        INSERT INTO sheet_blocks (unit_id, block_id, payload) VALUES (?, ?, ?)
+        ON CONFLICT (unit_id, block_id) DO UPDATE SET payload = excluded.payload
+      `);
+      this._writeSnapshotStatement = this._database.prepare(`
+        INSERT INTO snapshots (unit_id, revision, payload) VALUES (?, ?, ?)
+        ON CONFLICT (unit_id, revision) DO UPDATE SET payload = excluded.payload
+      `);
+
+      this._insertUnitStatement = this._database.prepare(`
+        INSERT INTO units (unit_id, type, head_revision, creator_id, created_at_ms)
+        VALUES (?, ?, 1, ?, ?)
+      `);
+      this._insertChangesetStatement = this._database.prepare(
+        "INSERT INTO changesets (unit_id, revision, payload) VALUES (?, ?, ?)",
+      );
+      this._updateHeadRevisionStatement = this._database.prepare(
+        "UPDATE units SET head_revision = ? WHERE unit_id = ?",
+      );
+
+      this._hasTombstoneStatement = this._database.prepare(
+        "SELECT 1 FROM tombstones WHERE unit_id = ?",
+      );
+      this._insertTombstoneStatement = this._database.prepare(
+        "INSERT INTO tombstones (unit_id) VALUES (?)",
+      );
+      this._deleteUnitStatement = this._database.prepare(
+        "DELETE FROM units WHERE unit_id = ?",
+      );
+      this._softDeleteUnitStatement = this._database.prepare(
+        "UPDATE units SET deleted = 1 WHERE unit_id = ?",
+      );
+      this._recoverUnitStatement = this._database.prepare(
+        "UPDATE units SET deleted = 0 WHERE unit_id = ?",
+      );
     } catch (error) {
       this._database.close();
       throw error;
     }
+  }
+
+  private _initializeTables(): void {
+    this._database
+      .transaction(() => {
+        const columns = this._database.prepare("PRAGMA table_info(units)").all() as {
+          name: string;
+        }[];
+        if (columns.length > 0 && !["creator_id", "created_at_ms"].every(
+          name => columns.some(column => column.name === name),
+        )) {
+          throw new Error(
+            "Custom SQLite schema requires creator_id and created_at_ms. Migrate the existing database before opening it.",
+          );
+        }
+
+        this._database.exec(`
+          CREATE TABLE IF NOT EXISTS units (
+            unit_id TEXT PRIMARY KEY NOT NULL,
+            type INTEGER NOT NULL,
+            head_revision INTEGER NOT NULL CHECK (head_revision >= 1),
+            creator_id TEXT NOT NULL,
+            created_at_ms INTEGER NOT NULL,
+            deleted INTEGER NOT NULL DEFAULT 0 CHECK (deleted IN (0, 1))
+          );
+          CREATE TABLE IF NOT EXISTS tombstones (
+            unit_id TEXT PRIMARY KEY NOT NULL
+          );
+          CREATE TABLE IF NOT EXISTS snapshots (
+            unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
+            revision INTEGER NOT NULL CHECK (revision >= 1),
+            payload BLOB NOT NULL,
+            PRIMARY KEY (unit_id, revision)
+          );
+          CREATE TABLE IF NOT EXISTS changesets (
+            unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
+            revision INTEGER NOT NULL CHECK (revision >= 2),
+            payload BLOB NOT NULL,
+            PRIMARY KEY (unit_id, revision)
+          );
+          CREATE TABLE IF NOT EXISTS sheet_blocks (
+            unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
+            block_id TEXT NOT NULL,
+            payload BLOB NOT NULL,
+            PRIMARY KEY (unit_id, block_id)
+          );
+        `);
+      })
+      .immediate();
   }
 
   async getUnit(_ctx: DatabaseContext, unitID: string): Promise<UnitRecord | null> {
@@ -83,6 +233,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     return unit && unit.deleted === 0 ? toUnitRecord(unit) : null;
   }
 
+  /** Reads the latest snapshot, or the latest at or before the requested revision. */
   async getSnapshot(
     _ctx: DatabaseContext,
     unitID: string,
@@ -93,19 +244,16 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
-    // Writes guarantee snapshots never exceed the head revision.
-    // Read the latest snapshot and check active status in the same indexed query.
-    const row = this._database
-      .prepare(`
-        SELECT s.payload FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
-        WHERE u.unit_id = ? AND u.deleted = 0
-          ${revision === undefined ? "" : "AND s.revision <= ?"}
-        ORDER BY s.revision DESC LIMIT 1
-      `)
-      .get(unitID, ...(revision === undefined ? [] : [revision])) as PayloadRow | undefined;
-    return row ? decodePayload<ISnapshot>(row.payload) : null;
+    const row = (
+      revision === undefined
+        ? this._getSnapshotStatement.get(unitID)
+        : this._getSnapshotAtRevisionStatement.get(unitID, revision)
+    ) as PayloadRow | undefined;
+
+    return row ? this._decode<ISnapshot>(row.payload) : null;
   }
 
+  /** Uses the same selection as getSnapshot without loading or decoding its payload. */
   async getSnapshotInfo(
     _ctx: DatabaseContext,
     unitID: string,
@@ -116,19 +264,16 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Snapshot revision cannot be negative");
     }
 
-    // Use the same selection as getSnapshot without reading or decoding the snapshot payload.
-    const row = this._database
-      .prepare(`
-        SELECT s.unit_id AS unitID, u.type, s.revision AS rev
-        FROM snapshots s JOIN units u ON u.unit_id = s.unit_id
-        WHERE u.unit_id = ? AND u.deleted = 0
-          ${revision === undefined ? "" : "AND s.revision <= ?"}
-        ORDER BY s.revision DESC LIMIT 1
-      `)
-      .get(unitID, ...(revision === undefined ? [] : [revision])) as SnapshotInfo | undefined;
-    return row ?? null;
+    const row = (
+      revision === undefined
+        ? this._getSnapshotInfoStatement.get(unitID)
+        : this._getSnapshotInfoAtRevisionStatement.get(unitID, revision)
+    ) as SnapshotInfo | undefined;
+
+    return row ? { unitID: row.unitID, type: row.type, rev: row.rev } : null;
   }
 
+  /** Reads changesets in (from, to]; omitted to means no upper bound, while 0 is an explicit bound. */
   async getChangesets(
     _ctx: DatabaseContext,
     unitID: string,
@@ -138,25 +283,25 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
 
-    // LEFT JOIN distinguishes an inactive Unit (null) from an active Unit with an empty range ([]).
-    const rows = this._database
-      .prepare(`
-        SELECT c.payload
-        FROM units u LEFT JOIN changesets c ON c.unit_id = u.unit_id
-          AND c.revision > ?
-          ${range.to === undefined ? "" : "AND c.revision <= ?"}
-        WHERE u.unit_id = ? AND u.deleted = 0
-        ORDER BY c.revision ASC
-      `)
-      .all(range.from, ...(range.to === undefined ? [] : [range.to]), unitID) as {
-      payload: Uint8Array | null;
+    // LEFT JOIN distinguishes an inactive Unit (null) from an active Unit with no matching history ([]).
+    const rows = (
+      range.to === undefined
+        ? this._getChangesetsStatement.all(range.from, unitID)
+        : this._getChangesetsInRangeStatement.all(range.from, range.to, unitID)
+    ) as {
+      payload: ArrayBuffer | Buffer | null;
     }[];
-    if (rows.length === 0) {
-      return null;
+
+    if (rows.length === 0) return null;
+
+    const changesets: IChangeset[] = [];
+    for (const row of rows) {
+      if (row.payload !== null) {
+        changesets.push(this._decode<IChangeset>(row.payload));
+      }
     }
-    return rows.flatMap((row) =>
-      row.payload === null ? [] : [decodePayload<IChangeset>(row.payload)],
-    );
+
+    return changesets;
   }
 
   async getSheetBlock(
@@ -164,17 +309,14 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     unitID: string,
     blockID: string,
   ): Promise<ISheetBlock | null> {
-    const row = this._database
-      .prepare(`
-        SELECT b.payload FROM sheet_blocks b JOIN units u ON u.unit_id = b.unit_id
-        WHERE u.unit_id = ? AND u.deleted = 0 AND b.block_id = ?
-      `)
-      .get(unitID, blockID) as PayloadRow | undefined;
-    return row ? decodePayload<ISheetBlock>(row.payload) : null;
+    const row = this._getSheetBlockStatement.get(unitID, blockID) as PayloadRow | undefined;
+
+    return row ? this._decode<ISheetBlock>(row.payload) : null;
   }
 
+  /** Atomically creates a Unit, snapshot, and blocks at revision 1; an existing active Unit returns its record. */
   async createUnit(
-    _ctx: DatabaseContext,
+    ctx: DatabaseContext,
     input: CreateUnitDatabaseInput,
   ): Promise<CreateUnitDatabaseResult> {
     const { record, snapshot, sheetBlocks = [] } = input;
@@ -195,6 +337,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         if (this._hasTombstone(record.unitID)) {
           throw new CollabError("INVALID_REQUEST", "A hard-deleted unit ID cannot be reused");
         }
+
         const existing = this._getStoredUnit(record.unitID);
         if (existing) {
           if (existing.deleted !== 0) {
@@ -203,12 +346,21 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
           return { status: "already-exists", record: toUnitRecord(existing) };
         }
 
-        this._database
-          .prepare("INSERT INTO units (unit_id, type, head_revision) VALUES (?, ?, 1)")
-          .run(record.unitID, record.type);
-        // Commit the Unit, initial snapshot, and dependent blocks together; any failure rolls back.
-        this._writeSnapshot(snapshot, sheetBlocks);
-        return { status: "created", record: { ...record } };
+        // rc.0 does not supply creation metadata; newer SDKs provide both fields.
+        const creation = record as UnitRecord & { creatorID?: string; createdAt?: number };
+        const storedRecord = {
+          ...record,
+          creatorID: creation.creatorID ?? ctx.userID,
+          createdAt: creation.createdAt ?? Date.now(),
+        };
+        this._insertUnitStatement.run(
+          storedRecord.unitID,
+          storedRecord.type,
+          storedRecord.creatorID,
+          storedRecord.createdAt,
+        );
+        this._writeSnapshotWithBlocks(snapshot, sheetBlocks);
+        return { status: "created", record: storedRecord };
       })
       .immediate();
   }
@@ -218,35 +370,37 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     input: CommitChangesetInput,
   ): Promise<CommitChangesetResult> {
     const { changeset } = input;
+
     return this._database
       .transaction((): CommitChangesetResult => {
         const unit = this._requireActiveUnit(changeset.unitID);
         const expectedHeadRevision = changeset.revision - 1;
-        // BEGIN IMMEDIATE acquires the write lock before checking the head to prevent concurrent writes.
-        // The transaction callback must run synchronously so all writes complete before commit.
-        // CAS compares only revision; the Service deduplicates {sid, reqId} using consecutive history.
+
+        // Checks the head and commits within a write transaction to keep the version check and writes atomic.
+        // The Service deduplicates requests; this check only compares changeset.revision - 1 with the head.
         if (unit.headRevision !== expectedHeadRevision) {
           return {
             status: "revision-mismatch",
             actualHeadRevision: unit.headRevision,
           };
         }
-        const payload = encodePayload(changeset);
-        this._database
-          .prepare("INSERT INTO changesets (unit_id, revision, payload) VALUES (?, ?, ?)")
-          .run(changeset.unitID, changeset.revision, payload);
-        this._database
-          .prepare("UPDATE units SET head_revision = ? WHERE unit_id = ?")
-          .run(changeset.revision, changeset.unitID);
+
+        this._insertChangesetStatement.run(
+          changeset.unitID,
+          changeset.revision,
+          this._encode(changeset),
+        );
+        this._updateHeadRevisionStatement.run(changeset.revision, changeset.unitID);
         return {
           status: "committed",
-          changeset: decodePayload<IChangeset>(payload),
+          changeset,
           headRevision: changeset.revision,
         };
       })
       .immediate();
   }
 
+  /** Saves snapshot metadata and the supplied blocks. */
   async saveSnapshot(_ctx: DatabaseContext, input: SaveSnapshotInput): Promise<void> {
     this._database
       .transaction(() => {
@@ -255,89 +409,88 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         if (snapshot.type !== unit.type || snapshot.rev < 1 || snapshot.rev > unit.headRevision) {
           throw new CollabError("INVALID_REQUEST", "Snapshot does not match the stored unit head");
         }
-        this._writeSnapshot(snapshot, sheetBlocks);
+        this._writeSnapshotWithBlocks(snapshot, sheetBlocks);
       })
       .immediate();
   }
 
+  /** Atomically deletes the specified Units; hard deletion retains tombstones to prevent ID reuse. */
   async deleteUnits(
     _ctx: DatabaseContext,
     input: DeleteUnitsDatabaseInput,
   ): Promise<DeleteUnitsDatabaseResult> {
+    if (input.unitIDs.length === 0) return { units: [] };
+
     return this._database
       .transaction((): DeleteUnitsDatabaseResult => {
-        // Validate all distinct Units first; a missing ID must leave the entire batch unchanged.
-        const units: DeleteUnitsDatabaseResult["units"] = [...new Set(input.unitIDs)].map(
-          (unitID) => {
-            const unit = this._getStoredUnit(unitID);
-            if (!unit) {
-              if (input.hardDelete && this._hasTombstone(unitID)) {
-                return { unitID, status: "already-hard-deleted" };
-              }
-              throw new CollabError("UNIT_NOT_FOUND", "Cannot delete a missing unit");
+        // The caller ensures unitIDs are unique.
+        const units: DeleteUnitsDatabaseResult["units"] = input.unitIDs.map((unitID) => {
+          const unit = this._getStoredUnit(unitID);
+          if (!unit) {
+            if (input.hardDelete && this._hasTombstone(unitID)) {
+              return { unitID, status: "already-hard-deleted" };
             }
-            return {
-              unitID,
-              status: input.hardDelete
-                ? "hard-deleted"
-                : unit.deleted === 0
-                  ? "soft-deleted"
-                  : "already-soft-deleted",
-            };
-          },
-        );
+            throw new CollabError("UNIT_NOT_FOUND", "Cannot delete a missing unit");
+          }
+          return {
+            unitID,
+            status: input.hardDelete
+              ? "hard-deleted"
+              : unit.deleted === 0
+                ? "soft-deleted"
+                : "already-soft-deleted",
+          };
+        });
 
         for (const unit of units) {
           if (unit.status === "hard-deleted") {
-            // Cascade-delete related content; retain a tombstone to prevent recreating the Unit.
-            this._database.prepare("INSERT INTO tombstones (unit_id) VALUES (?)").run(unit.unitID);
-            this._database.prepare("DELETE FROM units WHERE unit_id = ?").run(unit.unitID);
+            this._insertTombstoneStatement.run(unit.unitID);
+            this._deleteUnitStatement.run(unit.unitID);
           } else if (unit.status === "soft-deleted") {
-            this._database
-              .prepare("UPDATE units SET deleted = 1 WHERE unit_id = ?")
-              .run(unit.unitID);
+            this._softDeleteUnitStatement.run(unit.unitID);
           }
         }
+
         return { units };
       })
       .immediate();
   }
 
+  /** Atomically restores soft-deleted Units; hard-deleted IDs cannot be recovered. */
   async recoverUnits(
     _ctx: DatabaseContext,
     input: RecoverUnitsDatabaseInput,
   ): Promise<RecoverUnitsDatabaseResult> {
+    if (input.unitIDs.length === 0) return { units: [] };
+
     return this._database
       .transaction((): RecoverUnitsDatabaseResult => {
-        const units: RecoverUnitsDatabaseResult["units"] = [...new Set(input.unitIDs)].map(
-          (unitID) => {
+        // The caller ensures unitIDs are unique.
+        const units: RecoverUnitsDatabaseResult["units"] = input.unitIDs.map((unitID) => {
+          const unit = this._getStoredUnit(unitID);
+          if (!unit) {
             if (this._hasTombstone(unitID)) {
               throw new CollabError("INVALID_REQUEST", "A hard-deleted unit cannot be recovered");
             }
-            const unit = this._getStoredUnit(unitID);
-            if (!unit) {
-              throw new CollabError("UNIT_NOT_FOUND", "Cannot recover a missing unit");
-            }
-            return {
-              unitID,
-              status: unit.deleted === 0 ? "already-active" : "recovered",
-            };
-          },
-        );
+            throw new CollabError("UNIT_NOT_FOUND", "Cannot recover a missing unit");
+          }
+          return {
+            unitID,
+            status: unit.deleted === 0 ? "already-active" : "recovered",
+          };
+        });
 
         for (const unit of units) {
           if (unit.status === "recovered") {
-            this._database
-              .prepare("UPDATE units SET deleted = 0 WHERE unit_id = ?")
-              .run(unit.unitID);
+            this._recoverUnitStatement.run(unit.unitID);
           }
         }
+
         return { units };
       })
       .immediate();
   }
 
-  /** Call after all Services using this Adapter have stopped; repeated calls are safe. */
   async dispose(): Promise<void> {
     if (this._database.open) {
       this._database.close();
@@ -345,12 +498,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   }
 
   private _getStoredUnit(unitID: string): UnitRow | undefined {
-    return this._database
-      .prepare(`
-        SELECT unit_id AS unitID, type, head_revision AS headRevision, deleted
-        FROM units WHERE unit_id = ?
-      `)
-      .get(unitID) as UnitRow | undefined;
+    return this._getUnitStatement.get(unitID) as UnitRow | undefined;
   }
 
   private _requireActiveUnit(unitID: string): UnitRow {
@@ -362,40 +510,40 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   }
 
   private _hasTombstone(unitID: string): boolean {
-    return Boolean(
-      this._database.prepare("SELECT 1 FROM tombstones WHERE unit_id = ?").get(unitID),
-    );
+    return Boolean(this._hasTombstoneStatement.get(unitID));
   }
 
-  private _writeSnapshot(snapshot: ISnapshot, sheetBlocks: readonly ISheetBlock[]): void {
-    // Call only within a write transaction so a snapshot and its referenced blocks become visible together.
-    const writeBlock = this._database.prepare(`
-      INSERT INTO sheet_blocks (unit_id, block_id, payload) VALUES (?, ?, ?)
-      ON CONFLICT (unit_id, block_id) DO UPDATE SET payload = excluded.payload
-    `);
+  private _encode(value: IChangeset | ISnapshot | ISheetBlock): Uint8Array {
+    return this._encoder.encode(value);
+  }
+
+  private _decode<T>(payload: ArrayBuffer | Buffer): T {
+    const bytes =
+      payload instanceof ArrayBuffer
+        ? new Uint8Array(payload)
+        : new Uint8Array(payload.buffer, payload.byteOffset, payload.byteLength);
+    // Uses a plain Uint8Array view so protocol binary fields do not decode as Buffer.
+    return this._decoder.decode(bytes) as T;
+  }
+
+  private _writeSnapshotWithBlocks(
+    snapshot: ISnapshot,
+    sheetBlocks: readonly ISheetBlock[],
+  ): void {
     for (const block of sheetBlocks) {
-      writeBlock.run(snapshot.unitID, block.id, encodePayload(block));
+      this._writeSheetBlockStatement.run(snapshot.unitID, block.id, this._encode(block));
     }
-    this._database
-      .prepare(`
-        INSERT INTO snapshots (unit_id, revision, payload) VALUES (?, ?, ?)
-        ON CONFLICT (unit_id, revision) DO UPDATE SET payload = excluded.payload
-      `)
-      .run(snapshot.unitID, snapshot.rev, encodePayload(snapshot));
+
+    this._writeSnapshotStatement.run(snapshot.unitID, snapshot.rev, this._encode(snapshot));
   }
 }
 
-function toUnitRecord(row: UnitRow): UnitRecord {
-  return { unitID: row.unitID, type: row.type, headRevision: row.headRevision };
-}
-
-// MessagePack preserves complete protocol objects and nested Uint8Array values without field-specific conversions.
-function encodePayload(value: ISnapshot | IChangeset | ISheetBlock): Uint8Array {
-  // Omit unset object fields so MessagePack does not restore undefined values as null.
-  return encode(value, { ignoreUndefined: true });
-}
-
-function decodePayload<T>(payload: Uint8Array): T {
-  // Decode a plain Uint8Array view so binary fields use the Uint8Array type expected by the protocol.
-  return decode(new Uint8Array(payload.buffer, payload.byteOffset, payload.byteLength)) as T;
+function toUnitRecord(row: UnitRow) {
+  return {
+    unitID: row.unitID,
+    type: row.type,
+    headRevision: row.headRevision,
+    creatorID: row.creatorID,
+    createdAt: row.createdAt,
+  };
 }

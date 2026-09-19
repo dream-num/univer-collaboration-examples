@@ -42,7 +42,7 @@ const service = new UniverCollabService({ dbAdapter: database });
 | 实现 | 重点 |
 | --- | --- |
 | [CustomMemoryDatabaseAdapter](./server/custom-database-adapter/custom-memory-database-adapter.ts) | 使用 Map 保存数据，展示读取、revision 检查和删除恢复；退出进程后数据丢失 |
-| [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | 使用 `better-sqlite3` 和 MessagePack，展示表结构、事务和协议对象存储；数据在重启后保留 |
+| [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | 使用 `libsql` 和 MessagePack，展示表结构、事务和协议对象存储；数据在重启后保留 |
 
 试用时，在 `server/main.ts` 中取消对应 import 和构造语句的注释，并注释掉当前构造语句，然后重新运行启动命令。自定义 SQLite 使用 `.data/custom-collaboration.sqlite`，其表结构与内置 Adapter 不同，必须使用独立文件。
 

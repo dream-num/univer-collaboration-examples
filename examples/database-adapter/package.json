@@ -26,14 +26,13 @@
     "@univerjs/preset-sheets-core": "1.0.0-rc.0",
     "@univerjs/presets": "1.0.0-rc.0",
     "@univerjs/protocol": "1.0.0-rc.0",
-    "better-sqlite3": "^13.0.3",
     "express": "^5.1.0",
+    "libsql": "0.5.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.0",
     "tsx": "^4.20.0",
     "vite": "^8.0.0"
