@@ -21,8 +21,6 @@ import type {
 import type { IChangeset, ISheetBlock, ISnapshot } from "@univerjs/protocol";
 
 interface UnitRow extends UnitRecord {
-  readonly creatorID: string;
-  readonly createdAt: number;
   readonly deleted: number;
 }
 
@@ -67,8 +65,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       this._initializeTables();
 
       this._getUnitStatement = this._database.prepare(`
-        SELECT unit_id AS unitID, type, head_revision AS headRevision,
-          creator_id AS creatorID, created_at_ms AS createdAt, deleted
+        SELECT unit_id AS unitID, type, head_revision AS headRevision, deleted
         FROM units
         WHERE unit_id = ?
       `);
@@ -182,17 +179,6 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   private _initializeTables(): void {
     this._database
       .transaction(() => {
-        const columns = this._database.prepare("PRAGMA table_info(units)").all() as {
-          name: string;
-        }[];
-        if (columns.length > 0 && !["creator_id", "created_at_ms"].every(
-          name => columns.some(column => column.name === name),
-        )) {
-          throw new Error(
-            "Custom SQLite schema requires creator_id and created_at_ms. Migrate the existing database before opening it.",
-          );
-        }
-
         this._database.exec(`
           CREATE TABLE IF NOT EXISTS units (
             unit_id TEXT PRIMARY KEY NOT NULL,
@@ -346,21 +332,9 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
           return { status: "already-exists", record: toUnitRecord(existing) };
         }
 
-        // rc.0 does not supply creation metadata; newer SDKs provide both fields.
-        const creation = record as UnitRecord & { creatorID?: string; createdAt?: number };
-        const storedRecord = {
-          ...record,
-          creatorID: creation.creatorID ?? ctx.userID,
-          createdAt: creation.createdAt ?? Date.now(),
-        };
-        this._insertUnitStatement.run(
-          storedRecord.unitID,
-          storedRecord.type,
-          storedRecord.creatorID,
-          storedRecord.createdAt,
-        );
+        this._insertUnitStatement.run(record.unitID, record.type, ctx.userID, Date.now());
         this._writeSnapshotWithBlocks(snapshot, sheetBlocks);
-        return { status: "created", record: storedRecord };
+        return { status: "created", record: { ...record } };
       })
       .immediate();
   }
@@ -538,12 +512,6 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   }
 }
 
-function toUnitRecord(row: UnitRow) {
-  return {
-    unitID: row.unitID,
-    type: row.type,
-    headRevision: row.headRevision,
-    creatorID: row.creatorID,
-    createdAt: row.createdAt,
-  };
+function toUnitRecord(row: UnitRow): UnitRecord {
+  return { unitID: row.unitID, type: row.type, headRevision: row.headRevision };
 }
