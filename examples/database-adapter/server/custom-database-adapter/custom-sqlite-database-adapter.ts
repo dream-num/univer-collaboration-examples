@@ -149,7 +149,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         VALUES (?, ?, 1, ?, ?)
       `);
       this._insertChangesetStatement = this._database.prepare(
-        "INSERT INTO changesets (unit_id, revision, payload) VALUES (?, ?, ?)",
+        "INSERT INTO changesets (unit_id, revision, created_at_ms, payload) VALUES (?, ?, ?, ?)",
       );
       this._updateHeadRevisionStatement = this._database.prepare(
         "UPDATE units SET head_revision = ? WHERE unit_id = ?",
@@ -200,6 +200,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
           CREATE TABLE IF NOT EXISTS changesets (
             unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
             revision INTEGER NOT NULL CHECK (revision >= 2),
+            created_at_ms INTEGER NOT NULL,
             payload BLOB NOT NULL,
             PRIMARY KEY (unit_id, revision)
           );
@@ -359,15 +360,21 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
           };
         }
 
+        const createdAt = Date.now();
+        const committedChangeset = {
+          ...changeset,
+          createTime: Math.floor(createdAt / 1000),
+        };
         this._insertChangesetStatement.run(
           changeset.unitID,
           changeset.revision,
-          this._encode(changeset),
+          createdAt,
+          this._encode(committedChangeset),
         );
         this._updateHeadRevisionStatement.run(changeset.revision, changeset.unitID);
         return {
           status: "committed",
-          changeset,
+          changeset: committedChangeset,
           headRevision: changeset.revision,
         };
       })
