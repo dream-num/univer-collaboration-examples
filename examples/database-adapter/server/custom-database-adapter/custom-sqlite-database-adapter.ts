@@ -21,7 +21,7 @@ import type {
 import type { IChangeset, ISheetBlock, ISnapshot } from "@univerjs/protocol";
 
 interface UnitRow extends UnitRecord {
-  readonly deleted: number;
+  readonly deletedStatus: "soft" | "hard" | null;
 }
 
 interface PayloadRow {
@@ -51,9 +51,10 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
   private readonly _insertUnitStatement: Database.Statement;
   private readonly _insertChangesetStatement: Database.Statement;
   private readonly _updateHeadRevisionStatement: Database.Statement;
-  private readonly _hasTombstoneStatement: Database.Statement;
-  private readonly _insertTombstoneStatement: Database.Statement;
-  private readonly _deleteUnitStatement: Database.Statement;
+  private readonly _deleteSnapshotsStatement: Database.Statement;
+  private readonly _deleteChangesetsStatement: Database.Statement;
+  private readonly _deleteSheetBlocksStatement: Database.Statement;
+  private readonly _hardDeleteUnitStatement: Database.Statement;
   private readonly _softDeleteUnitStatement: Database.Statement;
   private readonly _recoverUnitStatement: Database.Statement;
 
@@ -65,7 +66,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       this._initializeTables();
 
       this._getUnitStatement = this._database.prepare(`
-        SELECT unit_id AS unitID, type, head_revision AS headRevision, deleted
+        SELECT unit_id AS unitID, type, head_revision AS headRevision, deleted_status AS deletedStatus
         FROM units
         WHERE unit_id = ?
       `);
@@ -75,7 +76,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         FROM snapshots s
         JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
         ORDER BY s.revision DESC
         LIMIT 1
       `);
@@ -84,7 +85,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         FROM snapshots s
         JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
           AND s.revision <= ?
         ORDER BY s.revision DESC
         LIMIT 1
@@ -95,7 +96,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         FROM snapshots s
         JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
         ORDER BY s.revision DESC
         LIMIT 1
       `);
@@ -104,7 +105,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         FROM snapshots s
         JOIN units u ON u.unit_id = s.unit_id
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
           AND s.revision <= ?
         ORDER BY s.revision DESC
         LIMIT 1
@@ -116,7 +117,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         LEFT JOIN changesets c ON c.unit_id = u.unit_id
           AND c.revision > ?
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
         ORDER BY c.revision ASC
       `);
       this._getChangesetsInRangeStatement = this._database.prepare(`
@@ -126,13 +127,13 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
           AND c.revision > ?
           AND c.revision <= ?
         WHERE u.unit_id = ?
-          AND u.deleted = 0
+          AND u.deleted_status IS NULL
         ORDER BY c.revision ASC
       `);
 
       this._getSheetBlockStatement = this._database.prepare(`
         SELECT b.payload FROM sheet_blocks b JOIN units u ON u.unit_id = b.unit_id
-        WHERE u.unit_id = ? AND u.deleted = 0 AND b.block_id = ?
+        WHERE u.unit_id = ? AND u.deleted_status IS NULL AND b.block_id = ?
       `);
 
       this._writeSheetBlockStatement = this._database.prepare(`
@@ -144,10 +145,9 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         ON CONFLICT (unit_id, revision) DO UPDATE SET payload = excluded.payload
       `);
 
-      this._insertUnitStatement = this._database.prepare(`
-        INSERT INTO units (unit_id, type, head_revision, creator_id, created_at_ms)
-        VALUES (?, ?, 1, ?, ?)
-      `);
+      this._insertUnitStatement = this._database.prepare(
+        "INSERT INTO units (unit_id, type, head_revision, creator_id, created_at_ms) VALUES (?, ?, 1, ?, ?)",
+      );
       this._insertChangesetStatement = this._database.prepare(
         "INSERT INTO changesets (unit_id, revision, created_at_ms, payload) VALUES (?, ?, ?, ?)",
       );
@@ -155,20 +155,23 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
         "UPDATE units SET head_revision = ? WHERE unit_id = ?",
       );
 
-      this._hasTombstoneStatement = this._database.prepare(
-        "SELECT 1 FROM tombstones WHERE unit_id = ?",
+      this._deleteSnapshotsStatement = this._database.prepare(
+        "DELETE FROM snapshots WHERE unit_id = ?",
       );
-      this._insertTombstoneStatement = this._database.prepare(
-        "INSERT INTO tombstones (unit_id) VALUES (?)",
+      this._deleteChangesetsStatement = this._database.prepare(
+        "DELETE FROM changesets WHERE unit_id = ?",
       );
-      this._deleteUnitStatement = this._database.prepare(
-        "DELETE FROM units WHERE unit_id = ?",
+      this._deleteSheetBlocksStatement = this._database.prepare(
+        "DELETE FROM sheet_blocks WHERE unit_id = ?",
+      );
+      this._hardDeleteUnitStatement = this._database.prepare(
+        "UPDATE units SET deleted_at_ms = ?, deleted_status = 'hard' WHERE unit_id = ?",
       );
       this._softDeleteUnitStatement = this._database.prepare(
-        "UPDATE units SET deleted = 1 WHERE unit_id = ?",
+        "UPDATE units SET deleted_at_ms = ?, deleted_status = 'soft' WHERE unit_id = ?",
       );
       this._recoverUnitStatement = this._database.prepare(
-        "UPDATE units SET deleted = 0 WHERE unit_id = ?",
+        "UPDATE units SET deleted_at_ms = NULL, deleted_status = NULL WHERE unit_id = ?",
       );
     } catch (error) {
       this._database.close();
@@ -186,10 +189,9 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
             head_revision INTEGER NOT NULL CHECK (head_revision >= 1),
             creator_id TEXT NOT NULL,
             created_at_ms INTEGER NOT NULL,
-            deleted INTEGER NOT NULL DEFAULT 0 CHECK (deleted IN (0, 1))
-          );
-          CREATE TABLE IF NOT EXISTS tombstones (
-            unit_id TEXT PRIMARY KEY NOT NULL
+            deleted_at_ms INTEGER,
+            deleted_status TEXT CHECK (deleted_status IN ('soft', 'hard')),
+            CHECK ((deleted_status IS NULL) = (deleted_at_ms IS NULL))
           );
           CREATE TABLE IF NOT EXISTS snapshots (
             unit_id TEXT NOT NULL REFERENCES units(unit_id) ON DELETE CASCADE,
@@ -217,10 +219,10 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 
   async getUnit(_ctx: DatabaseContext, unitID: string): Promise<UnitRecord | null> {
     const unit = this._getStoredUnit(unitID);
-    return unit && unit.deleted === 0 ? toUnitRecord(unit) : null;
+    return unit && unit.deletedStatus === null ? toUnitRecord(unit) : null;
   }
 
-  /** Reads the latest snapshot, or the latest at or before the requested revision. */
+  /** Reads the latest snapshot, optionally bounded by the specified revision. */
   async getSnapshot(
     _ctx: DatabaseContext,
     unitID: string,
@@ -240,7 +242,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     return row ? this._decode<ISnapshot>(row.payload) : null;
   }
 
-  /** Uses the same selection as getSnapshot without loading or decoding its payload. */
+  /** Reads metadata using the same criteria as getSnapshot, without loading or decoding its payload. */
   async getSnapshotInfo(
     _ctx: DatabaseContext,
     unitID: string,
@@ -260,7 +262,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     return row ? { unitID: row.unitID, type: row.type, rev: row.rev } : null;
   }
 
-  /** Reads changesets in (from, to]; omitted to means no upper bound, while 0 is an explicit bound. */
+  /** Reads changesets in (from, to]; omitting to leaves the range unbounded, while 0 is an explicit upper bound. */
   async getChangesets(
     _ctx: DatabaseContext,
     unitID: string,
@@ -270,7 +272,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Changeset range revisions cannot be negative");
     }
 
-    // LEFT JOIN distinguishes an inactive Unit (null) from an active Unit with no matching history ([]).
+    // LEFT JOIN distinguishes an inaccessible Unit (null) from a Unit with no matching history ([]).
     const rows = (
       range.to === undefined
         ? this._getChangesetsStatement.all(range.from, unitID)
@@ -301,7 +303,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
     return row ? this._decode<ISheetBlock>(row.payload) : null;
   }
 
-  /** Atomically creates a Unit, snapshot, and blocks at revision 1; an existing active Unit returns its record. */
+  /** Atomically creates a Unit at revision 1 with its snapshot and blocks; an existing active Unit returns its record. */
   async createUnit(
     ctx: DatabaseContext,
     input: CreateUnitDatabaseInput,
@@ -321,13 +323,9 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 
     return this._database
       .transaction((): CreateUnitDatabaseResult => {
-        if (this._hasTombstone(record.unitID)) {
-          throw new CollabError("INVALID_REQUEST", "A hard-deleted unit ID cannot be reused");
-        }
-
         const existing = this._getStoredUnit(record.unitID);
         if (existing) {
-          if (existing.deleted !== 0) {
+          if (existing.deletedStatus !== null) {
             throw new CollabError("INVALID_REQUEST", "A deleted unit ID cannot be reused");
           }
           return { status: "already-exists", record: toUnitRecord(existing) };
@@ -395,7 +393,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       .immediate();
   }
 
-  /** Atomically deletes the specified Units; hard deletion retains tombstones to prevent ID reuse. */
+  /** Atomically deletes the specified Units; hard deletion retains Unit rows to prevent ID reuse. */
   async deleteUnits(
     _ctx: DatabaseContext,
     input: DeleteUnitsDatabaseInput,
@@ -404,31 +402,31 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 
     return this._database
       .transaction((): DeleteUnitsDatabaseResult => {
-        // The caller ensures unitIDs are unique.
+        // The caller guarantees unique unitIDs.
         const units: DeleteUnitsDatabaseResult["units"] = input.unitIDs.map((unitID) => {
           const unit = this._getStoredUnit(unitID);
-          if (!unit) {
-            if (input.hardDelete && this._hasTombstone(unitID)) {
-              return { unitID, status: "already-hard-deleted" };
-            }
+          if (!unit || (unit.deletedStatus === "hard" && !input.hardDelete)) {
             throw new CollabError("UNIT_NOT_FOUND", "Cannot delete a missing unit");
           }
           return {
             unitID,
             status: input.hardDelete
-              ? "hard-deleted"
-              : unit.deleted === 0
+              ? unit.deletedStatus === "hard" ? "already-hard-deleted" : "hard-deleted"
+              : unit.deletedStatus === null
                 ? "soft-deleted"
                 : "already-soft-deleted",
           };
         });
 
+        const deletedAt = Date.now();
         for (const unit of units) {
           if (unit.status === "hard-deleted") {
-            this._insertTombstoneStatement.run(unit.unitID);
-            this._deleteUnitStatement.run(unit.unitID);
+            this._deleteSnapshotsStatement.run(unit.unitID);
+            this._deleteChangesetsStatement.run(unit.unitID);
+            this._deleteSheetBlocksStatement.run(unit.unitID);
+            this._hardDeleteUnitStatement.run(deletedAt, unit.unitID);
           } else if (unit.status === "soft-deleted") {
-            this._softDeleteUnitStatement.run(unit.unitID);
+            this._softDeleteUnitStatement.run(deletedAt, unit.unitID);
           }
         }
 
@@ -446,18 +444,18 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 
     return this._database
       .transaction((): RecoverUnitsDatabaseResult => {
-        // The caller ensures unitIDs are unique.
+        // The caller guarantees unique unitIDs.
         const units: RecoverUnitsDatabaseResult["units"] = input.unitIDs.map((unitID) => {
           const unit = this._getStoredUnit(unitID);
           if (!unit) {
-            if (this._hasTombstone(unitID)) {
-              throw new CollabError("INVALID_REQUEST", "A hard-deleted unit cannot be recovered");
-            }
             throw new CollabError("UNIT_NOT_FOUND", "Cannot recover a missing unit");
+          }
+          if (unit.deletedStatus === "hard") {
+            throw new CollabError("INVALID_REQUEST", "A hard-deleted unit cannot be recovered");
           }
           return {
             unitID,
-            status: unit.deleted === 0 ? "already-active" : "recovered",
+            status: unit.deletedStatus === null ? "already-active" : "recovered",
           };
         });
 
@@ -484,14 +482,10 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 
   private _requireActiveUnit(unitID: string): UnitRow {
     const unit = this._getStoredUnit(unitID);
-    if (!unit || unit.deleted !== 0) {
+    if (!unit || unit.deletedStatus !== null) {
       throw new CollabError("UNIT_NOT_FOUND", "Unit is not active");
     }
     return unit;
-  }
-
-  private _hasTombstone(unitID: string): boolean {
-    return Boolean(this._hasTombstoneStatement.get(unitID));
   }
 
   private _encode(value: IChangeset | ISnapshot | ISheetBlock): Uint8Array {
@@ -503,7 +497,7 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       payload instanceof ArrayBuffer
         ? new Uint8Array(payload)
         : new Uint8Array(payload.buffer, payload.byteOffset, payload.byteLength);
-    // Uses a plain Uint8Array view so protocol binary fields do not decode as Buffer.
+    // Uses a plain byte view so protocol binary fields decode as Uint8Array rather than Buffer.
     return this._decoder.decode(bytes) as T;
   }
 
