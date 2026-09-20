@@ -9,9 +9,11 @@ import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
+// import { Pool } from "pg";
 
 // import { CustomMemoryDatabaseAdapter } from "./custom-database-adapter/custom-memory-database-adapter.js";
 // import { CustomSQLiteDatabaseAdapter } from "./custom-database-adapter/custom-sqlite-database-adapter.js";
+// import { CustomPostgresDatabaseAdapter } from "./custom-database-adapter/custom-postgres-database-adapter.js";
 
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const UNIT_ID = "persistent-sheet";
@@ -42,6 +44,15 @@ await mkdir(dirname(filename), { recursive: true });
 const database = new SQLiteDatabaseAdapter({ filename });
 // const database = new CustomMemoryDatabaseAdapter();
 // const database = new CustomSQLiteDatabaseAdapter({ filename: ".data/custom-collaboration.sqlite" });
+// const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// pool.on("error", (error) => console.error("PostgreSQL idle connection error:", error.message));
+// try {
+//   await CustomPostgresDatabaseAdapter.createTables(pool);
+// } catch (error) {
+//   await pool.end();
+//   throw error;
+// }
+// const database = new CustomPostgresDatabaseAdapter(pool);
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const transport = createNodeTransport();
