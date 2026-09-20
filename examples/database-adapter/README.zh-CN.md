@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-Database Adapter 负责保存文档（Unit）、快照、Sheet blocks 和 changesets。本例默认使用 SDK 内置的 `SQLiteDatabaseAdapter`，并提供两个自定义实现，帮助你了解 `IDatabaseAdapter` 接口，并参考其实现接入自己的存储。
+Database Adapter 负责保存文档（Unit）、快照、Sheet blocks 和 changesets。本例默认使用 SDK 内置的 `SQLiteDatabaseAdapter`，并提供三个自定义实现，帮助你了解 `IDatabaseAdapter` 接口，并参考其实现接入自己的存储。
 
 ## 运行示例
 
@@ -37,14 +37,15 @@ const service = new UniverCollabService({ dbAdapter: database });
 
 ## 自定义 Adapter
 
-两个示例都实现 `IDatabaseAdapter`，可以从 Memory 版本理解接口，再看 SQLite 版本如何落到数据库事务：
+三个实现都实现 `IDatabaseAdapter`，可以从 Memory 版本理解接口，再看 SQLite 和 PostgreSQL 版本如何落到数据库事务：
 
 | 实现 | 重点 |
 | --- | --- |
 | [CustomMemoryDatabaseAdapter](./server/custom-database-adapter/custom-memory-database-adapter.ts) | 使用 Map 保存数据，展示读取、revision 检查和删除恢复；退出进程后数据丢失 |
 | [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | 使用 `libsql` 和 MessagePack，展示表结构、事务和协议对象存储；数据在重启后保留 |
+| [CustomPostgresDatabaseAdapter](./server/custom-database-adapter/custom-postgres-database-adapter.ts) | 使用 `pg` 在 PostgreSQL 上实现同一套 contract，通过行锁和 CTE 协调并发提交、删除和恢复 |
 
-试用时，在 `server/main.ts` 中取消对应 import 和构造语句的注释，并注释掉当前构造语句，然后重新运行启动命令。自定义 SQLite 使用 `.data/custom-collaboration.sqlite`，其表结构与内置 Adapter 不同，必须使用独立文件。
+试用时，在 `server/main.ts` 中取消对应 import 和构造语句的注释，并注释掉当前构造语句，然后重新运行启动命令。自定义 SQLite 使用 `.data/custom-collaboration.sqlite`，其表结构与内置 Adapter 不同，必须使用独立文件。自定义 PostgreSQL 还需要一个可连接的服务端，连接和初始化步骤见 `server/main.ts` 中的注释代码块。
 
 ### commitChangeset
 
@@ -62,4 +63,4 @@ OT 和提交去重由 Service 处理，鉴权由 middleware 处理，实时广�
 pnpm --filter @univerjs/collaboration-example-database-adapter reset
 ```
 
-此命令删除本例内置和自定义 SQLite 的两个数据库文件；下次启动会重新创建空白文档。
+此命令删除本例内置和自定义 SQLite 的两个数据库文件，不影响 PostgreSQL 中的数据；如需清空，请手动删除 `collaboration` schema。下次启动会重新创建空白文档。

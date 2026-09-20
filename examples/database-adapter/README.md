@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A Database Adapter stores documents (Units), snapshots, Sheet blocks, and changesets. This example uses the SDK's built-in `SQLiteDatabaseAdapter` by default and includes two custom implementations to help you understand the `IDatabaseAdapter` interface and use these implementations as a reference when connecting your own storage.
+A Database Adapter stores documents (Units), snapshots, Sheet blocks, and changesets. This example uses the SDK's built-in `SQLiteDatabaseAdapter` by default and includes three custom implementations to help you understand the `IDatabaseAdapter` interface and use these implementations as a reference when connecting your own storage.
 
 ## Run the example
 
@@ -37,14 +37,15 @@ The parent directory must exist before creating the Adapter; the full entry poin
 
 ## Custom Adapters
 
-Both examples implement `IDatabaseAdapter`. Start with the Memory version to understand the interface, then see how the SQLite version implements it with database transactions:
+All three implement `IDatabaseAdapter`. Start with the Memory version to understand the interface, then see how the SQLite and PostgreSQL versions implement it with database transactions:
 
 | Implementation | Focus |
 | --- | --- |
 | [CustomMemoryDatabaseAdapter](./server/custom-database-adapter/custom-memory-database-adapter.ts) | Uses Maps to demonstrate reads, revision checks, deletion, and recovery; data is lost when the process exits |
 | [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | Uses `libsql` and MessagePack to demonstrate schema, transactions, and protocol object storage; data survives restarts |
+| [CustomPostgresDatabaseAdapter](./server/custom-database-adapter/custom-postgres-database-adapter.ts) | Implements the same contract on PostgreSQL with `pg`, using row locks and CTEs to coordinate concurrent submissions, deletions, and recoveries |
 
-To try one, uncomment its import and constructor in `server/main.ts`, comment out the current constructor, and rerun the startup command. Custom SQLite uses `.data/custom-collaboration.sqlite`; its schema differs from the built-in Adapter, so it must use a separate file.
+To try one, uncomment its import and constructor in `server/main.ts`, comment out the current constructor, and rerun the startup command. Custom SQLite uses `.data/custom-collaboration.sqlite`; its schema differs from the built-in Adapter, so it must use a separate file. Custom PostgreSQL additionally requires a reachable server; follow the commented block in `server/main.ts` to connect and set it up.
 
 ### commitChangeset
 
@@ -62,4 +63,4 @@ Stop the server, then run from the repository root:
 pnpm --filter @univerjs/collaboration-example-database-adapter reset
 ```
 
-This deletes both the built-in and custom SQLite database files for this example. The next start creates a blank document.
+This deletes both the built-in and custom SQLite database files for this example. PostgreSQL data is not touched; drop the `collaboration` schema manually if you need a blank state there. The next start creates a blank document.
