@@ -13,6 +13,7 @@
     "example:database-adapter": "pnpm --filter @univerjs/collaboration-example-database-adapter build && pnpm --filter @univerjs/collaboration-example-database-adapter start",
     "example:all-unit": "pnpm --filter @univerjs/collaboration-example-all-unit build && pnpm --filter @univerjs/collaboration-example-all-unit start",
     "example:permissions": "pnpm --filter @univerjs/collaboration-example-permissions build && pnpm --filter @univerjs/collaboration-example-permissions start",
+    "example:object-permissions": "pnpm --filter @univerjs/collaboration-example-object-permissions build && pnpm --filter @univerjs/collaboration-example-object-permissions start",
     "example:history": "pnpm --filter @univerjs/collaboration-example-history build && pnpm --filter @univerjs/collaboration-example-history start",
     "example:comments": "pnpm --filter @univerjs/collaboration-example-comments build && pnpm --filter @univerjs/collaboration-example-comments start",
     "example:worktree": "pnpm --filter @univerjs/collaboration-example-worktree build && pnpm --filter @univerjs/collaboration-example-worktree start",
