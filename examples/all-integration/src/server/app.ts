@@ -54,7 +54,7 @@ export async function createApp(): Promise<AppRuntime> {
     repository,
     collabService: collaboration.service,
     createUnit: units.createUnit,
-    // Endpoint 关闭既有连接，后续重连会重新执行 joinUnit ACL。
+    // The Endpoint closes existing connections; reconnecting runs the joinUnit ACL again.
     invalidateUnitSessions: (input) =>
       collaboration.endpoint.invalidateUnitSessions(input),
   });

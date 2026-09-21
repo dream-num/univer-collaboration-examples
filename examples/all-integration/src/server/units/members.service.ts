@@ -45,7 +45,7 @@ export function createMembersService(options: MembersServiceOptions) {
       const member = repository.setMemberByUsername(unitId, username, role);
       if (!member) throw new MemberError("USER_NOT_FOUND", 404);
 
-      // 新成员此前无法加入该 Unit，没有需要失效的既有 Session。
+      // New members could not previously join this Unit, so no existing sessions need invalidation.
       if (existingMember) {
         await invalidateUnitSessions({
           unitID: unitId,

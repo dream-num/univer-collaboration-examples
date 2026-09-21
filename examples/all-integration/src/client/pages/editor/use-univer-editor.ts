@@ -48,7 +48,7 @@ export function useUniverEditor({
           unitId,
         });
 
-        // 异步初始化结束时，页面可能已卸载或切换文档。
+        // The page may unmount or switch documents before initialization completes.
         if (cancelled) {
           instance.dispose();
         } else {

@@ -19,9 +19,8 @@ pnpm example:all-integration
 ```
 
 Open <http://127.0.0.1:3015>, register a user, and create a Unit or import an Office file as one. Application tables and
-all Collaboration, Comment, and History adapter tables share `.data/office-app.sqlite`; each
-component still owns only its own tables. The database filename is retained from the former
-`office-app` name to preserve existing local data.
+all Collaboration, Comment, and History adapter tables share `.data/collaboration.sqlite`; each
+component still owns only its own tables.
 
 ## Source layout
 
@@ -36,27 +35,11 @@ src/
 └── shared/          Small API and Unit contracts shared by both sides
 ```
 
-The example deliberately keeps feature folders flat. Routes translate HTTP, services coordinate a
-use case, and repositories own application SQL; there is no DI container, ORM, or generic domain
-layer to learn before following the SDK integration.
-
 ## Capability matrix
 
 | Capability | Sheet | Doc | Slide | Board | Base |
 | --- | --- | --- | --- | --- | --- |
 | Create, collaborate, history | Yes | Yes | Yes | Yes | Yes |
-| Thread Comments | Yes | Yes | No | No | No |
+| Thread Comments | Yes | Yes | Yes | Yes | Yes |
 | Import | XLS/XLSX/CSV/TSV | DOC/DOCX | PPT/PPTX | No | XLS/XLSX/CSV/TSV |
 | Export | XLSX/CSV/TSV | DOCX | PPTX | No | XLSX/CSV/TSV |
-
-History indexing uses `historyService.attach(collabService)`. This is intentionally a small,
-process-local convenience setup: a process crash between a Collaboration commit and History index
-write can leave an indexing gap. Production deployments should use a transactional outbox and the
-explicit History indexing APIs.
-
-The example registers the native History UI plugin for each Unit type: Sheet, Doc, Slide, Board,
-and Base. These plugins connect to `UniverHistoryEndpoint` through `historyServerUrl`.
-
-This is a teaching application, not production identity or Unit-management infrastructure. Sessions are stored
-as hashes, but there is no email verification, password reset, rate limiting, object storage,
-transactional outbox, or multi-process realtime fanout.
