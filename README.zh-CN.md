@@ -24,6 +24,7 @@
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
 | [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
+| [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护,ACL 由应用持有 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
@@ -45,6 +46,7 @@ pnpm example:quick-start
 pnpm example:database-adapter
 pnpm example:all-unit
 pnpm example:permissions
+pnpm example:object-permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree
