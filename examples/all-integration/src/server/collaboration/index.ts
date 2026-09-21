@@ -96,7 +96,6 @@ export function createCollaboration(options: {
     userProvider,
   });
   registerHistoryAccess(historyService, options.repository);
-  historyService.attach(service);
 
   transport.register(new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }));
   transport.register(new UniverHistoryEndpoint(historyService));

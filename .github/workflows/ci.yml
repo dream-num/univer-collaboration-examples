@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - next/post-1.0.0-beta.2
+      - next/post-1.0.0-rc.0
 
 permissions:
   contents: read
