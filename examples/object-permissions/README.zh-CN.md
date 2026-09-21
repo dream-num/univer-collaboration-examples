@@ -15,7 +15,7 @@ Bearer token。
 
 ## 动手试一下
 
-1. 以 **Alice** 登录，选中 Budget 列（B 列），从工具栏或 sheet 标签栏添加区域保护，只保留
+1. 以 **Alice** 登录，选中 B2:B3，从工具栏或 sheet 标签栏添加区域保护，只保留
    Alice 可编辑。
 2. 切换为 **Bob**：他仍可编辑表格其余部分，但受保护区域会拒绝他的修改——是 Service 以
    `PERMISSION_DENIED` 拒绝了他的 changeset，而不只是 UI 拦截。

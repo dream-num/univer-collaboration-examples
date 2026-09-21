@@ -16,7 +16,7 @@ applications should replace it with their own Session or Bearer token.
 
 ## Try it
 
-1. Sign in as **Alice**, select the Budget column (B), and add a range protection from the toolbar
+1. Sign in as **Alice**, select B2:B3, and add a range protection from the toolbar
    or the sheet bar, keeping Alice as the only editor.
 2. Sign in as **Bob**: he can still edit the rest of the sheet, but the protected range rejects his
    edits — the Service refuses his changeset with `PERMISSION_DENIED`, not just the UI.
