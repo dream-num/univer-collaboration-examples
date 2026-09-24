@@ -24,7 +24,11 @@ interface PayloadRow {
   readonly payload: Buffer;
 }
 
-interface UnitRow extends UnitRecord {
+interface UnitRecordRow extends Omit<UnitRecord, "createdAt"> {
+  readonly createdAt: string | number;
+}
+
+interface UnitRow extends UnitRecordRow {
   readonly deletedStatus: "soft" | "hard" | null;
 }
 
@@ -72,12 +76,13 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
   }
 
   async getUnit(_ctx: DatabaseContext, unitID: string): Promise<UnitRecord | null> {
-    const { rows } = await this._query<UnitRecord>("get_unit", `
-      SELECT unit_id AS "unitID", type, head_revision AS "headRevision"
+    const { rows } = await this._query<UnitRecordRow>("get_unit", `
+      SELECT unit_id AS "unitID", type, head_revision AS "headRevision",
+        creator_id AS "creatorID", created_at_ms AS "createdAt"
       FROM collaboration.units
       WHERE unit_id = $1 AND deleted_status IS NULL
     `, [unitID]);
-    return rows[0] ?? null;
+    return rows[0] ? toUnitRecord(rows[0]) : null;
   }
 
   /** Reads the latest snapshot up to the specified revision, or the current head when omitted. */
@@ -413,6 +418,7 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
     // Acquires row locks in unit_id order to avoid deadlocks between batches with different input orders.
     const { rows } = await this._query<UnitRow>("lock_units", `
       SELECT unit_id AS "unitID", type, head_revision AS "headRevision",
+        creator_id AS "creatorID", created_at_ms AS "createdAt",
         deleted_status AS "deletedStatus"
       FROM collaboration.units
       WHERE unit_id = ANY($1::text[])
@@ -457,6 +463,12 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
   }
 }
 
-function toUnitRecord(unit: UnitRow): UnitRecord {
-  return { unitID: unit.unitID, type: unit.type, headRevision: unit.headRevision };
+function toUnitRecord(unit: UnitRecordRow): UnitRecord {
+  return {
+    unitID: unit.unitID,
+    type: unit.type,
+    headRevision: unit.headRevision,
+    creatorID: unit.creatorID,
+    createdAt: Number(unit.createdAt),
+  };
 }
