@@ -64,8 +64,6 @@ const historyService = new UniverHistoryService({
     },
   },
 });
-historyService.attach(service);
-
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
   context.userID = USER_ID;
