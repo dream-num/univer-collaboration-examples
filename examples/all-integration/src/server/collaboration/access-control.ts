@@ -48,6 +48,7 @@ export function registerCollaborationAccess(
   };
 
   service.use("submitChangeset", requireEdit);
+  // Unit Edit is a pre-execution constraint, so the apply stage can already reject it.
   service.use("applyChangeset", async (context, next) => {
     if (!isUnitActionAllowed(
       repository.resolveRole(context.userID, context.request.changeset.unitID),
@@ -55,6 +56,10 @@ export function registerCollaborationAccess(
     )) {
       throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
     }
+    await next();
+  });
+  // Content ACL: requirements are collected during apply and only visible at commit.
+  service.use("commitChangeset", async (context, next) => {
     for (const requirement of context.requiredUnitPermissions) {
       if (!authz.isAllowed(context.userID, {
         unitID: requirement.unitID,
@@ -64,7 +69,7 @@ export function registerCollaborationAccess(
       })) {
         throw new CollabError(
           "PERMISSION_DENIED",
-          `Cannot apply mutation ${requirement.mutationID}`,
+          `Cannot apply mutation on ${requirement.objectType} ${requirement.objectID}`,
         );
       }
     }
