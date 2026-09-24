@@ -66,7 +66,8 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
       this._initializeTables();
 
       this._getUnitStatement = this._database.prepare(`
-        SELECT unit_id AS unitID, type, head_revision AS headRevision, deleted_status AS deletedStatus
+        SELECT unit_id AS unitID, type, head_revision AS headRevision,
+          creator_id AS creatorID, created_at_ms AS createdAt, deleted_status AS deletedStatus
         FROM units
         WHERE unit_id = ?
       `);
@@ -514,5 +515,11 @@ export class CustomSQLiteDatabaseAdapter implements IDatabaseAdapter {
 }
 
 function toUnitRecord(row: UnitRow): UnitRecord {
-  return { unitID: row.unitID, type: row.type, headRevision: row.headRevision };
+  return {
+    unitID: row.unitID,
+    type: row.type,
+    headRevision: row.headRevision,
+    creatorID: row.creatorID,
+    createdAt: row.createdAt,
+  };
 }

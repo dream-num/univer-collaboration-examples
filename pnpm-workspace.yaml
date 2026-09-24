@@ -2,12 +2,9 @@ packages:
   - examples/*
 
 packageExtensions:
-  '@univerjs/preset-sheets-core@1.0.0-rc.0':
+  '@univerjs/preset-sheets-core@1.0.0':
     dependencies:
-      '@univerjs/presets': 1.0.0-rc.0
-  '@univerjs/preset-sheets-core@1.0.0-insiders.20260920-d3f40de':
-    dependencies:
-      '@univerjs/presets': 1.0.0-insiders.20260920-d3f40de
+      '@univerjs/presets': 1.0.0
 
 overrides:
   '@wendellhu/redi': 1.1.3
