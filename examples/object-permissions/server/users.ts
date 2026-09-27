@@ -6,6 +6,7 @@ export const users: readonly DemoUser[] = [
   { userId: "user-alice", username: "Alice", avatar: "" },
   { userId: "user-bob", username: "Bob", avatar: "" },
   { userId: "user-casey", username: "Casey", avatar: "" },
+  { userId: "user-dana", username: "Dana", avatar: "" },
 ];
 
 // Store demo sessions in memory; the cookie contains only a random session ID.

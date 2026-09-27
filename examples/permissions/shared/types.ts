@@ -4,4 +4,4 @@ export interface DemoUser {
   avatar: string;
 }
 
-export type DocumentRole = "editor" | "viewer";
+export type DocumentRole = "creator" | "editor" | "viewer";

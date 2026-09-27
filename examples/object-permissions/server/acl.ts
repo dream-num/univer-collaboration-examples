@@ -7,8 +7,8 @@ import { users } from "./users";
 /**
  * The application-owned ACL store for in-document permission objects.
  *
- * The collaboration Service never stores ACLs: it only reports which
- * `UnitObject + UnitAction` a mutation requires. The application persists
+ * The collaboration Service never stores ACLs. It analyzes the permission
+ * points the submitted changeset needs, for the application to check. The application persists
  * permission objects (a protected worksheet or range), their strategies
  * (which role may perform which action) and per-object collaborators,
  * and answers both the client's authz queries and the server-side

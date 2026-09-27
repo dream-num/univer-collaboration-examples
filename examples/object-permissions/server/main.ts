@@ -4,8 +4,14 @@ import { dirname } from "node:path";
 import express from "express";
 import Database from "libsql";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
+import { SQLiteCommentDatabaseAdapter } from "@univerjs-pro/collaboration-comment-database-sqlite";
+import { UniverCommentEndpoint } from "@univerjs-pro/collaboration-comment-endpoint";
+import { UniverCommentService } from "@univerjs-pro/collaboration-comment-service";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
+import { SQLiteHistoryDatabaseAdapter } from "@univerjs-pro/collaboration-history-database-sqlite";
+import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpoint";
+import { UniverHistoryService } from "@univerjs-pro/collaboration-history-service";
 import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { UnitAction, UniverType } from "@univerjs/protocol";
@@ -50,6 +56,32 @@ const database = new SQLiteDatabaseAdapter({ filename });
 // File-level read, JOIN, and submit hooks still run.
 const service = new UniverCollabService({ dbAdapter: database, enableUnitPermissionAnalysis: true });
 const endpoint = new UniverCollabEndpoint(service);
+const userProvider = {
+  async getUsers(userIDs: readonly string[]) {
+    return userIDs.map((userID) => {
+      const user = users.find((item) => item.userId === userID);
+      return {
+        userID,
+        name: user?.username ?? userID,
+        avatar: user?.avatar ?? "",
+        anonymous: false,
+        canBindAnonymous: false,
+        phone: "",
+        email: "",
+        createTimestamp: 0,
+      };
+    });
+  },
+};
+const commentService = new UniverCommentService({
+  database: new SQLiteCommentDatabaseAdapter({ filename }),
+  userProvider,
+});
+const historyService = new UniverHistoryService({
+  collabService: service,
+  dbAdapter: new SQLiteHistoryDatabaseAdapter({ filename }),
+  userProvider,
+});
 const transport = createNodeTransport();
 
 // The ACL lives in the application's own database, next to the collaboration data.
@@ -127,6 +159,8 @@ service.on("changesetCommitted", (event) => {
   }
 });
 
+transport.register(new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }));
+transport.register(new UniverHistoryEndpoint(historyService));
 transport.register(endpoint);
 try {
   await service.getUnitLoadData(

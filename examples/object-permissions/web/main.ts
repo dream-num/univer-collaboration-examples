@@ -1,4 +1,4 @@
-import { LocaleType, LogLevel, UserManagerService } from "@univerjs/core";
+import { IImageIoService, LocaleType, LogLevel, UserManagerService } from "@univerjs/core";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -8,13 +8,25 @@ import {
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
+import { UniverSheetsHistoryUIPlugin } from "@univerjs-pro/sheets-history-ui";
+import SheetsHistoryUIEnUS from "@univerjs-pro/sheets-history-ui/locale/en-US";
+import { UniverSheetsPrintPlugin } from "@univerjs-pro/sheets-print";
+import SheetsPrintEnUS from "@univerjs-pro/sheets-print/locale/en-US";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
+import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import { UnitObject } from "@univerjs/protocol";
+import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
+import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
+import ThreadCommentUIEnUS from "@univerjs/thread-comment-ui/locale/en-US";
 import type { DemoUser } from "../shared/types";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
+import "@univerjs-pro/sheets-history-ui/lib/index.css";
+import "@univerjs/sheets-thread-comment-ui/lib/index.css";
+import "@univerjs/thread-comment-ui/lib/index.css";
 
 import "./styles.css";
 
@@ -45,6 +57,10 @@ async function start() {
         UniverPresetSheetsCoreEnUS,
         CollaborationClientEnUS,
         CollaborationClientUIEnUS,
+        ThreadCommentUIEnUS,
+        SheetsThreadCommentUIEnUS,
+        SheetsHistoryUIEnUS,
+        SheetsPrintEnUS,
       ),
     },
     theme: defaultTheme,
@@ -71,6 +87,11 @@ async function start() {
         },
       ],
       UniverCollaborationClientUIPlugin,
+      [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
+      UniverSheetsThreadCommentUIPlugin,
+      UniverThreadCommentDataSourcePlugin,
+      [UniverSheetsHistoryUIPlugin, { historyServerUrl: `${baseURL}/history`, univerContainerId: "app" }],
+      UniverSheetsPrintPlugin,
     ],
   });
 

@@ -3,9 +3,10 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { DemoUser } from "../shared/types";
 
 export const users: readonly DemoUser[] = [
-  { userId: "user-editor", username: "Alice", avatar: "" },
-  { userId: "user-viewer", username: "Bob", avatar: "" },
-  { userId: "user-guest", username: "Casey", avatar: "" },
+  { userId: "user-alice", username: "Alice", avatar: "" },
+  { userId: "user-bob", username: "Bob", avatar: "" },
+  { userId: "user-casey", username: "Casey", avatar: "" },
+  { userId: "user-dana", username: "Dana", avatar: "" },
 ];
 
 // Store demo sessions in memory; the cookie contains only a random session ID.
