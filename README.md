@@ -26,6 +26,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`database-adapter`](./examples/database-adapter/README.md) | SQLite persistence and restart recovery |
 | [`all-unit`](./examples/all-unit/README.md) | Five fixed Unit types, sidebar switching, and SQLite persistence |
 | [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
+| [`object-permissions`](./examples/object-permissions/README.md) | Worksheet and range protection with an application-owned ACL |
 | [`history`](./examples/history/README.md) | Version history service and browser entry |
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
@@ -47,6 +48,7 @@ The other examples use the same command form:
 pnpm example:database-adapter
 pnpm example:all-unit
 pnpm example:permissions
+pnpm example:object-permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree

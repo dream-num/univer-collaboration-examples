@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Object Permissions · Univer</title>
+  </head>
+  <body>
+    <div id="example">
+      <header>
+        <h1>Object Permissions</h1>
+        <span id="current-user"></span>
+        <form id="sign-out" action="/logout" method="post" hidden>
+          <button>Sign out</button>
+        </form>
+      </header>
+      <section class="controls" aria-label="Document permissions">
+        <div class="accounts">
+          <form action="/login/Alice" method="post">
+            <button data-user-id="user-alice">Alice · Creator</button>
+          </form>
+          <form action="/login/Bob" method="post">
+            <button data-user-id="user-bob">Bob · Editor</button>
+          </form>
+          <form action="/login/Casey" method="post">
+            <button data-user-id="user-casey">Casey · Viewer</button>
+          </form>
+        </div>
+        <p class="hint">
+          Sign in as Alice, select B2:B3, and add a range protection that only she can
+          edit. Then sign in as Bob: he can edit everything except the protected range.
+        </p>
+      </section>
+      <main>
+        <div id="app"></div>
+        <div id="state" role="status">Loading…</div>
+      </main>
+    </div>
+    <script type="module" src="/web/main.ts"></script>
+  </body>
+</html>
