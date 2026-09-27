@@ -638,6 +638,103 @@ importers:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
 
+  examples/object-permissions:
+    dependencies:
+      '@univerjs-pro/collaboration':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client-ui':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-comment-database-sqlite':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-comment-endpoint':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-comment-service':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-database-sqlite':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-endpoint':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-history-database-sqlite':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-history-endpoint':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-history-service':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-service':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)
+      '@univerjs-pro/collaboration-transport-node':
+        specifier: 1.0.2
+        version: 1.0.2
+      '@univerjs-pro/license':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-history-ui':
+        specifier: 1.0.2
+        version: 1.0.2(@univerjs-pro/embed@1.0.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-print':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/thread-comment-datasource':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/drawing':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/preset-sheets-core':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/presets':
+        specifier: 1.0.2
+        version: 1.0.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/protocol':
+        specifier: 1.0.2
+        version: 1.0.2
+      '@univerjs/sheets-thread-comment-ui':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/thread-comment-ui':
+        specifier: 1.0.2
+        version: 1.0.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+      libsql:
+        specifier: ^0.5.29
+        version: 0.5.29
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      vite:
+        specifier: ^8.0.0
+        version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
+
   examples/permissions:
     dependencies:
       '@univerjs-pro/collaboration':
@@ -1649,40 +1746,40 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-comment-database-sqlite@1.0.2':
-    resolution: {integrity: sha512-NUVbZfSxj21elsCoDAT8i/9PMhUh0US4fSR+osYbhGy8fu6yE5jjLiWF7ngAmXLqPYwqWXon5jfEUNGcHxwIow==}
+    resolution: {integrity: sha512-NUVbZfSxj21elsCoDAT8i/9PMhUh0US4fSR+osYbhGy8fu6yE5jjLiWF7ngAmXLqPYwqWXon5jfEUNGcHxwIow==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-comment-database-sqlite/-/collaboration-comment-database-sqlite-1.0.2.tgz}
     engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-comment-endpoint@1.0.2':
-    resolution: {integrity: sha512-ZXvrwMXMz2pJVF51LUeQPDXv3/hx5SB9KPooo2LvliBLJ8oqmMycRihbAsEq8PpXz8cGYS/avKTuiKITr7G3hA==}
+    resolution: {integrity: sha512-ZXvrwMXMz2pJVF51LUeQPDXv3/hx5SB9KPooo2LvliBLJ8oqmMycRihbAsEq8PpXz8cGYS/avKTuiKITr7G3hA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-comment-endpoint/-/collaboration-comment-endpoint-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-comment-service@1.0.2':
-    resolution: {integrity: sha512-b1+tkIuuf2hr+5HlfxnTtqnAbPuFytZNY9N2jC/xYYeF/9kixCHQaHDbVTluksTWI4Z9JmHih5XJNQduR0eGmA==}
+    resolution: {integrity: sha512-b1+tkIuuf2hr+5HlfxnTtqnAbPuFytZNY9N2jC/xYYeF/9kixCHQaHDbVTluksTWI4Z9JmHih5XJNQduR0eGmA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-comment-service/-/collaboration-comment-service-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-database-memory@1.0.2':
     resolution: {integrity: sha512-oJjQu1Z5I57+YZ+YDXU9CqvDBEwIG3INU9SAunuQiaaScS9oi7x+Wy0DM1ILuGv+lwWw/gCxDFj0F5z/NxvSbg==}
 
   '@univerjs-pro/collaboration-database-sqlite@1.0.2':
-    resolution: {integrity: sha512-6oBDs7IjtiC5qVd2fQCVtZjrsJ7LjdTqXAWxJTtisQRoqfeEydcvt3toAkY2Uj5dm9fpgxeYVqGKjRthXyuHHA==}
+    resolution: {integrity: sha512-6oBDs7IjtiC5qVd2fQCVtZjrsJ7LjdTqXAWxJTtisQRoqfeEydcvt3toAkY2Uj5dm9fpgxeYVqGKjRthXyuHHA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-database-sqlite/-/collaboration-database-sqlite-1.0.2.tgz}
     engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-endpoint@1.0.2':
-    resolution: {integrity: sha512-051n5/6glxNlTzKv317vExsBGVzCRt2bEqwgh9x/ikRuu3BcT01r5OKIsap7PHKEuBmKKaAtTiJUOy1JL177Fw==}
+    resolution: {integrity: sha512-051n5/6glxNlTzKv317vExsBGVzCRt2bEqwgh9x/ikRuu3BcT01r5OKIsap7PHKEuBmKKaAtTiJUOy1JL177Fw==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-endpoint/-/collaboration-endpoint-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-history-database-sqlite@1.0.2':
-    resolution: {integrity: sha512-Mo13pCvXqPCyjb1UUGr7KK0w7/YChFVhtnnHxiBGU56XugsieOPeiDPgifDK2XrwOUzbehlLuiSVq5JzRcj+fA==}
+    resolution: {integrity: sha512-Mo13pCvXqPCyjb1UUGr7KK0w7/YChFVhtnnHxiBGU56XugsieOPeiDPgifDK2XrwOUzbehlLuiSVq5JzRcj+fA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-history-database-sqlite/-/collaboration-history-database-sqlite-1.0.2.tgz}
     engines: {node: '>=22'}
 
   '@univerjs-pro/collaboration-history-endpoint@1.0.2':
-    resolution: {integrity: sha512-RtMzjCqLRanAgqXiAnGJ/WpsTU/bezNpJvAu5Sughr8EZg0228SKWmYGBnddiRnD4PIohR1fLf8xb5jBPLd/7Q==}
+    resolution: {integrity: sha512-RtMzjCqLRanAgqXiAnGJ/WpsTU/bezNpJvAu5Sughr8EZg0228SKWmYGBnddiRnD4PIohR1fLf8xb5jBPLd/7Q==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-history-endpoint/-/collaboration-history-endpoint-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-history-service@1.0.2':
-    resolution: {integrity: sha512-qsKtGSVQKuSt5LH74OrC938uQjQEKMhqdVtPBJiJGCMsYoOviVH9Kw1PaMCLW5BiiZ/dmQ3Z4GvcgnfzuW0cdg==}
+    resolution: {integrity: sha512-qsKtGSVQKuSt5LH74OrC938uQjQEKMhqdVtPBJiJGCMsYoOviVH9Kw1PaMCLW5BiiZ/dmQ3Z4GvcgnfzuW0cdg==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-history-service/-/collaboration-history-service-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-service@1.0.2':
-    resolution: {integrity: sha512-ijQIHJwd6/8PEUdZ5eE9VOwZ/dSyv5Dt4yhtcTL1T4zAHcEFuQSpx97tAT8BXTWL3RERGVGPaDyIZfn9znZLuA==}
+    resolution: {integrity: sha512-ijQIHJwd6/8PEUdZ5eE9VOwZ/dSyv5Dt4yhtcTL1T4zAHcEFuQSpx97tAT8BXTWL3RERGVGPaDyIZfn9znZLuA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-service/-/collaboration-service-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-transport-node@1.0.2':
-    resolution: {integrity: sha512-MgOxD33vCXQzFkqCRFR5OD1jjqKckHqfyyKcIb//GZdcKSf8aodVwkUqsd4GEGZ3JxmtWkdgn7IbNEZLUUmgpg==}
+    resolution: {integrity: sha512-MgOxD33vCXQzFkqCRFR5OD1jjqKckHqfyyKcIb//GZdcKSf8aodVwkUqsd4GEGZ3JxmtWkdgn7IbNEZLUUmgpg==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-transport-node/-/collaboration-transport-node-1.0.2.tgz}
 
   '@univerjs-pro/collaboration-worktree-client@1.0.2':
     resolution: {integrity: sha512-bVonpmC+8UfP9f7k88yba+tRK2YfxDWsq7o1c2VZq7U9i5JEhI92WEznuR+qnknuPocKo4MiPCcaIxA7SU3WGg==}
@@ -1822,7 +1919,7 @@ packages:
     resolution: {integrity: sha512-b0jM8Snzlj99u68QnIasHD9YfPIHeV/CWqa7mng/1UpCXyxlyQLX0SunIDjhmpceXE9AM2HdmhdbZgBwpMyG/w==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding/-/engine-formula-rust-binding-1.0.1.tgz}
 
   '@univerjs-pro/engine-formula-rust@1.0.2':
-    resolution: {integrity: sha512-+KuP6Iio0SWbejuB0VbzNzmWLKt8InIJdTFqH1SW23UoWQz2ajVSmFMYo0Xu2Rk+EeD5oOr8q9fkmjxQoZ7BpA==}
+    resolution: {integrity: sha512-+KuP6Iio0SWbejuB0VbzNzmWLKt8InIJdTFqH1SW23UoWQz2ajVSmFMYo0Xu2Rk+EeD5oOr8q9fkmjxQoZ7BpA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust/-/engine-formula-rust-1.0.2.tgz}
     peerDependencies:
       rxjs: '>=7.0.0'
 

@@ -80,13 +80,13 @@ transport.register(endpoint);
 try {
   await service.getUnitLoadData(
     { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "user-editor" },
+    { userID: "user-alice" },
   );
 } catch (error) {
   if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
   await service.createUnitFromData(
     { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "user-editor" },
+    { userID: "user-alice" },
   );
 }
 

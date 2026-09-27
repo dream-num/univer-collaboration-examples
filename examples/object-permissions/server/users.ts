@@ -11,7 +11,7 @@ export const users: readonly DemoUser[] = [
 
 // Store demo sessions in memory; the cookie contains only a random session ID.
 const sessions = new Map<string, DemoUser>();
-const cookieName = "permissions_session";
+const cookieName = "object_permissions_session";
 function sessionID(request: IncomingMessage) {
   return request.headers.cookie
     ?.split(";")

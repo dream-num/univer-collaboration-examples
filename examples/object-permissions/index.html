@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Permissions · Univer</title>
+    <title>Object Permissions · Univer</title>
   </head>
   <body>
     <div id="example">
       <header>
-        <h1>Permissions</h1>
+        <h1>Object Permissions</h1>
         <span id="current-user"></span>
         <form id="sign-out" action="/logout" method="post" hidden>
           <button>Sign out</button>
@@ -29,6 +29,10 @@
             <button data-user-id="user-dana">Dana · No access</button>
           </form>
         </div>
+        <p class="hint">
+          Sign in as Alice, select B2:B3, and add a range protection that only she can
+          edit. Then sign in as Bob: he can edit everything except the protected range.
+        </p>
       </section>
       <main>
         <div id="app"></div>

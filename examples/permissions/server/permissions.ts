@@ -4,26 +4,22 @@ import type { DocumentRole } from "../shared/types";
 export const UNIT_ID = "permissions-sheet";
 export const UNIT_NAME = "Permissions Sheet";
 
-// Assign roles per user and document, separately from user profiles.
-const rolesByUnit = new Map<string, ReadonlyMap<string, DocumentRole>>([
-  [
-    UNIT_ID,
-    new Map([
-      ["user-editor", "editor"],
-      ["user-viewer", "viewer"],
-    ]),
-  ],
+const roles = new Map<string, DocumentRole>([
+  ["user-alice", "creator"],
+  ["user-bob", "editor"],
+  ["user-casey", "viewer"],
 ]);
 
 export function resolveRole(userID: string, unitID: string) {
-  return rolesByUnit.get(unitID)?.get(userID);
+  if (unitID !== UNIT_ID) return undefined;
+  return roles.get(userID);
 }
 
 const readActions = new Set<UnitAction>([
   UnitAction.View,
   UnitAction.Copy,
-  UnitAction.SelectProtectedCells,
-  UnitAction.SelectUnProtectedCells,
+  UnitAction.Comment,
+  UnitAction.ViewHistory,
 ]);
 const editActions = new Set<UnitAction>([
   UnitAction.Edit,
@@ -44,12 +40,25 @@ const editActions = new Set<UnitAction>([
   UnitAction.InsertHyperlink,
   UnitAction.Sort,
   UnitAction.Filter,
+  UnitAction.PivotTable,
+  UnitAction.Print,
+  UnitAction.Export,
+  UnitAction.RecoverHistory,
+  UnitAction.SelectProtectedCells,
+  UnitAction.SelectUnProtectedCells,
   UnitAction.EditExtraObject,
+  UnitAction.CreatePermissionObject,
 ]);
+const manageActions = new Set<UnitAction>([UnitAction.ManageCollaborator, UnitAction.Delete]);
+
+const roleRank: Record<DocumentRole, number> = { viewer: 0, editor: 1, creator: 2 };
 
 // Share the policy between client permission queries and server checks.
 export function isAllowed(userID: string, unitID: string, action: UnitAction) {
   const role = resolveRole(userID, unitID);
   if (!role) return false;
-  return readActions.has(action) || (role === "editor" && editActions.has(action));
+  if (readActions.has(action)) return true;
+  if (editActions.has(action)) return roleRank[role] >= roleRank.editor;
+  if (manageActions.has(action)) return role === "creator";
+  return false;
 }
