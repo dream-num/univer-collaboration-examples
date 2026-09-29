@@ -4,8 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-packageExtensionsChecksum: sha256-/hxqhbKpDtVRkZiS2LBR+S4CDP5ZQq2bHH3hKHUCU6g=
-
 importers:
 
   .:
@@ -5589,7 +5587,6 @@ snapshots:
       '@univerjs/engine-formula': 1.0.3(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/engine-render': 1.0.3(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/network': 1.0.3(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs/presets': 1.0.3(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/rpc': 1.0.3(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/sheets': 1.0.3(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/sheets-formula': 1.0.3(react@19.3.0)(rxjs@7.8.2)
