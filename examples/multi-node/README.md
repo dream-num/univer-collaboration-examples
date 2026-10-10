@@ -10,7 +10,7 @@ This example uses Nginx to route requests to two collaboration server nodes and 
 
 We recommend consistent hashing by **unitID (document ID)** to keep collaboration requests for each document on the same node while distributing different documents across nodes. This reduces the need for coordination between nodes and can improve collaboration performance.
 
-This example routes tickets, WebSockets, and collaboration submissions by unitID. Reads, including snapshots and history, use round robin across nodes.
+This example routes tickets, WebSockets, and collaboration submissions by unitID. Reads, including snapshots, use round robin across nodes.
 
 ## Current limitations and planned support
 

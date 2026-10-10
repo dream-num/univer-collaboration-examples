@@ -23,7 +23,7 @@ Open <http://127.0.0.1:3010>.
 
 Switching accounts writes a local demo cookie. The application resolves `userID` from its own cookie, Session, or token, then passes that id to the collaboration service.
 
-The collaborative Unit is stored in `.data/collaboration.sqlite` and reused after a restart. Roles live in an in-memory `Map` in `server/permissions.ts`, so they also survive a restart. When you move them to a database, keep that table on its own.
+The collaborative Unit is stored in `.data/collaboration.sqlite` and reused after a restart. Roles live in an in-memory `Map` in `server/permissions.ts` and are recreated from the fixed demo configuration on startup. When you move them to a database, keep that table on its own.
 
 ## Try it
 

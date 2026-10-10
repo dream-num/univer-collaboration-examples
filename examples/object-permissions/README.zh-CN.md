@@ -14,7 +14,7 @@ pnpm example:object-permissions
 
 打开 <http://127.0.0.1:3010>。四个账号和 [`permissions`](../permissions/README.zh-CN.md) 相同：Alice 是创建者，Bob 是编辑者，Casey 是查看者，Dana 可以登录但没有这份文件的角色。切换账号会写入本地演示 Cookie。
 
-协同数据和 ACL 都在 `.data/collaboration.sqlite`。服务重启后，保护和文件角色都还在。角色表现在写在内存 `Map` 里；换成数据库时，角色表要和 ACL 表一起保留。
+协同数据和 ACL 都在 `.data/collaboration.sqlite`，保护会在服务重启后保留。文件角色表现在写在内存 `Map` 里，启动时从固定演示配置重新创建；换成数据库时，角色表要和 ACL 表一起保留。
 
 ## 试一下
 

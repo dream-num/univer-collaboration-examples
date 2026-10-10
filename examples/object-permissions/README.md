@@ -14,7 +14,7 @@ pnpm example:object-permissions
 
 Open <http://127.0.0.1:3010>. The four accounts match [`permissions`](../permissions/README.md): Alice is the creator, Bob is an editor, Casey is a viewer, and Dana can sign in but has no role on the file. Switching accounts writes a local demo cookie.
 
-Collaboration data and the ACL both live in `.data/collaboration.sqlite`. After a restart, protections and file roles are still there. Roles are an in-memory `Map` today; when you move them to a database, keep the role table together with the ACL tables.
+Collaboration data and the ACL both live in `.data/collaboration.sqlite`, so protections survive a restart. File roles are an in-memory `Map` recreated from the fixed demo configuration on startup; when you move them to a database, keep the role table together with the ACL tables.
 
 ## Try it
 

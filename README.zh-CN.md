@@ -3,15 +3,15 @@
 [English](./README.md) | 简体中文
 
 本仓库只保存 Univer Collaboration SDK 的可运行示例。公开文档统一维护在
-[office.univer.ai](https://office.univer.ai/zh-CN/collaboration/overview)。
+[docs.univer.ai](https://docs.univer.ai/zh-CN/server/collaboration/overview)。
 
 ## 从这里开始
 
-1. 按文档站的[快速开始](https://office.univer.ai/zh-CN/collaboration/quick-start)，用两个浏览器
+1. 按文档站的[快速开始](https://docs.univer.ai/zh-CN/server/collaboration/quick-start)，用两个浏览器
    确认 HTTP、WebSocket 和 OT 主链路。
 2. 从下方选择想了解的功能示例，对照最小的前后端源码。
 3. 架构、middleware、身份、持久化和生产运行说明统一查阅
-   [协同编辑文档](https://office.univer.ai/zh-CN/collaboration/overview)。
+   [协同编辑文档](https://docs.univer.ai/zh-CN/server/collaboration/overview)。
 
 ## 选择示例
 
@@ -24,7 +24,7 @@
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
 | [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
-| [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护,ACL 由应用持有 |
+| [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护，ACL 由应用持有 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
@@ -61,6 +61,6 @@ pnpm example:multi-node
 `multi-node` 需要 Docker Compose，在容器内构建，共同使用的 SQLite 数据库保存在 Docker volume 中。
 
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
-[身份与权限](https://office.univer.ai/zh-CN/collaboration/identity-and-authorization)、
-[Middleware 与 Event](https://office.univer.ai/zh-CN/collaboration/middleware-and-events)和
-[Database Adapter](https://office.univer.ai/zh-CN/collaboration/database-adapters)。
+[身份与权限](https://docs.univer.ai/zh-CN/server/collaboration/identity-and-authorization)、
+[Middleware 与 Event](https://docs.univer.ai/zh-CN/server/collaboration/middleware-and-events)和
+[Database Adapter](https://docs.univer.ai/zh-CN/server/collaboration/database-adapters)。
