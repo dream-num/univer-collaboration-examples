@@ -23,7 +23,7 @@ pnpm example:permissions
 
 切换账号会写入本地演示 Cookie。应用自己从 Cookie、Session 或 token 解析出 `userID`，再交给协同服务。
 
-协同 Unit 写入 `.data/collaboration.sqlite`，服务重启后会继续复用。角色表在 `server/permissions.ts` 的内存 `Map` 里，重启后仍在。换成数据库时，角色表要单独保留。
+协同 Unit 写入 `.data/collaboration.sqlite`，服务重启后会继续复用。角色表在 `server/permissions.ts` 的内存 `Map` 里，启动时从固定演示配置重新创建。换成数据库时，角色表要单独保留。
 
 ## 试一下
 

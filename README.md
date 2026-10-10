@@ -3,15 +3,15 @@
 English | [简体中文](./README.zh-CN.md)
 
 This repository contains only runnable examples for the Univer Collaboration SDK. The public
-documentation is maintained on [office.univer.ai](https://office.univer.ai/collaboration/overview).
+documentation is maintained on [docs.univer.ai](https://docs.univer.ai/server/collaboration/overview).
 
 ## Start here
 
-1. Follow the documentation site's [Quick Start](https://office.univer.ai/collaboration/quick-start)
+1. Follow the documentation site's [Quick Start](https://docs.univer.ai/server/collaboration/quick-start)
    and use two browsers to verify the HTTP, WebSocket, and OT path.
 2. Choose an example below for the capability you want to explore, then compare its minimal
    frontend and backend source.
-3. Use the [Collaboration documentation](https://office.univer.ai/collaboration/overview) for
+3. Use the [Collaboration documentation](https://docs.univer.ai/server/collaboration/overview) for
    architecture, middleware, identity, persistence, and production guidance.
 
 ## Choose an example
@@ -67,6 +67,6 @@ lives in a Docker volume.
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read
-[Identity and authorization](https://office.univer.ai/collaboration/identity-and-authorization),
-[Middleware and Events](https://office.univer.ai/collaboration/middleware-and-events), and
-[Database Adapters](https://office.univer.ai/collaboration/database-adapters).
+[Identity and authorization](https://docs.univer.ai/server/collaboration/identity-and-authorization),
+[Middleware and Events](https://docs.univer.ai/server/collaboration/middleware-and-events), and
+[Database Adapters](https://docs.univer.ai/server/collaboration/database-adapters).
