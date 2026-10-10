@@ -38,3 +38,6 @@ jobs:
 
       - name: Build examples
         run: pnpm build
+
+      - name: Check all-integration server
+        run: pnpm --filter @univerjs/collaboration-example-all-integration test:server
