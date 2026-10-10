@@ -71,6 +71,7 @@ export interface ExchangeRouterOptions {
 
 export function createExchangeRouter(options: ExchangeRouterOptions): Router {
   const { service, userID } = options;
+  const materializer = new UnitSnapshotMaterializer();
   const files = new Map<string, StoredFile>();
   const tasks = new Map<string, ExchangeTask>();
   const router = express.Router();
@@ -166,7 +167,7 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
         const sheetID = optionalString(body.options?.sheet?.csv?.sheetId);
 
         const taskID = startTask(tasks, async () => {
-          const snapshot = await captureCurrentSnapshot(service, userID, unitID);
+          const snapshot = await captureCurrentSnapshot(service, materializer, userID, unitID);
           const exportOptions = createExportOptions(format, sheetID, snapshot);
           const data = await exportSnapshotToBuffer(snapshot, exportOptions);
           const fileID = randomUUID();
@@ -253,6 +254,7 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
 
 async function captureCurrentSnapshot(
   service: IUniverCollabService,
+  materializer: UnitSnapshotMaterializer,
   userID: string,
   unitID: string,
 ): Promise<ISnapshotWithBlocks> {
@@ -260,12 +262,7 @@ async function captureCurrentSnapshot(
     { unitID, type: UniverType.UNIVER_SHEET, revision: 0 },
     { userID },
   );
-  const materializer = new UnitSnapshotMaterializer();
-  try {
-    return await materializer.materializeSnapshot(loadData);
-  } finally {
-    await materializer.dispose();
-  }
+  return materializer.materializeSnapshot(loadData);
 }
 
 function startTask(
