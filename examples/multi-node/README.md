@@ -8,7 +8,9 @@ This example uses Nginx to route requests to two collaboration server nodes and 
 
 ## Why route by document?
 
-Every node passes a shared pub/sub adapter and a shared session ticket store to its Endpoint. Collaboration results are then correct wherever a request lands, including when nodes are added or removed.
+Every node passes a shared pub/sub adapter and a shared session ticket store to its Endpoint, so tickets, WebSockets, and broadcasts work across nodes, and committed data stays consistent wherever a request lands, including when nodes are added or removed.
+
+Submissions for a document should still reach one node. When different nodes commit the same document concurrently, the Service may ask the client to retry (`changeset_should_retry`), and the current collaboration client does not resubmit after that event, so its later edits stay local.
 
 We still recommend consistent hashing by **unitID (document ID)** for performance. When a document's WebSockets and submissions reach the same node, broadcasts and submit acknowledgements are delivered locally. When they reach different nodes, both are relayed through Redis, adding a round trip and memory on every node that loads the document.
 
