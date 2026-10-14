@@ -31,7 +31,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
-| [`multi-node`](./examples/multi-node/README.md) | File creation and listing with Nginx consistent hashing by unitID across two collaboration nodes |
+| [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID |
 
 ## Run the examples
 
