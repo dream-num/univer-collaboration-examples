@@ -8,15 +8,24 @@
 
 ## 为什么需要按文档路由？
 
-推荐按 **unitID（文档 ID）** 做一致性哈希，让同一文档的协同请求集中到同一个节点，不同文档的负载则分散到多个节点。这可以减少跨节点协调的需求，有助于获得更好的协同性能。
+每个节点都给 Endpoint 传入共享的 pub/sub 适配器和共享的会话票据存储。这样无论请求落在哪个节点，包括节点扩缩容时，协同结果都是正确的。
 
-本例对 ticket、WebSocket 和协同提交按 unitID 路由；快照等读取请求由各节点轮询处理。
+出于性能考虑，仍然推荐按 **unitID（文档 ID）** 做一致性哈希。同一文档的 WebSocket 和提交落在同一节点时，广播和提交的确认都在本地直接推送；落在不同节点时，两者都要经 Redis 转发一次，多一次往返，而且每个加载了该文档的节点都要占用内存。
 
-## 当前限制与开发计划
+## 跨节点投递
 
-当前版本的会话和实时广播局限于单个服务进程，因此同一文档的 ticket、WebSocket 和协同提交需要命中同一节点。扩缩容或故障切换导致请求分散到不同节点时，Service 与满足契约的数据库适配器仍保证已提交协同数据的一致性，但实时广播可能不完整。
+[`server/main.ts`](./server/main.ts) 用 `@univerjs-pro/collaboration-cluster-redis` 创建基于 Redis 的适配器，并传给 Endpoint：
 
-跨节点广播组件正在开发中，用于补齐跨节点实时消息投递能力。即使后续版本支持跨节点广播，仍推荐按 unitID 做一致性路由，减少跨节点协调开销。
+```ts
+const redis = createClient({ url: redisURL });
+const redisSubscriber = redis.duplicate();
+await Promise.all([redis.connect(), redisSubscriber.connect()]);
+const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscriber });
+const ticketStore = new RedisSessionTicketStore({ client: redis });
+const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
+```
+
+需要 Redis 6.2 及以上。Endpoint 不会释放外部传入的适配器和客户端，所以停止服务时先释放 Transport，再释放 pub/sub 适配器，最后关闭两个客户端。
 
 ## 运行示例
 
@@ -38,32 +47,35 @@ docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 
 ## 关键配置
 
-在 [`web/main.ts`](./web/main.ts) 中，为 ticket 和 WebSocket URL 追加相同的 `unit` 参数：
+在 [`web/main.ts`](./web/main.ts) 中，为 WebSocket URL 追加 `unit` 参数：
 
 ```ts
 const routingQuery = new URLSearchParams({ unit: unitID }).toString();
 const connectionConfig = {
   collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect?${routingQuery}`,
-  wsSessionTicketUrl: `${baseURL}/user/session-ticket?${routingQuery}`,
+  wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
 };
 ```
 
-这两个协议路径本身不含 unitID，SDK 会保留应用追加的参数，供 Nginx 选节点。提交请求的路径已经包含 unitID。[`nginx.conf`](./nginx.conf) 提取同一个路由键，使用 `hash $routing_unit consistent` 分配请求：
+WebSocket 的路径本身不含 unitID，SDK 会保留应用追加的参数，供 Nginx 选节点。提交请求的路径已经包含 unitID。[`nginx.conf`](./nginx.conf) 提取同一个路由键，使用 `hash $routing_unit consistent` 分配请求：
 
-| 请求 | 分配方式 |
-| --- | --- |
-| ticket、WebSocket | 按 query `unit` 一致性哈希 |
-| 协同提交 `new_changes` | 按路径 `unitID` 一致性哈希 |
-| snapshot、block、fetchmissing 读取 | 轮询 |
-| 页面、文件创建与列表、鉴权 | 轮询 |
+| 请求 | 分配方式 | 原因 |
+| --- | --- | --- |
+| WebSocket | 按 query `unit` 一致性哈希 | 广播和确认留在提交所在的节点上直接推送 |
+| 协同提交 `new_changes` | 按路径 `unitID` 一致性哈希 | 只有处理提交的节点需要把文档加载到内存 |
+| ticket | 轮询 | 票据存在 Redis 中，任何节点都能消费 |
+| snapshot、block、fetchmissing 读取 | 轮询 | 直接读数据库，不加载文档 |
+| 页面、文件创建与列表、鉴权 | 轮询 | |
 
-每个页面打开一份文档，切换文件时重新建连。`unit` 必须与当前文档 ID 一致，访问权限由应用校验。
+每个页面打开一份文档，切换文件时重新建连。`unit` 必须与当前文档 ID 一致，访问权限由应用校验。如果没有共享的票据存储，ticket 也必须和 WebSocket 落到同一节点。
 
 Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash)、[WebSocket 代理](https://nginx.org/en/docs/http/websocket.html)。
 
 ## 示例范围
 
 - 两个容器共享同一宿主机上的 SQLite volume，数据在重启后保留。跨主机部署需要所有节点可访问、满足 SDK 数据库适配器契约的共享持久化存储。
+- 两个节点共用一个 Redis 容器。生产环境应使用高可用的 Redis。Redis 不可用时，签票请求失败，WebSocket 建连返回可重试的 `503`。
+- 如果网关会保持与上游的空闲连接，空闲超时要短于 Node 服务的 keep-alive 超时（默认 5 秒），否则会偶发 `502`。
 - 节点拓扑固定，关闭自动换节点重试，不提供自动故障接管。
 - 使用固定用户和演示权限，只覆盖 Sheet 协同。
 

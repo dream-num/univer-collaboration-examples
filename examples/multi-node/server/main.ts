@@ -4,6 +4,8 @@ import { createServer } from "node:http";
 import { dirname } from "node:path";
 import express from "express";
 import Database from "libsql";
+import { createClient } from "redis";
+import { RedisPubSubAdapter, RedisSessionTicketStore } from "@univerjs-pro/collaboration-cluster-redis";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
@@ -14,6 +16,7 @@ import { createUnitData } from "./unit-data.js";
 const USER_ID = "demo-user";
 const NODE_ID = process.env.NODE_ID ?? "node-a";
 const filename = process.env.DATABASE_PATH ?? ".data/collaboration.sqlite";
+const redisURL = process.env.REDIS_URL ?? "redis://127.0.0.1:6379";
 
 await mkdir(dirname(filename), { recursive: true });
 // Both nodes use the same persistent database through the database adapter.
@@ -30,7 +33,17 @@ catalog.exec(`
   );
 `);
 
-const endpoint = new UniverCollabEndpoint(service);
+// Share real-time delivery and session tickets through Redis so any node can serve any request.
+const redis = createClient({ url: redisURL });
+const redisSubscriber = redis.duplicate();
+for (const client of [redis, redisSubscriber]) {
+  client.on("error", (error) => console.error(`[${NODE_ID}] redis error: ${error.message}`));
+}
+await Promise.all([redis.connect(), redisSubscriber.connect()]);
+const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscriber });
+const ticketStore = new RedisSessionTicketStore({ client: redis });
+
+const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
   // Use a fixed identity for this demo; production applications should authenticate here.
@@ -100,6 +113,9 @@ async function shutdown() {
   await transport.dispose();
   server.closeAllConnections();
   await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  // The Endpoint does not dispose the pub/sub adapter or the Redis clients it was given.
+  await pubSub.dispose();
+  await Promise.all([redis.close(), redisSubscriber.close()]);
   await service.dispose();
   await database.dispose();
   catalog.close();

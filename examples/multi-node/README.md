@@ -8,15 +8,24 @@ This example uses Nginx to route requests to two collaboration server nodes and 
 
 ## Why route by document?
 
-We recommend consistent hashing by **unitID (document ID)** to keep collaboration requests for each document on the same node while distributing different documents across nodes. This reduces the need for coordination between nodes and can improve collaboration performance.
+Every node passes a shared pub/sub adapter and a shared session ticket store to its Endpoint. Collaboration results are then correct wherever a request lands, including when nodes are added or removed.
 
-This example routes tickets, WebSockets, and collaboration submissions by unitID. Reads, including snapshots, use round robin across nodes.
+We still recommend consistent hashing by **unitID (document ID)** for performance. When a document's WebSockets and submissions reach the same node, broadcasts and submit acknowledgements are delivered locally. When they reach different nodes, both are relayed through Redis, adding a round trip and memory on every node that loads the document.
 
-## Current limitations and planned support
+## Cross-node delivery
 
-Sessions and real-time broadcasts currently operate within a single server process, so tickets, WebSockets, and collaboration submissions for a document must reach the same node. If scaling or failover sends requests to different nodes, the Service and a database adapter that satisfies its contract still ensure consistency of committed collaboration data, but real-time broadcasts may be incomplete.
+[`server/main.ts`](./server/main.ts) creates the Redis-backed adapters from `@univerjs-pro/collaboration-cluster-redis` and passes them to the Endpoint:
 
-A cross-node broadcast component is in development to support real-time message delivery between nodes. Even after this support becomes available, we will continue to recommend routing by unitID to reduce coordination overhead between nodes.
+```ts
+const redis = createClient({ url: redisURL });
+const redisSubscriber = redis.duplicate();
+await Promise.all([redis.connect(), redisSubscriber.connect()]);
+const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscriber });
+const ticketStore = new RedisSessionTicketStore({ client: redis });
+const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
+```
+
+Redis 6.2 or later is required. The Endpoint does not dispose the adapter or the clients, so shutdown disposes the transport first, then the pub/sub adapter, then both clients.
 
 ## Run the example
 
@@ -38,32 +47,35 @@ Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to 
 
 ## Essential configuration
 
-In [`web/main.ts`](./web/main.ts), add the same `unit` parameter to the ticket and WebSocket URLs:
+In [`web/main.ts`](./web/main.ts), add a `unit` parameter to the WebSocket URL:
 
 ```ts
 const routingQuery = new URLSearchParams({ unit: unitID }).toString();
 const connectionConfig = {
   collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect?${routingQuery}`,
-  wsSessionTicketUrl: `${baseURL}/user/session-ticket?${routingQuery}`,
+  wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
 };
 ```
 
-These two protocol paths do not contain a unitID. The SDK preserves the parameter added by the application so Nginx can select a node. Submission paths already contain the unitID. [`nginx.conf`](./nginx.conf) extracts a common routing key and uses `hash $routing_unit consistent`:
+The WebSocket path does not contain a unitID. The SDK preserves the parameter added by the application so Nginx can select a node. Submission paths already contain the unitID. [`nginx.conf`](./nginx.conf) extracts a common routing key and uses `hash $routing_unit consistent`:
 
-| Request | Distribution |
-| --- | --- |
-| Ticket, WebSocket | Consistent hashing by query `unit` |
-| Collaboration submission (`new_changes`) | Consistent hashing by path `unitID` |
-| Snapshot, block, fetchmissing reads | Round robin |
-| Pages, file creation and listing, authorization | Round robin |
+| Request | Distribution | Why |
+| --- | --- | --- |
+| WebSocket | Consistent hashing by query `unit` | Broadcasts and acknowledgements stay on the node that commits |
+| Collaboration submission (`new_changes`) | Consistent hashing by path `unitID` | Only the submitting node loads the document into memory |
+| Ticket | Round robin | Tickets live in Redis and can be redeemed on any node |
+| Snapshot, block, fetchmissing reads | Round robin | Reads come from the database without loading the document |
+| Pages, file creation and listing, authorization | Round robin | |
 
-Each page opens one document and reconnects when switching files. The `unit` parameter must match the current document ID. The application checks access permissions.
+Each page opens one document and reconnects when switching files. The `unit` parameter must match the current document ID. The application checks access permissions. Without a shared ticket store, tickets would also need to reach the WebSocket's node.
 
 Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash) and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
 
 ## Scope
 
 - Both containers share a SQLite volume on one host, preserving data across restarts. Deployments across hosts need shared persistence accessible to every node and satisfying the SDK database adapter contract.
+- A single Redis container serves both nodes. Production deployments should use a highly available Redis. When Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
+- If your gateway keeps idle upstream connections open, set its idle timeout below the Node server's keep-alive timeout (5 seconds by default) to avoid occasional `502` responses.
 - The node topology is fixed, automatic retries on another node are disabled, and the example does not provide automatic failover.
 - The example uses a fixed user and demo permissions and covers Sheet collaboration only.
 
