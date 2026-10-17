@@ -10,7 +10,7 @@
 pnpm example:exchange
 ```
 
-打开 <http://127.0.0.1:3010/?unit=exchange-sheet&type=2>。通过 **File → Open (File)** 把
+打开 <http://127.0.0.1:3010/?unit=exchange-sheet>。通过 **File → Open (File)** 把
 XLS/XLSX/CSV/TSV 导入为新的协同 Unit；通过 **File → Save As** 把当前 confirmed revision
 导出为 XLSX/CSV/TSV。导入完成通知中包含新 Unit 的链接。
 

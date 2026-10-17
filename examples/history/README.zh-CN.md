@@ -8,7 +8,7 @@
 pnpm example:history
 ```
 
-打开 <http://127.0.0.1:3010/?unit=history-sheet&type=2>，编辑后点击页面上方的 `History` 查看版本。这个示例刻意把
+打开 <http://127.0.0.1:3010/?unit=history-sheet>，编辑后点击页面上方的 `History` 查看版本。这个示例刻意把
 History 作为可选派生能力：`server/main.ts` 先组装 core，再通过 `collabService` 传入 History Service，并按
 认证 → History Endpoint → Collaboration Endpoint 的顺序注册。
 
