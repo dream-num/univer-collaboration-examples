@@ -13,7 +13,7 @@ pnpm install
 pnpm example:database-adapter
 ```
 
-Open <http://127.0.0.1:3010/?unit=persistent-sheet&type=2>:
+Open <http://127.0.0.1:3010/?unit=persistent-sheet>:
 
 1. Open the same URL in two tabs, edit a cell, and confirm the change has synchronized.
 2. Press `Ctrl+C` in the terminal to stop the server, then run the same startup command again.

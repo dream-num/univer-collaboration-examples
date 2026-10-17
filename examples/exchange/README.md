@@ -11,7 +11,7 @@ protocol expected by those plugins.
 pnpm example:exchange
 ```
 
-Open <http://127.0.0.1:3010/?unit=exchange-sheet&type=2>. Use **File → Open (File)** to import
+Open <http://127.0.0.1:3010/?unit=exchange-sheet>. Use **File → Open (File)** to import
 XLS/XLSX/CSV/TSV as a new collaborative Unit, or **File → Save As** to export the current confirmed
 revision as XLSX/CSV/TSV. The import notification contains a link to the newly created Unit.
 

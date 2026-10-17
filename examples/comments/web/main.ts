@@ -13,6 +13,7 @@ import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
 import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
 import ThreadCommentUIEnUS from "@univerjs/thread-comment-ui/locale/en-US";
@@ -25,7 +26,9 @@ import "@univerjs/thread-comment-ui/lib/index.css";
 document.querySelector<HTMLElement>("#status")!.textContent =
   "Select a cell and add a thread comment.";
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
-const { univer } = createUniver({
+const unitId = new URLSearchParams(location.search).get("unit");
+if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
+const { univer, univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
     [LocaleType.EN_US]: mergeLocales(
@@ -58,7 +61,7 @@ const { univer } = createUniver({
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
       },
     ],
-    UniverCollaborationClientUIPlugin,
+    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
     [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
     UniverSheetsThreadCommentUIPlugin,
     UniverThreadCommentDataSourcePlugin,
@@ -73,3 +76,6 @@ univer.__getInjector().get(UserManagerService).setCurrentUser({
   name: currentUser.userID,
   avatar: "",
 });
+
+const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
+if (!workbook) throw new Error("Document could not be loaded");
