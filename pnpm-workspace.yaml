@@ -2,6 +2,6 @@ packages:
   - examples/*
 
 packageExtensions:
-  '@univerjs/preset-sheets-core@1.0.4':
+  '@univerjs/preset-sheets-core@1.0.4-insiders.20261017-bbabd79':
     dependencies:
-      '@univerjs/presets': 1.0.4
+      '@univerjs/presets': 1.0.4-insiders.20261017-bbabd79
