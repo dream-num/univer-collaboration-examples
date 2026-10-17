@@ -13,7 +13,7 @@ pnpm install
 pnpm example:database-adapter
 ```
 
-打开 <http://127.0.0.1:3010/?unit=persistent-sheet&type=2>：
+打开 <http://127.0.0.1:3010/?unit=persistent-sheet>：
 
 1. 在两个标签页打开同一地址，编辑单元格，确认修改已同步。
 2. 在终端按 `Ctrl+C` 停止服务，再运行同一启动命令。

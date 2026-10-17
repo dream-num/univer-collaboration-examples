@@ -15,6 +15,7 @@ import SheetsExchangeClientEnUS from "@univerjs-pro/sheets-exchange-client/local
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import "@univerjs-pro/exchange-client/facade";
 import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
@@ -26,7 +27,9 @@ document.querySelector<HTMLElement>("#status")!.textContent =
   "Use File in the ribbon to import XLS/XLSX/CSV/TSV or export XLSX/CSV/TSV.";
 
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
-createUniver({
+const unitId = new URLSearchParams(location.search).get("unit");
+if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
+const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
     [LocaleType.EN_US]: mergeLocales(
@@ -59,7 +62,7 @@ createUniver({
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
       },
     ],
-    UniverCollaborationClientUIPlugin,
+    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
     [
       UniverExchangeClientPlugin,
       {
@@ -77,3 +80,6 @@ createUniver({
     ],
   ],
 });
+
+const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
+if (!workbook) throw new Error("Document could not be loaded");

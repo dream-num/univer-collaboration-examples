@@ -1,4 +1,3 @@
-import "@univerjs-pro/collaboration-client/facade";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import {
   IAuthzIoService,
@@ -15,7 +14,7 @@ import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
 import { defaultTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
-import { registerCollaboration } from "./features/collaboration";
+import { loadCollaborativeUnit, registerCollaboration } from "./features/collaboration";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
 import { loadUnitStyles, registerUnitPlugins } from "./units";
@@ -40,6 +39,8 @@ export async function mountUniverEditor(
   });
 
   const univerAPI = FUniver.newAPI(univer);
+  const unit = await loadCollaborativeUnit(univerAPI, options.unitType, options.unitId);
+  if (!unit) throw new Error("Unit could not be loaded");
 
   return {
     univerAPI,

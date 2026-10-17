@@ -102,6 +102,6 @@ const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3010);
 server.listen(port, host, () => {
   console.info(
-    `Exchange is running at http://${host}:${port}/?unit=${UNIT_ID}&type=${UniverType.UNIVER_SHEET}`,
+    `Exchange is running at http://${host}:${port}/?unit=${UNIT_ID}`,
   );
 });

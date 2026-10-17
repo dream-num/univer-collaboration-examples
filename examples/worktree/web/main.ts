@@ -15,6 +15,7 @@ import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
@@ -25,7 +26,7 @@ const client = new WorktreeClient({ origin: location.origin });
 const worktree = await client.getWorktree(worktreeID);
 const editingDraft = new URL(location.href).searchParams.has("worktree");
 const editorURL = (draft: boolean) =>
-  `/?unit=${unitID}&type=2${draft ? `&worktree=${worktreeID}` : ""}`;
+  `/?unit=${unitID}${draft ? `&worktree=${worktreeID}` : ""}`;
 document.querySelector<HTMLElement>("#toolbar")!.innerHTML =
   `<a href="${editorURL(false)}">Trunk</a><a href="${editorURL(true)}">Draft</a><span>Status: ${worktree.status}</span><button id="ready">Ready</button><button id="reopen">Reopen</button><button id="merge">Merge</button>`;
 document.querySelector<HTMLElement>("#status")!.textContent = editingDraft
@@ -53,7 +54,7 @@ const collaboration = editingDraft
       collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
       wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
     };
-createUniver({
+const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
     [LocaleType.EN_US]: mergeLocales(
@@ -81,6 +82,9 @@ createUniver({
         sendChangesetTimeout: 200,
       },
     ],
-    UniverCollaborationClientUIPlugin,
+    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
   ],
 });
+
+const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitID);
+if (!workbook) throw new Error("Document could not be loaded");
