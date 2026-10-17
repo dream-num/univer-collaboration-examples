@@ -11,6 +11,7 @@ import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import type { DemoUser } from "../shared/types";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
@@ -31,7 +32,8 @@ async function start() {
   currentUser.textContent = user.username;
   document.getElementById("sign-out")!.hidden = false;
   document.querySelector(`[data-user-id="${user.userId}"]`)?.setAttribute("aria-current", "true");
-  if (!new URLSearchParams(location.search).has("unit")) {
+  const unitId = new URLSearchParams(location.search).get("unit");
+  if (!unitId) {
     state.textContent = "Choose an account to open the sheet.";
     return;
   }
@@ -65,7 +67,7 @@ async function start() {
           wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         },
       ],
-      UniverCollaborationClientUIPlugin,
+      [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
     ],
   });
 
@@ -76,6 +78,8 @@ async function start() {
     avatar: user.avatar,
   });
   currentUser.textContent = univerAPI.getUserManager().getCurrentUser().name;
+  const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
+  if (!workbook) throw new Error("Document could not be loaded");
   state.hidden = true;
 }
 

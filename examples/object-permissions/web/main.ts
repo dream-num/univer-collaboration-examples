@@ -17,6 +17,7 @@ import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import { UnitObject } from "@univerjs/protocol";
 import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
 import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
@@ -44,7 +45,8 @@ async function start() {
   currentUser.textContent = user.username;
   document.getElementById("sign-out")!.hidden = false;
   document.querySelector(`[data-user-id="${user.userId}"]`)?.setAttribute("aria-current", "true");
-  if (!new URLSearchParams(location.search).has("unit")) {
+  const unitId = new URLSearchParams(location.search).get("unit");
+  if (!unitId) {
     state.textContent = "Choose an account to open the sheet.";
     return;
   }
@@ -86,7 +88,7 @@ async function start() {
           wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         },
       ],
-      UniverCollaborationClientUIPlugin,
+      [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
       [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
       UniverSheetsThreadCommentUIPlugin,
       UniverThreadCommentDataSourcePlugin,
@@ -102,6 +104,8 @@ async function start() {
     avatar: user.avatar,
   });
   currentUser.textContent = univerAPI.getUserManager().getCurrentUser().name;
+  const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
+  if (!workbook) throw new Error("Document could not be loaded");
   state.hidden = true;
 }
 

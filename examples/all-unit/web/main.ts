@@ -14,16 +14,14 @@ async function main() {
   const selected = units.find((unit) => unit.unitId === url.searchParams.get("unit")) ?? units[0];
   if (!selected) throw new Error("No units available");
 
-  // The collaboration plugin reads Unit identity from the URL; normalize it against the server catalog before setup.
+  // Keep the selected Unit in the URL so the page can be shared and reloaded.
   url.searchParams.set("unit", selected.unitId);
-  url.searchParams.set("type", String(selected.type));
   history.replaceState(null, "", url);
 
   for (const unit of units) {
     const link = document.createElement("a");
     const target = new URL(location.pathname, location.origin);
     target.searchParams.set("unit", unit.unitId);
-    target.searchParams.set("type", String(unit.type));
     link.href = target.href;
     link.textContent = unit.name;
     if (unit.unitId === selected.unitId) link.setAttribute("aria-current", "page");
