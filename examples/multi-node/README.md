@@ -29,7 +29,7 @@ flowchart LR
 
 - **Collaboration nodes** run the same code with the same database and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
 - **Redis** needs version 6.2 or later. Use a highly available Redis in production: when Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
-- **Database** must be reachable by every node and satisfy the SDK database adapter contract. The example shares a SQLite volume on one host.
+- **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example shares a SQLite volume on one host.
 - **Gateway** sends a document's WebSocket and submissions to one node and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
 
 ## Set up every collaboration node
