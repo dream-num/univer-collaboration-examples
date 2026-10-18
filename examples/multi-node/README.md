@@ -2,21 +2,30 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Deploying multiple nodes distributes collaboration workloads for different documents across servers, reducing the load on each node and increasing overall capacity for concurrent collaboration.
+Run several collaboration server nodes behind one gateway. The SDK turns the nodes into one cluster through two interfaces: a **pub/sub adapter** that relays real-time messages between nodes, and a **session ticket store** that lets any node accept a ticket issued elsewhere. `@univerjs-pro/collaboration-cluster-redis` implements both on Redis.
 
-This example uses Nginx to route requests to two collaboration server nodes and provides a simple Sheet creation and file list UI to observe routing and try collaborative editing. For your deployment, you can choose another gateway or load balancer to fit your existing infrastructure. When using a container orchestration platform such as Kubernetes, let the platform manage service replicas and configure the gateway to route requests using consistent hashing by unitID.
+This example runs two nodes, Redis, and Nginx with Docker Compose, plus a small Sheet creation and file list UI to observe routing and try collaborative editing. Replace Nginx with any gateway or load balancer in your deployment; on Kubernetes, let the platform manage replicas and configure the gateway as described in [Route by unitID for performance](#route-by-unitid-for-performance).
 
-## Why route by document?
+## How nodes work together
 
-Every node passes a shared pub/sub adapter and a shared session ticket store to its Endpoint, so tickets, WebSockets, and broadcasts work across nodes, and committed data stays consistent wherever a request lands, including when nodes are added or removed.
+| Responsibility | Where it lives | Notes |
+| --- | --- | --- |
+| Units, changesets, snapshots | Shared database | The source of truth. Every node commits through the same database adapter; the database's revision check decides the order when two nodes commit the same document at once. |
+| Broadcasts, submit acknowledgements, member lists, cursors, session invalidation | Pub/sub adapter | Each node publishes what happens to its own connections and delivers what other nodes publish. Delivery is best effort: a lost broadcast is recovered when the client sees a revision gap and fetches the missing changesets. |
+| Session tickets | Session ticket store | A ticket is issued on one node, stored in Redis, and valid once on any node. |
+| WebSocket connections, loaded documents | Each node | Connections stay on the node that accepted them. A node loads a document into memory when it commits to it. |
 
-Submissions for a document should still reach one node. When different nodes commit the same document concurrently, the Service may ask the client to retry (`changeset_should_retry`), and the current collaboration client does not resubmit after that event, so its later edits stay local.
+With `pubSub` and `ticketStore` configured, any request can land on any node: committed data, broadcasts, and tickets stay consistent when nodes are added or removed, and correctness does not depend on how the gateway routes. Without them, rooms and broadcasts cover only one process.
 
-We still recommend consistent hashing by **unitID (document ID)** for performance. When a document's WebSockets and submissions reach the same node, broadcasts and submit acknowledgements are delivered locally. When they reach different nodes, both are relayed through Redis, adding a round trip and memory on every node that loads the document.
+## Set up every node
 
-## Cross-node delivery
+Install the adapter package and a Redis client next to the Endpoint:
 
-[`server/main.ts`](./server/main.ts) creates the Redis-backed adapters from `@univerjs-pro/collaboration-cluster-redis` and passes them to the Endpoint:
+```bash
+pnpm add @univerjs-pro/collaboration-endpoint @univerjs-pro/collaboration-cluster-redis redis
+```
+
+[`server/main.ts`](./server/main.ts) creates one Redis connection for commands and a duplicate for subscriptions, builds both adapters, and passes them to the Endpoint:
 
 ```ts
 const redis = createClient({ url: redisURL });
@@ -27,7 +36,9 @@ const ticketStore = new RedisSessionTicketStore({ client: redis });
 const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 ```
 
-Redis 6.2 or later is required. The Endpoint does not dispose the adapter or the clients, so shutdown disposes the transport first, then the pub/sub adapter, then both clients.
+Every node runs the same code against the same Redis (`REDIS_URL`) and the same database. Redis 6.2 or later is required; `ioredis` and Redis Cluster are also supported, see the `@univerjs-pro/collaboration-cluster-redis` README.
+
+The Endpoint does not dispose the adapters or the clients it was given. Shut down in reverse order of creation: dispose the transport, then the pub/sub adapter, then close both Redis connections.
 
 ## Run the example
 
@@ -41,15 +52,25 @@ Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside
 
 Open <http://127.0.0.1:3010/>:
 
-1. Click **New Sheet** to create a file. The sidebar shows its assigned `node-a` or `node-b`.
+1. Click **New Sheet** to create a file. The sidebar shows the node that hashing assigns to it, `node-a` or `node-b`.
 2. Copy the complete URL into another tab, edit the same Sheet, and check synchronization.
 3. Create more files and repeat with one assigned to the other node.
 
+To watch delivery cross nodes, follow the logs with `docker compose -f examples/multi-node/compose.yaml logs -f node-a node-b`. Each `new_changes` submission is logged by one node only; the other node delivers it to its own connections through Redis.
+
 Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to supply a license at build time. After code changes, rerun the startup command to recreate both the server nodes and Nginx, preventing stale container addresses in the gateway. Reopen the page afterward.
 
-## Essential configuration
+## Route by unitID for performance
 
-In [`web/main.ts`](./web/main.ts), add a `unit` parameter to the WebSocket URL:
+Routing is not needed for correctness, but keeping a document's WebSockets and submissions on one node is the recommended optimization:
+
+- Only one node loads the document into memory and keeps it warm; other nodes serve the document from the database without loading it.
+- Commits for a document are serialized on one node instead of racing on the database revision check from several nodes.
+- When the submitter's WebSocket is on the committing node, the acknowledgement and the broadcast are delivered locally instead of being relayed through Redis.
+
+In a load test with 3 nodes and 1,800 documents, routing everything round robin raised server p95 latency to about 3 times the hashed configuration and node memory by about 40%. Hashing the ticket request in addition brought no measurable change, because tickets are redeemed from Redis on any node.
+
+Submission paths already contain the unitID. The WebSocket path does not, so [`web/main.ts`](./web/main.ts) adds a `unit` query parameter that the SDK preserves:
 
 ```ts
 const routingQuery = new URLSearchParams({ unit: unitID }).toString();
@@ -59,26 +80,26 @@ const connectionConfig = {
 };
 ```
 
-The WebSocket path does not contain a unitID. The SDK preserves the parameter added by the application so Nginx can select a node. Submission paths already contain the unitID. [`nginx.conf`](./nginx.conf) extracts a common routing key and uses `hash $routing_unit consistent`:
+[`nginx.conf`](./nginx.conf) maps both to one routing key and distributes with `hash $routing_unit consistent`:
 
-| Request | Distribution | Why |
+| Request | Distribution | Effect |
 | --- | --- | --- |
-| WebSocket | Consistent hashing by query `unit` | Broadcasts and acknowledgements stay on the node that commits |
-| Collaboration submission (`new_changes`) | Consistent hashing by path `unitID` | Only the submitting node loads the document into memory |
-| Ticket | Round robin | Tickets live in Redis and can be redeemed on any node |
-| Snapshot, block, fetchmissing reads | Round robin | Reads come from the database without loading the document |
+| WebSocket | Consistent hashing by query `unit` | Acknowledgements and broadcasts for the document are delivered locally |
+| Collaboration submission (`new_changes`) | Consistent hashing by path `unitID` | One node loads and commits the document |
+| Ticket | Round robin | Redeemed from Redis on any node |
+| Snapshot, block, fetchmissing reads | Round robin | Served from the database without loading the document |
 | Pages, file creation and listing, authorization | Round robin | |
 
-Each page opens one document and reconnects when switching files. The `unit` parameter must match the current document ID. The application checks access permissions. Without a shared ticket store, tickets would also need to reach the WebSocket's node.
-
-Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash) and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
+Each page opens one document and reconnects when switching files, so the `unit` parameter always matches the current document ID. The application checks access permissions. Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash) and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
 
 ## Scope
 
 - Both containers share a SQLite volume on one host, preserving data across restarts. Deployments across hosts need shared persistence accessible to every node and satisfying the SDK database adapter contract.
 - A single Redis container serves both nodes. Production deployments should use a highly available Redis. When Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
+- Cross-node delivery is best effort. A lost broadcast is recovered on the next revision gap. A lost acknowledgement, which can only happen when the submitter's WebSocket is on a different node than the commit, leaves the submitter waiting until the next revision arrives. Routing by unitID keeps acknowledgements local.
+- If the Service gives up a commit after repeated revision conflicts or a retryable database error, it sends `changeset_should_retry`; the current collaboration client does not resubmit after that event, and its later edits stay local until the page reloads. Routing by unitID keeps a document's commits on one node, so this is not reached in practice.
 - If your gateway keeps idle upstream connections open, set its idle timeout below the Node server's keep-alive timeout (5 seconds by default) to avoid occasional `502` responses.
-- The node topology is fixed, automatic retries on another node are disabled, and the example does not provide automatic failover.
+- The node topology is fixed: Nginx does not retry a request on another node, and the example does not provide automatic failover.
 - The example uses a fixed user and demo permissions and covers Sheet collaboration only.
 
 ## Logs and shutdown
