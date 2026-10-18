@@ -1,37 +1,28 @@
 import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
-import { dirname } from "node:path";
 import express from "express";
-import Database from "libsql";
+import { Pool } from "pg";
 import { createClient } from "redis";
 import { RedisPubSubAdapter, RedisSessionTicketStore } from "@univerjs-pro/collaboration-cluster-redis";
-import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
+import { CustomPostgresDatabaseAdapter } from "./postgres-database-adapter.js";
 import { createUnitData } from "./unit-data.js";
 
 const USER_ID = "demo-user";
 const NODE_ID = process.env.NODE_ID ?? "node-a";
-const filename = process.env.DATABASE_PATH ?? ".data/collaboration.sqlite";
+const databaseURL = process.env.DATABASE_URL ?? "postgres://univer:univer@127.0.0.1:5432/collaboration";
 const redisURL = process.env.REDIS_URL ?? "redis://127.0.0.1:6379";
 
-await mkdir(dirname(filename), { recursive: true });
-// Both nodes use the same persistent database through the database adapter.
-const database = new SQLiteDatabaseAdapter({ filename });
+// Both nodes use the same PostgreSQL database through the database adapter.
+// The schema comes from schema.sql, applied when the database is provisioned; nodes never run DDL.
+const pool = new Pool({ connectionString: databaseURL });
+pool.on("error", (error) => console.error(`[${NODE_ID}] postgres idle connection error: ${error.message}`));
+await requireDatabaseSchema();
+const database = new CustomPostgresDatabaseAdapter(pool);
 const service = new UniverCollabService({ dbAdapter: database });
-// Store the application catalog alongside the adapter's collaboration_* tables.
-const catalog = new Database(filename);
-catalog.exec(`
-  PRAGMA busy_timeout = 5000;
-  CREATE TABLE IF NOT EXISTS files (
-    unit_id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    created_at INTEGER NOT NULL
-  );
-`);
 
 // Share real-time delivery and session tickets through Redis so any node can serve any request.
 const redis = createClient({ url: redisURL });
@@ -59,10 +50,10 @@ transport.register(endpoint);
 
 const app = express();
 app.get("/healthz", (_request, response) => response.json({ node: NODE_ID }));
-app.get("/api/files", (_request, response) => {
-  const files = catalog.prepare(
-    "SELECT unit_id AS unitID, name FROM files ORDER BY created_at DESC, unit_id",
-  ).all();
+app.get("/api/files", async (_request, response) => {
+  const { rows: files } = await pool.query<{ unitID: string; name: string }>(
+    'SELECT unit_id AS "unitID", name FROM files ORDER BY created_at DESC, unit_id',
+  );
   response.json({ files });
 });
 app.post("/api/files", express.json({ limit: "4kb" }), async (request, response) => {
@@ -80,8 +71,7 @@ app.post("/api/files", express.json({ limit: "4kb" }), async (request, response)
     return;
   }
   // Add the file to the application catalog only after the Unit is created.
-  catalog.prepare("INSERT INTO files (unit_id, name, created_at) VALUES (?, ?, ?)")
-    .run(unitID, data.name, Date.now());
+  await pool.query("INSERT INTO files (unit_id, name, created_at) VALUES ($1, $2, $3)", [unitID, data.name, Date.now()]);
   console.info(`[${NODE_ID}] file.created unitID=${unitID}`);
   response.setHeader("X-Collab-Node", NODE_ID);
   response.status(201).json({ unitID, name: data.name });
@@ -117,11 +107,20 @@ async function shutdown() {
   await pubSub.dispose();
   await Promise.all([redis.close(), redisSubscriber.close()]);
   await service.dispose();
+  // The adapter owns the pool and closes it, which also closes the catalog connections.
   await database.dispose();
-  catalog.close();
 }
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => void shutdown().catch(() => {
     process.exitCode = 1;
   }));
+}
+
+/** Fails fast when schema.sql has not been applied, instead of surfacing "relation does not exist" on the first request. */
+async function requireDatabaseSchema() {
+  const { rows } = await pool.query<{ exists: string | null }>("SELECT to_regclass('collaboration.units') AS exists");
+  if (!rows[0]?.exists) {
+    await pool.end();
+    throw new Error("Database schema is missing. Apply examples/multi-node/schema.sql first.");
+  }
 }
