@@ -7,14 +7,21 @@ import {
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
+import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
+import ExchangeClientEnUS from "@univerjs-pro/exchange-client/locale/en-US";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
+import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import SheetsExchangeClientEnUS from "@univerjs-pro/sheets-exchange-client/locale/en-US";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "@univerjs-pro/collaboration-client/facade";
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
+import "@univerjs-pro/exchange-client/lib/index.css";
 
 const status = document.querySelector<HTMLElement>("#status")!;
 const picker = document.querySelector<HTMLElement>("#picker")!;
@@ -126,6 +133,8 @@ async function main() {
         UniverPresetSheetsCoreEnUS,
         CollaborationClientEnUS,
         CollaborationClientUIEnUS,
+        ExchangeClientEnUS,
+        SheetsExchangeClientEnUS,
       ),
     },
     theme: defaultTheme,
@@ -154,6 +163,19 @@ async function main() {
         },
       ],
       [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+      [
+        UniverExchangeClientPlugin,
+        {
+          // Import/export goes through the same gateway, which forwards these paths to the exchange replicas.
+          uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+          getTaskServerUrl: `${baseURL}/exchange/task/{taskID}`,
+          signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+          importServerUrl: `${baseURL}/exchange/{type}/import`,
+          exportServerUrl: `${baseURL}/exchange/{type}/export`,
+          downloadEndpointUrl: `${httpProtocol}://${location.host}/`,
+        },
+      ],
+      [UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 }],
     ],
   });
 

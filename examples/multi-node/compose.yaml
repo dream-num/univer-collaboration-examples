@@ -1,12 +1,16 @@
 name: univer-collaboration-multi-node
 
+x-build: &build
+  context: ../..
+  dockerfile: examples/multi-node/Dockerfile
+  args:
+    UNIVER_LICENSE: ${UNIVER_LICENSE:-}
+
 x-app: &app
   image: univer-collaboration-multi-node:local
   build:
-    context: ../..
-    dockerfile: examples/multi-node/Dockerfile
-    args:
-      UNIVER_LICENSE: ${UNIVER_LICENSE:-}
+    <<: *build
+    target: collab
   init: true
 
 x-runtime: &runtime
@@ -73,6 +77,34 @@ services:
         condition: service_healthy
     healthcheck: *health
 
+  # Import/export service: a separate deployment with its own replica count and resource limits.
+  # Replicas share tasks and files through PostgreSQL, so any of them can answer any request.
+  # Conversion runs in the replica that accepted the request; production uses a queue and workers.
+  exchange:
+    image: univer-collaboration-multi-node-exchange:local
+    build:
+      <<: *build
+      target: exchange
+    init: true
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1g
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3011"
+      DATABASE_URL: postgres://univer:univer@postgres:5432/collaboration
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3011/healthz').then(r => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1))"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
   nginx:
     image: nginx:1.30.4-alpine
     ports:
@@ -83,6 +115,8 @@ services:
       node-a:
         condition: service_healthy
       node-b:
+        condition: service_healthy
+      exchange:
         condition: service_healthy
 
 volumes:

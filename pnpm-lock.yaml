@@ -603,9 +603,18 @@ importers:
       '@univerjs-pro/collaboration-transport-node':
         specifier: 1.1.0
         version: 1.1.0
+      '@univerjs-pro/exchange-client':
+        specifier: 1.1.0
+        version: 1.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/exchange-node':
+        specifier: 1.1.0
+        version: 1.1.0(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/license':
         specifier: 1.1.0
         version: 1.1.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-exchange-client':
+        specifier: 1.1.0
+        version: 1.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/core':
         specifier: 1.1.0
         version: 1.1.0(react@19.3.0)(rxjs@7.8.2)
@@ -621,6 +630,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
+      multer:
+        specifier: ^2.0.2
+        version: 2.2.0
       pg:
         specifier: 8.23.0
         version: 8.23.0
@@ -640,6 +652,9 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
+      '@types/multer':
+        specifier: ^2.0.0
+        version: 2.2.0
       '@types/pg':
         specifier: 8.23.1
         version: 8.23.1

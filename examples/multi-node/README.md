@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 Run several collaboration server nodes behind one gateway. The nodes share one database and one Redis: Redis carries real-time messages between nodes and holds session tickets, so any node can serve any request. `@univerjs-pro/collaboration-cluster-redis` provides the Redis adapters.
 
-This example runs two collaboration nodes, PostgreSQL, Redis, and Nginx with Docker Compose, plus a small Sheet creation and file list UI to observe routing and try collaborative editing.
+This example runs two collaboration nodes, two replicas of a separate import/export (exchange) service, PostgreSQL, Redis, and Nginx with Docker Compose, plus a small Sheet creation and file list UI to observe routing, try collaborative editing, and import or export XLSX files.
 
 ## Deployment
 
@@ -17,20 +17,26 @@ flowchart LR
     end
     Gateway --> A
     Gateway --> B
+    subgraph exchange["Import/export service"]
+        X1["exchange ×2"]
+    end
+    Gateway --> X1
     subgraph shared["Shared by every node"]
         Redis[("Redis<br/>pub/sub + session tickets")]
-        DB[("Database")]
+        DB[("Database<br/>+ exchange tasks and files")]
     end
     A --- Redis
     B --- Redis
     A --- DB
     B --- DB
+    X1 --- DB
 ```
 
 - **Collaboration nodes** run the same code with the same `DATABASE_URL` and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
 - **Redis** needs version 6.2 or later. Use a highly available Redis in production: when Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
 - **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example uses PostgreSQL through [`server/postgres-database-adapter.ts`](./server/postgres-database-adapter.ts), a copy of the custom adapter from the [`database-adapter`](../database-adapter/README.md) example; the application file catalog lives in the same database. The nodes do not create tables: [`schema.sql`](./schema.sql) is applied once when PostgreSQL initializes its data directory, and each node only checks on startup that the tables exist. In production, manage that schema with your migration tool and run migrations as a separate deployment step rather than from the service.
-- **Gateway** sends a document's WebSocket and submissions to one node and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
+- **Import/export service** is a second entry point of the same code base, [`server/exchange-main.ts`](./server/exchange-main.ts), deployed separately from the collaboration nodes and scaled on its own, see [Run import and export separately](#run-import-and-export-separately). It connects to the same `DATABASE_URL` and does not use Redis.
+- **Gateway** sends a document's WebSocket and submissions to one node, exchange paths to the exchange replicas, and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
 
 ## Set up every collaboration node
 
@@ -77,10 +83,34 @@ const connectionConfig = {
 | Collaboration submission `new_changes` | Consistent hashing by path `unitID` |
 | Ticket, snapshot, block, fetchmissing | Round robin |
 | Pages, file creation and listing, authorization | Round robin |
+| Upload `/universer-api/stream/file/upload`, `/universer-api/exchange/`, `/universer-api/file/` | Round robin across the exchange replicas |
 
 The `unit` parameter must match the current document ID; the example opens one document per page and reconnects when switching files. The application checks access permissions. If your gateway keeps idle upstream connections open, set its idle timeout below the Node.js server's keep-alive timeout (5 seconds by default) to avoid occasional `502` responses.
 
-Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash) and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
+The exchange upstream uses `server exchange:3011 resolve` with Docker's DNS so that Nginx follows the replica set as it changes; the exchange locations raise `client_max_body_size` to `32m` for uploads. Every exchange response carries an `X-Exchange-Instance` header naming the replica that handled it.
+
+Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash), [resolve](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#resolve), and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
+
+## Run import and export separately
+
+Server-side import and export use `@univerjs-pro/exchange-node`, whose converter is a native Rust binding of roughly 29 MB per platform. A conversion is CPU-bound and holds the whole workbook in memory, while a collaboration node mostly waits on sockets and keeps many small documents resident. The two have different resource profiles and different load curves, so the example runs the exchange routes in their own service:
+
+- it scales on its own: `deploy.replicas: 2` with `cpus: 1` and `memory: 1g` in [`compose.yaml`](./compose.yaml), independent of the number of collaboration nodes;
+- a long or failing conversion does not slow down or crash a node that is serving WebSockets;
+- the collaboration image does not ship the native binding (see the `collab` target in [`Dockerfile`](./Dockerfile)).
+
+[`server/exchange-main.ts`](./server/exchange-main.ts) wires only the database adapter, `UniverCollabService`, and the exchange router: no Endpoint, Transport, or Redis. Import creates the Unit through `createUnitFromSnapshot()` and registers it in the file catalog; export reads the latest confirmed revision through `getUnitLoadDataWithBlocks()` and `UnitSnapshotMaterializer`, without involving the node that currently hosts the document.
+
+[`server/exchange.ts`](./server/exchange.ts) implements the protocol expected by `UniverExchangeClientPlugin`: upload, `import`/`export` returning a task ID, task polling, signed URL, and download. All of its state lives in two PostgreSQL tables from [`schema.sql`](./schema.sql), accessed through [`server/exchange-store.ts`](./server/exchange-store.ts):
+
+| Table | Content |
+| --- | --- |
+| `exchange_tasks` | `pending` → `running` → `done` (with `result`) or `failed` (with `error`) |
+| `exchange_files` | Uploaded source files, deleted after import, and exported results |
+
+Because the replica that accepts an upload or starts a task writes to the shared database, any replica can answer the poll for that task or serve the download, which is what allows plain round robin at the gateway. Watch `X-Exchange-Instance` in the browser's network panel to see different replicas handling the upload, the poll, and the download of one import.
+
+The example is simplified in one way: conversion runs synchronously inside the replica that accepted the request. Universer, the production server, separates the layers further: the API replicas are stateless, tasks live in a database table, files live in object storage, and a queue or workflow engine (such as Temporal) dispatches each task to dedicated worker processes that are scaled by their own autoscaler (an HPA on Kubernetes). To move from the example to that shape, keep the tables, replace the `bytea` column with object-storage keys, and turn `startTask()` into a queue publish consumed by workers. If a replica stops mid-conversion, its tasks stay `running`; a worker design adds leases or timeouts so another worker can pick them up.
 
 ## Run the example
 
@@ -97,6 +127,7 @@ Open <http://127.0.0.1:3010/>:
 1. Click **New Sheet** to create a file. The sidebar shows the node assigned to it, `node-a` or `node-b`.
 2. Copy the complete URL into another tab, edit the same Sheet, and check synchronization.
 3. Create more files and repeat with one assigned to the other node.
+4. With a file open, use **File → Open (File)** to import an XLSX/XLS/CSV/TSV file. The import creates a new Unit named after the file, lists it in the sidebar, and the notification links to it. Use **File → Save As** to export the current Sheet as XLSX/CSV/TSV.
 
 Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to supply a license at build time. After code changes, rerun the startup command to recreate both the server nodes and Nginx, preventing stale container addresses in the gateway. Reopen the page afterward.
 
@@ -104,12 +135,13 @@ Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to 
 
 - The node topology is fixed: Nginx does not retry a request on another node, and the example does not provide automatic failover.
 - The example uses a fixed user and demo permissions and covers Sheet collaboration only.
+- Import and export convert inside the exchange replica that accepted the request, keep file bytes in PostgreSQL, and serve unsigned download URLs. These are teaching choices; see [Run import and export separately](#run-import-and-export-separately) for the production shape.
 
 ## Logs and shutdown
 
 ```bash
-# View node logs
-docker compose -f examples/multi-node/compose.yaml logs -f node-a node-b
+# View node and exchange logs
+docker compose -f examples/multi-node/compose.yaml logs -f node-a node-b exchange
 
 # Stop services and preserve data
 docker compose -f examples/multi-node/compose.yaml down

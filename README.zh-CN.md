@@ -29,7 +29,7 @@
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
-| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由 |
+| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由，另有独立部署、多副本的导入导出服务 |
 
 ## 运行示例
 
@@ -58,7 +58,7 @@ pnpm example:multi-node
 特意使用内存文件与任务存储，不代替生产文件服务。
 
 `quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`，服务重启后仍会保留。
-`multi-node` 需要 Docker Compose，在容器内构建，两个节点共用一个 PostgreSQL 数据库，数据保存在 Docker volume 中。
+`multi-node` 需要 Docker Compose，在容器内构建，两个节点和导入导出副本共用一个 PostgreSQL 数据库，数据保存在 Docker volume 中。
 
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
 [身份与权限](https://docs.univer.ai/zh-CN/server/collaboration/identity-and-authorization)、
