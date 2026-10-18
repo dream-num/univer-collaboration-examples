@@ -110,7 +110,7 @@ Server-side import and export use `@univerjs-pro/exchange-node`, whose converter
 
 Because the replica that accepts an upload or starts a task writes to the shared database, any replica can answer the poll for that task or serve the download, which is what allows plain round robin at the gateway. Watch `X-Exchange-Instance` in the browser's network panel to see different replicas handling the upload, the poll, and the download of one import.
 
-The example is simplified in one way: conversion runs synchronously inside the replica that accepted the request. Universer, the production server, separates the layers further: the API replicas are stateless, tasks live in a database table, files live in object storage, and a queue or workflow engine (such as Temporal) dispatches each task to dedicated worker processes that are scaled by their own autoscaler (an HPA on Kubernetes). To move from the example to that shape, keep the tables, replace the `bytea` column with object-storage keys, and turn `startTask()` into a queue publish consumed by workers. If a replica stops mid-conversion, its tasks stay `running`; a worker design adds leases or timeouts so another worker can pick them up.
+The example keeps one simplification: conversion runs synchronously inside the replica that accepted the request. A production deployment keeps the same two tables, stores file bytes in object storage instead of a `bytea` column, and turns `startTask()` into a queue publish consumed by dedicated worker processes that scale on their own. If a replica stops mid-conversion, its tasks stay `running`; a worker design adds leases or timeouts so another worker can pick them up.
 
 ## Run the example
 
