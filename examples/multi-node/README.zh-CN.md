@@ -4,7 +4,7 @@
 
 在一个网关后面运行多个协同服务节点。所有节点共用一个数据库和一个 Redis：Redis 负责在节点之间传递实时消息并保存会话票据，因此任何节点都能处理任何请求。`@univerjs-pro/collaboration-cluster-redis` 提供了 Redis 适配器。
 
-本例用 Docker Compose 运行两个节点、Redis 和 Nginx，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。
+本例用 Docker Compose 运行两个协同服务节点、Redis 和 Nginx，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。
 
 ## 部署结构
 
@@ -27,12 +27,12 @@ flowchart LR
     B --- DB
 ```
 
-- **节点**运行同样的代码，连接同一个数据库和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
+- **协同服务节点**运行同样的代码，连接同一个数据库和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
 - **Redis** 需要 6.2 及以上。生产环境使用高可用的 Redis：Redis 不可用时，签票请求失败，WebSocket 建连返回可重试的 `503`。
 - **数据库**必须让所有节点都能访问，并满足 SDK 数据库适配器契约。本例在同一宿主机上共享一个 SQLite volume。
 - **网关**把同一文档的 WebSocket 和提交发到同一个节点，其余请求随意分配，见[配置网关](#配置网关)。可以换成任何网关或负载均衡；使用 Kubernetes 时由平台管理副本，套用同样的路由规则。
 
-## 配置每个节点
+## 配置每个协同服务节点
 
 在 Endpoint 旁边安装适配器包和 Redis 客户端：
 
@@ -78,7 +78,7 @@ const connectionConfig = {
 | ticket、snapshot、block、fetchmissing | 轮询 |
 | 页面、文件创建与列表、鉴权 | 轮询 |
 
-`unit` 必须与当前文档 ID 一致；本例每个页面打开一份文档，切换文件时重新建连。访问权限由应用校验。如果网关会保持与上游的空闲连接，空闲超时要短于 Node 服务的 keep-alive 超时（默认 5 秒），否则会偶发 `502`。
+`unit` 必须与当前文档 ID 一致；本例每个页面打开一份文档，切换文件时重新建连。访问权限由应用校验。如果网关会保持与上游的空闲连接，空闲超时要短于 Node.js 服务的 keep-alive 超时（默认 5 秒），否则会偶发 `502`。
 
 Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash)、[WebSocket 代理](https://nginx.org/en/docs/http/websocket.html)。
 

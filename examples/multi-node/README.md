@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 Run several collaboration server nodes behind one gateway. The nodes share one database and one Redis: Redis carries real-time messages between nodes and holds session tickets, so any node can serve any request. `@univerjs-pro/collaboration-cluster-redis` provides the Redis adapters.
 
-This example runs two nodes, Redis, and Nginx with Docker Compose, plus a small Sheet creation and file list UI to observe routing and try collaborative editing.
+This example runs two collaboration nodes, Redis, and Nginx with Docker Compose, plus a small Sheet creation and file list UI to observe routing and try collaborative editing.
 
 ## Deployment
 
@@ -27,12 +27,12 @@ flowchart LR
     B --- DB
 ```
 
-- **Nodes** run the same code with the same database and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
+- **Collaboration nodes** run the same code with the same database and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
 - **Redis** needs version 6.2 or later. Use a highly available Redis in production: when Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
 - **Database** must be reachable by every node and satisfy the SDK database adapter contract. The example shares a SQLite volume on one host.
 - **Gateway** sends a document's WebSocket and submissions to one node and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
 
-## Set up every node
+## Set up every collaboration node
 
 Install the adapter package and a Redis client next to the Endpoint:
 
@@ -78,7 +78,7 @@ const connectionConfig = {
 | Ticket, snapshot, block, fetchmissing | Round robin |
 | Pages, file creation and listing, authorization | Round robin |
 
-The `unit` parameter must match the current document ID; the example opens one document per page and reconnects when switching files. The application checks access permissions. If your gateway keeps idle upstream connections open, set its idle timeout below the Node server's keep-alive timeout (5 seconds by default) to avoid occasional `502` responses.
+The `unit` parameter must match the current document ID; the example opens one document per page and reconnects when switching files. The application checks access permissions. If your gateway keeps idle upstream connections open, set its idle timeout below the Node.js server's keep-alive timeout (5 seconds by default) to avoid occasional `502` responses.
 
 Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash) and [WebSocket proxying](https://nginx.org/en/docs/http/websocket.html).
 
