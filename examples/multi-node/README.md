@@ -110,7 +110,7 @@ Server-side import and export use `@univerjs-pro/exchange-node`, whose converter
 
 Because the replica that accepts an upload or starts a task writes to the shared database, any replica can answer the poll for that task or serve the download, which is what allows plain round robin at the gateway. Watch `X-Exchange-Instance` in the browser's network panel to see different replicas handling the upload, the poll, and the download of one import.
 
-The example keeps one simplification: conversion runs synchronously inside the replica that accepted the request. A production deployment keeps the same two tables, stores file bytes in object storage instead of a `bytea` column, and turns `startTask()` into a queue publish consumed by dedicated worker processes that scale on their own. If a replica stops mid-conversion, its tasks stay `running`; a worker design adds leases or timeouts so another worker can pick them up.
+The example keeps one simplification: conversion runs synchronously inside the replica that accepted the request. To split further, keep the same two tables, store file bytes in object storage instead of a `bytea` column, and turn `startTask()` into a queue publish consumed by dedicated worker processes that scale on their own. If a replica stops mid-conversion, its tasks stay `running`; a worker design adds leases or timeouts so another worker can pick them up.
 
 ## Run the example
 
@@ -135,7 +135,7 @@ Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to 
 
 - The node topology is fixed: Nginx does not retry a request on another node, and the example does not provide automatic failover.
 - The example uses a fixed user and demo permissions and covers Sheet collaboration only.
-- Import and export convert inside the exchange replica that accepted the request, keep file bytes in PostgreSQL, and serve unsigned download URLs. These are teaching choices; see [Run import and export separately](#run-import-and-export-separately) for the production shape.
+- Import and export convert inside the exchange replica that accepted the request, keep file bytes in PostgreSQL, and serve unsigned download URLs. These are teaching choices; see [Run import and export separately](#run-import-and-export-separately) for how to split further.
 
 ## Logs and shutdown
 
