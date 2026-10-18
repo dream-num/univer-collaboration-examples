@@ -58,7 +58,7 @@ pnpm example:multi-node
 特意使用内存文件与任务存储，不代替生产文件服务。
 
 `quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`，服务重启后仍会保留。
-`multi-node` 需要 Docker Compose，在容器内构建，共同使用的 SQLite 数据库保存在 Docker volume 中。
+`multi-node` 需要 Docker Compose，在容器内构建，两个节点共用一个 PostgreSQL 数据库，数据保存在 Docker volume 中。
 
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读
 [身份与权限](https://docs.univer.ai/zh-CN/server/collaboration/identity-and-authorization)、

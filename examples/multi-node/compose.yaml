@@ -8,13 +8,11 @@ x-app: &app
     args:
       UNIVER_LICENSE: ${UNIVER_LICENSE:-}
   init: true
-  volumes:
-    - collaboration-data:/data
 
 x-runtime: &runtime
   HOST: 0.0.0.0
   PORT: "3010"
-  DATABASE_PATH: /data/collaboration.sqlite
+  DATABASE_URL: postgres://univer:univer@postgres:5432/collaboration
   REDIS_URL: redis://redis:6379
 
 x-health: &health
@@ -24,6 +22,24 @@ x-health: &health
   retries: 20
 
 services:
+  # Shared persistent storage for both nodes: collaboration tables and the file catalog.
+  # schema.sql runs once when the data directory is first initialized; the nodes never run DDL.
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: univer
+      POSTGRES_PASSWORD: univer
+      POSTGRES_DB: collaboration
+    volumes:
+      - collaboration-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      # Check over TCP: during initialization only a temporary socket-only server is up.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U univer -d collaboration"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
   # Shared real-time delivery and session tickets for both nodes.
   redis:
     image: redis:7.4.11
@@ -39,6 +55,8 @@ services:
       <<: *runtime
       NODE_ID: node-a
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck: *health
@@ -49,6 +67,8 @@ services:
       <<: *runtime
       NODE_ID: node-b
     depends_on:
+      postgres:
+        condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck: *health

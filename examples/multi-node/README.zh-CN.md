@@ -4,7 +4,7 @@
 
 在一个网关后面运行多个协同服务节点。所有节点共用一个数据库和一个 Redis：Redis 负责在节点之间传递实时消息并保存会话票据，因此任何节点都能处理任何请求。`@univerjs-pro/collaboration-cluster-redis` 提供了 Redis 适配器。
 
-本例用 Docker Compose 运行两个协同服务节点、Redis 和 Nginx，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。
+本例用 Docker Compose 运行两个协同服务节点、PostgreSQL、Redis 和 Nginx，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。
 
 ## 部署结构
 
@@ -27,9 +27,9 @@ flowchart LR
     B --- DB
 ```
 
-- **协同服务节点**运行同样的代码，连接同一个数据库和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
+- **协同服务节点**运行同样的代码，连接同一个 `DATABASE_URL` 和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
 - **Redis** 需要 6.2 及以上。生产环境使用高可用的 Redis：Redis 不可用时，签票请求失败，WebSocket 建连返回可重试的 `503`。
-- **数据库**必须让所有协同服务节点都能访问，并满足 SDK 数据库适配器契约。本例在同一宿主机上共享一个 SQLite volume。
+- **数据库**必须让所有协同服务节点都能访问，并满足 SDK 数据库适配器契约。本例使用 PostgreSQL，适配器为 [`server/postgres-database-adapter.ts`](./server/postgres-database-adapter.ts)，复制自 [`database-adapter`](../database-adapter/README.zh-CN.md) 示例中的自定义适配器；应用的文件目录表也放在同一个数据库中。节点不负责建表：[`schema.sql`](./schema.sql) 在 PostgreSQL 首次初始化数据目录时执行一次，节点启动时只检查表是否存在。生产环境请用迁移工具管理这份 schema，并把迁移作为独立的部署步骤执行，而不是由服务自己建表。
 - **网关**把同一文档的 WebSocket 和提交发到同一个节点，其余请求随意分配，见[配置网关](#配置网关)。可以换成任何网关或负载均衡；使用 Kubernetes 时由平台管理副本，套用同样的路由规则。
 
 ## 配置每个协同服务节点

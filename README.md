@@ -62,8 +62,8 @@ an in-memory file/task store rather than a production file service.
 
 `quick-start` uses the Memory Adapter to keep setup minimal. The other single-node examples store
 collaboration data in their own `.data/collaboration.sqlite` file so state survives server restarts.
-`multi-node` requires Docker Compose and builds inside its containers. Its shared SQLite database
-lives in a Docker volume.
+`multi-node` requires Docker Compose and builds inside its containers. Both nodes share one PostgreSQL
+database whose data lives in a Docker volume.
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read
