@@ -78,6 +78,8 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 },
+    // Browsers send the file name as raw UTF-8; multer decodes it as latin1 unless told otherwise.
+    defParamCharset: "utf8",
   });
 
   router.post("/stream/file/upload", upload.single("file"), (request, response) => {
