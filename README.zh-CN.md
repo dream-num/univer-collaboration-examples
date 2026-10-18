@@ -29,7 +29,7 @@
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
-| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、Nginx 按 unitID 一致性哈希路由到两个协同节点 |
+| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由 |
 
 ## 运行示例
 

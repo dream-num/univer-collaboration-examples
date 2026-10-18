@@ -588,6 +588,9 @@ importers:
       '@univerjs-pro/collaboration-client-ui':
         specifier: 1.1.0
         version: 1.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-cluster-redis':
+        specifier: 1.1.0
+        version: 1.1.0(react@19.3.0)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.1.0
         version: 1.1.0(react@19.3.0)
@@ -627,6 +630,9 @@ importers:
       react-dom:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
+      redis:
+        specifier: ^6.3.0
+        version: 6.3.0
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
@@ -1524,6 +1530,42 @@ packages:
   '@radix-ui/rect@1.1.3':
     resolution: {integrity: sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==}
 
+  '@redis/bloom@6.3.0':
+    resolution: {integrity: sha512-NQ5poYpZr0jv6zazN1cy6JY5kIipKFZ3R9GTL4kOUTX3a9YAfY29U8bsE4lWhVQEM+G4V0BXVC57mubIdDijeA==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.3.0
+
+  '@redis/client@6.3.0':
+    resolution: {integrity: sha512-fHrjwGCBvAANGi+TuRuwKi83sIOzgHr8eh+Uf48w3fSX7Hhrz174NrWqfJhAC2vnN0d/tfaZpdr6+o6JC3QHwg==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@node-rs/xxhash': ^1.1.0
+      '@opentelemetry/api': '>=1 <2'
+    peerDependenciesMeta:
+      '@node-rs/xxhash':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+
+  '@redis/json@6.3.0':
+    resolution: {integrity: sha512-yt6vRfPBXtW/3qm53cF81TSQpLMjWdW4/2E9WQ2GgbvsKkuCKCFQIcMiKlil1ZMnezK+IQuS795xKU5psbaegw==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.3.0
+
+  '@redis/search@6.3.0':
+    resolution: {integrity: sha512-RPXAZmKjZZG7Tm7m1w9keFdXzbL91PiSHQBfQRe9xwW40jNsTRbG0FwhIz4QlHPU4gKDAsCy8IQHj4yZl4H9rw==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.3.0
+
+  '@redis/time-series@6.3.0':
+    resolution: {integrity: sha512-+fJOB8mN1z5WRakCJNh5lVdz1KqvHGSOistsKeitD24QsCtPwyRQXWC0iq6T/i/ubLE/YcguZqPm8F598MKk4A==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      '@redis/client': ^6.3.0
+
   '@rolldown/binding-android-arm-eabi@1.2.5':
     resolution: {integrity: sha512-DLe/i+l8ynIBY7XEQ191TeZvCoowIGa18R+dIV30GW7DiOtp74i/xX8hs8GUjW5ARV7VZuie3d6AumSmCwbeRA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1750,6 +1792,10 @@ packages:
     peerDependencies:
       rxjs: '>=7.0.0'
 
+  '@univerjs-pro/collaboration-cluster-redis@1.1.0':
+    resolution: {integrity: sha512-n9hWxcqkvUb8DHyNVfwErGm0vPf63OvQXV5sUHNQhu5tLVIiGb3Om8R4k/eyA3y3lsb8XCPIB0Izz4M72G203A==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-cluster-redis/-/collaboration-cluster-redis-1.1.0.tgz}
+    engines: {node: '>=22'}
+
   '@univerjs-pro/collaboration-comment-database-sqlite@1.1.0':
     resolution: {integrity: sha512-X978DzsxXyQSI/rcEp2nfCDbqybSV0uUI/RcZDvsdiZppXcC+hLCG5MkZBI+Bjqoyk/Wffwdirllu96xszxB5Q==}
     engines: {node: '>=22'}
@@ -1894,29 +1940,29 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-formula-rust-binding-darwin-arm64@1.0.2':
-    resolution: {integrity: sha512-w0ZRMNBKfIa4rhN7yG2uJDJsKjBFKvMz9Pch4gYXL5LbqA7Gri2/tUir/cnW7O2XM7TEDftqskqD1CmFHO4isA==}
+    resolution: {integrity: sha512-w0ZRMNBKfIa4rhN7yG2uJDJsKjBFKvMz9Pch4gYXL5LbqA7Gri2/tUir/cnW7O2XM7TEDftqskqD1CmFHO4isA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-darwin-arm64/-/engine-formula-rust-binding-darwin-arm64-1.0.2.tgz}
     cpu: [arm64]
     os: [darwin]
 
   '@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.2':
-    resolution: {integrity: sha512-wWWkGmqulI3rI7m/wF9d7HmwmFaN3hi8crgZrDIhJAtDWKopPlH4X2mMNhFWUloTAC8nfoZmi9YcEzYVE5B+QA==}
+    resolution: {integrity: sha512-wWWkGmqulI3rI7m/wF9d7HmwmFaN3hi8crgZrDIhJAtDWKopPlH4X2mMNhFWUloTAC8nfoZmi9YcEzYVE5B+QA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-darwin-x64/-/engine-formula-rust-binding-darwin-x64-1.0.2.tgz}
     cpu: [x64]
     os: [darwin]
 
   '@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.2':
-    resolution: {integrity: sha512-JnVSN1gkx3jg9tvXOeBmhamSBLQLhvk9Iht8tkJ3P8NKzfIDypYS1Yai+x9tqFE1TNAZLDNsSIB+VChisV0qAQ==}
+    resolution: {integrity: sha512-JnVSN1gkx3jg9tvXOeBmhamSBLQLhvk9Iht8tkJ3P8NKzfIDypYS1Yai+x9tqFE1TNAZLDNsSIB+VChisV0qAQ==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu/-/engine-formula-rust-binding-linux-arm64-gnu-1.0.2.tgz}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu@1.0.2':
-    resolution: {integrity: sha512-mAzwMYuqgC/GdDnpaLe/V9+y/7BoVgLvOA1YRNRAIi3Jq2hsNN4iHlf42Mr4lfOVY8Ngz8XT2Xsw4CHRMnw40Q==}
+    resolution: {integrity: sha512-mAzwMYuqgC/GdDnpaLe/V9+y/7BoVgLvOA1YRNRAIi3Jq2hsNN4iHlf42Mr4lfOVY8Ngz8XT2Xsw4CHRMnw40Q==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu/-/engine-formula-rust-binding-linux-x64-gnu-1.0.2.tgz}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc@1.0.2':
-    resolution: {integrity: sha512-vzmsswkarZBmy5Lg6TbX/CtXk8zIJQEKW2B6m478t9cImeEiLRURXbtCjFcmmpCZrWG8EfpgDz8g4v1MmqknsA==}
+    resolution: {integrity: sha512-vzmsswkarZBmy5Lg6TbX/CtXk8zIJQEKW2B6m478t9cImeEiLRURXbtCjFcmmpCZrWG8EfpgDz8g4v1MmqknsA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc/-/engine-formula-rust-binding-win32-x64-msvc-1.0.2.tgz}
     cpu: [x64]
     os: [win32]
 
@@ -1944,29 +1990,29 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/exchange-node-binding-darwin-arm64@1.0.3':
-    resolution: {integrity: sha512-tYNMl7QIT5x/YAYaLzdtLOnHYhPe4FodgYM+LWouHrwXh4iG9C8X5SrzUjYE8D4rHI4gZYS6fNJL1pRDnu7hoQ==}
+    resolution: {integrity: sha512-tYNMl7QIT5x/YAYaLzdtLOnHYhPe4FodgYM+LWouHrwXh4iG9C8X5SrzUjYE8D4rHI4gZYS6fNJL1pRDnu7hoQ==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-node-binding-darwin-arm64/-/exchange-node-binding-darwin-arm64-1.0.3.tgz}
     cpu: [arm64]
     os: [darwin]
 
   '@univerjs-pro/exchange-node-binding-darwin-x64@1.0.3':
-    resolution: {integrity: sha512-wf3ayOPpRHX30k4XbQ98q6gevlR5ubIVqacAeTQVhjAv1gUB/OUlanYc95oxhNsam6lYVzOfP2KfioVUTn/jAw==}
+    resolution: {integrity: sha512-wf3ayOPpRHX30k4XbQ98q6gevlR5ubIVqacAeTQVhjAv1gUB/OUlanYc95oxhNsam6lYVzOfP2KfioVUTn/jAw==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-node-binding-darwin-x64/-/exchange-node-binding-darwin-x64-1.0.3.tgz}
     cpu: [x64]
     os: [darwin]
 
   '@univerjs-pro/exchange-node-binding-linux-arm64-gnu@1.0.3':
-    resolution: {integrity: sha512-JarGLL/2MJaX+gM1q0WJ08wupQQZC2g9qmn+p5Kwri3JIROAlWc+IKgc9XzGqdei3slomoZO4JU/sIc/dSQfSg==}
+    resolution: {integrity: sha512-JarGLL/2MJaX+gM1q0WJ08wupQQZC2g9qmn+p5Kwri3JIROAlWc+IKgc9XzGqdei3slomoZO4JU/sIc/dSQfSg==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-node-binding-linux-arm64-gnu/-/exchange-node-binding-linux-arm64-gnu-1.0.3.tgz}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/exchange-node-binding-linux-x64-gnu@1.0.3':
-    resolution: {integrity: sha512-EUFnFbe9Pv15Zv714GBZS9ctD+tcUK5ZZYY3ZfKPvyGoAuvYsEobX2WD7BooKXRXesqldjsv7svNIKK9sMaMjA==}
+    resolution: {integrity: sha512-EUFnFbe9Pv15Zv714GBZS9ctD+tcUK5ZZYY3ZfKPvyGoAuvYsEobX2WD7BooKXRXesqldjsv7svNIKK9sMaMjA==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-node-binding-linux-x64-gnu/-/exchange-node-binding-linux-x64-gnu-1.0.3.tgz}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/exchange-node-binding-win32-x64-msvc@1.0.3':
-    resolution: {integrity: sha512-cB/uajRdpSQCaj/N2R46rntECwDIOUQAEKPzYi23NKQCNdbTKAR8AC8+eZhTe9jnYpHB2fxsL/fTfiXXXYBrbQ==}
+    resolution: {integrity: sha512-cB/uajRdpSQCaj/N2R46rntECwDIOUQAEKPzYi23NKQCNdbTKAR8AC8+eZhTe9jnYpHB2fxsL/fTfiXXXYBrbQ==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-node-binding-win32-x64-msvc/-/exchange-node-binding-win32-x64-msvc-1.0.3.tgz}
     cpu: [x64]
     os: [win32]
 
@@ -3074,6 +3120,10 @@ packages:
     resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
     engines: {node: '>= 6'}
 
+  redis@6.3.0:
+    resolution: {integrity: sha512-XFQbPie1lGpKeUZ8ySYY43yLnQy/iIQtHNvIr/1XdaABpb96rUSdm3Mfl+98FEVbv9ZJIzINMno5s0Nh8E5LEw==}
+    engines: {node: '>= 20.0.0'}
+
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -3736,6 +3786,24 @@ snapshots:
 
   '@radix-ui/rect@1.1.3': {}
 
+  '@redis/bloom@6.3.0(@redis/client@6.3.0)':
+    dependencies:
+      '@redis/client': 6.3.0
+
+  '@redis/client@6.3.0': {}
+
+  '@redis/json@6.3.0(@redis/client@6.3.0)':
+    dependencies:
+      '@redis/client': 6.3.0
+
+  '@redis/search@6.3.0(@redis/client@6.3.0)':
+    dependencies:
+      '@redis/client': 6.3.0
+
+  '@redis/time-series@6.3.0(@redis/client@6.3.0)':
+    dependencies:
+      '@redis/client': 6.3.0
+
   '@rolldown/binding-android-arm-eabi@1.2.5':
     optional: true
 
@@ -4132,6 +4200,15 @@ snapshots:
       rxjs: 7.8.2
     transitivePeerDependencies:
       - react
+
+  '@univerjs-pro/collaboration-cluster-redis@1.1.0(react@19.3.0)':
+    dependencies:
+      '@univerjs-pro/collaboration-endpoint': 1.1.0(react@19.3.0)
+      '@univerjs-pro/collaboration-service': 1.1.0(react@19.3.0)
+    transitivePeerDependencies:
+      - bufferutil
+      - react
+      - utf-8-validate
 
   '@univerjs-pro/collaboration-comment-database-sqlite@1.1.0(react@19.3.0)':
     dependencies:
@@ -6699,6 +6776,17 @@ snapshots:
       inherits: 2.0.4
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
+
+  redis@6.3.0:
+    dependencies:
+      '@redis/bloom': 6.3.0(@redis/client@6.3.0)
+      '@redis/client': 6.3.0
+      '@redis/json': 6.3.0(@redis/client@6.3.0)
+      '@redis/search': 6.3.0(@redis/client@6.3.0)
+      '@redis/time-series': 6.3.0(@redis/client@6.3.0)
+    transitivePeerDependencies:
+      - '@node-rs/xxhash'
+      - '@opentelemetry/api'
 
   require-directory@2.1.1: {}
 

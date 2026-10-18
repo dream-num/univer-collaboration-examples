@@ -111,7 +111,7 @@ async function main() {
   document.querySelector<HTMLElement>("#empty-state")!.hidden = true;
   document.querySelector<HTMLElement>("#app")!.hidden = false;
 
-  // Ticket and WebSocket paths lack a unitID; add a custom unit query for Nginx routing.
+  // The WebSocket path lacks a unitID; add a custom unit query so Nginx routes it with the submissions.
   // The SDK preserves this routing parameter. Its value must match the current document's unitID.
   const routingQuery = new URLSearchParams({ unit: unitID }).toString();
 
@@ -148,9 +148,9 @@ async function main() {
           // Reads use round robin; submissions use the path unitID to reach the WebSocket's node.
           snapshotServerUrl: `${baseURL}/snapshot`,
           collabSubmitChangesetUrl: `${baseURL}/comb`,
-          // Both URLs must carry the same unit parameter so ticket issuance and WebSocket setup reach the same node.
+          // Tickets live in Redis and can be redeemed on any node, so only the WebSocket carries the unit.
           collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect?${routingQuery}`,
-          wsSessionTicketUrl: `${baseURL}/user/session-ticket?${routingQuery}`,
+          wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         },
       ],
       [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],

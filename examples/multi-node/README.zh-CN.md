@@ -2,21 +2,85 @@
 
 [English](./README.md) | 简体中文
 
-多节点部署可以将不同文档的协同负载分配到多个服务节点，分担单节点压力，提升整体并发处理能力。
+在一个网关后面运行多个协同服务节点。所有节点共用一个数据库和一个 Redis：Redis 负责在节点之间传递实时消息并保存会话票据，因此任何节点都能处理任何请求。`@univerjs-pro/collaboration-cluster-redis` 提供了 Redis 适配器。
 
-本例使用 Nginx 将请求路由到两个协同服务节点，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。实际部署时，可以根据现有基础设施选择其他网关或负载均衡方案；使用 Kubernetes 等容器编排平台时，可由平台管理服务副本，并配置相应网关按 unitID 做一致性路由。
+本例用 Docker Compose 运行两个协同服务节点、Redis 和 Nginx，并提供简单的 Sheet 创建和文件列表，方便观察路由和验证多人协同。
 
-## 为什么需要按文档路由？
+## 部署结构
 
-推荐按 **unitID（文档 ID）** 做一致性哈希，让同一文档的协同请求集中到同一个节点，不同文档的负载则分散到多个节点。这可以减少跨节点协调的需求，有助于获得更好的协同性能。
+```mermaid
+flowchart LR
+    Browser["浏览器"] --> Gateway["网关（Nginx）"]
+    subgraph nodes["协同服务节点"]
+        A["node-a"]
+        B["node-b"]
+    end
+    Gateway --> A
+    Gateway --> B
+    subgraph shared["所有节点共用"]
+        Redis[("Redis<br/>pub/sub + 会话票据")]
+        DB[("数据库")]
+    end
+    A --- Redis
+    B --- Redis
+    A --- DB
+    B --- DB
+```
 
-本例对 ticket、WebSocket 和协同提交按 unitID 路由；快照等读取请求由各节点轮询处理。
+- **协同服务节点**运行同样的代码，连接同一个数据库和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
+- **Redis** 需要 6.2 及以上。生产环境使用高可用的 Redis：Redis 不可用时，签票请求失败，WebSocket 建连返回可重试的 `503`。
+- **数据库**必须让所有协同服务节点都能访问，并满足 SDK 数据库适配器契约。本例在同一宿主机上共享一个 SQLite volume。
+- **网关**把同一文档的 WebSocket 和提交发到同一个节点，其余请求随意分配，见[配置网关](#配置网关)。可以换成任何网关或负载均衡；使用 Kubernetes 时由平台管理副本，套用同样的路由规则。
 
-## 当前限制与开发计划
+## 配置每个协同服务节点
 
-当前版本的会话和实时广播局限于单个服务进程，因此同一文档的 ticket、WebSocket 和协同提交需要命中同一节点。扩缩容或故障切换导致请求分散到不同节点时，Service 与满足契约的数据库适配器仍保证已提交协同数据的一致性，但实时广播可能不完整。
+在 Endpoint 旁边安装适配器包和 Redis 客户端：
 
-跨节点广播组件正在开发中，用于补齐跨节点实时消息投递能力。即使后续版本支持跨节点广播，仍推荐按 unitID 做一致性路由，减少跨节点协调开销。
+```bash
+pnpm add @univerjs-pro/collaboration-endpoint @univerjs-pro/collaboration-cluster-redis redis
+```
+
+[`server/main.ts`](./server/main.ts) 创建一个 Redis 连接用于命令，再复制一个专门用于订阅，构造两个适配器后传给 Endpoint：
+
+```ts
+const redis = createClient({ url: redisURL });
+const redisSubscriber = redis.duplicate();
+await Promise.all([redis.connect(), redisSubscriber.connect()]);
+const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscriber });
+const ticketStore = new RedisSessionTicketStore({ client: redis });
+const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
+```
+
+也支持 `ioredis` 和 Redis Cluster，见 `@univerjs-pro/collaboration-cluster-redis` 的 README。
+
+Endpoint 不会释放外部传入的适配器和客户端。停止服务时按创建的反序释放：先释放 Transport，再释放 pub/sub 适配器，最后关闭两个 Redis 连接。
+
+## 配置网关
+
+把同一文档的 WebSocket 和提交固定到一个节点：提交确认和广播在本地直接推送，并且只有这个节点把文档加载进内存。其余请求发到任何节点都可以。
+
+提交请求的路径已经包含 unitID。WebSocket 的路径不含，所以 [`web/main.ts`](./web/main.ts) 给它追加 `unit` 参数，SDK 会保留这个参数：
+
+```ts
+const routingQuery = new URLSearchParams({ unit: unitID }).toString();
+const connectionConfig = {
+  collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect?${routingQuery}`,
+  wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
+};
+```
+
+[`nginx.conf`](./nginx.conf) 把两者映射成同一个路由键，用 `hash $routing_unit consistent` 分配：
+
+| 请求 | 分配方式 |
+| --- | --- |
+| WebSocket `/universer-api/comb/connect` | 按 query `unit` 一致性哈希 |
+| 协同提交 `new_changes` | 按路径 `unitID` 一致性哈希 |
+| ticket、snapshot、block、fetchmissing | 轮询 |
+| 页面、文件创建与列表、鉴权 | 轮询 |
+
+`unit` 必须与当前文档 ID 一致；本例每个页面打开一份文档，切换文件时重新建连。访问权限由应用校验。如果网关会保持与上游的空闲连接，空闲超时要短于 Node.js 服务的 keep-alive 超时（默认 5 秒），否则会偶发 `502`。
+
+Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash)、[WebSocket 代理](https://nginx.org/en/docs/http/websocket.html)。
 
 ## 运行示例
 
@@ -30,41 +94,15 @@ docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 
 打开 <http://127.0.0.1:3010/>：
 
-1. 点击 **New Sheet** 创建文件，侧栏会显示它分配到的 `node-a` 或 `node-b`。
+1. 点击 **New Sheet** 创建文件，侧栏会显示它分配到的节点，`node-a` 或 `node-b`。
 2. 把完整 URL 复制到另一个标签页，编辑同一份 Sheet，观察同步。
 3. 再创建几份文件，选择分配到另一节点的文件重复验证。
 
 `GATEWAY_PORT` 可修改默认端口 `3010`；`UNIVER_LICENSE` 可在构建时传入许可证。更新代码后重新执行启动命令，会同时重建服务节点和 Nginx，避免网关保留旧容器地址；随后重新打开页面。
 
-## 关键配置
-
-在 [`web/main.ts`](./web/main.ts) 中，为 ticket 和 WebSocket URL 追加相同的 `unit` 参数：
-
-```ts
-const routingQuery = new URLSearchParams({ unit: unitID }).toString();
-const connectionConfig = {
-  collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect?${routingQuery}`,
-  wsSessionTicketUrl: `${baseURL}/user/session-ticket?${routingQuery}`,
-};
-```
-
-这两个协议路径本身不含 unitID，SDK 会保留应用追加的参数，供 Nginx 选节点。提交请求的路径已经包含 unitID。[`nginx.conf`](./nginx.conf) 提取同一个路由键，使用 `hash $routing_unit consistent` 分配请求：
-
-| 请求 | 分配方式 |
-| --- | --- |
-| ticket、WebSocket | 按 query `unit` 一致性哈希 |
-| 协同提交 `new_changes` | 按路径 `unitID` 一致性哈希 |
-| snapshot、block、fetchmissing 读取 | 轮询 |
-| 页面、文件创建与列表、鉴权 | 轮询 |
-
-每个页面打开一份文档，切换文件时重新建连。`unit` 必须与当前文档 ID 一致，访问权限由应用校验。
-
-Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#hash)、[WebSocket 代理](https://nginx.org/en/docs/http/websocket.html)。
-
 ## 示例范围
 
-- 两个容器共享同一宿主机上的 SQLite volume，数据在重启后保留。跨主机部署需要所有节点可访问、满足 SDK 数据库适配器契约的共享持久化存储。
-- 节点拓扑固定，关闭自动换节点重试，不提供自动故障接管。
+- 节点拓扑固定：Nginx 不会把请求改发到另一个节点，示例也不提供自动故障接管。
 - 使用固定用户和演示权限，只覆盖 Sheet 协同。
 
 ## 日志与停止
