@@ -11,8 +11,12 @@ This example runs two nodes, Redis, and Nginx with Docker Compose, plus a small 
 ```mermaid
 flowchart LR
     Browser --> Gateway["Gateway (Nginx)"]
-    Gateway --> A["node-a"]
-    Gateway --> B["node-b"]
+    subgraph nodes["Collaboration nodes"]
+        A["node-a"]
+        B["node-b"]
+    end
+    Gateway --> A
+    Gateway --> B
     subgraph shared["Shared by every node"]
         Redis[("Redis<br/>pub/sub + session tickets")]
         DB[("Database")]

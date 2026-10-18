@@ -11,8 +11,12 @@
 ```mermaid
 flowchart LR
     Browser["浏览器"] --> Gateway["网关（Nginx）"]
-    Gateway --> A["node-a"]
-    Gateway --> B["node-b"]
+    subgraph nodes["协同服务节点"]
+        A["node-a"]
+        B["node-b"]
+    end
+    Gateway --> A
+    Gateway --> B
     subgraph shared["所有节点共用"]
         Redis[("Redis<br/>pub/sub + 会话票据")]
         DB[("数据库")]
