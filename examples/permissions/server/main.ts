@@ -95,7 +95,7 @@ app.post("/login/:username", (request, response) => {
   const user = users.find((user) => user.username === request.params.username);
   if (!user) return void response.sendStatus(404);
   signIn(request, response, user);
-  response.redirect(303, `/?unit=${UNIT_ID}&type=${UniverType.UNIVER_SHEET}`);
+  response.redirect(303, `/?unit=${UNIT_ID}`);
 });
 app.post("/logout", (request, response) => {
   signOut(request, response);
@@ -130,6 +130,6 @@ const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 3010);
 server.listen(port, host, () =>
   console.info(
-    `Permissions is running at http://${host}:${port}/?unit=${UNIT_ID}&type=${UniverType.UNIVER_SHEET}`,
+    `Permissions is running at http://${host}:${port}/?unit=${UNIT_ID}`,
   ),
 );

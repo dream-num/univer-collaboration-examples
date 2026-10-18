@@ -11,6 +11,7 @@ import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
+import "@univerjs-pro/collaboration-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
@@ -26,7 +27,7 @@ const refreshButton = document.querySelector<HTMLButtonElement>("#refresh-files"
 
 function fileURL(unitID: string) {
   // Reload the page when switching documents to reconnect using the new routing key.
-  return `/?unit=${encodeURIComponent(unitID)}&type=2`;
+  return `/?unit=${encodeURIComponent(unitID)}`;
 }
 
 async function listFiles(): Promise<FileEntry[]> {
@@ -118,7 +119,7 @@ async function main() {
   const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
   const baseURL = `${httpProtocol}://${location.host}/universer-api`;
 
-  createUniver({
+  const { univerAPI } = createUniver({
     locale: LocaleType.EN_US,
     locales: {
       [LocaleType.EN_US]: mergeLocales(
@@ -152,10 +153,12 @@ async function main() {
           wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         },
       ],
-      UniverCollaborationClientUIPlugin,
+      [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
     ],
   });
 
+  const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitID);
+  if (!workbook) throw new Error("Document could not be loaded");
 }
 
 void main().catch(showError);
