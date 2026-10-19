@@ -187,24 +187,44 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
       throw new CollabError("INVALID_REQUEST", "Initial record and snapshot must match at revision 1");
     }
 
+    const blocks = latestBlocks(sheetBlocks);
     return this._transaction(async (client) => {
-      const blocks = this._encodeBlocks(sheetBlocks);
-      const result = await this._query("create_unit", `
-        WITH created AS (
+      if (blocks.length <= MAX_BLOCKS_PER_STATEMENT) {
+        // One statement creates the Unit, its blocks and its snapshot; each block is a scalar parameter.
+        const values: unknown[] = [record.unitID, record.type, this._encode(snapshot), ctx.userID, Date.now()];
+        const result = await this._query(null, `
+          WITH created AS (
+            INSERT INTO collaboration.units (unit_id, type, head_revision, creator_id, created_at_ms)
+            VALUES ($1, $2, 1, $4, $5)
+            ON CONFLICT (unit_id) DO NOTHING
+            RETURNING unit_id
+          ), saved_blocks AS (
+            INSERT INTO collaboration.sheet_blocks (unit_id, block_id, payload)
+            SELECT u.unit_id, b.id, b.payload
+            FROM created u
+            CROSS JOIN ${this._blockRows(blocks, values)} AS b(id, payload)
+          )
+          INSERT INTO collaboration.snapshots (unit_id, revision, payload)
+          SELECT unit_id, 1, $3 FROM created
+        `, values, client);
+        if (result.rowCount) return { status: "created", record: { ...record } };
+      } else {
+        // Rare: more blocks than one statement can carry. The transaction still publishes everything together.
+        const created = await this._query("create_unit", `
           INSERT INTO collaboration.units (unit_id, type, head_revision, creator_id, created_at_ms)
-          VALUES ($1, $2, 1, $6, $7)
+          VALUES ($1, $2, 1, $3, $4)
           ON CONFLICT (unit_id) DO NOTHING
           RETURNING unit_id
-        ), saved_blocks AS (
-          INSERT INTO collaboration.sheet_blocks (unit_id, block_id, payload)
-          SELECT u.unit_id, b.id, b.payload
-          FROM created u
-          CROSS JOIN unnest($4::text[], $5::bytea[]) AS b(id, payload)
-        )
-        INSERT INTO collaboration.snapshots (unit_id, revision, payload)
-        SELECT unit_id, 1, $3 FROM created
-      `, [record.unitID, record.type, this._encode(snapshot), blocks.ids, blocks.payloads, ctx.userID, Date.now()], client);
-      if (result.rowCount) return { status: "created", record: { ...record } };
+        `, [record.unitID, record.type, ctx.userID, Date.now()], client);
+        if (created.rowCount) {
+          await this._insertBlocks(client, record.unitID, blocks, false);
+          await this._query("create_snapshot", `
+            INSERT INTO collaboration.snapshots (unit_id, revision, payload)
+            VALUES ($1, 1, $2)
+          `, [record.unitID, this._encode(snapshot)], client);
+          return { status: "created", record: { ...record } };
+        }
+      }
 
       // After a conflict, reads with a fresh statement snapshot and coordinates with deletion and recovery using a row lock.
       const [unit] = await this._lockUnits(client, [record.unitID]);
@@ -249,10 +269,13 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
 
   /** Saves snapshot metadata and the supplied blocks. */
   async saveSnapshot(_ctx: DatabaseContext, input: SaveSnapshotInput): Promise<void> {
-    const { snapshot, sheetBlocks = [] } = input;
-    const blocks = this._encodeBlocks(sheetBlocks);
+    const { snapshot } = input;
+    const blocks = latestBlocks(input.sheetBlocks ?? []);
+    if (blocks.length > MAX_BLOCKS_PER_STATEMENT) return this._saveSnapshotInChunks(snapshot, blocks);
     // Validates the current row returned by FOR UPDATE; writes only apply to a Unit that passes validation.
-    const { rows } = await this._query<{ deletedStatus: UnitRow["deletedStatus"]; saved: boolean }>("save_snapshot", `
+    // One statement, so the snapshot row is published together with every block it references.
+    const values: unknown[] = [snapshot.unitID, snapshot.type, snapshot.rev, this._encode(snapshot)];
+    const { rows } = await this._query<{ deletedStatus: UnitRow["deletedStatus"]; saved: boolean }>(null, `
       WITH locked_unit AS MATERIALIZED (
         SELECT unit_id, type, head_revision, deleted_status
         FROM collaboration.units
@@ -265,7 +288,7 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
         INSERT INTO collaboration.sheet_blocks (unit_id, block_id, payload)
         SELECT u.unit_id, b.id, b.payload
         FROM valid_unit u
-        CROSS JOIN unnest($5::text[], $6::bytea[]) AS b(id, payload)
+        CROSS JOIN ${this._blockRows(blocks, values)} AS b(id, payload)
         ON CONFLICT (unit_id, block_id) DO UPDATE SET payload = excluded.payload
       ), saved_snapshot AS (
         INSERT INTO collaboration.snapshots (unit_id, revision, payload)
@@ -274,12 +297,29 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
         RETURNING revision
       )
       SELECT deleted_status AS "deletedStatus", EXISTS (SELECT 1 FROM saved_snapshot) AS saved FROM locked_unit
-    `, [snapshot.unitID, snapshot.type, snapshot.rev, this._encode(snapshot), blocks.ids, blocks.payloads]);
+    `, values);
     const unit = rows[0];
     if (!unit || unit.deletedStatus !== null) throw new CollabError("UNIT_NOT_FOUND", "Unit is not active");
     if (!unit.saved) {
       throw new CollabError("INVALID_REQUEST", "Snapshot does not match the stored unit head");
     }
+  }
+
+  /** Rare: more blocks than one statement can carry. Same checks and writes, split over one transaction. */
+  private async _saveSnapshotInChunks(snapshot: ISnapshot, blocks: readonly ISheetBlock[]): Promise<void> {
+    await this._transaction(async (client) => {
+      const [unit] = await this._lockUnits(client, [snapshot.unitID]);
+      if (!unit || unit.deletedStatus !== null) throw new CollabError("UNIT_NOT_FOUND", "Unit is not active");
+      if (unit.type !== snapshot.type || snapshot.rev < 1 || snapshot.rev > unit.headRevision) {
+        throw new CollabError("INVALID_REQUEST", "Snapshot does not match the stored unit head");
+      }
+      await this._insertBlocks(client, snapshot.unitID, blocks, true);
+      await this._query("save_snapshot_row", `
+        INSERT INTO collaboration.snapshots (unit_id, revision, payload)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (unit_id, revision) DO UPDATE SET payload = excluded.payload
+      `, [snapshot.unitID, snapshot.rev, this._encode(snapshot)], client);
+    });
   }
 
   /** Atomically deletes the specified Units; hard deletion retains Unit rows to prevent ID reuse. */
@@ -399,13 +439,15 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
     return unitIDs.map(unitID => units.get(unitID));
   }
 
+  /** `name` null runs an unnamed statement; used where the statement text depends on the block count. */
   private _query<R extends QueryResultRow = QueryResultRow>(
-    name: string,
+    name: string | null,
     text: string,
     values: unknown[] = [],
     client?: PoolClient,
   ): Promise<QueryResult<R>> {
-    return (client ?? this._pool).query<R>({ name: `collaboration-${name}`, text, values });
+    const query = name === null ? { text, values } : { name: `collaboration-${name}`, text, values };
+    return (client ?? this._pool).query<R>(query);
   }
 
   private _encode(value: IChangeset | ISnapshot | ISheetBlock): Buffer {
@@ -419,17 +461,46 @@ export class CustomPostgresDatabaseAdapter implements IDatabaseAdapter {
     return this._decoder.decode(bytes) as T;
   }
 
-  private _encodeBlocks(sheetBlocks: readonly ISheetBlock[]): { ids: string[]; payloads: Buffer[] } {
-    const ids: string[] = [];
-    const payloads: Buffer[] = [];
-    // Keeps the last block for each duplicate ID, matching sequential upserts.
-    const blocks = new Map(sheetBlocks.map(block => [block.id, block]));
-    for (const block of blocks.values()) {
-      ids.push(block.id);
-      payloads.push(this._encode(block));
-    }
-    return { ids, payloads };
+  /**
+   * Renders blocks as an inline VALUES relation and appends two scalar parameters per block, so every
+   * payload travels as a binary `bytea` parameter. `pg` has no binary encoding for a `bytea[]` parameter:
+   * it would hex-encode every byte into a text array literal on the event loop and the server would parse
+   * it back, doubling the bytes on the wire and costing hundreds of milliseconds per snapshot of a large
+   * workbook.
+   */
+  private _blockRows(blocks: readonly ISheetBlock[], values: unknown[]): string {
+    if (blocks.length === 0) return "(SELECT NULL::text, NULL::bytea WHERE false)";
+    const rows = blocks.map((block) => {
+      values.push(block.id, this._encode(block));
+      return `($${values.length - 1}::text, $${values.length}::bytea)`;
+    });
+    return `(VALUES ${rows.join(", ")})`;
   }
+
+  private async _insertBlocks(
+    client: PoolClient,
+    unitID: string,
+    blocks: readonly ISheetBlock[],
+    upsert: boolean,
+  ): Promise<void> {
+    for (let start = 0; start < blocks.length; start += MAX_BLOCKS_PER_STATEMENT) {
+      const values: unknown[] = [unitID];
+      await this._query(null, `
+        INSERT INTO collaboration.sheet_blocks (unit_id, block_id, payload)
+        SELECT $1::text, b.id, b.payload
+        FROM ${this._blockRows(blocks.slice(start, start + MAX_BLOCKS_PER_STATEMENT), values)} AS b(id, payload)
+        ${upsert ? "ON CONFLICT (unit_id, block_id) DO UPDATE SET payload = excluded.payload" : ""}
+      `, values, client);
+    }
+  }
+}
+
+/** Blocks per statement: two parameters each plus a few fixed ones stay well below PostgreSQL's 65535-parameter limit. */
+const MAX_BLOCKS_PER_STATEMENT = 30_000;
+
+/** Keeps the last block for each duplicate ID, matching sequential upserts. */
+function latestBlocks(sheetBlocks: readonly ISheetBlock[]): ISheetBlock[] {
+  return [...new Map(sheetBlocks.map(block => [block.id, block])).values()];
 }
 
 function toUnitRecord(unit: UnitRecordRow): UnitRecord {
