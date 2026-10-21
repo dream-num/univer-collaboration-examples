@@ -16,16 +16,11 @@ import {
   UnitSnapshotMaterializer,
   type IUniverCollabService,
 } from "@univerjs-pro/collaboration-service";
-import { ErrorCode, UniverType, type IError } from "@univerjs/protocol";
+import { ErrorCode, FileSource, UniverType, type IError } from "@univerjs/protocol";
+import type { FileStore } from "./file-store.js";
 
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 const OK = protocolError(ErrorCode.OK, "");
-
-interface StoredFile {
-  readonly data: Buffer;
-  readonly fileName: string;
-  readonly contentType: string;
-}
 
 interface ImportRequest {
   readonly fileID?: unknown;
@@ -67,12 +62,13 @@ type ExchangeTask =
 export interface ExchangeRouterOptions {
   readonly service: IUniverCollabService;
   readonly userID: string;
+  /** Durable file store; see `file-store.ts` for which `source` values are temporary. */
+  readonly files: FileStore;
 }
 
 export function createExchangeRouter(options: ExchangeRouterOptions): Router {
-  const { service, userID } = options;
+  const { service, userID, files } = options;
   const materializer = new UnitSnapshotMaterializer();
-  const files = new Map<string, StoredFile>();
   const tasks = new Map<string, ExchangeTask>();
   const router = express.Router();
   const upload = multer({
@@ -82,18 +78,28 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
     defParamCharset: "utf8",
   });
 
-  router.post("/stream/file/upload", upload.single("file"), (request, response) => {
+  // Univer clients upload with `?size=<bytes>&source=<FileSource>&assign=<id>`. The exchange client
+  // sends `FileSource.HttpImport`; image and attachment uploads send `FileSource.UnitEmbedded` with
+  // the Unit ID as `assign`. See file-store.ts for which values are temporary.
+  router.post("/stream/file/upload", upload.single("file"), async (request, response) => {
     if (!request.file) {
       response.status(400).json({ error: protocolError(ErrorCode.UNDEFINED, "file is required") });
       return;
     }
-    const fileID = randomUUID();
-    files.set(fileID, {
-      data: request.file.buffer,
-      fileName: basename(request.file.originalname) || "upload.bin",
-      contentType: request.file.mimetype || "application/octet-stream",
-    });
-    response.json({ FileId: fileID, error: OK });
+    try {
+      const stored = await files.save({
+        data: request.file.buffer,
+        fileName: basename(request.file.originalname) || "upload.bin",
+        contentType: request.file.mimetype || "application/octet-stream",
+        source: optionalString(request.query.source),
+        assign: optionalString(request.query.assign),
+      });
+      response.json({ FileId: stored.fileID, error: OK });
+    } catch (error) {
+      response.status(500).json({
+        error: protocolError(ErrorCode.INTERNAL_ERROR, errorMessage(error)),
+      });
+    }
   });
 
   router.post(
@@ -111,8 +117,10 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
         if (!file) throw new Error("Uploaded file was not found");
 
         const taskID = startTask(tasks, async () => {
+          const data = await files.read(fileID);
+          if (!data) throw new Error("Uploaded file was not found");
           const unitID = randomUUID();
-          const imported = await importBufferToSnapshot(file.data, {
+          const imported = await importBufferToSnapshot(data, {
             type: UniverInstanceType.UNIVER_SHEET,
             fileName: file.fileName,
             unitId: unitID,
@@ -138,7 +146,8 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
           if (created.status !== "created") {
             throw new Error("Imported Unit ID already exists");
           }
-          files.delete(fileID);
+          // The uploaded source file (`FileSource.HttpImport`) is temporary; drop it once the Unit exists.
+          await files.delete(fileID);
           return {
             kind: "import",
             import: { outputType: 1, unitID, jsonID: "" },
@@ -172,17 +181,19 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
           const snapshot = await captureCurrentSnapshot(service, materializer, userID, unitID);
           const exportOptions = createExportOptions(format, sheetID, snapshot);
           const data = await exportSnapshotToBuffer(snapshot, exportOptions);
-          const fileID = randomUUID();
-          files.set(fileID, {
+          // Export results are temporary (`FileSource.HttpExport`): they may be deleted once downloaded.
+          const stored = await files.save({
             data,
             fileName: `${unitID}.${format}`,
             contentType: contentTypeFor(format),
+            source: String(FileSource.HttpExport),
+            assign: unitID,
           });
           return {
             kind: "export",
             export: {
-              fileID,
-              fileUrl: `/universer-api/file/${fileID}/download`,
+              fileID: stored.fileID,
+              fileUrl: `/universer-api/file/${stored.fileID}/download`,
             },
           };
         });
@@ -239,7 +250,7 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
     });
   });
 
-  router.get("/file/:fileID/download", (request, response) => {
+  router.get("/file/:fileID/download", (request, response, next) => {
     const file = files.get(request.params.fileID);
     if (!file) {
       response.sendStatus(404);
@@ -247,8 +258,14 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
     }
     response
       .type(file.contentType)
-      .set("Content-Disposition", `attachment; filename="${file.fileName}"`)
-      .send(file.data);
+      .set(
+        "Content-Disposition",
+        `attachment; filename*=UTF-8''${encodeURIComponent(file.fileName)}`,
+      )
+      // Serve relative to the store directory: `.data` is a dot segment that `sendFile` would otherwise refuse.
+      .sendFile(file.fileID, { root: files.directory }, (error) => {
+        if (error) next(error);
+      });
   });
 
   return router;
