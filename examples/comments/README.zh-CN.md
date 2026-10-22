@@ -16,3 +16,5 @@ Endpoint 的 Session 和 Unit room。
 必须一起纳入业务数据生命周期。
 core 与 Comment SQLite Adapter 共享 `.data/collaboration.sqlite`，两类数据都会在服务重启
 后保留。
+示例没有文件服务，插入的图片以 base64 内嵌在 Sheet 中；生产环境应把协同客户端的图片服务接到
+文件服务。

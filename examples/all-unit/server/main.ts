@@ -9,10 +9,15 @@ import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
 import type { UnitsResponse } from "../shared/units";
+import { FileStore } from "./file-store";
+import { createFileRouter } from "./files";
 import { DEMO_USER, ensureUnits, units } from "./units";
 
 const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
+// Images and attachments uploaded from the editors are written here; see file-store.ts for the lifecycle rules.
+const filesDirectory = process.env.FILES_PATH ?? fileURLToPath(new URL("../../.data/files", import.meta.url));
 await mkdir(dirname(filename), { recursive: true });
+const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const transport = createNodeTransport();
@@ -31,6 +36,7 @@ const app = express();
 app.get("/api/units", (_request, response) => {
   response.json({ units, user: DEMO_USER } satisfies UnitsResponse);
 });
+app.use("/universer-api", createFileRouter(files));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
   const body = request.body as { requests?: IAllowedRequest[] };
   response.json({

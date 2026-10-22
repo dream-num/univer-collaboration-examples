@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
-import { dirname } from "node:path";
+import { dirname, resolve } from "node:path";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
@@ -13,10 +13,13 @@ import {
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { createExchangeRouter } from "./exchange.js";
+import { FileStore } from "./file-store.js";
 
 const UNIT_ID = "exchange-sheet";
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const filename = ".data/collaboration.sqlite";
+// Uploads and export results are written here; see file-store.ts for which ones are temporary.
+const filesDirectory = resolve(".data/files");
 const unitData: IWorkbookData = {
   id: UNIT_ID,
   rev: 1,
@@ -42,6 +45,7 @@ const unitData: IWorkbookData = {
 };
 
 await mkdir(dirname(filename), { recursive: true });
+const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
@@ -74,7 +78,7 @@ try {
 const app = express();
 app.use(
   "/universer-api",
-  createExchangeRouter({ service, userID: USER_ID }),
+  createExchangeRouter({ service, userID: USER_ID, files }),
 );
 app.post(
   "/universer-api/authz/-/object/-/batch_allowed",

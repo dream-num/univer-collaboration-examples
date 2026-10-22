@@ -22,8 +22,15 @@ XLS/XLSX/CSV/TSV 导入为新的协同 Unit；通过 **File → Save As** 把当
   `UnitSnapshotMaterializer` 补全后交给转换器。
 - `web/main.ts`：配置协同与 exchange 前端插件。
 
-协同 Unit 写入 `.data/collaboration.sqlite`，服务重启后仍会保留；上传文件和任务仍只存在于
-当前进程，进程停止后会丢失。固定用户、全允许授权、内存文件存储、25 MiB 上传限制以及未签名
+- `server/file-store.ts`：把上传文件和导出结果写入 `.data/files/<fileID>`，并用 JSON 索引记录
+  文件名、MIME、大小、`source`、`assign` 和创建时间。
+
+协同 Unit 写入 `.data/collaboration.sqlite`，文件写入 `.data/files`，服务重启后都会保留；任务仍
+只存在于当前进程，进程停止后会丢失。上传接口会记录 Univer 客户端带上的 `source` 和 `assign`
+查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值。`HttpImport`（导入源文件）
+和 `HttpExport`（导出结果）是临时文件：导入
+完成后源文件会被删除，导出结果下载后即可删除；其余 `source` 包括缺省值都是持久文件，生命周期
+与 `assign` 指定的 Unit 相同。固定用户、全允许授权、本地文件存储、25 MiB 上传限制以及未签名
 的本地下载 URL 都只用于教学，不是生产配置。生产应用应认证所有路由、校验 Unit 创建和导出
 权限，使用持久对象存储与任务队列，设置配额、校验文件、让下载 URL 过期，并在隔离 worker 中
 执行转换。Exchange HTTP 路由属于应用，Collaboration SDK 不提供 Exchange Endpoint。
