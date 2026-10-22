@@ -61,6 +61,10 @@ html, body {
 #document-title { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
 #toolbar p { margin: 5px 0 0; color: #8a95a5; font-size: 12px; }
 #document-node { padding: 5px 8px; font-size: 11px; }
+#exchange-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.exchange-action { padding: 6px 12px; border: 1px solid #dfe4eb; border-radius: 6px; background: #fff; color: #354157; font: inherit; font-size: 12px; line-height: 1.4; cursor: pointer; }
+.exchange-action:hover { background: #edf0f5; }
+#exchange-actions[aria-busy="true"] .exchange-action { opacity: .55; pointer-events: none; }
 #status:empty { display: none; }
 #status { padding: 10px 24px; background: #fff3f1; color: #b3493f; font-size: 13px; }
 #empty-state { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; background: #fdfefe; }
@@ -68,7 +72,7 @@ html, body {
 #empty-state h2 { margin: 0; color: #354157; font-size: 20px; font-weight: 500; letter-spacing: -.4px; }
 #empty-state p { margin: 10px 0 0; color: #8a95a5; font-size: 13px; line-height: 1.6; }
 #app { flex: 1; min-height: 0; position: relative; }
-#app[hidden], #empty-state[hidden], #document-node[hidden] { display: none; }
+#app[hidden], #empty-state[hidden], #document-node[hidden], #exchange-actions[hidden] { display: none; }
 @media (max-width: 700px) {
   #sidebar { width: 200px; padding: 14px 8px; }
   #toolbar { padding: 14px 16px; }

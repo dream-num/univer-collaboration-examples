@@ -7,11 +7,9 @@ import {
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
-import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
-import ExchangeClientEnUS from "@univerjs-pro/exchange-client/locale/en-US";
+import { ExchangeFormat, UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
-import SheetsExchangeClientEnUS from "@univerjs-pro/sheets-exchange-client/locale/en-US";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
@@ -21,7 +19,6 @@ import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
-import "@univerjs-pro/exchange-client/lib/index.css";
 
 const status = document.querySelector<HTMLElement>("#status")!;
 const picker = document.querySelector<HTMLElement>("#picker")!;
@@ -133,8 +130,7 @@ async function main() {
         UniverPresetSheetsCoreEnUS,
         CollaborationClientEnUS,
         CollaborationClientUIEnUS,
-        ExchangeClientEnUS,
-        SheetsExchangeClientEnUS,
+        // SDK 1.2.0 does not publish locale entry points for the two exchange packages.
       ),
     },
     theme: defaultTheme,
@@ -181,6 +177,42 @@ async function main() {
 
   const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitID);
   if (!workbook) throw new Error("Document could not be loaded");
+
+  // SDK 1.2.0 ships the exchange packages headless, without ribbon entries: the application owns
+  // the entry points and calls the Facade, which talks to the exchange replicas through the gateway.
+  const actions = document.querySelector<HTMLElement>("#exchange-actions")!;
+  const importInput = document.querySelector<HTMLInputElement>("#exchange-import")!;
+  const exportButton = document.querySelector<HTMLButtonElement>("#exchange-export")!;
+  actions.hidden = false;
+  importInput.addEventListener("change", async () => {
+    const file = importInput.files?.[0];
+    if (!file) return;
+    actions.setAttribute("aria-busy", "true");
+    try {
+      // Upload, import, and task polling happen inside the Facade; the result is the new Unit's ID.
+      const importedUnitID = await univerAPI.importSheetToUnitIdAsync(file);
+      if (!importedUnitID) throw new Error("Import did not produce a collaborative Unit.");
+      // The exchange service already listed the Unit in the catalog; open it like any other file.
+      location.assign(fileURL(importedUnitID));
+    } catch (error) {
+      showError(error);
+      importInput.value = "";
+      actions.removeAttribute("aria-busy");
+    }
+  });
+  exportButton.addEventListener("click", async () => {
+    actions.setAttribute("aria-busy", "true");
+    try {
+      // Exports the latest confirmed revision from the shared database, not the in-browser state.
+      const file = await univerAPI.exportSheetByUnitIdAsync(unitID, ExchangeFormat.XLSX);
+      if (!file) throw new Error("Export did not produce a file.");
+      univerAPI.downloadFile(file, workbook.getName() || unitID, "xlsx");
+    } catch (error) {
+      showError(error);
+    } finally {
+      actions.removeAttribute("aria-busy");
+    }
+  });
 }
 
 void main().catch(showError);

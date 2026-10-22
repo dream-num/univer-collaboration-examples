@@ -101,6 +101,8 @@ Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_u
 
 [`server/exchange-main.ts`](./server/exchange-main.ts) 只装配数据库适配器、`UniverCollabService` 和 exchange 路由，没有 Endpoint、Transport 和 Redis。导入通过 `createUnitFromSnapshot()` 创建 Unit 并写入文件目录；导出通过 `getUnitLoadDataWithBlocks()` 和 `UnitSnapshotMaterializer` 读取最新已确认版本，不需要经过当前承载该文档的节点。
 
+SDK 1.2.0 的 `exchange-client` 与 `sheets-exchange-client` 是 headless 的，不再带 ribbon 入口，所以 [`web/main.ts`](./web/main.ts) 自己提供 **Import** 和 **Export XLSX** 按钮并调用 Facade：`importSheetToUnitIdAsync`、`exportSheetByUnitIdAsync` 和 `downloadFile`。Facade 按 `UniverExchangeClientPlugin` 上配置的 URL 完成上传、任务轮询和下载，全部经过同一个网关。
+
 [`server/exchange.ts`](./server/exchange.ts) 实现 `UniverExchangeClientPlugin` 期望的协议：上传、返回任务 ID 的 `import`/`export`、任务轮询、签名 URL 和下载。它的全部状态都在 [`schema.sql`](./schema.sql) 定义的两张 PostgreSQL 表里，由 [`server/exchange-store.ts`](./server/exchange-store.ts) 读写：
 
 | 表 | 内容 |
@@ -127,7 +129,7 @@ docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 1. 点击 **New Sheet** 创建文件，侧栏会显示它分配到的节点，`node-a` 或 `node-b`。
 2. 把完整 URL 复制到另一个标签页，编辑同一份 Sheet，观察同步。
 3. 再创建几份文件，选择分配到另一节点的文件重复验证。
-4. 打开一个文件后，通过 **File → Open (File)** 导入 XLSX/XLS/CSV/TSV。导入会创建一个以文件名命名的新 Unit 并列入侧栏，通知中带有它的链接。通过 **File → Save As** 把当前 Sheet 导出为 XLSX/CSV/TSV。
+4. 打开一个文件后，点击 Sheet 上方的 **Import** 导入 XLSX/XLS/CSV/TSV。导入会创建一个以文件名命名的新 Unit 并列入侧栏，页面随即打开它。点击 **Export XLSX** 下载当前已确认版本。
 
 `GATEWAY_PORT` 可修改默认端口 `3010`；`UNIVER_LICENSE` 可在构建时传入许可证。更新代码后重新执行启动命令，会同时重建服务节点和 Nginx，避免网关保留旧容器地址；随后重新打开页面。
 

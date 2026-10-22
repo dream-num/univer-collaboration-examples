@@ -22,8 +22,13 @@
       </aside>
       <main id="workspace">
         <header id="toolbar">
-          <div><h1 id="document-title">Your workspace</h1><p>Open the same file in another tab to collaborate. Use File → Open (File) to import and File → Save As to export.</p></div>
-          <span id="document-node" class="node-badge" hidden></span>
+          <div><h1 id="document-title">Your workspace</h1><p>Open the same file in another tab to collaborate, or import and export XLSX through the exchange service.</p></div>
+          <div id="exchange-actions" hidden>
+            <label class="exchange-action" for="exchange-import">Import</label>
+            <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
+            <button class="exchange-action" id="exchange-export" type="button">Export XLSX</button>
+            <span id="document-node" class="node-badge" hidden></span>
+          </div>
         </header>
         <div id="status" role="status" aria-live="polite"></div>
         <div id="empty-state">

@@ -101,6 +101,8 @@ Server-side import and export use `@univerjs-pro/exchange-node`, whose converter
 
 [`server/exchange-main.ts`](./server/exchange-main.ts) wires only the database adapter, `UniverCollabService`, and the exchange router: no Endpoint, Transport, or Redis. Import creates the Unit through `createUnitFromSnapshot()` and registers it in the file catalog; export reads the latest confirmed revision through `getUnitLoadDataWithBlocks()` and `UnitSnapshotMaterializer`, without involving the node that currently hosts the document.
 
+SDK 1.2.0 ships `exchange-client` and `sheets-exchange-client` headless, without ribbon entries, so [`web/main.ts`](./web/main.ts) provides the **Import** and **Export XLSX** buttons and calls the Facade: `importSheetToUnitIdAsync`, `exportSheetByUnitIdAsync`, and `downloadFile`. The Facade performs the upload, the task polling, and the download against the URLs configured on `UniverExchangeClientPlugin`, all through the same gateway.
+
 [`server/exchange.ts`](./server/exchange.ts) implements the protocol expected by `UniverExchangeClientPlugin`: upload, `import`/`export` returning a task ID, task polling, signed URL, and download. All of its state lives in two PostgreSQL tables from [`schema.sql`](./schema.sql), accessed through [`server/exchange-store.ts`](./server/exchange-store.ts):
 
 | Table | Content |
@@ -127,7 +129,7 @@ Open <http://127.0.0.1:3010/>:
 1. Click **New Sheet** to create a file. The sidebar shows the node assigned to it, `node-a` or `node-b`.
 2. Copy the complete URL into another tab, edit the same Sheet, and check synchronization.
 3. Create more files and repeat with one assigned to the other node.
-4. With a file open, use **File → Open (File)** to import an XLSX/XLS/CSV/TSV file. The import creates a new Unit named after the file, lists it in the sidebar, and the notification links to it. Use **File → Save As** to export the current Sheet as XLSX/CSV/TSV.
+4. With a file open, click **Import** above the Sheet to import an XLSX/XLS/CSV/TSV file. The import creates a new Unit named after the file, lists it in the sidebar, and the page opens it. Click **Export XLSX** to download the current confirmed revision.
 
 Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to supply a license at build time. After code changes, rerun the startup command to recreate both the server nodes and Nginx, preventing stale container addresses in the gateway. Reopen the page afterward.
 
