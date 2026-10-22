@@ -49,6 +49,9 @@ const { univer, univerAPI } = createUniver({
       { license: import.meta.env.UNIVER_LICENSE || undefined },
     ],
     UniverCollaborationPlugin,
+    // Register before the collaboration client plugins: they resolve the image service at startup,
+    // and with the override below only the Drawing plugin's base64 implementation provides it.
+    UniverDrawingPlugin,
     [
       UniverCollaborationClientPlugin,
       {
@@ -59,10 +62,12 @@ const { univer, univerAPI } = createUniver({
         collabSubmitChangesetUrl: `${baseURL}/comb`,
         collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
+        // No file service in this example: drop the collaboration image service so images are
+        // embedded as base64 by the Drawing plugin's default implementation.
+        override: [[IImageIoService, null]],
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
-    [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
+    UniverCollaborationClientUIPlugin,
     UniverSheetsThreadCommentUIPlugin,
     UniverThreadCommentDataSourcePlugin,
   ],

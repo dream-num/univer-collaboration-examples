@@ -14,7 +14,7 @@ pnpm example:object-permissions
 
 Open <http://127.0.0.1:3010>. The four accounts match [`permissions`](../permissions/README.md): Alice is the creator, Bob is an editor, Casey is a viewer, and Dana can sign in but has no role on the file. Switching accounts writes a local demo cookie.
 
-Collaboration data and the ACL both live in `.data/collaboration.sqlite`, so protections survive a restart. File roles are an in-memory `Map` recreated from the fixed demo configuration on startup; when you move them to a database, keep the role table together with the ACL tables.
+Collaboration data and the ACL both live in `.data/collaboration.sqlite`, so protections survive a restart. File roles are an in-memory `Map` recreated from the fixed demo configuration on startup; when you move them to a database, keep the role table together with the ACL tables. Inserted images are embedded in the Sheet as base64 because this example has no file service; a production application should wire the collaboration client's image service to a file service.
 
 ## Try it
 

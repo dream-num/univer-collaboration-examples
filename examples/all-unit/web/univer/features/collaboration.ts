@@ -20,8 +20,12 @@ export function registerCollaboration(univer: Univer, baseURL: string) {
     collabSubmitChangesetUrl: `${baseURL}/comb`,
     collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
     wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
+    // Images and attachments are uploaded through the application's file routes (server/files.ts).
+    uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+    signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+    downloadEndpointUrl: `${location.protocol}//${location.host}/`,
   });
-  univer.registerPlugin(UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false });
+  univer.registerPlugin(UniverCollaborationClientUIPlugin);
 }
 
 /** Load the Unit explicitly; call this after the current user has been set. */

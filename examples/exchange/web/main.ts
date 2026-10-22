@@ -7,11 +7,9 @@ import {
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
-import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
-import ExchangeClientEnUS from "@univerjs-pro/exchange-client/locale/en-US";
+import { ExchangeFormat, UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
-import SheetsExchangeClientEnUS from "@univerjs-pro/sheets-exchange-client/locale/en-US";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
@@ -21,14 +19,14 @@ import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
-import "@univerjs-pro/exchange-client/lib/index.css";
 
 document.querySelector<HTMLElement>("#status")!.textContent =
-  "Use File in the ribbon to import XLS/XLSX/CSV/TSV or export XLSX/CSV/TSV.";
+  "Use the toolbar to import XLS/XLSX/CSV/TSV as a new Unit, or export the current revision.";
 
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
 if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
+const sheetUnitId: string = unitId;
 const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
@@ -36,8 +34,7 @@ const { univerAPI } = createUniver({
       UniverPresetSheetsCoreEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
-      ExchangeClientEnUS,
-      SheetsExchangeClientEnUS,
+      // SDK 1.2.0 does not publish locale entry points for the two exchange packages.
     ),
   },
   theme: defaultTheme,
@@ -62,7 +59,7 @@ const { univerAPI } = createUniver({
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+    UniverCollaborationClientUIPlugin,
     [
       UniverExchangeClientPlugin,
       {
@@ -83,3 +80,50 @@ const { univerAPI } = createUniver({
 
 const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
 if (!workbook) throw new Error("Document could not be loaded");
+
+// SDK 1.2.0 ships the exchange packages headless: the built-in ribbon entries are gone, so the
+// host application owns the entry points and calls the Facade instead.
+const toolbar = document.querySelector<HTMLElement>("#toolbar")!;
+const status = document.querySelector<HTMLElement>("#status")!;
+toolbar.innerHTML = `
+  <label class="exchange-action" for="exchange-import">Import</label>
+  <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
+  <button class="exchange-action" id="exchange-export-xlsx" type="button">Export XLSX</button>
+  <button class="exchange-action" id="exchange-export-csv" type="button">Export CSV</button>
+`;
+
+async function exportCurrentSheet(format: ExchangeFormat, extension: string) {
+  status.textContent = `Exporting ${extension.toUpperCase()}…`;
+  try {
+    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format);
+    if (!file) throw new Error("Export did not produce a file.");
+    univerAPI.downloadFile(file, sheetUnitId, extension);
+    status.textContent = `Exported the current revision as ${extension.toUpperCase()}.`;
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : String(error);
+  }
+}
+
+toolbar
+  .querySelector<HTMLInputElement>("#exchange-import")!
+  .addEventListener("change", async (event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    status.textContent = `Importing ${file.name}…`;
+    try {
+      const importedUnitId = await univerAPI.importSheetToUnitIdAsync(file);
+      if (!importedUnitId) throw new Error("Import did not produce a collaborative Unit.");
+      location.href = `/?unit=${encodeURIComponent(importedUnitId)}`;
+    } catch (error) {
+      status.textContent = error instanceof Error ? error.message : String(error);
+      input.value = "";
+    }
+  });
+
+toolbar
+  .querySelector("#exchange-export-xlsx")!
+  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx"));
+toolbar
+  .querySelector("#exchange-export-csv")!
+  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.CSV, "csv"));

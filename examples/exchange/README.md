@@ -11,9 +11,13 @@ protocol expected by those plugins.
 pnpm example:exchange
 ```
 
-Open <http://127.0.0.1:3010/?unit=exchange-sheet>. Use **File → Open (File)** to import
-XLS/XLSX/CSV/TSV as a new collaborative Unit, or **File → Save As** to export the current confirmed
-revision as XLSX/CSV/TSV. The import notification contains a link to the newly created Unit.
+Open <http://127.0.0.1:3010/?unit=exchange-sheet>. Use the **Import** / **Export** toolbar above the
+editor to import XLS/XLSX/CSV/TSV as a new collaborative Unit, or to export the current confirmed
+revision as XLSX/CSV/TSV. After an import the browser navigates to the newly created Unit.
+
+SDK 1.2.0 ships `exchange-client` and `sheets-exchange-client` headless (no ribbon entries), so the
+example owns the entry points: `web/main.ts` calls `importSheetToUnitIdAsync`,
+`exportSheetByUnitIdAsync`, and `downloadFile` from the Facade.
 
 Read these files together:
 
@@ -23,10 +27,19 @@ Read these files together:
   `getUnitLoadDataWithBlocks()` and completes it with `UnitSnapshotMaterializer` before conversion.
 - `web/main.ts` configures the collaboration and exchange plugins.
 
-Collaboration Units are stored in `.data/collaboration.sqlite` and survive server restarts. Uploaded
-files and tasks remain process-local and disappear when the process stops. The fixed user,
-permissive authorization, in-memory file store, 25 MiB upload limit, and unsigned local download URL
-are teaching choices, not production configuration. A production application should authenticate
-every route, authorize Unit creation and export, use durable object storage and a task queue, enforce
-quotas, validate files, expire downloads, and run conversions in isolated workers. Exchange HTTP
-routes belong to the application; the Collaboration SDK does not provide an Exchange Endpoint.
+- `server/file-store.ts` writes uploaded files and export results to `.data/files/<fileID>` with a
+  JSON index of name, MIME type, size, `source`, `assign`, and creation time.
+
+Collaboration Units are stored in `.data/collaboration.sqlite`, and files in `.data/files`; both
+survive server restarts. Tasks remain process-local and disappear when the process stops. The
+upload route records the `source` and `assign` query parameters that Univer clients send; `source`
+is the numeric `FileSource` enum from `@univerjs/protocol`. Files with `HttpImport` (import
+sources) or `HttpExport` (export results) are temporary:
+the import route deletes its source file once the Unit exists, and an export result can be deleted
+after download. Any other `source`, including the default, is a persistent file that shares the
+lifecycle of the Unit named by `assign`. The fixed user, permissive authorization, local file
+store, 25 MiB upload limit, and unsigned local download URL are teaching choices, not production
+configuration. A production application should authenticate every route, authorize Unit creation
+and export, use durable object storage and a task queue, enforce quotas, validate files, expire
+downloads, and run conversions in isolated workers. Exchange HTTP routes belong to the application;
+the Collaboration SDK does not provide an Exchange Endpoint.
