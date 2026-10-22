@@ -67,7 +67,7 @@ async function start() {
           wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         },
       ],
-      [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+      UniverCollaborationClientUIPlugin,
     ],
   });
 

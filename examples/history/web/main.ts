@@ -61,7 +61,7 @@ const { univerAPI } = createUniver({
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+    UniverCollaborationClientUIPlugin,
     [
       UniverSheetsHistoryUIPlugin,
       { historyServerUrl: `${baseURL}/history`, univerContainerId: "app" },

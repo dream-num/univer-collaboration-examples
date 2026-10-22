@@ -82,7 +82,7 @@ const { univerAPI } = createUniver({
         sendChangesetTimeout: 200,
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+    UniverCollaborationClientUIPlugin,
   ],
 });
 

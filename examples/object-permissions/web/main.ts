@@ -94,7 +94,7 @@ async function start() {
           override: [[IImageIoService, null]],
         },
       ],
-      [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+      UniverCollaborationClientUIPlugin,
       UniverSheetsThreadCommentUIPlugin,
       UniverThreadCommentDataSourcePlugin,
       [UniverSheetsHistoryUIPlugin, { historyServerUrl: `${baseURL}/history`, univerContainerId: "app" }],

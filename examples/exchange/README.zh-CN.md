@@ -10,9 +10,13 @@
 pnpm example:exchange
 ```
 
-打开 <http://127.0.0.1:3010/?unit=exchange-sheet>。通过 **File → Open (File)** 把
-XLS/XLSX/CSV/TSV 导入为新的协同 Unit；通过 **File → Save As** 把当前 confirmed revision
-导出为 XLSX/CSV/TSV。导入完成通知中包含新 Unit 的链接。
+打开 <http://127.0.0.1:3010/?unit=exchange-sheet>。使用编辑器上方的 **Import** / **Export**
+工具栏，把 XLS/XLSX/CSV/TSV 导入为新的协同 Unit，或把当前 confirmed revision 导出为
+XLSX/CSV/TSV。导入完成后浏览器会跳转到新建的 Unit。
+
+SDK 1.2.0 的 `exchange-client` 与 `sheets-exchange-client` 只提供 headless 能力（不再带
+ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Facade 的
+`importSheetToUnitIdAsync`、`exportSheetByUnitIdAsync` 和 `downloadFile`。
 
 建议一起阅读：
 

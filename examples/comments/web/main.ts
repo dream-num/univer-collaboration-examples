@@ -67,7 +67,7 @@ const { univer, univerAPI } = createUniver({
         override: [[IImageIoService, null]],
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+    UniverCollaborationClientUIPlugin,
     UniverSheetsThreadCommentUIPlugin,
     UniverThreadCommentDataSourcePlugin,
   ],

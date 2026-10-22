@@ -25,7 +25,7 @@ export function registerCollaboration(univer: Univer, baseURL: string) {
     signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
     downloadEndpointUrl: `${location.protocol}//${location.host}/`,
   });
-  univer.registerPlugin(UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false });
+  univer.registerPlugin(UniverCollaborationClientUIPlugin);
 }
 
 /** Load the Unit explicitly; call this after the current user has been set. */
