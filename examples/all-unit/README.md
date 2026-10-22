@@ -35,9 +35,8 @@ and loads `GET /universer-api/file/:fileID/download`. The client URLs are set in
 parameters; `source` is the numeric `FileSource` enum from `@univerjs/protocol`. `HttpImport` and
 `HttpExport` files are temporary, while any other `source`, including
 the default and `UnitEmbedded`, is persistent and shares the lifecycle of the Unit named by
-`assign`. This example keeps files on the local disk with an unsigned download URL for teaching; a
-production application should store them in object storage, return time-limited signed URLs, and
-authorize every file route. Set `UNIVER_LICENSE`
+`assign`. See the [`file-service`](../file-service/README.md) example for a fuller description.
+Set `UNIVER_LICENSE`
 before building when a license is required for Pro features.
 
 ```bash

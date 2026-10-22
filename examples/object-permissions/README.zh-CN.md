@@ -14,7 +14,7 @@ pnpm example:object-permissions
 
 打开 <http://127.0.0.1:3010>。四个账号和 [`permissions`](../permissions/README.zh-CN.md) 相同：Alice 是创建者，Bob 是编辑者，Casey 是查看者，Dana 可以登录但没有这份文件的角色。切换账号会写入本地演示 Cookie。
 
-协同数据和 ACL 都在 `.data/collaboration.sqlite`，保护会在服务重启后保留。文件角色表现在写在内存 `Map` 里，启动时从固定演示配置重新创建；换成数据库时，角色表要和 ACL 表一起保留。示例没有文件服务，插入的图片以 base64 内嵌在 Sheet 中；生产环境应把协同客户端的图片服务接到文件服务。
+协同数据和 ACL 都在 `.data/collaboration.sqlite`，保护会在服务重启后保留。文件角色表现在写在内存 `Map` 里，启动时从固定演示配置重新创建；换成数据库时，角色表要和 ACL 表一起保留。示例没有文件服务，插入的图片以 base64 内嵌在 Sheet 中；文件服务的实现请参考 [`file-service`](../file-service/README.zh-CN.md) 示例。
 
 ## 试一下
 
