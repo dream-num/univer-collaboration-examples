@@ -26,7 +26,6 @@ Read these files together:
   current-revision snapshot export. Export reads self-contained recovery data through
   `getUnitLoadDataWithBlocks()` and completes it with `UnitSnapshotMaterializer` before conversion.
 - `web/main.ts` configures the collaboration and exchange plugins.
-
 - `server/file-store.ts` writes uploaded files and export results to `.data/files/<fileID>` with a
   JSON index of name, MIME type, size, `source`, `assign`, and creation time.
 

@@ -25,7 +25,6 @@ ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Faca
   的 snapshot 导出；导出先通过 `getUnitLoadDataWithBlocks()` 读取自包含恢复数据，再用
   `UnitSnapshotMaterializer` 补全后交给转换器。
 - `web/main.ts`：配置协同与 exchange 前端插件。
-
 - `server/file-store.ts`：把上传文件和导出结果写入 `.data/files/<fileID>`，并用 JSON 索引记录
   文件名、MIME、大小、`source`、`assign` 和创建时间。
 

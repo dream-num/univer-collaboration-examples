@@ -7,8 +7,6 @@ FROM node:24-bookworm-slim AS base
 RUN npm install --global pnpm@10.32.1
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
-# 1.2.0 server packages are not on the public registry yet; carry the registry config.
-COPY .npmrc ./
 COPY examples/multi-node/package.json ./examples/multi-node/package.json
 
 # Install every dependency and build the web bundle and both server entry points once.
