@@ -1,4 +1,5 @@
 import { getBoardsEmptySnapshot } from "@univerjs-pro/boards";
+import { getPdfsEmptySnapshot } from "@univerjs-pro/pdfs";
 import { getSlidesEmptySnapshot } from "@univerjs-pro/slides";
 import {
   CollabError,
@@ -17,6 +18,7 @@ export const units: readonly UnitSummary[] = [
   { unitId: "all-unit-slide", type: UniverType.UNIVER_SLIDE, name: "Slide" },
   { unitId: "all-unit-board", type: UniverType.UNIVER_BOARD, name: "Board" },
   { unitId: "all-unit-base", type: UniverType.UNIVER_BASE, name: "Base" },
+  { unitId: "all-unit-pdf", type: UniverType.UNIVER_PDF, name: "PDF" },
 ];
 
 export async function ensureUnits(service: IUniverCollabService): Promise<void> {
@@ -59,6 +61,8 @@ function initialData(unit: UnitSummary): CreateUnitFromDataInput {
       return { type, data: { ...getBoardsEmptySnapshot(unitId, name), rev: 1 } };
     case UniverType.UNIVER_BASE:
       return { type, data: { ...getBasesEmptySnapshot(unitId), rev: 1, name } };
+    case UniverType.UNIVER_PDF:
+      return { type, data: { ...getPdfsEmptySnapshot(unitId, name), rev: 1 } };
     default:
       throw new Error(`Unsupported Unit type: ${type}`);
   }

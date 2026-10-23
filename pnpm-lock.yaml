@@ -133,6 +133,15 @@ importers:
       '@univerjs-pro/license':
         specifier: 1.2.0
         version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)
+      '@univerjs-pro/pdfs-editor':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs-ui':
+        specifier: 1.2.0
+        version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/shape-editor-ui':
         specifier: 1.2.0
         version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
@@ -2045,6 +2054,15 @@ packages:
     peerDependencies:
       rxjs: '>=7.0.0'
 
+  '@univerjs-pro/pdfs-editor@1.2.0':
+    resolution: {integrity: sha512-dmE587SG8e/nE9+aDbC6NUn5bD7lab1pLsrylDJQRSacenveE5q5Ug1pqyl5VXo2XOxCzRTlBe+S5GbMEwDF/Q==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-editor/-/pdfs-editor-1.2.0.tgz}
+
+  '@univerjs-pro/pdfs-ui@1.2.0':
+    resolution: {integrity: sha512-6k9+wSi3ipvJGFQRunXdyte0lBHzVkhtCwf5QkCGZvXbALdGiggxShAho/g9ga8Wpbwm/cBsue4fiFg4XdYe6g==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-ui/-/pdfs-ui-1.2.0.tgz}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
+
   '@univerjs-pro/pdfs@1.2.0':
     resolution: {integrity: sha512-d/JrEht6Oj/a0jFNe8V4zpi2f+UqXxLpQnDxeEo+pC2QjQqOLqMSLuHTjDlmD63ZErzY+Mw23mNfk4CHT1AcVA==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs/-/pdfs-1.2.0.tgz}
 
@@ -2976,6 +2994,10 @@ packages:
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
+
+  opentype.js@2.0.0:
+    resolution: {integrity: sha512-kCyjv6xdDY1W/jLWZ/L3QhhTlKUqDZMQ5+Jdlw12b3dXkKNpYBqqlMMj0YDQPShWFTMwgZI1hG14kN3XUDSg/A==}
+    hasBin: true
 
   ot-json1@1.0.2:
     resolution: {integrity: sha512-IhxkqVWQqlkWULoi/Q2AdzKk0N5vQRbUMUwubFXFCPcY4TsOZjmp2YKrk0/z1TeiECPadWEK060sdFdQ3Grokg==}
@@ -4841,6 +4863,35 @@ snapshots:
     transitivePeerDependencies:
       - react
 
+  '@univerjs-pro/pdfs-editor@1.2.0(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/collaboration': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.2.0(react@19.3.0)
+      '@univerjs/core': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+    transitivePeerDependencies:
+      - react
+      - rxjs
+
+  '@univerjs-pro/pdfs-ui@1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.2.0(react@19.3.0)
+      '@univerjs/core': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/design': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/docs': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-ui': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-render': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.46.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/ui': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      opentype.js: 2.0.0
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
+
   '@univerjs-pro/pdfs@1.2.0(react@19.3.0)':
     dependencies:
       '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
@@ -6633,6 +6684,8 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  opentype.js@2.0.0: {}
 
   ot-json1@1.0.2:
     dependencies:

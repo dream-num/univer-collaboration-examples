@@ -1,4 +1,3 @@
-import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import {
   BrowserCollaborationSocketService,
@@ -10,8 +9,8 @@ import { UniverType } from "@univerjs/protocol";
 
 import "@univerjs-pro/collaboration-client/facade";
 
+/** Register the client plugins; the core collaboration plugin is registered in `createUniver`. */
 export function registerCollaboration(univer: Univer, baseURL: string) {
-  univer.registerPlugin(UniverCollaborationPlugin);
   univer.registerPlugin(UniverCollaborationClientPlugin, {
     socketService: BrowserCollaborationSocketService,
     sendChangesetTimeout: 200,
@@ -36,5 +35,6 @@ export async function loadCollaborativeUnit(univerAPI: FUniver, unitType: number
   if (unitType === UniverType.UNIVER_SLIDE) return collaboration.loadSlideAsync(unitId);
   if (unitType === UniverType.UNIVER_BOARD) return collaboration.loadBoardAsync(unitId);
   if (unitType === UniverType.UNIVER_BASE) return collaboration.loadBaseAsync(unitId);
+  if (unitType === UniverType.UNIVER_PDF) return collaboration.loadPdfAsync(unitId);
   throw new Error(`Unsupported Unit type: ${unitType}`);
 }

@@ -22,7 +22,7 @@
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.zh-CN.md) | 最小 Sheet 实时协同链路 |
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
-| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
+| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定六类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护，ACL 由应用持有 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
