@@ -87,6 +87,8 @@ const transport = createNodeTransport();
 // The ACL lives in the application's own database, next to the collaboration data.
 const aclDatabase = new Database(filename);
 aclDatabase.pragma("foreign_keys = ON");
+// The SDK adapters sharing this file wait up to 5 s for write locks; do the same instead of failing with SQLITE_BUSY.
+aclDatabase.pragma("busy_timeout = 5000");
 initializeAclSchema(aclDatabase);
 const acl = createAclStore(aclDatabase);
 

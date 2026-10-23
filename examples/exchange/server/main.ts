@@ -35,7 +35,7 @@ const unitData: IWorkbookData = {
       columnCount: 26,
       cellData: {
         0: {
-          0: { v: "Edit this Sheet, then export it from File → Save As." },
+          0: { v: "Edit this Sheet, then export it with the toolbar above." },
         },
       },
     },
