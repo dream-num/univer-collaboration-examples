@@ -28,8 +28,10 @@ ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Faca
 - `server/file-store.ts`：把上传文件和导出结果写入 `.data/files/<fileID>`，并用 JSON 索引记录
   文件名、MIME、大小、`source`、`assign` 和创建时间。
 
-协同 Unit 写入 `.data/collaboration.sqlite`，文件写入 `.data/files`，服务重启后都会保留；任务仍
-只存在于当前进程，进程停止后会丢失。上传接口会记录 Univer 客户端带上的 `source` 和 `assign`
+协同 Unit 写入 `.data/collaboration.sqlite`，文件写入 `.data/files`，服务重启后都会保留。
+`exchange-sheet` 的初始内容只在首次创建 Unit 时写入；要从空库重新开始，先停止服务，再运行
+`pnpm --filter @univerjs/collaboration-example-exchange reset` 删除 `.data`。任务仍只存在于当前进程，
+进程停止后会丢失。上传接口会记录 Univer 客户端带上的 `source` 和 `assign`
 查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值。`HttpImport`（导入源文件）
 和 `HttpExport`（导出结果）是临时文件：导入
 完成后源文件会被删除，导出结果下载后即可删除；其余 `source` 包括缺省值都是持久文件，生命周期
