@@ -72,7 +72,6 @@
     "@univerjs/preset-docs-drawing": "1.2.0",
     "@univerjs/preset-docs-hyper-link": "1.2.0",
     "@univerjs/preset-sheets-advanced": "1.2.0",
-    "@univerjs/preset-sheets-collaboration": "1.2.0",
     "@univerjs/preset-sheets-conditional-formatting": "1.2.0",
     "@univerjs/preset-sheets-core": "1.2.0",
     "@univerjs/preset-sheets-data-validation": "1.2.0",

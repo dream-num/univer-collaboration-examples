@@ -4,28 +4,155 @@ body {
   height: 100%;
   margin: 0;
   font-family: system-ui, sans-serif;
+  color: #1f2937;
 }
 #example {
   position: fixed;
   inset: 0;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
 }
-#toolbar {
-  grid-row: 1;
+#panel {
+  display: grid;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #eef2ff;
+  border-bottom: 1px solid #c7d2fe;
+}
+.panel-row {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 8px 12px;
-  background: #e0e7ff;
+  justify-content: space-between;
+  gap: 10px 20px;
+}
+.panel-title h1 {
+  margin: 0;
+  font-size: 16px;
+}
+.panel-title p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+/* Lifecycle: draft → ready → merged. The current step is highlighted; passed steps are dimmed. */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.steps li + li::before {
+  content: "→";
+  color: #9ca3af;
+}
+.steps .step-text {
+  display: grid;
+  line-height: 1.2;
+}
+.steps .step-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+.steps small {
+  font-size: 11px;
+}
+.steps li.is-done {
+  color: #4f46e5;
+}
+.steps li.is-done .step-index {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+.steps li.is-current {
+  color: #1e1b4b;
+  font-weight: 600;
+}
+.steps li.is-current .step-index {
+  background: #1e1b4b;
+  border-color: #1e1b4b;
+  color: #fff;
+}
+.steps li.is-discarded {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.group-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-right: 6px;
+}
+.view-switch a {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid #a5b4fc;
+  border-radius: 999px;
+  margin-right: 4px;
+  color: #3730a3;
+  text-decoration: none;
+  font-size: 13px;
+}
+.view-switch a[hidden] {
+  display: none;
+}
+.view-switch a[aria-current] {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.actions .group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.actions button {
+  padding: 4px 12px;
+  border: 1px solid #4f46e5;
+  border-radius: 6px;
+  background: #fff;
+  color: #3730a3;
+  font-size: 13px;
+  cursor: pointer;
+}
+.actions button:disabled {
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 #status {
-  grid-row: 2;
-  padding: 8px 12px;
+  margin: 0;
+  font-size: 13px;
   color: #374151;
-  background: #f3f4f6;
+}
+#status.is-error {
+  color: #b91c1c;
 }
 #app {
-  grid-row: 3;
   min-height: 0;
 }

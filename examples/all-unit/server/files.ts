@@ -1,3 +1,5 @@
+// Copy of examples/file-service/server/files.ts, differing only in the doc comment's client file path.
+// file-service is the source: change it there first, then mirror the change here.
 import { basename } from "node:path";
 import express, { type Router } from "express";
 import multer from "multer";

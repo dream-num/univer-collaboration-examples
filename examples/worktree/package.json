@@ -9,7 +9,8 @@
   "scripts": {
     "build": "vite build && vite build --ssr server/main.ts --outDir dist/server && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "start": "node dist/server/main.js"
+    "start": "node dist/server/main.js",
+    "reset": "node server/reset.ts"
   },
   "dependencies": {
     "@univerjs-pro/collaboration": "1.2.0",

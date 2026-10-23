@@ -30,7 +30,10 @@ Read these files together:
   JSON index of name, MIME type, size, `source`, `assign`, and creation time.
 
 Collaboration Units are stored in `.data/collaboration.sqlite`, and files in `.data/files`; both
-survive server restarts. Tasks remain process-local and disappear when the process stops. The
+survive server restarts. The seed text in `exchange-sheet` is written only when the Unit is first
+created; to start from a blank database, stop the server and run
+`pnpm --filter @univerjs/collaboration-example-exchange reset`, which deletes `.data`. Tasks remain
+process-local and disappear when the process stops. The
 upload route records the `source` and `assign` query parameters that Univer clients send; `source`
 is the numeric `FileSource` enum from `@univerjs/protocol`. Files with `HttpImport` (import
 sources) or `HttpExport` (export results) are temporary:
