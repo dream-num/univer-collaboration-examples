@@ -1,3 +1,5 @@
+// Copy of examples/file-service/server/file-store.ts. file-service is the source: change it there
+// first, then mirror the change here so the copies stay identical apart from this header.
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
