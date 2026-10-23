@@ -32,22 +32,25 @@ type WorktreeStatus = Awaited<ReturnType<WorktreeClient["getWorktree"]>>["status
 const editorURL = (draft: boolean) =>
   `/?unit=${unitID}${draft ? `&worktree=${worktreeID}` : ""}`;
 
-// Lifecycle: Ready takes draft to ready, Reopen takes ready back to draft, and Merge takes ready to
-// merged. ready freezes the draft; merged and discarded are final and close the draft for good.
+// Lifecycle: draft → ready → merged, with Reopen taking ready back to draft for another round and
+// Discard abandoning a draft or ready Worktree. ready freezes the draft; merged and discarded are
+// final and close the draft for good. See README.md for the agent-edits, human-reviews workflow.
 const draftOpen = (current: WorktreeStatus) => current === "draft" || current === "ready";
 
 function describeStatus(current: WorktreeStatus, editingDraft: boolean): string {
   switch (current) {
     case "draft":
-      return editingDraft ? "Editing the isolated draft." : "Viewing trunk. Open Draft to edit in isolation.";
+      return editingDraft
+        ? "Editing the draft as the agent would. Mark it Ready to hand it over for review."
+        : "Viewing trunk. Draft changes stay isolated until a reviewer merges them.";
     case "ready":
-      return "Draft is ready and frozen. Merge it into trunk, or Reopen it to keep editing.";
+      return "Draft is frozen for review. Merge accepts it into trunk; Reopen sends it back for another round; Discard abandons it.";
     case "merging":
       return "Merge in progress. Reload in a moment.";
     case "merged":
       return `Draft was merged into trunk. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
     case "discarded":
-      return `Draft was discarded. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
+      return `Draft was discarded; trunk is unchanged. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
   }
 }
 
@@ -72,13 +75,15 @@ async function main() {
   toolbar.innerHTML =
     `<a href="${editorURL(false)}">Trunk</a><a id="draft-link" href="${editorURL(true)}">Draft</a>` +
     `<span id="worktree-status"></span>` +
-    `<button id="ready">Ready</button><button id="reopen">Reopen</button><button id="merge">Merge</button>`;
+    `<button id="ready">Ready</button><button id="reopen">Reopen</button>` +
+    `<button id="merge">Merge</button><button id="discard">Discard</button>`;
   const draftLink = toolbar.querySelector<HTMLAnchorElement>("#draft-link")!;
   const statusLabel = toolbar.querySelector<HTMLElement>("#worktree-status")!;
   const buttons = {
     ready: toolbar.querySelector<HTMLButtonElement>("#ready")!,
     reopen: toolbar.querySelector<HTMLButtonElement>("#reopen")!,
     merge: toolbar.querySelector<HTMLButtonElement>("#merge")!,
+    discard: toolbar.querySelector<HTMLButtonElement>("#discard")!,
   };
   // Enable only the action the current status allows.
   const render = () => {
@@ -87,6 +92,7 @@ async function main() {
     buttons.ready.disabled = worktree.status !== "draft";
     buttons.reopen.disabled = worktree.status !== "ready";
     buttons.merge.disabled = worktree.status !== "ready";
+    buttons.discard.disabled = !draftOpen(worktree.status);
     status.textContent = describeStatus(worktree.status, editingDraft);
   };
   render();
@@ -110,6 +116,10 @@ async function main() {
   );
   buttons.merge.onclick = run(
     () => client.mergeWorktree(worktreeID),
+    () => location.assign(editorURL(false)),
+  );
+  buttons.discard.onclick = run(
+    () => client.discardWorktree(worktreeID),
     () => location.assign(editorURL(false)),
   );
 
