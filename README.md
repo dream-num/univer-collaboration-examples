@@ -32,7 +32,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 | [`file-service`](./examples/file-service/README.md) | Application file service for images and attachments: upload, sign-url, and download routes with on-disk storage |
-| [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID |
+| [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID, plus a separately deployed, replicated import/export service |
 
 ## Run the examples
 
@@ -65,8 +65,8 @@ explains the routes the Univer client calls and what to change for production.
 
 `quick-start` uses the Memory Adapter to keep setup minimal. The other single-node examples store
 collaboration data in their own `.data/collaboration.sqlite` file so state survives server restarts.
-`multi-node` requires Docker Compose and builds inside its containers. Both nodes share one PostgreSQL
-database whose data lives in a Docker volume.
+`multi-node` requires Docker Compose and builds inside its containers. All nodes connect to the same
+PostgreSQL database, whose data lives in a Docker volume.
 
 Fixed users, demo authorization, and local secrets are for teaching only and are not production
 configuration. Before integrating in production, read

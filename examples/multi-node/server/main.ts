@@ -8,6 +8,7 @@ import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
+import { requireDatabaseSchema } from "./database-schema.js";
 import { CustomPostgresDatabaseAdapter } from "./postgres-database-adapter.js";
 import { createUnitData } from "./unit-data.js";
 
@@ -20,7 +21,7 @@ const redisURL = process.env.REDIS_URL ?? "redis://127.0.0.1:6379";
 // The schema comes from schema.sql, applied when the database is provisioned; nodes never run DDL.
 const pool = new Pool({ connectionString: databaseURL });
 pool.on("error", (error) => console.error(`[${NODE_ID}] postgres idle connection error: ${error.message}`));
-await requireDatabaseSchema();
+await requireDatabaseSchema(pool, ["collaboration.units", "files"]);
 const database = new CustomPostgresDatabaseAdapter(pool);
 const service = new UniverCollabService({ dbAdapter: database });
 
@@ -116,11 +117,3 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
   }));
 }
 
-/** Fails fast when schema.sql has not been applied, instead of surfacing "relation does not exist" on the first request. */
-async function requireDatabaseSchema() {
-  const { rows } = await pool.query<{ exists: string | null }>("SELECT to_regclass('collaboration.units') AS exists");
-  if (!rows[0]?.exists) {
-    await pool.end();
-    throw new Error("Database schema is missing. Apply examples/multi-node/schema.sql first.");
-  }
-}
