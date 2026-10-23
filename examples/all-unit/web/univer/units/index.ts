@@ -4,6 +4,7 @@ import type { MountUniverEditorOptions } from "../types";
 import { registerBaseUnit } from "./base";
 import { registerBoardUnit } from "./board";
 import { registerDocUnit } from "./doc";
+import { registerPdfUnit } from "./pdf";
 import { registerSheetUnit } from "./sheet";
 import { registerSlideUnit } from "./slide";
 
@@ -28,6 +29,10 @@ export async function loadUnitStyles(unitType: number) {
     await import("./base/styles");
     return;
   }
+  if (unitType === UniverType.UNIVER_PDF) {
+    await import("./pdf/styles");
+    return;
+  }
   throw new Error(`Unsupported Unit type: ${unitType}`);
 }
 
@@ -45,6 +50,8 @@ export function registerUnitPlugins(
     registerBoardUnit(univer, options);
   } else if (options.unitType === UniverType.UNIVER_BASE) {
     registerBaseUnit(univer, options);
+  } else if (options.unitType === UniverType.UNIVER_PDF) {
+    registerPdfUnit(univer, options);
   } else {
     throw new Error(`Unsupported Unit type: ${options.unitType}`);
   }

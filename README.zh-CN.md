@@ -22,13 +22,14 @@
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.zh-CN.md) | 最小 Sheet 实时协同链路 |
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
-| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定五类 Unit、侧边栏切换与 SQLite 持久化 |
+| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 固定六类 Unit、侧边栏切换与 SQLite 持久化 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护，ACL 由应用持有 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
+| [`file-service`](./examples/file-service/README.zh-CN.md) | 图片与附件的应用文件服务：上传、sign-url、下载三条路由与本地落盘 |
 | [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由，另有独立部署、多副本的导入导出服务 |
 
 ## 运行示例
@@ -51,11 +52,13 @@ pnpm example:history
 pnpm example:comments
 pnpm example:worktree
 pnpm example:exchange
+pnpm example:file-service
 pnpm example:multi-node
 ```
 
-示例只承担教学和可复制装配，不包含文件空间或完整办公套件。exchange 示例
-特意使用内存文件与任务存储，不代替生产文件服务。
+示例只承担教学和可复制装配，不包含文件空间或完整办公套件。`file-service`、`exchange`、
+`all-unit` 把上传文件放在本地磁盘，不代替生产文件服务；[`file-service`](./examples/file-service/README.zh-CN.md)
+说明 Univer 客户端调用的路由和生产环境要改什么。
 
 `quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`，服务重启后仍会保留。
 `multi-node` 需要 Docker Compose，在容器内构建，多个节点连接同一个 PostgreSQL 数据库，数据保存在 Docker volume 中。

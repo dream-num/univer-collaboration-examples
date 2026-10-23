@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-Minimal collaboration for five fixed Units: Sheet, Doc, Slide, Board, and Base.
+Minimal collaboration for six fixed Units: Sheet, Doc, Slide, Board, Base, and PDF.
 The server returns their IDs, types, and display labels from `GET /api/units`.
 The browser lists them in a sidebar and opens the selected editor.
 
@@ -19,7 +19,7 @@ Switching Units navigates to a new page; the selected Unit is preserved in the U
 - `server/files.ts` and `server/file-store.ts`: the upload, sign-url, and download routes the
   editors use for images and attachments, backed by `.data/files/<fileID>` plus a JSON index.
 - `web/main.ts`: list loading, sidebar, URL selection, and editor lifecycle.
-- `web/univer/`: editor assembly for the five Unit types, including plugins, themes,
+- `web/univer/`: editor assembly for the six Unit types, including plugins, themes,
   locales, and Base Worker. Only collaboration is wired to the
   backend; login, member management, comments, history, and exchange are omitted.
 
@@ -35,9 +35,8 @@ and loads `GET /universer-api/file/:fileID/download`. The client URLs are set in
 parameters; `source` is the numeric `FileSource` enum from `@univerjs/protocol`. `HttpImport` and
 `HttpExport` files are temporary, while any other `source`, including
 the default and `UnitEmbedded`, is persistent and shares the lifecycle of the Unit named by
-`assign`. This example keeps files on the local disk with an unsigned download URL for teaching; a
-production application should store them in object storage, return time-limited signed URLs, and
-authorize every file route. Set `UNIVER_LICENSE`
+`assign`. See the [`file-service`](../file-service/README.md) example for a fuller description.
+Set `UNIVER_LICENSE`
 before building when a license is required for Pro features.
 
 ```bash

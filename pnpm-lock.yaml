@@ -133,6 +133,15 @@ importers:
       '@univerjs-pro/license':
         specifier: 1.2.0
         version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)
+      '@univerjs-pro/pdfs-editor':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs-ui':
+        specifier: 1.2.0
+        version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/shape-editor-ui':
         specifier: 1.2.0
         version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
@@ -476,6 +485,73 @@ importers:
         specifier: 1.2.0
         version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/preset-sheets-core':
+        specifier: 1.2.0
+        version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/presets':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/protocol':
+        specifier: 1.2.0
+        version: 1.2.0
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+      multer:
+        specifier: ^2.0.2
+        version: 2.2.0
+      react:
+        specifier: ^19.3.0
+        version: 19.3.0
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.6
+      '@types/multer':
+        specifier: ^2.0.0
+        version: 2.2.0
+      vite:
+        specifier: ^8.0.0
+        version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
+
+  examples/file-service:
+    dependencies:
+      '@univerjs-pro/collaboration':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-client-ui':
+        specifier: 1.2.0
+        version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-database-sqlite':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)
+      '@univerjs-pro/collaboration-endpoint':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)
+      '@univerjs-pro/collaboration-service':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)
+      '@univerjs-pro/collaboration-transport-node':
+        specifier: 1.2.0
+        version: 1.2.0
+      '@univerjs-pro/license':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core':
+        specifier: 1.2.0
+        version: 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/preset-sheets-core':
+        specifier: 1.2.0
+        version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/preset-sheets-drawing':
         specifier: 1.2.0
         version: 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/presets':
@@ -2060,6 +2136,15 @@ packages:
     peerDependencies:
       rxjs: '>=7.0.0'
 
+  '@univerjs-pro/pdfs-editor@1.2.0':
+    resolution: {integrity: sha512-dmE587SG8e/nE9+aDbC6NUn5bD7lab1pLsrylDJQRSacenveE5q5Ug1pqyl5VXo2XOxCzRTlBe+S5GbMEwDF/Q==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-editor/-/pdfs-editor-1.2.0.tgz}
+
+  '@univerjs-pro/pdfs-ui@1.2.0':
+    resolution: {integrity: sha512-6k9+wSi3ipvJGFQRunXdyte0lBHzVkhtCwf5QkCGZvXbALdGiggxShAho/g9ga8Wpbwm/cBsue4fiFg4XdYe6g==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-ui/-/pdfs-ui-1.2.0.tgz}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
+
   '@univerjs-pro/pdfs@1.2.0':
     resolution: {integrity: sha512-d/JrEht6Oj/a0jFNe8V4zpi2f+UqXxLpQnDxeEo+pC2QjQqOLqMSLuHTjDlmD63ZErzY+Mw23mNfk4CHT1AcVA==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs/-/pdfs-1.2.0.tgz}
 
@@ -2991,6 +3076,10 @@ packages:
 
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
+
+  opentype.js@2.0.0:
+    resolution: {integrity: sha512-kCyjv6xdDY1W/jLWZ/L3QhhTlKUqDZMQ5+Jdlw12b3dXkKNpYBqqlMMj0YDQPShWFTMwgZI1hG14kN3XUDSg/A==}
+    hasBin: true
 
   ot-json1@1.0.2:
     resolution: {integrity: sha512-IhxkqVWQqlkWULoi/Q2AdzKk0N5vQRbUMUwubFXFCPcY4TsOZjmp2YKrk0/z1TeiECPadWEK060sdFdQ3Grokg==}
@@ -4856,6 +4945,35 @@ snapshots:
     transitivePeerDependencies:
       - react
 
+  '@univerjs-pro/pdfs-editor@1.2.0(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/collaboration': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.2.0(react@19.3.0)
+      '@univerjs/core': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+    transitivePeerDependencies:
+      - react
+      - rxjs
+
+  '@univerjs-pro/pdfs-ui@1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.2.0(react@19.3.0)
+      '@univerjs/core': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/design': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/docs': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-ui': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-render': 1.2.0(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.46.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/ui': 1.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      opentype.js: 2.0.0
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
+
   '@univerjs-pro/pdfs@1.2.0(react@19.3.0)':
     dependencies:
       '@univerjs-pro/license': 1.2.0(react@19.3.0)(rxjs@7.8.2)
@@ -6648,6 +6766,8 @@ snapshots:
   once@1.4.0:
     dependencies:
       wrappy: 1.0.2
+
+  opentype.js@2.0.0: {}
 
   ot-json1@1.0.2:
     dependencies:

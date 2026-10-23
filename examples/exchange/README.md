@@ -37,9 +37,6 @@ is the numeric `FileSource` enum from `@univerjs/protocol`. Files with `HttpImpo
 sources) or `HttpExport` (export results) are temporary:
 the import route deletes its source file once the Unit exists, and an export result can be deleted
 after download. Any other `source`, including the default, is a persistent file that shares the
-lifecycle of the Unit named by `assign`. The fixed user, permissive authorization, local file
-store, 25 MiB upload limit, and unsigned local download URL are teaching choices, not production
-configuration. A production application should authenticate every route, authorize Unit creation
-and export, use durable object storage and a task queue, enforce quotas, validate files, expire
-downloads, and run conversions in isolated workers. Exchange HTTP routes belong to the application;
-the Collaboration SDK does not provide an Exchange Endpoint.
+lifecycle of the Unit named by `assign`. See the [`file-service`](../file-service/README.md)
+example for a fuller description of the file routes. Exchange HTTP routes belong to the
+application; the Collaboration SDK does not provide an Exchange Endpoint.

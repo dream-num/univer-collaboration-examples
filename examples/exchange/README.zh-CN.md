@@ -34,7 +34,6 @@ ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Faca
 查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值。`HttpImport`（导入源文件）
 和 `HttpExport`（导出结果）是临时文件：导入
 完成后源文件会被删除，导出结果下载后即可删除；其余 `source` 包括缺省值都是持久文件，生命周期
-与 `assign` 指定的 Unit 相同。固定用户、全允许授权、本地文件存储、25 MiB 上传限制以及未签名
-的本地下载 URL 都只用于教学，不是生产配置。生产应用应认证所有路由、校验 Unit 创建和导出
-权限，使用持久对象存储与任务队列，设置配额、校验文件、让下载 URL 过期，并在隔离 worker 中
-执行转换。Exchange HTTP 路由属于应用，Collaboration SDK 不提供 Exchange Endpoint。
+与 `assign` 指定的 Unit 相同。文件接口的更详细说明请参考
+[`file-service`](../file-service/README.zh-CN.md) 示例。Exchange HTTP 路由属于应用，
+Collaboration SDK 不提供 Exchange Endpoint。

@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-最简五类 Unit 协同示例：Sheet、Doc、Slide、Board、Base。服务端固定每类一个 Unit，
+最简六类 Unit 协同示例：Sheet、Doc、Slide、Board、Base、PDF。服务端固定每类一个 Unit，
 通过 `GET /api/units` 返回 ID、类型和展示标签，前端侧边栏展示列表并打开对应编辑器。
 
 ```bash
@@ -18,7 +18,7 @@ pnpm example:all-unit
 - `server/files.ts` 与 `server/file-store.ts`：编辑器插入图片和附件时使用的上传、sign-url
   和下载接口，文件落盘到 `.data/files/<fileID>` 并带 JSON 索引。
 - `web/main.ts`：加载列表、侧边栏、URL 选择与编辑器生命周期。
-- `web/univer/`：五类 Unit 插件装配、主题、语言资源和
+- `web/univer/`：六类 Unit 插件装配、主题、语言资源和
   Base Worker；只接入协同，不接入登录、成员管理、评论、历史和导入导出业务。
 
 所有浏览器使用固定 `demo-user`，编辑权限固定允许，仅用于本地教学。侧边栏使用固定类型标签，
@@ -30,9 +30,8 @@ pnpm example:all-unit
 加载。前端地址在 `web/univer/features/collaboration.ts` 中配置。上传接口会记录 `source` 和
 `assign` 查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值：`HttpImport` 和
 `HttpExport` 是临时文件；其余 `source` 包括缺省值和
-`UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。示例把文件放在本地磁盘并
-返回未签名的下载地址，仅用于教学；生产环境应改用对象存储，返回带时效的签名地址，并对所有
-文件接口做鉴权。
+`UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。更详细的说明请参考
+[`file-service`](../file-service/README.zh-CN.md) 示例。
 Pro 功能需要 license 时，在构建前设置 `UNIVER_LICENSE`。
 
 ```bash

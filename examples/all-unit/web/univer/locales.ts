@@ -33,6 +33,7 @@ import UIZhCN from "@univerjs/ui/locale/zh-CN";
 import { baseLocales } from "./units/base/locales";
 import { boardLocales } from "./units/board/locales";
 import { docLocales } from "./units/doc/locales";
+import { pdfLocales } from "./units/pdf/locales";
 import { sheetLocales } from "./units/sheet/locales";
 import { slideLocales } from "./units/slide/locales";
 
@@ -56,6 +57,7 @@ export const univerLocales = {
     BasesEnUS,
     baseLocales.enUS,
     BasesUIEnUS,
+    pdfLocales.enUS,
     CollaborationEnUS,
     CollaborationUIEnUS,
   ),
@@ -78,6 +80,7 @@ export const univerLocales = {
     BasesZhCN,
     baseLocales.zhCN,
     BasesUIZhCN,
+    pdfLocales.zhCN,
     CollaborationZhCN,
     CollaborationUIZhCN,
   ),

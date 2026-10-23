@@ -1,3 +1,4 @@
+import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import {
   IAuthzIoService,
@@ -13,7 +14,7 @@ import { FUniver } from "@univerjs/core/facade";
 import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
-import { defaultTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
+import { defaultTheme, greenTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
 import { loadCollaborativeUnit, registerCollaboration } from "./features/collaboration";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
@@ -60,6 +61,7 @@ function getUnitTheme(unitType: number) {
   if (unitType === UniverType.UNIVER_SLIDE) return purpleTheme;
   if (unitType === UniverType.UNIVER_BOARD) return redTheme;
   if (unitType === UniverType.UNIVER_BASE) return yellowTheme;
+  if (unitType === UniverType.UNIVER_PDF) return greenTheme;
   return defaultTheme;
 }
 
@@ -79,6 +81,9 @@ function createUniver(unitType: number, locale: EditorLocale) {
   univer.registerPlugin(UniverLicensePlugin, {
     license: import.meta.env.UNIVER_LICENSE || undefined,
   });
+  // Register before Unit plugins: the PDF editor plugin depends on it and would otherwise
+  // register it implicitly, making a later explicit registration a duplicate.
+  univer.registerPlugin(UniverCollaborationPlugin);
   univer.registerPlugin(UniverRenderEnginePlugin);
   univer.registerPlugin(UniverDrawingPlugin, {
     override: [[IImageIoService, null]],
