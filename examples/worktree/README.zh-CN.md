@@ -12,8 +12,8 @@ pnpm example:worktree
 ```
 
 打开 <http://127.0.0.1:3010/?unit=worktree-sheet&worktree=demo-worktree>。示例会创建固定的
-`demo-worktree`，初始为 draft；工具栏同时扮演两个角色：先像 Agent 一样编辑 draft，再像人类一样审阅。
-Trunk/Draft 切换视图，按钮只启用当前状态允许的操作。
+`demo-worktree`，初始为 draft。页面同时扮演两个角色：Agent 的操作（Mark ready）和 Reviewer 的操作
+（Merge、Reopen、Discard）分成两组，只启用当前状态允许的操作。Trunk/Draft 切换视图，状态行提示下一步做什么。
 
 ```text
 create → draft → ready → merged

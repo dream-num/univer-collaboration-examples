@@ -7,8 +7,39 @@
   </head>
   <body>
     <div id="example">
-      <div id="toolbar"></div>
-      <div id="status"></div>
+      <header id="panel">
+        <div class="panel-row">
+          <div class="panel-title">
+            <h1>Worktree</h1>
+            <p>An agent edits an isolated <b>draft</b>; a reviewer decides whether it enters <b>trunk</b>.</p>
+          </div>
+          <ol id="lifecycle" class="steps" aria-label="Worktree lifecycle">
+            <li data-step="draft"><span class="step-index">1</span><span class="step-text"><span class="step-name">Draft</span><small>agent edits</small></span></li>
+            <li data-step="ready"><span class="step-index">2</span><span class="step-text"><span class="step-name">Ready</span><small>frozen for review</small></span></li>
+            <li data-step="merged"><span class="step-index">3</span><span class="step-text"><span class="step-name">Merged</span><small>changes in trunk</small></span></li>
+          </ol>
+        </div>
+        <div class="panel-row">
+          <nav class="view-switch" aria-label="View">
+            <span class="group-label">View</span>
+            <a id="view-trunk" href="/?unit=worktree-sheet" title="The shared document everyone sees">Trunk</a>
+            <a id="view-draft" href="/?unit=worktree-sheet&amp;worktree=demo-worktree" title="The isolated copy the agent edits">Draft</a>
+          </nav>
+          <div class="actions">
+            <div class="group">
+              <span class="group-label">Agent</span>
+              <button id="ready" title="Freeze the draft and hand it to the reviewer">Mark ready</button>
+            </div>
+            <div class="group">
+              <span class="group-label">Reviewer</span>
+              <button id="merge" title="Accept the draft: its changes enter trunk">Merge</button>
+              <button id="reopen" title="Send the draft back to the agent for another round">Reopen</button>
+              <button id="discard" title="Abandon the draft; trunk stays unchanged">Discard</button>
+            </div>
+          </div>
+        </div>
+        <p id="status" role="status">Loading…</p>
+      </header>
       <div id="app"></div>
     </div>
     <script type="module" src="/web/main.ts"></script>

@@ -13,9 +13,9 @@ pnpm example:worktree
 ```
 
 Open <http://127.0.0.1:3010/?unit=worktree-sheet&worktree=demo-worktree>. The example creates the
-fixed `demo-worktree` in draft, and the toolbar plays both roles: edit the draft as the agent would,
-then review it as the human would. Trunk and Draft switch views; the buttons enable only the actions
-the current status allows.
+fixed `demo-worktree` in draft. The page plays both roles: the Agent action (Mark ready) and the
+Reviewer actions (Merge, Reopen, Discard) are separate groups, and only the actions the current status
+allows are enabled. Trunk and Draft switch the view, and the status line says what to do next.
 
 ```text
 create → draft → ready → merged

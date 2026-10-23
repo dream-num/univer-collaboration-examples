@@ -23,11 +23,26 @@ import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 const worktreeID = "demo-worktree";
 const unitID = "worktree-sheet";
 const RESET_COMMAND = "pnpm --filter @univerjs/collaboration-example-worktree reset";
-const toolbar = document.querySelector<HTMLElement>("#toolbar")!;
-const status = document.querySelector<HTMLElement>("#status")!;
 const client = new WorktreeClient({ origin: location.origin });
 
 type WorktreeStatus = Awaited<ReturnType<WorktreeClient["getWorktree"]>>["status"];
+
+function element<T extends Element>(selector: string): T {
+  const found = document.querySelector<T>(selector);
+  if (!found) throw new Error(`Missing ${selector} in index.html`);
+  return found;
+}
+const ui = {
+  status: element<HTMLElement>("#status"),
+  steps: [...element<HTMLElement>("#lifecycle").querySelectorAll<HTMLElement>("li")],
+  viewTrunk: element<HTMLAnchorElement>("#view-trunk"),
+  viewDraft: element<HTMLAnchorElement>("#view-draft"),
+  ready: element<HTMLButtonElement>("#ready"),
+  reopen: element<HTMLButtonElement>("#reopen"),
+  merge: element<HTMLButtonElement>("#merge"),
+  discard: element<HTMLButtonElement>("#discard"),
+};
+const buttons = [ui.ready, ui.reopen, ui.merge, ui.discard];
 
 const editorURL = (draft: boolean) =>
   `/?unit=${unitID}${draft ? `&worktree=${worktreeID}` : ""}`;
@@ -37,20 +52,20 @@ const editorURL = (draft: boolean) =>
 // final and close the draft for good. See README.md for the agent-edits, human-reviews workflow.
 const draftOpen = (current: WorktreeStatus) => current === "draft" || current === "ready";
 
-function describeStatus(current: WorktreeStatus, editingDraft: boolean): string {
+function nextStep(current: WorktreeStatus, editingDraft: boolean): string {
   switch (current) {
     case "draft":
       return editingDraft
-        ? "Editing the draft as the agent would. Mark it Ready to hand it over for review."
-        : "Viewing trunk. Draft changes stay isolated until a reviewer merges them.";
+        ? "You are editing the draft; trunk does not see these changes. Next: change a few cells, then click Mark ready."
+        : "You are viewing trunk. Next: open Draft to see the agent's isolated changes.";
     case "ready":
-      return "Draft is frozen for review. Merge accepts it into trunk; Reopen sends it back for another round; Discard abandons it.";
+      return "The draft is frozen for review; edits are rejected. Next: compare Trunk and Draft, then Merge, Reopen, or Discard.";
     case "merging":
-      return "Merge in progress. Reload in a moment.";
+      return "Merging the draft into trunk. Reload in a moment.";
     case "merged":
-      return `Draft was merged into trunk. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
+      return `Merged: trunk now contains the draft's changes, and this Worktree is finished. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
     case "discarded":
-      return `Draft was discarded; trunk is unchanged. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
+      return `Discarded: trunk is unchanged, and this Worktree is finished. To start over, stop the server, run \`${RESET_COMMAND}\`, and start it again.`;
   }
 }
 
@@ -58,6 +73,30 @@ function describeError(error: unknown): string {
   if (!(error instanceof Error)) return String(error);
   const code = (error as { code?: unknown }).code;
   return code === undefined ? error.message : `${String(code)}: ${error.message}`;
+}
+
+// Highlight the lifecycle step, mark the active view, and enable only the allowed actions.
+function render(current: WorktreeStatus, editingDraft: boolean) {
+  const order = ["draft", "ready", "merged"];
+  const position = current === "merging" ? 2 : order.indexOf(current);
+  for (const [index, step] of ui.steps.entries()) {
+    step.classList.toggle("is-done", position > index);
+    step.classList.toggle("is-current", position === index);
+    step.classList.toggle("is-discarded", current === "discarded" && index === 2);
+  }
+  if (current === "discarded") {
+    ui.steps[2]!.querySelector(".step-name")!.textContent = "Discarded";
+    ui.steps[2]!.querySelector("small")!.textContent = "trunk unchanged";
+  }
+  ui.viewTrunk.toggleAttribute("aria-current", !editingDraft);
+  ui.viewDraft.toggleAttribute("aria-current", editingDraft);
+  ui.viewDraft.hidden = !draftOpen(current);
+  ui.ready.disabled = current !== "draft";
+  ui.reopen.disabled = current !== "ready";
+  ui.merge.disabled = current !== "ready";
+  ui.discard.disabled = !draftOpen(current);
+  ui.status.classList.remove("is-error");
+  ui.status.textContent = nextStep(current, editingDraft);
 }
 
 async function main() {
@@ -71,54 +110,31 @@ async function main() {
     // The draft collaboration path rejects a merged or discarded Worktree; show trunk instead.
     history.replaceState(null, "", editorURL(false));
   }
-
-  toolbar.innerHTML =
-    `<a href="${editorURL(false)}">Trunk</a><a id="draft-link" href="${editorURL(true)}">Draft</a>` +
-    `<span id="worktree-status"></span>` +
-    `<button id="ready">Ready</button><button id="reopen">Reopen</button>` +
-    `<button id="merge">Merge</button><button id="discard">Discard</button>`;
-  const draftLink = toolbar.querySelector<HTMLAnchorElement>("#draft-link")!;
-  const statusLabel = toolbar.querySelector<HTMLElement>("#worktree-status")!;
-  const buttons = {
-    ready: toolbar.querySelector<HTMLButtonElement>("#ready")!,
-    reopen: toolbar.querySelector<HTMLButtonElement>("#reopen")!,
-    merge: toolbar.querySelector<HTMLButtonElement>("#merge")!,
-    discard: toolbar.querySelector<HTMLButtonElement>("#discard")!,
-  };
-  // Enable only the action the current status allows.
-  const render = () => {
-    statusLabel.textContent = `Status: ${worktree.status}`;
-    draftLink.hidden = !draftOpen(worktree.status);
-    buttons.ready.disabled = worktree.status !== "draft";
-    buttons.reopen.disabled = worktree.status !== "ready";
-    buttons.merge.disabled = worktree.status !== "ready";
-    buttons.discard.disabled = !draftOpen(worktree.status);
-    status.textContent = describeStatus(worktree.status, editingDraft);
-  };
-  render();
+  render(worktree.status, editingDraft);
 
   // Run a lifecycle action; on failure show the server's answer and re-read the status.
   const run = (action: () => Promise<unknown>, next: () => void) => async () => {
-    for (const button of Object.values(buttons)) button.disabled = true;
+    for (const button of buttons) button.disabled = true;
     try {
       await action();
       next();
     } catch (error) {
       worktree = await client.getWorktree(worktreeID).catch(() => worktree);
-      render();
-      status.textContent = describeError(error);
+      render(worktree.status, editingDraft);
+      ui.status.classList.add("is-error");
+      ui.status.textContent = describeError(error);
     }
   };
-  buttons.ready.onclick = run(() => client.markReady(worktreeID), () => location.reload());
-  buttons.reopen.onclick = run(
+  ui.ready.onclick = run(() => client.markReady(worktreeID), () => location.reload());
+  ui.reopen.onclick = run(
     () => client.reopenWorktree(worktreeID),
     () => location.assign(editorURL(true)),
   );
-  buttons.merge.onclick = run(
+  ui.merge.onclick = run(
     () => client.mergeWorktree(worktreeID),
     () => location.assign(editorURL(false)),
   );
-  buttons.discard.onclick = run(
+  ui.discard.onclick = run(
     () => client.discardWorktree(worktreeID),
     () => location.assign(editorURL(false)),
   );
@@ -170,5 +186,6 @@ async function main() {
 
 void main().catch((error: unknown) => {
   console.error(error);
-  status.textContent = describeError(error);
+  ui.status.classList.add("is-error");
+  ui.status.textContent = describeError(error);
 });
