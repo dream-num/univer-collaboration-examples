@@ -9,5 +9,4 @@ import "@univerjs/preset-sheets-note/lib/index.css";
 import "@univerjs/preset-sheets-sort/lib/index.css";
 import "@univerjs/preset-sheets-table/lib/index.css";
 import "@univerjs/preset-sheets-advanced/lib/index.css";
-import "@univerjs/preset-sheets-collaboration/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
