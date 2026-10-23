@@ -13,5 +13,5 @@ Open <http://127.0.0.1:3010/?unit=comments-sheet>, select a cell, and use the co
 Comment anchors still change with Sheet collaboration data, while comment content and solved state are stored by the Comment Service. Both must be included in the product data lifecycle.
 The core and Comment SQLite Adapters share `.data/collaboration.sqlite`, so both kinds of data
 survive server restarts.
-Inserted images are embedded in the Sheet as base64 because this example has no file service; a
-production application should wire the collaboration client's image service to a file service.
+Inserted images are embedded in the Sheet as base64 because this example has no file service;
+see the [`file-service`](../file-service/README.md) example for a file service implementation.

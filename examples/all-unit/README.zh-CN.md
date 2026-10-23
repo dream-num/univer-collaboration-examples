@@ -30,9 +30,8 @@ pnpm example:all-unit
 加载。前端地址在 `web/univer/features/collaboration.ts` 中配置。上传接口会记录 `source` 和
 `assign` 查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值：`HttpImport` 和
 `HttpExport` 是临时文件；其余 `source` 包括缺省值和
-`UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。示例把文件放在本地磁盘并
-返回未签名的下载地址，仅用于教学；生产环境应改用对象存储，返回带时效的签名地址，并对所有
-文件接口做鉴权。
+`UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。更详细的说明请参考
+[`file-service`](../file-service/README.zh-CN.md) 示例。
 Pro 功能需要 license 时，在构建前设置 `UNIVER_LICENSE`。
 
 ```bash
