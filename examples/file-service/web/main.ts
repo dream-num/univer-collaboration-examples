@@ -70,7 +70,7 @@ const { univerAPI } = createUniver({
         downloadEndpointUrl: `${httpProtocol}://${location.host}/`,
       },
     ],
-    [UniverCollaborationClientUIPlugin, { enableUrlUnitLoader: false }],
+    UniverCollaborationClientUIPlugin,
   ],
 });
 

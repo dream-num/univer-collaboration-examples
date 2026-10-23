@@ -99,9 +99,11 @@ export class FileStore {
 
   private writeIndex(): Promise<void> {
     const snapshot = JSON.stringify([...this.files.values()], null, 2);
-    this.pendingWrite = this.pendingWrite.then(() =>
+    const write = this.pendingWrite.then(() =>
       writeFile(join(this.directory, INDEX_FILE), snapshot),
     );
-    return this.pendingWrite;
+    // Report the failure to this caller, but keep the chain settled so later writes still run.
+    this.pendingWrite = write.catch(() => undefined);
+    return write;
   }
 }
