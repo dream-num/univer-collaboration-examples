@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-最简五类 Unit 协同示例：Sheet、Doc、Slide、Board、Base。服务端固定每类一个 Unit，
+最简六类 Unit 协同示例：Sheet、Doc、Slide、Board、Base、PDF。服务端固定每类一个 Unit，
 通过 `GET /api/units` 返回 ID、类型和展示标签，前端侧边栏展示列表并打开对应编辑器。
 
 ```bash
@@ -18,7 +18,7 @@ pnpm example:all-unit
 - `server/files.ts` 与 `server/file-store.ts`：编辑器插入图片和附件时使用的上传、sign-url
   和下载接口，文件落盘到 `.data/files/<fileID>` 并带 JSON 索引。
 - `web/main.ts`：加载列表、侧边栏、URL 选择与编辑器生命周期。
-- `web/univer/`：五类 Unit 插件装配、主题、语言资源和
+- `web/univer/`：六类 Unit 插件装配、主题、语言资源和
   Base Worker；只接入协同，不接入登录、成员管理、评论、历史和导入导出业务。
 
 所有浏览器使用固定 `demo-user`，编辑权限固定允许，仅用于本地教学。侧边栏使用固定类型标签，
