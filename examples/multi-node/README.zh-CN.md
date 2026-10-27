@@ -83,8 +83,6 @@ const connectionConfig = {
 };
 ```
 
-浏览器端 SDK 会附带 `x-univer-host` 请求头，Endpoint 用它核对许可证的授权域名。Nginx 原样转发；会过滤请求头的网关需要保留它。
-
 [`nginx.conf`](./nginx.conf) 把两者映射成同一个路由键，用 `hash $routing_unit consistent` 分配：
 
 | 请求 | 分配方式 |

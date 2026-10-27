@@ -84,8 +84,6 @@ const connectionConfig = {
 };
 ```
 
-The SDK in the browser sends an `x-univer-host` header that the Endpoint checks against the License's authorized domains. Nginx forwards it unchanged; a gateway that filters request headers has to keep it.
-
 [`nginx.conf`](./nginx.conf) maps both to one routing key and distributes with `hash $routing_unit consistent`:
 
 | Request | Distribution |
