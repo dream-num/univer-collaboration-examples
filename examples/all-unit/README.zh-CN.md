@@ -32,7 +32,7 @@ pnpm example:all-unit
 `HttpExport` 是临时文件；其余 `source` 包括缺省值和
 `UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。更详细的说明请参考
 [`file-service`](../file-service/README.zh-CN.md) 示例。
-Pro 功能需要 license 时，在构建前设置 `UNIVER_LICENSE`。
+需要许可证时，运行前设置 `UNIVER_LICENSE` 与 `UNIVER_LICENSE_KEY`，见[仓库说明](../../README.zh-CN.md#许可证)。
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck

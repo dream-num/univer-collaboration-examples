@@ -35,6 +35,12 @@ const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscr
 const ticketStore = new RedisSessionTicketStore({ client: redis });
 
 const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
+// Nodes count each other through pubSub; log when this node goes beyond the License's node limit.
+for (const event of ["nodesExceeded", "nodesOfflineSoon", "nodesOffline", "nodesRecovered"] as const) {
+  endpoint.license.on(event, ({ limit, status }) => {
+    console.warn(`[${NODE_ID}] license.${event} limit=${limit} status=${status}`);
+  });
+}
 const transport = createNodeTransport();
 transport.use(async (context, next) => {
   // Use a fixed identity for this demo; production applications should authenticate here.

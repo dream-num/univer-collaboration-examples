@@ -36,8 +36,8 @@ parameters; `source` is the numeric `FileSource` enum from `@univerjs/protocol`.
 `HttpExport` files are temporary, while any other `source`, including
 the default and `UnitEmbedded`, is persistent and shares the lifecycle of the Unit named by
 `assign`. See the [`file-service`](../file-service/README.md) example for a fuller description.
-Set `UNIVER_LICENSE`
-before building when a license is required for Pro features.
+Set `UNIVER_LICENSE` and `UNIVER_LICENSE_KEY` before running when a License is required, as described in the
+[repository README](../../README.md#license).
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck

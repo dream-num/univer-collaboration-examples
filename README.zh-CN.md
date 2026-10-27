@@ -30,7 +30,7 @@
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
 | [`file-service`](./examples/file-service/README.zh-CN.md) | 图片与附件的应用文件服务：上传、sign-url、下载三条路由与本地落盘 |
-| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由 |
+| [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由；需要多节点许可证 |
 
 ## 运行示例
 
@@ -55,6 +55,19 @@ pnpm example:exchange
 pnpm example:file-service
 pnpm example:multi-node
 ```
+
+### 许可证
+
+已有许可证时，运行前在终端设置两个变量，再执行上面的命令：
+
+```bash
+export UNIVER_LICENSE="$(cat license.txt)"
+export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
+```
+
+构建时 `UNIVER_LICENSE` 写入浏览器产物；服务启动时 `UNIVER_LICENSE` 与 `UNIVER_LICENSE_KEY` 一起交给
+`UniverCollabService`。两个都不设置时按免费版运行，单个节点支持 3 个协同编辑连接；`multi-node` 需要支持多个节点的许可证。
+说明见[许可证](https://docs.univer.ai/server/license)。
 
 示例只承担教学和可复制装配，不包含文件空间或完整办公套件。`file-service`、`exchange`、
 `all-unit` 把上传文件放在本地磁盘，不代替生产文件服务；[`file-service`](./examples/file-service/README.zh-CN.md)
