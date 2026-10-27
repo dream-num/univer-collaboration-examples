@@ -35,7 +35,7 @@ const pubSub = new RedisPubSubAdapter({ pubClient: redis, subClient: redisSubscr
 const ticketStore = new RedisSessionTicketStore({ client: redis });
 
 const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
-// Nodes count each other through pubSub; log each change of this node's status against the License's node limit.
+// Log each change of this node's status against the License's node limit.
 endpoint.license.on("nodesStatusChanged", ({ status, previousStatus, limit, reason }) => {
   console.warn(`[${NODE_ID}] license.nodes ${previousStatus} -> ${status} limit=${limit}${reason ? ` reason=${reason}` : ""}`);
 });

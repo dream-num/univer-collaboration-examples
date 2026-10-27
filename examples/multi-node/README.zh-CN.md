@@ -55,7 +55,7 @@ const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 
 ### 许可证
 
-每个节点从 `UNIVER_LICENSE` 和 `UNIVER_LICENSE_KEY` 读取同一份许可证，并通过 pub/sub 适配器互相计数。许可证要覆盖运行的
+每个节点从 `UNIVER_LICENSE` 和 `UNIVER_LICENSE_KEY` 读取同一份许可证。许可证要覆盖运行的
 节点数，本例是两个。单节点许可证配合 `pubSub` 启动时，节点以 `LICENSE_POLICY_INVALID` 停止。运行的节点多于许可证覆盖的数量时，
 最新加入的节点在宽限期后下线；[`server/main.ts`](./server/main.ts) 记录每次变化：
 

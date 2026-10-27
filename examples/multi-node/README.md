@@ -55,8 +55,7 @@ const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 
 ### License
 
-Every node reads the same License from `UNIVER_LICENSE` and `UNIVER_LICENSE_KEY`; the nodes count each other through
-the pub/sub adapter. The License must cover the number of nodes you run, two in this example. A node that receives a
+Every node reads the same License from `UNIVER_LICENSE` and `UNIVER_LICENSE_KEY`. The License must cover the number of nodes you run, two in this example. A node that receives a
 `pubSub` with a single-node License stops at startup with `LICENSE_POLICY_INVALID`. When more nodes run than the
 License covers, the newest ones go offline after a grace period; [`server/main.ts`](./server/main.ts) logs each change:
 
