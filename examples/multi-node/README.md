@@ -61,11 +61,9 @@ the pub/sub adapter. The License must cover the number of nodes you run, two in 
 License covers, the newest ones go offline after a grace period; [`server/main.ts`](./server/main.ts) logs each change:
 
 ```ts
-for (const event of ["nodesExceeded", "nodesOfflineSoon", "nodesOffline", "nodesRecovered"] as const) {
-  endpoint.license.on(event, ({ limit, status }) => {
-    console.warn(`[${NODE_ID}] license.${event} limit=${limit} status=${status}`);
-  });
-}
+endpoint.license.on("nodesStatusChanged", ({ status, previousStatus, limit, reason }) => {
+  console.warn(`[${NODE_ID}] license.nodes ${previousStatus} -> ${status} limit=${limit}${reason ? ` reason=${reason}` : ""}`);
+});
 ```
 
 The Endpoint does not dispose the adapters or the clients it was given. Shut down in reverse order of creation: dispose the transport, then the pub/sub adapter, then close both Redis connections.

@@ -60,11 +60,9 @@ const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 最新加入的节点在宽限期后下线；[`server/main.ts`](./server/main.ts) 记录每次变化：
 
 ```ts
-for (const event of ["nodesExceeded", "nodesOfflineSoon", "nodesOffline", "nodesRecovered"] as const) {
-  endpoint.license.on(event, ({ limit, status }) => {
-    console.warn(`[${NODE_ID}] license.${event} limit=${limit} status=${status}`);
-  });
-}
+endpoint.license.on("nodesStatusChanged", ({ status, previousStatus, limit, reason }) => {
+  console.warn(`[${NODE_ID}] license.nodes ${previousStatus} -> ${status} limit=${limit}${reason ? ` reason=${reason}` : ""}`);
+});
 ```
 
 Endpoint 不会释放外部传入的适配器和客户端。停止服务时按创建的反序释放：先释放 Transport，再释放 pub/sub 适配器，最后关闭两个 Redis 连接。
