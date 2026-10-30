@@ -15,8 +15,8 @@ Open <http://127.0.0.1:3010/?unit=exchange-sheet>. Use the **Import** / **Export
 editor to import XLS/XLSX/CSV/TSV as a new collaborative Unit, or to export the current confirmed
 revision as XLSX/CSV/TSV. After an import the browser navigates to the newly created Unit.
 
-SDK 1.2.0 ships `exchange-client` and `sheets-exchange-client` headless (no ribbon entries), so the
-example owns the entry points: `web/main.ts` calls `importSheetToUnitIdAsync`,
+Since SDK 1.2.0, `exchange-client` and `sheets-exchange-client` ship headless (no ribbon entries), so
+the example owns the entry points: `web/main.ts` calls `importSheetToUnitIdAsync`,
 `exportSheetByUnitIdAsync`, and `downloadFile` from the Facade.
 
 Read these files together:

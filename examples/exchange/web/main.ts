@@ -34,7 +34,7 @@ const { univerAPI } = createUniver({
       UniverPresetSheetsCoreEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
-      // SDK 1.2.0 does not publish locale entry points for the two exchange packages.
+      // The two exchange packages do not publish locale entry points.
     ),
   },
   theme: defaultTheme,
@@ -81,7 +81,7 @@ const { univerAPI } = createUniver({
 const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
 if (!workbook) throw new Error("Document could not be loaded");
 
-// SDK 1.2.0 ships the exchange packages headless: the built-in ribbon entries are gone, so the
+// Since SDK 1.2.0 the exchange packages ship headless: there are no built-in ribbon entries, so the
 // host application owns the entry points and calls the Facade instead.
 const toolbar = document.querySelector<HTMLElement>("#toolbar")!;
 const status = document.querySelector<HTMLElement>("#status")!;

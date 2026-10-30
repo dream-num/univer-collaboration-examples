@@ -14,7 +14,7 @@ pnpm example:exchange
 工具栏，把 XLS/XLSX/CSV/TSV 导入为新的协同 Unit，或把当前 confirmed revision 导出为
 XLSX/CSV/TSV。导入完成后浏览器会跳转到新建的 Unit。
 
-SDK 1.2.0 的 `exchange-client` 与 `sheets-exchange-client` 只提供 headless 能力（不再带
+自 SDK 1.2.0 起，`exchange-client` 与 `sheets-exchange-client` 只提供 headless 能力（不再带
 ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Facade 的
 `importSheetToUnitIdAsync`、`exportSheetByUnitIdAsync` 和 `downloadFile`。
 
