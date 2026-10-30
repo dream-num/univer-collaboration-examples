@@ -1787,90 +1787,90 @@ packages:
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
 
   '@univerjs-pro/bases-dashboard-ui@1.3.1':
-    resolution: {integrity: sha512-Rq3Vk4Q68O014bFLua0lKMkkSWMSkqDijSmzs3qYkIAclMPf5/2lTbdkivgE5IiVwopUolAWIp39653MMJIdDQ==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-dashboard-ui/-/bases-dashboard-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-Rq3Vk4Q68O014bFLua0lKMkkSWMSkqDijSmzs3qYkIAclMPf5/2lTbdkivgE5IiVwopUolAWIp39653MMJIdDQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases-dashboard@1.3.1':
-    resolution: {integrity: sha512-ZQEu5yMlpnXdFhfar51zyqwJvbY8Z1szrQfNmWe9ObBoLRy7WJKW1vtRkqVhZG02mUc6fMCiYl0xp4Dk53ULpg==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-dashboard/-/bases-dashboard-1.3.1.tgz}
+    resolution: {integrity: sha512-ZQEu5yMlpnXdFhfar51zyqwJvbY8Z1szrQfNmWe9ObBoLRy7WJKW1vtRkqVhZG02mUc6fMCiYl0xp4Dk53ULpg==}
 
   '@univerjs-pro/bases-thread-comment@1.3.1':
-    resolution: {integrity: sha512-wms3vzl92IJghQlHPiV8LAWFR9sZaQx8Yha/zwGKFDGGLxYQYsgTH5Z0SLGZMgqbw2IRWQ3Rx/+mk2VyVQWlPw==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-thread-comment/-/bases-thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-wms3vzl92IJghQlHPiV8LAWFR9sZaQx8Yha/zwGKFDGGLxYQYsgTH5Z0SLGZMgqbw2IRWQ3Rx/+mk2VyVQWlPw==}
 
   '@univerjs-pro/bases-ui@1.3.1':
-    resolution: {integrity: sha512-E9Ba1pXpLfQ1icSqXxOg7pUXGG+5cEGtydFBog7mx3g5j67hd+A/guEB5Af4YW2vE/tVbuOH6OtA9zIS63dwCQ==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-ui/-/bases-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-E9Ba1pXpLfQ1icSqXxOg7pUXGG+5cEGtydFBog7mx3g5j67hd+A/guEB5Af4YW2vE/tVbuOH6OtA9zIS63dwCQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases@1.3.1':
-    resolution: {integrity: sha512-SR9i230fcvzKsMRONy4AAAMYgnW2vGa5p5wqJPWO0hDz+ipZ2As25JaKCOgL0ZiQCXCo/A5VOsyhjhxcpLADWQ==, tarball: https://registry.npmjs.org/@univerjs-pro/bases/-/bases-1.3.1.tgz}
+    resolution: {integrity: sha512-SR9i230fcvzKsMRONy4AAAMYgnW2vGa5p5wqJPWO0hDz+ipZ2As25JaKCOgL0ZiQCXCo/A5VOsyhjhxcpLADWQ==}
 
   '@univerjs-pro/boards-chart-ui@1.3.1':
-    resolution: {integrity: sha512-CzMtPaz9r8x89RYdF3DlDgcPPz3zTZCGELoOf27vNUwkd5Trkr3dQ7jN94m94BUnyE7ycP8P43MZ8bCgCYNwJg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-chart-ui/-/boards-chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-CzMtPaz9r8x89RYdF3DlDgcPPz3zTZCGELoOf27vNUwkd5Trkr3dQ7jN94m94BUnyE7ycP8P43MZ8bCgCYNwJg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-chart@1.3.1':
-    resolution: {integrity: sha512-SBnPknTcmmzIkSxDBqzs4BF5jF8dBP54ljfonmyZUYv/1RvLDTkpL9+1d1UD0LYQf5l7jP7leIzsdArTmn/K3w==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-chart/-/boards-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-SBnPknTcmmzIkSxDBqzs4BF5jF8dBP54ljfonmyZUYv/1RvLDTkpL9+1d1UD0LYQf5l7jP7leIzsdArTmn/K3w==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-mind-ui@1.3.1':
-    resolution: {integrity: sha512-ZY/Nl1PWyC72S+CrrKwPByUXQffAPeUhBhRMxsir7bsS7sLvthrNgwNqPbq+PcC8PfDLosYMESL0vJg5T1VtBA==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-mind-ui/-/boards-mind-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-ZY/Nl1PWyC72S+CrrKwPByUXQffAPeUhBhRMxsir7bsS7sLvthrNgwNqPbq+PcC8PfDLosYMESL0vJg5T1VtBA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-mind@1.3.1':
-    resolution: {integrity: sha512-XkJljyZxQRzKzxsIFC3QsXc5FZXq7OJ40wqRit0Qvsy+AxFY7ABA0lw40ctMAgsesxclYJu1SYqlf6KHEHKKsQ==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-mind/-/boards-mind-1.3.1.tgz}
+    resolution: {integrity: sha512-XkJljyZxQRzKzxsIFC3QsXc5FZXq7OJ40wqRit0Qvsy+AxFY7ABA0lw40ctMAgsesxclYJu1SYqlf6KHEHKKsQ==}
 
   '@univerjs-pro/boards-table-ui@1.3.1':
-    resolution: {integrity: sha512-+Us5Gm6DRKnCKle5JcPdTf+tPWGrv8TrhKv2hF1wwTx7Bd8r92yOD2iYPnfmW30KN1utsMx4GFviod+W8VL9Sg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-table-ui/-/boards-table-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-+Us5Gm6DRKnCKle5JcPdTf+tPWGrv8TrhKv2hF1wwTx7Bd8r92yOD2iYPnfmW30KN1utsMx4GFviod+W8VL9Sg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs-pro/boards-table@1.3.1':
-    resolution: {integrity: sha512-pDV2Yz0D9HA1L3dGHRha1V8MhcTTkuV7Yd8IVgEMiLVAGMHVDHg9tlPhGefkxFy27SFfgtYNGKwzVOzYNaf2hQ==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-table/-/boards-table-1.3.1.tgz}
+    resolution: {integrity: sha512-pDV2Yz0D9HA1L3dGHRha1V8MhcTTkuV7Yd8IVgEMiLVAGMHVDHg9tlPhGefkxFy27SFfgtYNGKwzVOzYNaf2hQ==}
 
   '@univerjs-pro/boards-thread-comment@1.3.1':
-    resolution: {integrity: sha512-Nwxfb78xl+MIXh48yNzq6Y8dBVkvwXpPOkScjK02MiMZUC/qRZhU/z2FOJ6kxmgpm3BNEauvut3fMCpQsjqz4Q==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-thread-comment/-/boards-thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-Nwxfb78xl+MIXh48yNzq6Y8dBVkvwXpPOkScjK02MiMZUC/qRZhU/z2FOJ6kxmgpm3BNEauvut3fMCpQsjqz4Q==}
 
   '@univerjs-pro/boards-ui@1.3.1':
-    resolution: {integrity: sha512-eWnp1sa8TnLwZTe8IQIY73ZYU/4CZSM7onvueJOT2B7+dCL9h9W0UHarb5eAW9EnosMIXJ48A+HKVBqJ8a1KIQ==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-ui/-/boards-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-eWnp1sa8TnLwZTe8IQIY73ZYU/4CZSM7onvueJOT2B7+dCL9h9W0UHarb5eAW9EnosMIXJ48A+HKVBqJ8a1KIQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards@1.3.1':
-    resolution: {integrity: sha512-MHighLKiGSHUEr1SjfTNpfhz8rx7Y1wRDfamEQ5LnWO4AqXslChqgK+9YD9SM6kDhlXnhWFZuHdT3vXjVs3Qdw==, tarball: https://registry.npmjs.org/@univerjs-pro/boards/-/boards-1.3.1.tgz}
+    resolution: {integrity: sha512-MHighLKiGSHUEr1SjfTNpfhz8rx7Y1wRDfamEQ5LnWO4AqXslChqgK+9YD9SM6kDhlXnhWFZuHdT3vXjVs3Qdw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/chart-embed@1.3.1':
-    resolution: {integrity: sha512-BCaB8q/saSAbexrq3y0Mwm595gNZuuZyIoSMdq8KPHT0Y7Z0zbLXFH0A2dOL2DWdgHSUD4faXG8ZYPtkibUXlg==, tarball: https://registry.npmjs.org/@univerjs-pro/chart-embed/-/chart-embed-1.3.1.tgz}
+    resolution: {integrity: sha512-BCaB8q/saSAbexrq3y0Mwm595gNZuuZyIoSMdq8KPHT0Y7Z0zbLXFH0A2dOL2DWdgHSUD4faXG8ZYPtkibUXlg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/chart-ui@1.3.1':
-    resolution: {integrity: sha512-Y//P4etFMAoHZ/0tePTFkDKAyiTFU1JpM5MIaomf0LpnpnZBIq/ummJVVPIiaUc9D34UbnWEP0Yjq+sTIITUEw==, tarball: https://registry.npmjs.org/@univerjs-pro/chart-ui/-/chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-Y//P4etFMAoHZ/0tePTFkDKAyiTFU1JpM5MIaomf0LpnpnZBIq/ummJVVPIiaUc9D34UbnWEP0Yjq+sTIITUEw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-client-ui@1.3.1':
-    resolution: {integrity: sha512-GwlUweBdAEQiQDxG+TKO5MZRUNnURjDPeSVLbK22pAnClm/tOFySpUAVkhmxzBSmLAbq96ZU/OHH3rrT2jeW/A==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-client-ui/-/collaboration-client-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-GwlUweBdAEQiQDxG+TKO5MZRUNnURjDPeSVLbK22pAnClm/tOFySpUAVkhmxzBSmLAbq96ZU/OHH3rrT2jeW/A==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-client@1.3.1':
-    resolution: {integrity: sha512-QzV2N3XX41jChLEsGiri8vxaTW/1RHzMts35JVQI8UEt7fo2EkyK2HtoMXwUAxVYDpJnC8ICiq3uFcpHUEQDuA==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-client/-/collaboration-client-1.3.1.tgz}
+    resolution: {integrity: sha512-QzV2N3XX41jChLEsGiri8vxaTW/1RHzMts35JVQI8UEt7fo2EkyK2HtoMXwUAxVYDpJnC8ICiq3uFcpHUEQDuA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
@@ -1928,128 +1928,128 @@ packages:
     resolution: {integrity: sha512-P/i2YE/voTzufB4N81zYylvgmUSS1SqNlaNkMlFAo3vWaZ7BnIF6NZRssu5fQGrSF+siiNboNKZ/7TxELzvlEQ==}
 
   '@univerjs-pro/collaboration@1.3.1':
-    resolution: {integrity: sha512-S8hpkug034CjkDhwskBMgu4oBa6vJL+3lA1I/2mqwfxrW52YgJWKYYtecVIyIhTtdQBdsxHcvgmji8i54Iiliw==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration/-/collaboration-1.3.1.tgz}
+    resolution: {integrity: sha512-S8hpkug034CjkDhwskBMgu4oBa6vJL+3lA1I/2mqwfxrW52YgJWKYYtecVIyIhTtdQBdsxHcvgmji8i54Iiliw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-callout-ui@1.3.1':
-    resolution: {integrity: sha512-/fzwTG4oznwMVqI4ikKyqL5xeJFgTRS1rZ83CeoLKQg4PMgpQSzs+RWLkzSaTUwU2ByDW99H/RG+UpDfu0oMyw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-callout-ui/-/docs-callout-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-/fzwTG4oznwMVqI4ikKyqL5xeJFgTRS1rZ83CeoLKQg4PMgpQSzs+RWLkzSaTUwU2ByDW99H/RG+UpDfu0oMyw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-callout@1.3.1':
-    resolution: {integrity: sha512-AelN9tudU0w38t5gHR9mTxmqnAV/8J4DsFruUN6Ed9dgc+a+jMQ7FBVKZP2AFu661Ve2FkPCJIC4VicI4FLi0A==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-callout/-/docs-callout-1.3.1.tgz}
+    resolution: {integrity: sha512-AelN9tudU0w38t5gHR9mTxmqnAV/8J4DsFruUN6Ed9dgc+a+jMQ7FBVKZP2AFu661Ve2FkPCJIC4VicI4FLi0A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-chart-ui@1.3.1':
-    resolution: {integrity: sha512-QycNeGD4BytNGLt9WCTK4Yu5nDlAfBNd81ifslA5HC/VuhM2PHahn3UEebjzr53nq8BzEjAjWuet3Qik9xNF/Q==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-chart-ui/-/docs-chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-QycNeGD4BytNGLt9WCTK4Yu5nDlAfBNd81ifslA5HC/VuhM2PHahn3UEebjzr53nq8BzEjAjWuet3Qik9xNF/Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-chart@1.3.1':
-    resolution: {integrity: sha512-dNqpyYH9MCor4hQotVx61HRPn/C1ldo6CeNR0oMSPtUJoBJrZidocnTYBSnbH+V+EPG6PqmME2mpRZ5HFZJejg==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-chart/-/docs-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-dNqpyYH9MCor4hQotVx61HRPn/C1ldo6CeNR0oMSPtUJoBJrZidocnTYBSnbH+V+EPG6PqmME2mpRZ5HFZJejg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-code-ui@1.3.1':
-    resolution: {integrity: sha512-fg0SLTolH78eWQCEYHyyAqt5RwrHCPfbQKED521dlYtEKLFlk+Q0xWo1fXeGfm7jjz+4YdJVP1dYa+MspMRwIg==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-code-ui/-/docs-code-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-fg0SLTolH78eWQCEYHyyAqt5RwrHCPfbQKED521dlYtEKLFlk+Q0xWo1fXeGfm7jjz+4YdJVP1dYa+MspMRwIg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-code@1.3.1':
-    resolution: {integrity: sha512-hwJjOipDanhBVCenv18+/QKm/PIhsJ+9O9g4G76X4/5jR2skzSF/wLqwX/C7dza2sHX6B/f4gxLGcNZ0/bWqpA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-code/-/docs-code-1.3.1.tgz}
+    resolution: {integrity: sha512-hwJjOipDanhBVCenv18+/QKm/PIhsJ+9O9g4G76X4/5jR2skzSF/wLqwX/C7dza2sHX6B/f4gxLGcNZ0/bWqpA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-column@1.3.1':
-    resolution: {integrity: sha512-L7quOtlazoOZUrjIQ2PXzBzZHlRXVYhtlZRB2Gnz/Wfuw8sI0sNNS7hgvo7dVFf3qtCdD6K97ZSRT+YJHKiRuw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-column/-/docs-column-1.3.1.tgz}
+    resolution: {integrity: sha512-L7quOtlazoOZUrjIQ2PXzBzZHlRXVYhtlZRB2Gnz/Wfuw8sI0sNNS7hgvo7dVFf3qtCdD6K97ZSRT+YJHKiRuw==}
 
   '@univerjs-pro/docs-latex-ui@1.3.1':
-    resolution: {integrity: sha512-7faQfTPo6I2QbZy3CrqAQiiIh8NcR/WzuSlVSrcXcenvS7N2S19ilcK/ZqLHoxSYkjoX4WB6t44SI1SSQoCASQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-latex-ui/-/docs-latex-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-7faQfTPo6I2QbZy3CrqAQiiIh8NcR/WzuSlVSrcXcenvS7N2S19ilcK/ZqLHoxSYkjoX4WB6t44SI1SSQoCASQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-latex@1.3.1':
-    resolution: {integrity: sha512-0KYl4o0gbo2BcPDyQsXtdqtYB8ilQ3UkvXS1l5+hFi4zcgZvGeVZg7oMYv7P5HbDRCq0UOufYdK5t22oIBhw2A==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-latex/-/docs-latex-1.3.1.tgz}
+    resolution: {integrity: sha512-0KYl4o0gbo2BcPDyQsXtdqtYB8ilQ3UkvXS1l5+hFi4zcgZvGeVZg7oMYv7P5HbDRCq0UOufYdK5t22oIBhw2A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-shape-ui@1.3.1':
-    resolution: {integrity: sha512-y9QU7d/+vk8syPsOXImdqab3eIaXXqSXJ/r0pQtCgQnsk1WGWL9vqfc9ZOilruitp1Kch7vipYZhbT3aC8bltQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-shape-ui/-/docs-shape-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-y9QU7d/+vk8syPsOXImdqab3eIaXXqSXJ/r0pQtCgQnsk1WGWL9vqfc9ZOilruitp1Kch7vipYZhbT3aC8bltQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-shape@1.3.1':
-    resolution: {integrity: sha512-eU0IVvhQMeDSS4r+j8QuDZksoHJLKGVG6JwLVG+jK2Z82ie1lRHy0lRxDZzVc6OXLQP4cWekUaozqHCcoXhvAA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-shape/-/docs-shape-1.3.1.tgz}
+    resolution: {integrity: sha512-eU0IVvhQMeDSS4r+j8QuDZksoHJLKGVG6JwLVG+jK2Z82ie1lRHy0lRxDZzVc6OXLQP4cWekUaozqHCcoXhvAA==}
 
   '@univerjs-pro/docs-table-ui@1.3.1':
-    resolution: {integrity: sha512-2QGFXXhTDIBS6merAA/MZLKHVs0YgqlcDjkXX8lEzhn6Q2OG/SiHHgaNzOsQnaJ+fLLk87zjgjCIlKM/C33i3A==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-table-ui/-/docs-table-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-2QGFXXhTDIBS6merAA/MZLKHVs0YgqlcDjkXX8lEzhn6Q2OG/SiHHgaNzOsQnaJ+fLLk87zjgjCIlKM/C33i3A==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-table@1.3.1':
-    resolution: {integrity: sha512-0qB+cJT+iQqvmQSMSLy9+FdMXUzMm7sNHPKLYJsAwp2NVeACs5SQydlfTdbKIsxHfcTB/vYR1GC3wucMoD7b+g==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-table/-/docs-table-1.3.1.tgz}
+    resolution: {integrity: sha512-0qB+cJT+iQqvmQSMSLy9+FdMXUzMm7sNHPKLYJsAwp2NVeACs5SQydlfTdbKIsxHfcTB/vYR1GC3wucMoD7b+g==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/edit-history@1.3.1':
-    resolution: {integrity: sha512-qOrI1+4E4iVdPpyOlWpXbi7DsHsfOh8FYA5cui9O1/5oOR01VrsJpluJs7TGX7PqsOjrhRiVeMsiM/hLQmT9Lw==, tarball: https://registry.npmjs.org/@univerjs-pro/edit-history/-/edit-history-1.3.1.tgz}
+    resolution: {integrity: sha512-qOrI1+4E4iVdPpyOlWpXbi7DsHsfOh8FYA5cui9O1/5oOR01VrsJpluJs7TGX7PqsOjrhRiVeMsiM/hLQmT9Lw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/embed-unit-ui@1.3.1':
-    resolution: {integrity: sha512-0enh/k0F/Nc78dmc/6B/bkxrb72q6wWYpm2SfP8MY9nkC2wLJwnd8YTPV1JIh6Y2N0vvYZvG5Nf7lHmldkt1/Q==, tarball: https://registry.npmjs.org/@univerjs-pro/embed-unit-ui/-/embed-unit-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-0enh/k0F/Nc78dmc/6B/bkxrb72q6wWYpm2SfP8MY9nkC2wLJwnd8YTPV1JIh6Y2N0vvYZvG5Nf7lHmldkt1/Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/embed@1.3.1':
-    resolution: {integrity: sha512-ciF8fTnxcYZZ7ZwxGYqEeYfDXsJXWmZsT85UheJpcUPDBEb0q4gOoSUjwsAhWgizrxW0lR50eT0TIgM6YoDD/g==, tarball: https://registry.npmjs.org/@univerjs-pro/embed/-/embed-1.3.1.tgz}
+    resolution: {integrity: sha512-ciF8fTnxcYZZ7ZwxGYqEeYfDXsJXWmZsT85UheJpcUPDBEb0q4gOoSUjwsAhWgizrxW0lR50eT0TIgM6YoDD/g==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-chart@1.3.1':
-    resolution: {integrity: sha512-74EWREj5Mz4GsfIEn3WkKHXqTm5ZrmFNFtdcEmLH+ymwgARh5/QTXmYB2lcqL213DzGqrE/j/tOfo2NI3Lhqbg==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-chart/-/engine-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-74EWREj5Mz4GsfIEn3WkKHXqTm5ZrmFNFtdcEmLH+ymwgARh5/QTXmYB2lcqL213DzGqrE/j/tOfo2NI3Lhqbg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-formula-rust-binding-darwin-arm64@1.0.4':
-    resolution: {integrity: sha512-CnjQcRMT9gnc9k55Dgyjrsy0RtMrMaVFGU62PILvnTiP9B6Fs2weihpekAxrVAoeKvs1rZbUnO8DNhIPQAM0EQ==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-darwin-arm64/-/engine-formula-rust-binding-darwin-arm64-1.0.4.tgz}
+    resolution: {integrity: sha512-CnjQcRMT9gnc9k55Dgyjrsy0RtMrMaVFGU62PILvnTiP9B6Fs2weihpekAxrVAoeKvs1rZbUnO8DNhIPQAM0EQ==}
     cpu: [arm64]
     os: [darwin]
 
   '@univerjs-pro/engine-formula-rust-binding-darwin-x64@1.0.4':
-    resolution: {integrity: sha512-D3fyDOb5m4qr634IkmYkVmPBMU24JkSX6W6y93fTH1P4dZ7JBcTBH0fOlQVOSPQrGYca3DbZVutxW4AQjBxDZQ==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-darwin-x64/-/engine-formula-rust-binding-darwin-x64-1.0.4.tgz}
+    resolution: {integrity: sha512-D3fyDOb5m4qr634IkmYkVmPBMU24JkSX6W6y93fTH1P4dZ7JBcTBH0fOlQVOSPQrGYca3DbZVutxW4AQjBxDZQ==}
     cpu: [x64]
     os: [darwin]
 
   '@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu@1.0.4':
-    resolution: {integrity: sha512-rUclW5PtSWmff4O2ui90o8I6WuqFwdJYp5ITbWZzDdiP9xCA/QKjh59oTSz0HzhHGPavPwUBrTG2zlFPlMKwDQ==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-linux-arm64-gnu/-/engine-formula-rust-binding-linux-arm64-gnu-1.0.4.tgz}
+    resolution: {integrity: sha512-rUclW5PtSWmff4O2ui90o8I6WuqFwdJYp5ITbWZzDdiP9xCA/QKjh59oTSz0HzhHGPavPwUBrTG2zlFPlMKwDQ==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu@1.0.4':
-    resolution: {integrity: sha512-xiMZhrBtdbojxkImQuDgjKuzUTxbI6JVmPsFT1uuWnmYnsJ7AqWexNLWJBOX31Yc34mJaJ3Q/2XO+QdZdY5URA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-linux-x64-gnu/-/engine-formula-rust-binding-linux-x64-gnu-1.0.4.tgz}
+    resolution: {integrity: sha512-xiMZhrBtdbojxkImQuDgjKuzUTxbI6JVmPsFT1uuWnmYnsJ7AqWexNLWJBOX31Yc34mJaJ3Q/2XO+QdZdY5URA==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
   '@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc@1.0.4':
-    resolution: {integrity: sha512-uhXjip8VtR9RY7fvsrFa9hfsq90HgWCrNTgK4uvZUE+BlffjgJ20Vx6VY+uhYtw5F6mZM0sjJTAMxwcCe83gKw==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding-win32-x64-msvc/-/engine-formula-rust-binding-win32-x64-msvc-1.0.4.tgz}
+    resolution: {integrity: sha512-uhXjip8VtR9RY7fvsrFa9hfsq90HgWCrNTgK4uvZUE+BlffjgJ20Vx6VY+uhYtw5F6mZM0sjJTAMxwcCe83gKw==}
     cpu: [x64]
     os: [win32]
 
   '@univerjs-pro/engine-formula-rust-binding@1.0.4':
-    resolution: {integrity: sha512-Eaor9DgG3GClsulxtPWlB2Q7+xq0k2uQbCbT7CpDTljY0mCxRF2iY47c6Q/zU8CLsneuQLQo36VMJYxL4QafMg==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula-rust-binding/-/engine-formula-rust-binding-1.0.4.tgz}
+    resolution: {integrity: sha512-Eaor9DgG3GClsulxtPWlB2Q7+xq0k2uQbCbT7CpDTljY0mCxRF2iY47c6Q/zU8CLsneuQLQo36VMJYxL4QafMg==}
 
   '@univerjs-pro/engine-formula-rust@1.3.1':
     resolution: {integrity: sha512-ldTZRxQoVMQr8gv6Jo1hm8pUwDgEFjxwFd3AygBgWHk8yoHMRJqGSZ6x2H9ZaGEuqadB0JODVPnuXqVKBEv+dw==}
@@ -2057,16 +2057,16 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-formula@1.3.1':
-    resolution: {integrity: sha512-dxAEJywOABY6SiscfgkKr1u4c9BKKPRaSWTQJMUBRmnRMNnHmMqM+4FsfCRiTzvD2qAnv++mxyv7vUsc1bTXOw==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula/-/engine-formula-1.3.1.tgz}
+    resolution: {integrity: sha512-dxAEJywOABY6SiscfgkKr1u4c9BKKPRaSWTQJMUBRmnRMNnHmMqM+4FsfCRiTzvD2qAnv++mxyv7vUsc1bTXOw==}
 
   '@univerjs-pro/engine-pivot@1.3.1':
-    resolution: {integrity: sha512-nVn0qr5g9iJKlGZrmRFB+k0ET3fVdGNltnZ1sbVDHjU/OKc2BbB2kkzNHZoWROjTUZ+xUElUsywvvDHlA2Awow==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-pivot/-/engine-pivot-1.3.1.tgz}
+    resolution: {integrity: sha512-nVn0qr5g9iJKlGZrmRFB+k0ET3fVdGNltnZ1sbVDHjU/OKc2BbB2kkzNHZoWROjTUZ+xUElUsywvvDHlA2Awow==}
 
   '@univerjs-pro/engine-shape@1.3.1':
-    resolution: {integrity: sha512-KA79GJEmnMZbmscOJ4/avou6RnmMKRlhyyDfEyiSfC4re7V8wXcXrqJtFrJYph5JR1GgmxbWkHlL6IbOl3oC+Q==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-shape/-/engine-shape-1.3.1.tgz}
+    resolution: {integrity: sha512-KA79GJEmnMZbmscOJ4/avou6RnmMKRlhyyDfEyiSfC4re7V8wXcXrqJtFrJYph5JR1GgmxbWkHlL6IbOl3oC+Q==}
 
   '@univerjs-pro/exchange-client@1.3.1':
-    resolution: {integrity: sha512-B5DbXkIa69ZZLJjlakCf6FX3BL1yCWAIK9mKk1a2jUcl41/1KGgP5aiqOdynGwaUZWWl3oKL9wjMugC+VQb1Lg==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-client/-/exchange-client-1.3.1.tgz}
+    resolution: {integrity: sha512-B5DbXkIa69ZZLJjlakCf6FX3BL1yCWAIK9mKk1a2jUcl41/1KGgP5aiqOdynGwaUZWWl3oKL9wjMugC+VQb1Lg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
@@ -2110,544 +2110,544 @@ packages:
         optional: true
 
   '@univerjs-pro/ink-ui@1.3.1':
-    resolution: {integrity: sha512-dmk1k+pX9PiWZv0C/UG2L8jvBxNQ/O4rU5T96jdELoGUybB2HDK1b3RFCkFFm2G/OlZjbcWRahJUkfiTVV0zsA==, tarball: https://registry.npmjs.org/@univerjs-pro/ink-ui/-/ink-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-dmk1k+pX9PiWZv0C/UG2L8jvBxNQ/O4rU5T96jdELoGUybB2HDK1b3RFCkFFm2G/OlZjbcWRahJUkfiTVV0zsA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/ink@1.3.1':
-    resolution: {integrity: sha512-wUlSuSGrwkRcj7SQRKoaCuf3vG68a2cAHODThyTGCmE/RF/fhxMCfl9yBJkPkGlUoVfiO7SqQyGxJxtlnKRZHQ==, tarball: https://registry.npmjs.org/@univerjs-pro/ink/-/ink-1.3.1.tgz}
+    resolution: {integrity: sha512-wUlSuSGrwkRcj7SQRKoaCuf3vG68a2cAHODThyTGCmE/RF/fhxMCfl9yBJkPkGlUoVfiO7SqQyGxJxtlnKRZHQ==}
 
   '@univerjs-pro/license@1.3.1':
-    resolution: {integrity: sha512-uQaeFef+gK07gLIcoocU6hQ4SuwDszrSr6c6sfHv5rMgRiKGaG18TkgumkqPlZ3uDnyzuD8yXEB3vBpaId1pYQ==, tarball: https://registry.npmjs.org/@univerjs-pro/license/-/license-1.3.1.tgz}
+    resolution: {integrity: sha512-uQaeFef+gK07gLIcoocU6hQ4SuwDszrSr6c6sfHv5rMgRiKGaG18TkgumkqPlZ3uDnyzuD8yXEB3vBpaId1pYQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/pdfs-editor@1.3.1':
-    resolution: {integrity: sha512-HNA8Yt6Q3SA1G4N5bRy/ScEyV+Sca5FThDk794Q0M6zq/4WuDYzKOlREuPy+/W6qDPYPRe+iItHtuyBWyEfg1Q==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-editor/-/pdfs-editor-1.3.1.tgz}
+    resolution: {integrity: sha512-HNA8Yt6Q3SA1G4N5bRy/ScEyV+Sca5FThDk794Q0M6zq/4WuDYzKOlREuPy+/W6qDPYPRe+iItHtuyBWyEfg1Q==}
 
   '@univerjs-pro/pdfs-ui@1.3.1':
-    resolution: {integrity: sha512-D6ixEH7N3KLR3or6JTHoV8zmz5HfNUc/m/bjg8z1rI0dtmsRFIsWX/U9ChgeHVf+QJQeyH/FTKtkMLVhTovAkA==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-ui/-/pdfs-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-D6ixEH7N3KLR3or6JTHoV8zmz5HfNUc/m/bjg8z1rI0dtmsRFIsWX/U9ChgeHVf+QJQeyH/FTKtkMLVhTovAkA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/pdfs@1.3.1':
-    resolution: {integrity: sha512-1VSbxfTJnUSBkAozFzw+oVwY2ZXUtbbXAp63o2ekOUS2T9Hhsdk/b9G7FJXDPwTr9Fo32Wn/fz+yfAH/tru0Sg==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs/-/pdfs-1.3.1.tgz}
+    resolution: {integrity: sha512-1VSbxfTJnUSBkAozFzw+oVwY2ZXUtbbXAp63o2ekOUS2T9Hhsdk/b9G7FJXDPwTr9Fo32Wn/fz+yfAH/tru0Sg==}
 
   '@univerjs-pro/pivot-cache@1.3.1':
-    resolution: {integrity: sha512-At8K+ZWfcoS2pLREHJpH6J9W78zA44N+1OatHQ3gCSq0/BXv/PIDIgJuuLaR2IzC5qlKqbKhmoxl8Jiu4Gfq6A==, tarball: https://registry.npmjs.org/@univerjs-pro/pivot-cache/-/pivot-cache-1.3.1.tgz}
+    resolution: {integrity: sha512-At8K+ZWfcoS2pLREHJpH6J9W78zA44N+1OatHQ3gCSq0/BXv/PIDIgJuuLaR2IzC5qlKqbKhmoxl8Jiu4Gfq6A==}
     peerDependencies:
       '@univerjs-pro/embed': 1.3.1
       '@univerjs-pro/engine-pivot': 1.3.1
 
   '@univerjs-pro/pivot-chart@1.3.1':
-    resolution: {integrity: sha512-9CSdD6lS7P6i/FLbFNQTm8yWe4wkdUD1GWOK4XCrCqsjvg7lzl2URGQSgjvh9vhrEvVapR+ltZyY3nE4ZpI87w==, tarball: https://registry.npmjs.org/@univerjs-pro/pivot-chart/-/pivot-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-9CSdD6lS7P6i/FLbFNQTm8yWe4wkdUD1GWOK4XCrCqsjvg7lzl2URGQSgjvh9vhrEvVapR+ltZyY3nE4ZpI87w==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/print@1.3.1':
-    resolution: {integrity: sha512-XedX41VOW+hv13cQOznnTl4nB0C1Ch/TKCEsrgzeQ9kOJU8pVVUKrFv6pXlN5fpmSkji1orR885Pl966k1LTWw==, tarball: https://registry.npmjs.org/@univerjs-pro/print/-/print-1.3.1.tgz}
+    resolution: {integrity: sha512-XedX41VOW+hv13cQOznnTl4nB0C1Ch/TKCEsrgzeQ9kOJU8pVVUKrFv6pXlN5fpmSkji1orR885Pl966k1LTWw==}
 
   '@univerjs-pro/shape-editor-ui@1.3.1':
-    resolution: {integrity: sha512-DQbGhRtDrmXqLTOf+0caNpMpTnm8iCh1Gq4vQYQ1PswsIZMa+1yLkvo2hjWQp1ZBCqfmmIVZAfAv4V3azyNY7Q==, tarball: https://registry.npmjs.org/@univerjs-pro/shape-editor-ui/-/shape-editor-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-DQbGhRtDrmXqLTOf+0caNpMpTnm8iCh1Gq4vQYQ1PswsIZMa+1yLkvo2hjWQp1ZBCqfmmIVZAfAv4V3azyNY7Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/shape-editor@1.3.1':
-    resolution: {integrity: sha512-aKLaSRYL79wgj2ww5gzKFF4YEXFrvcRnT5x2tVrdoQuv1qA/GDai7fPE/nQCKARu3AguvJY1dgbaBhbzNnSHZg==, tarball: https://registry.npmjs.org/@univerjs-pro/shape-editor/-/shape-editor-1.3.1.tgz}
+    resolution: {integrity: sha512-aKLaSRYL79wgj2ww5gzKFF4YEXFrvcRnT5x2tVrdoQuv1qA/GDai7fPE/nQCKARu3AguvJY1dgbaBhbzNnSHZg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-chart-ui@1.3.1':
-    resolution: {integrity: sha512-4jtgzC7Pg0fV4Tw8drRrVjxekAyqfEsOTH9LRO5ivEiY9uskIp5ok4kIa/KEm7KSVEW4Q3+RqFrvI3a+mVlMXw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-chart-ui/-/sheets-chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-4jtgzC7Pg0fV4Tw8drRrVjxekAyqfEsOTH9LRO5ivEiY9uskIp5ok4kIa/KEm7KSVEW4Q3+RqFrvI3a+mVlMXw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-chart@1.3.1':
-    resolution: {integrity: sha512-hYcpVio4H/zd6bXJgXA5107/fVSTve3ris2wF11wJuv2IPcz7+Ekf68FvoDZfxDYdo/nnGVsp6V3HTJy/TlH4w==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-chart/-/sheets-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-hYcpVio4H/zd6bXJgXA5107/fVSTve3ris2wF11wJuv2IPcz7+Ekf68FvoDZfxDYdo/nnGVsp6V3HTJy/TlH4w==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-exchange-client@1.3.1':
-    resolution: {integrity: sha512-treFiyPTADTWE3TY7OV5YwHc4RDPdiYWFkDYvlXFHZYr637Bjlh68GIyT9EnnWtbQV6Z/dYZxC790YAplNEaUQ==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-exchange-client/-/sheets-exchange-client-1.3.1.tgz}
+    resolution: {integrity: sha512-treFiyPTADTWE3TY7OV5YwHc4RDPdiYWFkDYvlXFHZYr637Bjlh68GIyT9EnnWtbQV6Z/dYZxC790YAplNEaUQ==}
 
   '@univerjs-pro/sheets-history-ui@1.3.1':
-    resolution: {integrity: sha512-T5hJFLQg3uT3I6Ruh5H/ms5CODLnB5ZBQ7eiFyatEZ0GgKRFP3pOQZljAhNzybNky52PW/qIoMLuys02oBk2tg==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-history-ui/-/sheets-history-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-T5hJFLQg3uT3I6Ruh5H/ms5CODLnB5ZBQ7eiFyatEZ0GgKRFP3pOQZljAhNzybNky52PW/qIoMLuys02oBk2tg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-history@1.3.1':
-    resolution: {integrity: sha512-SPK51riYEPJ9uCplEd5iAbPC1WKlxN69ye5tN/VI+chMmsdDgD+lfqj5QmIA8pBCki9iWR79DilQvJKhsGRpmw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-history/-/sheets-history-1.3.1.tgz}
+    resolution: {integrity: sha512-SPK51riYEPJ9uCplEd5iAbPC1WKlxN69ye5tN/VI+chMmsdDgD+lfqj5QmIA8pBCki9iWR79DilQvJKhsGRpmw==}
 
   '@univerjs-pro/sheets-outline-ui@1.3.1':
-    resolution: {integrity: sha512-CV7vhgFhVmF8SkqHzeGE0wjLVyjrK/rsgnNFKVi7m7il3eVFbqbh+39Ktyzp32R5wt/7+dD24KdMtip82CVUAw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-outline-ui/-/sheets-outline-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-CV7vhgFhVmF8SkqHzeGE0wjLVyjrK/rsgnNFKVi7m7il3eVFbqbh+39Ktyzp32R5wt/7+dD24KdMtip82CVUAw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-outline@1.3.1':
-    resolution: {integrity: sha512-moHXK/OaqRSHbBADR5TGLG6ZVoMwPjqNTUyf+NhAYfrT+GLxtQrG9+N3R+ZcedOZfPEnGZ3YyDLRPHMwcSQmqQ==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-outline/-/sheets-outline-1.3.1.tgz}
+    resolution: {integrity: sha512-moHXK/OaqRSHbBADR5TGLG6ZVoMwPjqNTUyf+NhAYfrT+GLxtQrG9+N3R+ZcedOZfPEnGZ3YyDLRPHMwcSQmqQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-chart-ui@1.3.1':
-    resolution: {integrity: sha512-AsYAr/QY1CZ70i8jbpsUY9HJR6mXszmtP4SN4HG3shdrdHRtZJPR17eXI/n5G/6gmD4c0htJOdX7AiobY3It9A==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-chart-ui/-/sheets-pivot-chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-AsYAr/QY1CZ70i8jbpsUY9HJR6mXszmtP4SN4HG3shdrdHRtZJPR17eXI/n5G/6gmD4c0htJOdX7AiobY3It9A==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-chart@1.3.1':
-    resolution: {integrity: sha512-emNdw0pRoQsE1ASaElp3KW5pmD8zJnMeuVF8wJzMP5l7E9imR+W3bRlEUXzubj4VVhZ4fjjTQX6b5rUxMQiy8A==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-chart/-/sheets-pivot-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-emNdw0pRoQsE1ASaElp3KW5pmD8zJnMeuVF8wJzMP5l7E9imR+W3bRlEUXzubj4VVhZ4fjjTQX6b5rUxMQiy8A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-ui@1.3.1':
-    resolution: {integrity: sha512-MozkwbSgYQ8cc4tdhJf/yk1lunzGHXIOS+gX73No0slCTqlKSIqb4MVkZ0pFedO5Za7bTs45HPNfbN40ljwHtA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-ui/-/sheets-pivot-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-MozkwbSgYQ8cc4tdhJf/yk1lunzGHXIOS+gX73No0slCTqlKSIqb4MVkZ0pFedO5Za7bTs45HPNfbN40ljwHtA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot@1.3.1':
-    resolution: {integrity: sha512-hYOE2wsYg5XWgvLZhZgikWpr6wPpqi0hnLXVgjzu8BBBOitLV+ma6ZeR4z4bm6cxnN8TnWsmuYIUi4OqnvXHZA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot/-/sheets-pivot-1.3.1.tgz}
+    resolution: {integrity: sha512-hYOE2wsYg5XWgvLZhZgikWpr6wPpqi0hnLXVgjzu8BBBOitLV+ma6ZeR4z4bm6cxnN8TnWsmuYIUi4OqnvXHZA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-print@1.3.1':
-    resolution: {integrity: sha512-kkcGkIUl2eCp9SK792e6jrTgOwCrHHOxEZfmqgOwiTvgApB6Xem8LB/3v4+AzPpLqYiX8JhPGcvui3qcLGaoTw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-print/-/sheets-print-1.3.1.tgz}
+    resolution: {integrity: sha512-kkcGkIUl2eCp9SK792e6jrTgOwCrHHOxEZfmqgOwiTvgApB6Xem8LB/3v4+AzPpLqYiX8JhPGcvui3qcLGaoTw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-shape-ui@1.3.1':
-    resolution: {integrity: sha512-h4VcfoSLvpgrNhCWCQX7tQw/meUhwhWjugP8Le86V6aAR6+9NvL7dOi93edzord1fa81DQKrlEyoqG4Qb7nPow==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-shape-ui/-/sheets-shape-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-h4VcfoSLvpgrNhCWCQX7tQw/meUhwhWjugP8Le86V6aAR6+9NvL7dOi93edzord1fa81DQKrlEyoqG4Qb7nPow==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-shape@1.3.1':
-    resolution: {integrity: sha512-7Ym1QS9tX6ALd4OMlXgE2Gg7a98CVN1uDBrRw5qF8wFbTbXluwoFelPqClf/d6TgeXNiYEfn1UzEKSrdjkc+iA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-shape/-/sheets-shape-1.3.1.tgz}
+    resolution: {integrity: sha512-7Ym1QS9tX6ALd4OMlXgE2Gg7a98CVN1uDBrRw5qF8wFbTbXluwoFelPqClf/d6TgeXNiYEfn1UzEKSrdjkc+iA==}
 
   '@univerjs-pro/sheets-slicer-ui@1.3.1':
-    resolution: {integrity: sha512-BKeLRoFNqrq5KXgPdaZ3yJqf+0wvi2+ehcAzP8oeB79UiDde/nGjl3Nvz0nmv4oZxRvFHjI42WB1Ephm69VBgg==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-slicer-ui/-/sheets-slicer-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-BKeLRoFNqrq5KXgPdaZ3yJqf+0wvi2+ehcAzP8oeB79UiDde/nGjl3Nvz0nmv4oZxRvFHjI42WB1Ephm69VBgg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-slicer@1.3.1':
-    resolution: {integrity: sha512-WXWPeDBJ6Eb8M08sI67l5Hf24gb4d1L8CJt/XJU2sJYlnCBxTMAlEe4CsUSNTUsLoS63yhL7a5wVjyTGqcIhTA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-slicer/-/sheets-slicer-1.3.1.tgz}
+    resolution: {integrity: sha512-WXWPeDBJ6Eb8M08sI67l5Hf24gb4d1L8CJt/XJU2sJYlnCBxTMAlEe4CsUSNTUsLoS63yhL7a5wVjyTGqcIhTA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-sparkline-ui@1.3.1':
-    resolution: {integrity: sha512-uTmWlXpRQf8HfZOXylT1jAVVqlCVoeFQu7E0wlJIHMhZox379yOsSJYm0Zado+c5r4kpdJV48LoMHZcT+vwlCw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-sparkline-ui/-/sheets-sparkline-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-uTmWlXpRQf8HfZOXylT1jAVVqlCVoeFQu7E0wlJIHMhZox379yOsSJYm0Zado+c5r4kpdJV48LoMHZcT+vwlCw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-sparkline@1.3.1':
-    resolution: {integrity: sha512-TNXrxawuiljarLZGr8BW+cOBCi5ujqeGXPzJOA37rsJxsq++muKfSkHA5vN0R7SLUhXnkTU0tESChMaZnTx/Nw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-sparkline/-/sheets-sparkline-1.3.1.tgz}
+    resolution: {integrity: sha512-TNXrxawuiljarLZGr8BW+cOBCi5ujqeGXPzJOA37rsJxsq++muKfSkHA5vN0R7SLUhXnkTU0tESChMaZnTx/Nw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slicer@1.3.1':
-    resolution: {integrity: sha512-pMpElyFOQKWbneNAW843RsbwCm+c+WVWN+rqLuxLGWBJQ0d0W7f8yv7iwhekjlN7+77QJdElffBLQDg2EVl9fw==, tarball: https://registry.npmjs.org/@univerjs-pro/slicer/-/slicer-1.3.1.tgz}
+    resolution: {integrity: sha512-pMpElyFOQKWbneNAW843RsbwCm+c+WVWN+rqLuxLGWBJQ0d0W7f8yv7iwhekjlN7+77QJdElffBLQDg2EVl9fw==}
 
   '@univerjs-pro/slides-chart-ui@1.3.1':
-    resolution: {integrity: sha512-MYH2APtsnLbzN6jqBe2EeHl24VUWzZe5Rmhl1CpAyB9jCiq7CtBv+/PurcDUjOLMQgBlIzmadkdL4zgIo7RX8g==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-chart-ui/-/slides-chart-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-MYH2APtsnLbzN6jqBe2EeHl24VUWzZe5Rmhl1CpAyB9jCiq7CtBv+/PurcDUjOLMQgBlIzmadkdL4zgIo7RX8g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-chart@1.3.1':
-    resolution: {integrity: sha512-2/txWLACzu63tX33Photv0G+TIG5/HzYxrKsrqF+8kZSw67nuuHhvGmluzL2SmZ9KXKfgWFk0HNRa8tD7CPOIA==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-chart/-/slides-chart-1.3.1.tgz}
+    resolution: {integrity: sha512-2/txWLACzu63tX33Photv0G+TIG5/HzYxrKsrqF+8kZSw67nuuHhvGmluzL2SmZ9KXKfgWFk0HNRa8tD7CPOIA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-table-ui@1.3.1':
-    resolution: {integrity: sha512-cNElcqugcwi3VHl0EPogkwV+qdC/pV/xrSZlH2vP8myEj2x++Beu57FmfhDRKuouNEgwgYNHzgMFt2M7pbzDaQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-table-ui/-/slides-table-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-cNElcqugcwi3VHl0EPogkwV+qdC/pV/xrSZlH2vP8myEj2x++Beu57FmfhDRKuouNEgwgYNHzgMFt2M7pbzDaQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs-pro/slides-table@1.3.1':
-    resolution: {integrity: sha512-kyqbCb7Emzb9xvdlVbGh9VR7fNtL4Woeln9XfQ13hvscaXpYP1kvfXeZMgrcs34exq4j/UiurRRtgrPvUBVVGQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-table/-/slides-table-1.3.1.tgz}
+    resolution: {integrity: sha512-kyqbCb7Emzb9xvdlVbGh9VR7fNtL4Woeln9XfQ13hvscaXpYP1kvfXeZMgrcs34exq4j/UiurRRtgrPvUBVVGQ==}
 
   '@univerjs-pro/slides-thread-comment@1.3.1':
-    resolution: {integrity: sha512-36rH9ivKH46qM2MW+7DkAqmU4HgLkDEDUzFNye4wPcv7XRXNAiGIOfsIf04KF7s7HQDmJxvQBt9zURG59QoqLA==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-thread-comment/-/slides-thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-36rH9ivKH46qM2MW+7DkAqmU4HgLkDEDUzFNye4wPcv7XRXNAiGIOfsIf04KF7s7HQDmJxvQBt9zURG59QoqLA==}
 
   '@univerjs-pro/slides-ui@1.3.1':
-    resolution: {integrity: sha512-mXoeX+gJVhMctLuIpwr9ENtUJ1wtlJJMY2m+Ie/GzWm8akoI7mQaamAuGCi32OpkPnJV0qn6kCi0A1ohJmmlMA==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-ui/-/slides-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-mXoeX+gJVhMctLuIpwr9ENtUJ1wtlJJMY2m+Ie/GzWm8akoI7mQaamAuGCi32OpkPnJV0qn6kCi0A1ohJmmlMA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides@1.3.1':
-    resolution: {integrity: sha512-wjbeingiqCk7XaXEJQ245Ad6NYB72x9w3t2XpRqmJzmffp5r6UGCRFVhg2w2MYob7GCHWoW/HXNkL3DSrKeEHA==, tarball: https://registry.npmjs.org/@univerjs-pro/slides/-/slides-1.3.1.tgz}
+    resolution: {integrity: sha512-wjbeingiqCk7XaXEJQ245Ad6NYB72x9w3t2XpRqmJzmffp5r6UGCRFVhg2w2MYob7GCHWoW/HXNkL3DSrKeEHA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/thread-comment-datasource@1.3.1':
-    resolution: {integrity: sha512-6ILOsx1VujTidtk2KTiY57TgRp6DvCVz7UFnZk4apftaLLYlym+fogyiQa8ocC1hSKyqqTnzvN235Lc25t6oPw==, tarball: https://registry.npmjs.org/@univerjs-pro/thread-comment-datasource/-/thread-comment-datasource-1.3.1.tgz}
+    resolution: {integrity: sha512-6ILOsx1VujTidtk2KTiY57TgRp6DvCVz7UFnZk4apftaLLYlym+fogyiQa8ocC1hSKyqqTnzvN235Lc25t6oPw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/thread-comment-resource@1.3.1':
-    resolution: {integrity: sha512-ggyT9tR71whx2tuZk4zD4dv/4Sf4ddFXwlsrXhdaNjl/VfhNq6cQWs4fvzDdcyTnWe/aHy/1t3z8t+Oa12f7tQ==, tarball: https://registry.npmjs.org/@univerjs-pro/thread-comment-resource/-/thread-comment-resource-1.3.1.tgz}
+    resolution: {integrity: sha512-ggyT9tR71whx2tuZk4zD4dv/4Sf4ddFXwlsrXhdaNjl/VfhNq6cQWs4fvzDdcyTnWe/aHy/1t3z8t+Oa12f7tQ==}
 
   '@univerjs/core@1.3.1':
-    resolution: {integrity: sha512-5+Ud6ul0DVJJT9CEwLq/ig2gBdsCeTTRd8qoiiGpq0FdyhZPfMzr9ZS7fffgi7glzsJGoU5yTKZxq4bRrQTI2A==, tarball: https://registry.npmjs.org/@univerjs/core/-/core-1.3.1.tgz}
+    resolution: {integrity: sha512-5+Ud6ul0DVJJT9CEwLq/ig2gBdsCeTTRd8qoiiGpq0FdyhZPfMzr9ZS7fffgi7glzsJGoU5yTKZxq4bRrQTI2A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/data-validation@1.3.1':
-    resolution: {integrity: sha512-JkkU5f1K9PfbRcPAVlbYpkmv/Kx7sLbaOxv02o482kllsqeTl3TN/P2wIkSGCkfPUn+vHZRof7JaTVCzt48gYg==, tarball: https://registry.npmjs.org/@univerjs/data-validation/-/data-validation-1.3.1.tgz}
+    resolution: {integrity: sha512-JkkU5f1K9PfbRcPAVlbYpkmv/Kx7sLbaOxv02o482kllsqeTl3TN/P2wIkSGCkfPUn+vHZRof7JaTVCzt48gYg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/design@1.3.1':
-    resolution: {integrity: sha512-63wWjyIRsTRdZfEPZ2/4tMgZzqI3NN1Gr2LmKuEQhqbkRGEKSlafBGb8VTm5BaSA/ud7cdYQusXjmkVAkIKMog==, tarball: https://registry.npmjs.org/@univerjs/design/-/design-1.3.1.tgz}
+    resolution: {integrity: sha512-63wWjyIRsTRdZfEPZ2/4tMgZzqI3NN1Gr2LmKuEQhqbkRGEKSlafBGb8VTm5BaSA/ud7cdYQusXjmkVAkIKMog==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs/docs-drawing-ui@1.3.1':
-    resolution: {integrity: sha512-JY97DqegoeR5DYzB/s2mTKldA5VBxJRDJegZhkHLmLbd9diK3v+LRRIpV98hMXTQ3k+GqpYMUKqNbjaaf3Fw2w==, tarball: https://registry.npmjs.org/@univerjs/docs-drawing-ui/-/docs-drawing-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-JY97DqegoeR5DYzB/s2mTKldA5VBxJRDJegZhkHLmLbd9diK3v+LRRIpV98hMXTQ3k+GqpYMUKqNbjaaf3Fw2w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs-drawing@1.3.1':
-    resolution: {integrity: sha512-uRNEVNk/AQ/kUJ7hVIU2Twd1EM5Wfzdm2lNXRq0c/fH4i3TIqOs7zZBnwJakuuKGMDso8bextnY3Kb7w8O/D/g==, tarball: https://registry.npmjs.org/@univerjs/docs-drawing/-/docs-drawing-1.3.1.tgz}
+    resolution: {integrity: sha512-uRNEVNk/AQ/kUJ7hVIU2Twd1EM5Wfzdm2lNXRq0c/fH4i3TIqOs7zZBnwJakuuKGMDso8bextnY3Kb7w8O/D/g==}
 
   '@univerjs/docs-hyper-link-ui@1.3.1':
-    resolution: {integrity: sha512-u1Uluca4x3DPHhjfKIUrS79hNXKFplnAumn3pqoo3YmsWKnMMKg9qewoeGiEtis6ZIVHvyHCUKOHmXIaNVXALg==, tarball: https://registry.npmjs.org/@univerjs/docs-hyper-link-ui/-/docs-hyper-link-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-u1Uluca4x3DPHhjfKIUrS79hNXKFplnAumn3pqoo3YmsWKnMMKg9qewoeGiEtis6ZIVHvyHCUKOHmXIaNVXALg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs-hyper-link@1.3.1':
-    resolution: {integrity: sha512-UvD0XW+osZrhYem1CAXPaPnagpoHxxfjWwmh0ziKgHIul6uikiZGBGdn37pSTisQqfNtGeU7SycasfTy33WvKw==, tarball: https://registry.npmjs.org/@univerjs/docs-hyper-link/-/docs-hyper-link-1.3.1.tgz}
+    resolution: {integrity: sha512-UvD0XW+osZrhYem1CAXPaPnagpoHxxfjWwmh0ziKgHIul6uikiZGBGdn37pSTisQqfNtGeU7SycasfTy33WvKw==}
 
   '@univerjs/docs-thread-comment@1.3.1':
-    resolution: {integrity: sha512-Tge+lHfqNLZ/XEQxfyFJ73jxmDDVSfTpkRwOveVszBz+WxCCHjOAWFIER2/F4ar+ILgIvRhidY4ohb/2EOk4YQ==, tarball: https://registry.npmjs.org/@univerjs/docs-thread-comment/-/docs-thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-Tge+lHfqNLZ/XEQxfyFJ73jxmDDVSfTpkRwOveVszBz+WxCCHjOAWFIER2/F4ar+ILgIvRhidY4ohb/2EOk4YQ==}
 
   '@univerjs/docs-ui@1.3.1':
-    resolution: {integrity: sha512-Jl74y2ImBuAg6BiZTaU2rlNGUtqvnmgw/BUdHCRaNGab3bxwW++cnA3pES/oOVURvcbnMpRRVn1NRwOrcBJmYg==, tarball: https://registry.npmjs.org/@univerjs/docs-ui/-/docs-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-Jl74y2ImBuAg6BiZTaU2rlNGUtqvnmgw/BUdHCRaNGab3bxwW++cnA3pES/oOVURvcbnMpRRVn1NRwOrcBJmYg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs@1.3.1':
-    resolution: {integrity: sha512-sWQytQgPXX5YKzCoyypUO2GLDJthbcB65BYNDj3/py8+xH3KaxmvK9vd22aqRU3/kbby/W55QYpIIlQ5AiaUCw==, tarball: https://registry.npmjs.org/@univerjs/docs/-/docs-1.3.1.tgz}
+    resolution: {integrity: sha512-sWQytQgPXX5YKzCoyypUO2GLDJthbcB65BYNDj3/py8+xH3KaxmvK9vd22aqRU3/kbby/W55QYpIIlQ5AiaUCw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/drawing-ui@1.3.1':
-    resolution: {integrity: sha512-zNA+B7vNLCyH27hE2izYikBBWBEMeWg9aNzrXzY4JWJETXSG2GHZOBD8YPVsRhua5ILHwHDIHyoKPWmIUramNg==, tarball: https://registry.npmjs.org/@univerjs/drawing-ui/-/drawing-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-zNA+B7vNLCyH27hE2izYikBBWBEMeWg9aNzrXzY4JWJETXSG2GHZOBD8YPVsRhua5ILHwHDIHyoKPWmIUramNg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/drawing@1.3.1':
-    resolution: {integrity: sha512-Inl01SBkOn4wb8Z8+L1W3Sg/r5J+OwAktMS+bvr5rWqgiYm8TOLU9bO1s9+3cpnVrDsYtXnP0pQq/j6J9RViGw==, tarball: https://registry.npmjs.org/@univerjs/drawing/-/drawing-1.3.1.tgz}
+    resolution: {integrity: sha512-Inl01SBkOn4wb8Z8+L1W3Sg/r5J+OwAktMS+bvr5rWqgiYm8TOLU9bO1s9+3cpnVrDsYtXnP0pQq/j6J9RViGw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/engine-formula@1.3.1':
-    resolution: {integrity: sha512-tPn+97hk9YL9qQL274Ceqt5bpUbPOhgKUOwxMkzRBsD1ZJPH3x36N82Tky6dPKl5gNqvGwKJZXLhXgwEHCUnyQ==, tarball: https://registry.npmjs.org/@univerjs/engine-formula/-/engine-formula-1.3.1.tgz}
+    resolution: {integrity: sha512-tPn+97hk9YL9qQL274Ceqt5bpUbPOhgKUOwxMkzRBsD1ZJPH3x36N82Tky6dPKl5gNqvGwKJZXLhXgwEHCUnyQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/engine-render@1.3.1':
-    resolution: {integrity: sha512-P+0y7uSt/XZ2VolY0b8JHrne3rRcydxuRLEEsk3SqxfxV5mp0q2lxgVwZIBBXhfzVF4khrwGiiGk+JI0U42J8A==, tarball: https://registry.npmjs.org/@univerjs/engine-render/-/engine-render-1.3.1.tgz}
+    resolution: {integrity: sha512-P+0y7uSt/XZ2VolY0b8JHrne3rRcydxuRLEEsk3SqxfxV5mp0q2lxgVwZIBBXhfzVF4khrwGiiGk+JI0U42J8A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/find-replace@1.3.1':
-    resolution: {integrity: sha512-SXARNxkIYuZwZPaliQz8UjYdIZ0DOrvkvsu7wet0r5drkXWQAEG8nrHNnuHR8y1JBfuVPlmPApzz5ay8UEmhMQ==, tarball: https://registry.npmjs.org/@univerjs/find-replace/-/find-replace-1.3.1.tgz}
+    resolution: {integrity: sha512-SXARNxkIYuZwZPaliQz8UjYdIZ0DOrvkvsu7wet0r5drkXWQAEG8nrHNnuHR8y1JBfuVPlmPApzz5ay8UEmhMQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/icons@1.46.0':
-    resolution: {integrity: sha512-7fdSnacp0xTK/0vAgcpMgVuty6HfVuxSjV6C5lhXwNVfnZCXVp3/7m7/u4xjoWcf4nLG9R4Qp3ftayODWWk/Pg==, tarball: https://registry.npmjs.org/@univerjs/icons/-/icons-1.46.0.tgz}
+    resolution: {integrity: sha512-7fdSnacp0xTK/0vAgcpMgVuty6HfVuxSjV6C5lhXwNVfnZCXVp3/7m7/u4xjoWcf4nLG9R4Qp3ftayODWWk/Pg==}
     peerDependencies:
       react: '*'
       react-dom: '*'
 
   '@univerjs/network@1.3.1':
-    resolution: {integrity: sha512-kXxvsMC3HBPOyCON7gIbc4qwa9iIIpsQJww7sTa7d/9VvKVTJFKMoX8Xc7XNgaI1wSISex8Vw0qpR5pF9vsJWg==, tarball: https://registry.npmjs.org/@univerjs/network/-/network-1.3.1.tgz}
+    resolution: {integrity: sha512-kXxvsMC3HBPOyCON7gIbc4qwa9iIIpsQJww7sTa7d/9VvKVTJFKMoX8Xc7XNgaI1wSISex8Vw0qpR5pF9vsJWg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-core@1.3.1':
-    resolution: {integrity: sha512-/rcM1Pcyk/XcV/DhB1uaTyHwesGj/48+tn2FzJ6GiSADLvcCPxwqOATUajtlq1mxQq7r+gh+/D4g0zhCBzHAzw==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-core/-/preset-docs-core-1.3.1.tgz}
+    resolution: {integrity: sha512-/rcM1Pcyk/XcV/DhB1uaTyHwesGj/48+tn2FzJ6GiSADLvcCPxwqOATUajtlq1mxQq7r+gh+/D4g0zhCBzHAzw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-drawing@1.3.1':
-    resolution: {integrity: sha512-xuKAKptqpnA8miePhJJFvQB8F6BWgRP1nKcQ6LFizmxhQNnnKqtgjUFuvy/A5pFgVhWeU4PTZZXLaju1bRaw9g==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-drawing/-/preset-docs-drawing-1.3.1.tgz}
+    resolution: {integrity: sha512-xuKAKptqpnA8miePhJJFvQB8F6BWgRP1nKcQ6LFizmxhQNnnKqtgjUFuvy/A5pFgVhWeU4PTZZXLaju1bRaw9g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-hyper-link@1.3.1':
-    resolution: {integrity: sha512-Q0jpybmmUfZAmPQlk5HA0P6jy/uELVZRNjqCGN3h31VDpT1P30LFD+0DMOHg6camM+m0ts31uuymL9UhXkHa+A==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-hyper-link/-/preset-docs-hyper-link-1.3.1.tgz}
+    resolution: {integrity: sha512-Q0jpybmmUfZAmPQlk5HA0P6jy/uELVZRNjqCGN3h31VDpT1P30LFD+0DMOHg6camM+m0ts31uuymL9UhXkHa+A==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-advanced@1.3.1':
-    resolution: {integrity: sha512-IjaHpIxCTM81t1sezfcQnjDIeqqVIdmB+AuI87yVEOkn8PumAvXaRR23M1/Vp006+u/YwwC0FJpenqjCkXOOjw==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-advanced/-/preset-sheets-advanced-1.3.1.tgz}
+    resolution: {integrity: sha512-IjaHpIxCTM81t1sezfcQnjDIeqqVIdmB+AuI87yVEOkn8PumAvXaRR23M1/Vp006+u/YwwC0FJpenqjCkXOOjw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-conditional-formatting@1.3.1':
-    resolution: {integrity: sha512-yEoYo67KvqO3DI9QWMezL1AsEsNtegOM2f2I/VlJhLRxMB+Xi9Qi7INf3f9hdZqI99NnIZHvO9iUbvfGWnHGlA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-conditional-formatting/-/preset-sheets-conditional-formatting-1.3.1.tgz}
+    resolution: {integrity: sha512-yEoYo67KvqO3DI9QWMezL1AsEsNtegOM2f2I/VlJhLRxMB+Xi9Qi7INf3f9hdZqI99NnIZHvO9iUbvfGWnHGlA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-core@1.3.1':
-    resolution: {integrity: sha512-HBty2HNxZDxKKwiipNQKie7Hjox4H7eWVKxw+sl7G9IhgZvhXYwmo0FLaqDJbLw6Z0RdnHdFv00XP+uz8yUqkQ==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-core/-/preset-sheets-core-1.3.1.tgz}
+    resolution: {integrity: sha512-HBty2HNxZDxKKwiipNQKie7Hjox4H7eWVKxw+sl7G9IhgZvhXYwmo0FLaqDJbLw6Z0RdnHdFv00XP+uz8yUqkQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-data-validation@1.3.1':
-    resolution: {integrity: sha512-M8qBvV5zs+8ngD9zLlBtGRX6hgnyaFJwsJhvDWT63t1KntpV9hlQCFRn9SQQzr9CvDNKI2kiIMrorKfQ5x0KzA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-data-validation/-/preset-sheets-data-validation-1.3.1.tgz}
+    resolution: {integrity: sha512-M8qBvV5zs+8ngD9zLlBtGRX6hgnyaFJwsJhvDWT63t1KntpV9hlQCFRn9SQQzr9CvDNKI2kiIMrorKfQ5x0KzA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-drawing@1.3.1':
-    resolution: {integrity: sha512-b18OzZFpQnruyy1lU8M5RCXEX2BuhEWYxm9X9Dnc2ERSY5f72KwrxKljZs/ivHuNJv8ez/Q2pyUSFRHusaokgg==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-drawing/-/preset-sheets-drawing-1.3.1.tgz}
+    resolution: {integrity: sha512-b18OzZFpQnruyy1lU8M5RCXEX2BuhEWYxm9X9Dnc2ERSY5f72KwrxKljZs/ivHuNJv8ez/Q2pyUSFRHusaokgg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-filter@1.3.1':
-    resolution: {integrity: sha512-FB3+CQnT6rDfq6tX4xGHjhvJBobykC7cHddOZCAAqrdyZRRAG9ZRNYn+aa44deLKTY8uz4i50gX6lDU0KrHS6w==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-filter/-/preset-sheets-filter-1.3.1.tgz}
+    resolution: {integrity: sha512-FB3+CQnT6rDfq6tX4xGHjhvJBobykC7cHddOZCAAqrdyZRRAG9ZRNYn+aa44deLKTY8uz4i50gX6lDU0KrHS6w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-find-replace@1.3.1':
-    resolution: {integrity: sha512-Tdul9iqhOhuTw9G27HeOR+Ud9CkvyR6SbVQXZzkFR5LKql7dCLPJhuFxCxAmMriBRucrTpp2S5E48LWkzKf+rA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-find-replace/-/preset-sheets-find-replace-1.3.1.tgz}
+    resolution: {integrity: sha512-Tdul9iqhOhuTw9G27HeOR+Ud9CkvyR6SbVQXZzkFR5LKql7dCLPJhuFxCxAmMriBRucrTpp2S5E48LWkzKf+rA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-hyper-link@1.3.1':
-    resolution: {integrity: sha512-OA4NDbCO1KGbHvH/Lvs35BrKj8OzoldifNw17xJuaRdRlCJMZqa4AuPTycSCMSU7MF6yx4HGE8/qpu9V3z2xzA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-hyper-link/-/preset-sheets-hyper-link-1.3.1.tgz}
+    resolution: {integrity: sha512-OA4NDbCO1KGbHvH/Lvs35BrKj8OzoldifNw17xJuaRdRlCJMZqa4AuPTycSCMSU7MF6yx4HGE8/qpu9V3z2xzA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-note@1.3.1':
-    resolution: {integrity: sha512-zypAputMw2aRuKFUJUWpdAWQ0GFNdUy3rlUUalsEXQyFESVVcBlU8L18IKb5xvoE3UMQciyInG4wddtEUNXW7Q==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-note/-/preset-sheets-note-1.3.1.tgz}
+    resolution: {integrity: sha512-zypAputMw2aRuKFUJUWpdAWQ0GFNdUy3rlUUalsEXQyFESVVcBlU8L18IKb5xvoE3UMQciyInG4wddtEUNXW7Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-sort@1.3.1':
-    resolution: {integrity: sha512-csbcjCxfLvK8vvKD8jD2QUEjRBqgPJrC1YRCSlVB7cMbmKLMyHFqNS4cwRZUkX3x1I0YIs8JytDxOST99sX2Jg==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-sort/-/preset-sheets-sort-1.3.1.tgz}
+    resolution: {integrity: sha512-csbcjCxfLvK8vvKD8jD2QUEjRBqgPJrC1YRCSlVB7cMbmKLMyHFqNS4cwRZUkX3x1I0YIs8JytDxOST99sX2Jg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-table@1.3.1':
-    resolution: {integrity: sha512-gw4GkF3QeNQYcfOT5l2AGPiq/0s8LbwGi8V3UGHDYanQ3g1ZanqkTdPRI4zYnGxcHt/3ux8FSLZ0qQUQLVlbGQ==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-table/-/preset-sheets-table-1.3.1.tgz}
+    resolution: {integrity: sha512-gw4GkF3QeNQYcfOT5l2AGPiq/0s8LbwGi8V3UGHDYanQ3g1ZanqkTdPRI4zYnGxcHt/3ux8FSLZ0qQUQLVlbGQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/presets@1.3.1':
-    resolution: {integrity: sha512-JQMPmkIf6cDNozSyTelKr0Kk6fsu82R5JgoK5Cg7iQclWx0wBaRk75xaqXqIMGkfOrZyVOuEcAt+J6BZfaJQfQ==, tarball: https://registry.npmjs.org/@univerjs/presets/-/presets-1.3.1.tgz}
+    resolution: {integrity: sha512-JQMPmkIf6cDNozSyTelKr0Kk6fsu82R5JgoK5Cg7iQclWx0wBaRk75xaqXqIMGkfOrZyVOuEcAt+J6BZfaJQfQ==}
 
   '@univerjs/protocol@1.3.1':
-    resolution: {integrity: sha512-x1laHGmuN8Q4r2M8VFDsviSQRMAxHOFmUXO+O3h4DAiab903MXaHJkCkuyHtvzTMndMfRmLMwFXq/RzwDzMJ7A==, tarball: https://registry.npmjs.org/@univerjs/protocol/-/protocol-1.3.1.tgz}
+    resolution: {integrity: sha512-x1laHGmuN8Q4r2M8VFDsviSQRMAxHOFmUXO+O3h4DAiab903MXaHJkCkuyHtvzTMndMfRmLMwFXq/RzwDzMJ7A==}
 
   '@univerjs/rpc@1.3.1':
-    resolution: {integrity: sha512-O1Ovvdb+avHsbIOvqnlX5/XLq5KtKAo489ciYzDjnsN3WpWFthbnmkxWLHwzdzMwLF4Pq8Dvas8ouoEBDXHLlQ==, tarball: https://registry.npmjs.org/@univerjs/rpc/-/rpc-1.3.1.tgz}
+    resolution: {integrity: sha512-O1Ovvdb+avHsbIOvqnlX5/XLq5KtKAo489ciYzDjnsN3WpWFthbnmkxWLHwzdzMwLF4Pq8Dvas8ouoEBDXHLlQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-conditional-formatting-ui@1.3.1':
-    resolution: {integrity: sha512-lULfuW5UnUjqHQvnF2W6fa600fBMfOrpfvHCf+JVIrw88j/VJ3ZFmV9aeWsuWqLxDUCH4euBLRXZLNYgQvmrGg==, tarball: https://registry.npmjs.org/@univerjs/sheets-conditional-formatting-ui/-/sheets-conditional-formatting-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-lULfuW5UnUjqHQvnF2W6fa600fBMfOrpfvHCf+JVIrw88j/VJ3ZFmV9aeWsuWqLxDUCH4euBLRXZLNYgQvmrGg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-conditional-formatting@1.3.1':
-    resolution: {integrity: sha512-uGUsWwgNzt6I4aWkG728H3cCP3eQCZZl1WHaQCl6CmGKgqh9eV9cTEJz9WBuXalzxytC1JgrevUCgIBnpPqakg==, tarball: https://registry.npmjs.org/@univerjs/sheets-conditional-formatting/-/sheets-conditional-formatting-1.3.1.tgz}
+    resolution: {integrity: sha512-uGUsWwgNzt6I4aWkG728H3cCP3eQCZZl1WHaQCl6CmGKgqh9eV9cTEJz9WBuXalzxytC1JgrevUCgIBnpPqakg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-data-validation-ui@1.3.1':
-    resolution: {integrity: sha512-cMe1gYPkmyyKproyVkS6KtuaeCxgLkt6I4JbOdcD+oDYeQOoIY3WVNEACRErGNEDHL05JD5IHmsq16WVH7WdiA==, tarball: https://registry.npmjs.org/@univerjs/sheets-data-validation-ui/-/sheets-data-validation-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-cMe1gYPkmyyKproyVkS6KtuaeCxgLkt6I4JbOdcD+oDYeQOoIY3WVNEACRErGNEDHL05JD5IHmsq16WVH7WdiA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-data-validation@1.3.1':
-    resolution: {integrity: sha512-RbDRhKozTKkvJCSuW3T6d4W1j0XnbEKDx90/Ts3nIXdSOAMmc0nJwmvo8vyYypr99OF8B5RdAcMMohrXsnC48w==, tarball: https://registry.npmjs.org/@univerjs/sheets-data-validation/-/sheets-data-validation-1.3.1.tgz}
+    resolution: {integrity: sha512-RbDRhKozTKkvJCSuW3T6d4W1j0XnbEKDx90/Ts3nIXdSOAMmc0nJwmvo8vyYypr99OF8B5RdAcMMohrXsnC48w==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-drawing-ui@1.3.1':
-    resolution: {integrity: sha512-UikidI6xt34Cib5nn6YEWwK6p4kxy8IjsHCqc2EFLyYDTwSZUx+mlDLu1e1Ac7HptFUNW08+yqtawzsT1esV4w==, tarball: https://registry.npmjs.org/@univerjs/sheets-drawing-ui/-/sheets-drawing-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-UikidI6xt34Cib5nn6YEWwK6p4kxy8IjsHCqc2EFLyYDTwSZUx+mlDLu1e1Ac7HptFUNW08+yqtawzsT1esV4w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-drawing@1.3.1':
-    resolution: {integrity: sha512-Jc6IZFGc8xd7+cIOSLJCdE9XIFjuLy0+GYd/t020kyzRHjQKbH1T9DiBas8x18F3YjWqgDOaV2c1T+jJB9dXow==, tarball: https://registry.npmjs.org/@univerjs/sheets-drawing/-/sheets-drawing-1.3.1.tgz}
+    resolution: {integrity: sha512-Jc6IZFGc8xd7+cIOSLJCdE9XIFjuLy0+GYd/t020kyzRHjQKbH1T9DiBas8x18F3YjWqgDOaV2c1T+jJB9dXow==}
 
   '@univerjs/sheets-filter-ui@1.3.1':
-    resolution: {integrity: sha512-sMGrzipFEbiF40uTQ8v8YPxsIvf6WKLFiH4lwCnGH8PWvbheBZqji9olQtG5PanwS0mfhvnG74AD8Lh2pzQLaw==, tarball: https://registry.npmjs.org/@univerjs/sheets-filter-ui/-/sheets-filter-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-sMGrzipFEbiF40uTQ8v8YPxsIvf6WKLFiH4lwCnGH8PWvbheBZqji9olQtG5PanwS0mfhvnG74AD8Lh2pzQLaw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-filter@1.3.1':
-    resolution: {integrity: sha512-aTPMM/cHdUcqQQVeHWFGKpBGBsL+eue2JlbMWvyh3nJBzNhfOd4hr5y3gaCCCaSJR+h7FI/ncszc1jfro9YAQg==, tarball: https://registry.npmjs.org/@univerjs/sheets-filter/-/sheets-filter-1.3.1.tgz}
+    resolution: {integrity: sha512-aTPMM/cHdUcqQQVeHWFGKpBGBsL+eue2JlbMWvyh3nJBzNhfOd4hr5y3gaCCCaSJR+h7FI/ncszc1jfro9YAQg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-find-replace@1.3.1':
-    resolution: {integrity: sha512-61oBywSAJWZIBZD1I7+W9P5Rk6FnPsAHbFuWUFmgx5XaHXAJ8KCxHC9gWA4APHzozCeI7YBsaTTLD6Y3UOQ6Rw==, tarball: https://registry.npmjs.org/@univerjs/sheets-find-replace/-/sheets-find-replace-1.3.1.tgz}
+    resolution: {integrity: sha512-61oBywSAJWZIBZD1I7+W9P5Rk6FnPsAHbFuWUFmgx5XaHXAJ8KCxHC9gWA4APHzozCeI7YBsaTTLD6Y3UOQ6Rw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-formula-ui@1.3.1':
-    resolution: {integrity: sha512-7CB6Ei3JF7hKfxZx2y/PoM0ZJKG71lrY+77JEiKqJ0oOnBo29ZZT8qah/TYwuYpHLpbTOOAJ/0X4Yk2b9euUdQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-formula-ui/-/sheets-formula-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-7CB6Ei3JF7hKfxZx2y/PoM0ZJKG71lrY+77JEiKqJ0oOnBo29ZZT8qah/TYwuYpHLpbTOOAJ/0X4Yk2b9euUdQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-formula@1.3.1':
-    resolution: {integrity: sha512-snB3ttEQxi3Vbp+Ki4OoTDKGBod95Ia2uCxFk5h9RhZiCkfuYP9CkuqkTNf6Pc1py46fWv/eMS5Bmv35C684tw==, tarball: https://registry.npmjs.org/@univerjs/sheets-formula/-/sheets-formula-1.3.1.tgz}
+    resolution: {integrity: sha512-snB3ttEQxi3Vbp+Ki4OoTDKGBod95Ia2uCxFk5h9RhZiCkfuYP9CkuqkTNf6Pc1py46fWv/eMS5Bmv35C684tw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-hyper-link-ui@1.3.1':
-    resolution: {integrity: sha512-0pm6I354X6/sH97BnFBpokAvm94j1r4dNuxHRumIOci4Thab0ZGixta009gYQHyeMlHY7YvOA8WL8qfS8sPjjQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-hyper-link-ui/-/sheets-hyper-link-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-0pm6I354X6/sH97BnFBpokAvm94j1r4dNuxHRumIOci4Thab0ZGixta009gYQHyeMlHY7YvOA8WL8qfS8sPjjQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-hyper-link@1.3.1':
-    resolution: {integrity: sha512-RMmvpeUND3ELFUTkXOia/U3k4kvhqvFrJ4dmZuB7aX7iuuksxZBAjbwJqq8pNazyA89Pa3oTlFqDNt/DGaf9TQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-hyper-link/-/sheets-hyper-link-1.3.1.tgz}
+    resolution: {integrity: sha512-RMmvpeUND3ELFUTkXOia/U3k4kvhqvFrJ4dmZuB7aX7iuuksxZBAjbwJqq8pNazyA89Pa3oTlFqDNt/DGaf9TQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-note-ui@1.3.1':
-    resolution: {integrity: sha512-4MuMptCBGLMhNmOAoRmv2f9fJWmyXQ2wqHDSS1Zljuhwx5+x7OD8gth0gkhKEun6LBicyFud1MdnwB6Kr1Ux7Q==, tarball: https://registry.npmjs.org/@univerjs/sheets-note-ui/-/sheets-note-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-4MuMptCBGLMhNmOAoRmv2f9fJWmyXQ2wqHDSS1Zljuhwx5+x7OD8gth0gkhKEun6LBicyFud1MdnwB6Kr1Ux7Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-note@1.3.1':
-    resolution: {integrity: sha512-GQeHB17hQ2IX5gMZ53l9fBSmrgH9NTnyuPbiPGl8ytG+hQ3YX8rmGQJKO8rlSDr9i4ATmPECo3k2VcmwTqBSwA==, tarball: https://registry.npmjs.org/@univerjs/sheets-note/-/sheets-note-1.3.1.tgz}
+    resolution: {integrity: sha512-GQeHB17hQ2IX5gMZ53l9fBSmrgH9NTnyuPbiPGl8ytG+hQ3YX8rmGQJKO8rlSDr9i4ATmPECo3k2VcmwTqBSwA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-numfmt-ui@1.3.1':
-    resolution: {integrity: sha512-TUCjm9+OlkFwmQbGGMj/E/ohYN88iy7/WJp/BUy339uNafq3dUpR2CEds7EesLEDki/gPCVuWATbkqXWgjvYhQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-numfmt-ui/-/sheets-numfmt-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-TUCjm9+OlkFwmQbGGMj/E/ohYN88iy7/WJp/BUy339uNafq3dUpR2CEds7EesLEDki/gPCVuWATbkqXWgjvYhQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-numfmt@1.3.1':
-    resolution: {integrity: sha512-I41ZsOmwR+sJ/RxYx2Xkkvgicu5sLqjjUe/tza2GzjLmtMZQlk8JlbjZ7ptnOSQo1PjOqNVrpuO6iHIahW0qcA==, tarball: https://registry.npmjs.org/@univerjs/sheets-numfmt/-/sheets-numfmt-1.3.1.tgz}
+    resolution: {integrity: sha512-I41ZsOmwR+sJ/RxYx2Xkkvgicu5sLqjjUe/tza2GzjLmtMZQlk8JlbjZ7ptnOSQo1PjOqNVrpuO6iHIahW0qcA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-sort-ui@1.3.1':
-    resolution: {integrity: sha512-UkQTihsm8uvso7bXiZlp4/+GDrgJuglcqdOIBJMduqEPIqXQJaX+bwOCerEcAFQ8m6GmikRAt+1uLQmrJIjLNQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-sort-ui/-/sheets-sort-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-UkQTihsm8uvso7bXiZlp4/+GDrgJuglcqdOIBJMduqEPIqXQJaX+bwOCerEcAFQ8m6GmikRAt+1uLQmrJIjLNQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-sort@1.3.1':
-    resolution: {integrity: sha512-cXRVn0IncgYkCq0kK26/AYa27rw5nt8L+HZLw46k5fvOEaVTdU+11QuogLwrp7ZnR2lGoUTQLd80QmCv6Ix9JA==, tarball: https://registry.npmjs.org/@univerjs/sheets-sort/-/sheets-sort-1.3.1.tgz}
+    resolution: {integrity: sha512-cXRVn0IncgYkCq0kK26/AYa27rw5nt8L+HZLw46k5fvOEaVTdU+11QuogLwrp7ZnR2lGoUTQLd80QmCv6Ix9JA==}
 
   '@univerjs/sheets-table-ui@1.3.1':
-    resolution: {integrity: sha512-syfCx+XxioS+0qzF++hULwGslUFdcKY+u1/skW8ijab8dZnVHBtanuyaJ9WgvkZjAxlwd8Xh6uELUaswbtUkiw==, tarball: https://registry.npmjs.org/@univerjs/sheets-table-ui/-/sheets-table-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-syfCx+XxioS+0qzF++hULwGslUFdcKY+u1/skW8ijab8dZnVHBtanuyaJ9WgvkZjAxlwd8Xh6uELUaswbtUkiw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-table@1.3.1':
-    resolution: {integrity: sha512-lLdwlYNUaGdgyOPjQd125uyTHaXw6DioRyBR6PQ7imvMKMk2gfyC+sbddG1Et4VQv4RKzyXV7E/dEuFBU9pyZQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-table/-/sheets-table-1.3.1.tgz}
+    resolution: {integrity: sha512-lLdwlYNUaGdgyOPjQd125uyTHaXw6DioRyBR6PQ7imvMKMk2gfyC+sbddG1Et4VQv4RKzyXV7E/dEuFBU9pyZQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-thread-comment-ui@1.3.1':
-    resolution: {integrity: sha512-z0gCcrKIp/H1rt0sYR/wRMc00bamngztLDnbkTfaU5VVBGCuiJg3fWKEQkSgowfdyUf+HPKzMI1PmoqmQ263QA==, tarball: https://registry.npmjs.org/@univerjs/sheets-thread-comment-ui/-/sheets-thread-comment-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-z0gCcrKIp/H1rt0sYR/wRMc00bamngztLDnbkTfaU5VVBGCuiJg3fWKEQkSgowfdyUf+HPKzMI1PmoqmQ263QA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-thread-comment@1.3.1':
-    resolution: {integrity: sha512-qk5vro3rAAiz1ScV/2/0n20WBFD0dl7yql89vH8naXi8YFGPnwspYHHAhFC/EuFuFoxAijfzgpQ+RVWs5BeqPA==, tarball: https://registry.npmjs.org/@univerjs/sheets-thread-comment/-/sheets-thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-qk5vro3rAAiz1ScV/2/0n20WBFD0dl7yql89vH8naXi8YFGPnwspYHHAhFC/EuFuFoxAijfzgpQ+RVWs5BeqPA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-ui@1.3.1':
-    resolution: {integrity: sha512-0jK71JK8w7SHfjQGizNyT+jHAFdrw/57hITGYTlkPdwqKmEmrckIT4HtW+ZgEVzEHjmb8zYKeCobPv7e0Hxs0w==, tarball: https://registry.npmjs.org/@univerjs/sheets-ui/-/sheets-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-0jK71JK8w7SHfjQGizNyT+jHAFdrw/57hITGYTlkPdwqKmEmrckIT4HtW+ZgEVzEHjmb8zYKeCobPv7e0Hxs0w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets@1.3.1':
-    resolution: {integrity: sha512-ENjgyzvOqSU7Fn2DJrqNFWpiW3nJVlbhSvx7mI5MkAj2QLDgzxbpPawByYuSR/EB32x6/r8mN9e0+GUSmxmVmw==, tarball: https://registry.npmjs.org/@univerjs/sheets/-/sheets-1.3.1.tgz}
+    resolution: {integrity: sha512-ENjgyzvOqSU7Fn2DJrqNFWpiW3nJVlbhSvx7mI5MkAj2QLDgzxbpPawByYuSR/EB32x6/r8mN9e0+GUSmxmVmw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/telemetry@1.3.1':
-    resolution: {integrity: sha512-Y55dGZ47qNWJ6SbH4hySLPyQVszMOBZYwvUqhkVLqm0/9hHbHdulJ90x7Q1JMTrVCEqhzwT8eSIhGlUSzfUGaw==, tarball: https://registry.npmjs.org/@univerjs/telemetry/-/telemetry-1.3.1.tgz}
+    resolution: {integrity: sha512-Y55dGZ47qNWJ6SbH4hySLPyQVszMOBZYwvUqhkVLqm0/9hHbHdulJ90x7Q1JMTrVCEqhzwT8eSIhGlUSzfUGaw==}
 
   '@univerjs/themes@1.3.1':
-    resolution: {integrity: sha512-ucpdqiIex1QiQh7ZohtsLDCdb+Q9qLMfnx5ijQ48ChDFk75Ao/ja9HpFnrJemLNZIqm5x4W7sDBkUwIOz1IOUQ==, tarball: https://registry.npmjs.org/@univerjs/themes/-/themes-1.3.1.tgz}
+    resolution: {integrity: sha512-ucpdqiIex1QiQh7ZohtsLDCdb+Q9qLMfnx5ijQ48ChDFk75Ao/ja9HpFnrJemLNZIqm5x4W7sDBkUwIOz1IOUQ==}
 
   '@univerjs/thread-comment-ui@1.3.1':
-    resolution: {integrity: sha512-qOF7GrMfYb3UpfSLOdUUiwOS7R/q0x7FXwQpywQTJoOjALPojGIvKssQloWwhi/J4Dyut/yGeX2QMODGKJXm3g==, tarball: https://registry.npmjs.org/@univerjs/thread-comment-ui/-/thread-comment-ui-1.3.1.tgz}
+    resolution: {integrity: sha512-qOF7GrMfYb3UpfSLOdUUiwOS7R/q0x7FXwQpywQTJoOjALPojGIvKssQloWwhi/J4Dyut/yGeX2QMODGKJXm3g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/thread-comment@1.3.1':
-    resolution: {integrity: sha512-QKCxMRRzGBxmuIO6nNaUEfS405SuLA0liUBnAicjdyPHw9tgUm5PuMEQdr7kDC9KkhF7t7u5QEDwlZ0gfubFPw==, tarball: https://registry.npmjs.org/@univerjs/thread-comment/-/thread-comment-1.3.1.tgz}
+    resolution: {integrity: sha512-QKCxMRRzGBxmuIO6nNaUEfS405SuLA0liUBnAicjdyPHw9tgUm5PuMEQdr7kDC9KkhF7t7u5QEDwlZ0gfubFPw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/ui@1.3.1':
-    resolution: {integrity: sha512-FISyNnzN5AnvdfbDP5EYFN+AF5ksGWrKmb0m/omHCBy34VIOjMjZ8pJdsdFCfO2IPvkvzz+xM6b2GvPPFYfGcw==, tarball: https://registry.npmjs.org/@univerjs/ui/-/ui-1.3.1.tgz}
+    resolution: {integrity: sha512-FISyNnzN5AnvdfbDP5EYFN+AF5ksGWrKmb0m/omHCBy34VIOjMjZ8pJdsdFCfO2IPvkvzz+xM6b2GvPPFYfGcw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
