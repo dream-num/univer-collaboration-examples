@@ -116,7 +116,7 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
         const file = files.get(fileID);
         if (!file) throw new Error("Uploaded file was not found");
 
-        const taskID = startTask(tasks, async () => {
+        const taskID = startTask(tasks, "import", async () => {
           const data = await files.read(fileID);
           if (!data) throw new Error("Uploaded file was not found");
           const unitID = randomUUID();
@@ -177,7 +177,7 @@ export function createExchangeRouter(options: ExchangeRouterOptions): Router {
         const format = requireExportFormat(body.format);
         const sheetID = optionalString(body.options?.sheet?.csv?.sheetId);
 
-        const taskID = startTask(tasks, async () => {
+        const taskID = startTask(tasks, "export", async () => {
           const snapshot = await captureCurrentSnapshot(service, materializer, userID, unitID);
           const exportOptions = createExportOptions(format, sheetID, snapshot);
           const data = await exportSnapshotToBuffer(snapshot, exportOptions);
@@ -286,17 +286,21 @@ async function captureCurrentSnapshot(
 
 function startTask(
   tasks: Map<string, ExchangeTask>,
+  kind: TaskResult["kind"],
   operation: () => Promise<TaskResult>,
 ): string {
   const taskID = randomUUID();
   tasks.set(taskID, { status: "pending" });
   void operation().then(
     (result) => tasks.set(taskID, { status: "done", result }),
-    (error: unknown) =>
+    (error: unknown) => {
+      // The browser only sees the message through task polling; keep the full error on the server.
+      console.error(`Exchange ${kind} task ${taskID} failed:`, error);
       tasks.set(taskID, {
         status: "failed",
         error: protocolError(ErrorCode.INTERNAL_ERROR, errorMessage(error)),
-      }),
+      });
+    },
   );
   return taskID;
 }
