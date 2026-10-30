@@ -37,3 +37,33 @@ jobs:
 
       - name: Build examples
         run: pnpm build
+
+  merge-gate:
+    name: merge-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Reject private npm registry configuration
+        run: |
+          npmrcs=$(git ls-files | grep -E '(^|/)\.npmrc$' || true)
+          if [ -z "$npmrcs" ]; then
+            echo "No .npmrc is committed."
+            exit 0
+          fi
+          private=$(printf '%s\n' "$npmrcs" | xargs grep -hE '^[^#;]*registry=' | grep -v 'registry\.npmjs\.org' || true)
+          if [ -n "$private" ]; then
+            echo "Private npm registry configuration detected:"
+            echo "$private"
+            echo
+            echo "Merging to main is not allowed while a private registry is configured."
+            echo "Before merging to main, every npm package must be promoted to the public"
+            echo "npm registry and the private registry configuration must be removed."
+            echo
+            echo "合入 main 前必须把所有 npm 包提升到公开 npm，并移除私有源配置。"
+            exit 1
+          fi
+          echo "No private npm registry is configured."
