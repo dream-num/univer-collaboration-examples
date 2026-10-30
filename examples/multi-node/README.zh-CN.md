@@ -53,6 +53,18 @@ const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 
 也支持 `ioredis` 和 Redis Cluster，见 `@univerjs-pro/collaboration-cluster-redis` 的 README。
 
+### 许可证
+
+每个节点从 `UNIVER_LICENSE` 和 `UNIVER_LICENSE_KEY` 读取同一份许可证。许可证要覆盖运行的
+节点数，本例是两个。单节点许可证配合 `pubSub` 启动时，节点以 `LICENSE_POLICY_INVALID` 停止。运行的节点多于许可证覆盖的数量时，
+最新加入的节点在宽限期后下线；[`server/main.ts`](./server/main.ts) 记录每次变化：
+
+```ts
+endpoint.license.on("nodesStatusChanged", ({ status, previousStatus, limit, reason }) => {
+  console.warn(`[${NODE_ID}] license.nodes ${previousStatus} -> ${status} limit=${limit}${reason ? ` reason=${reason}` : ""}`);
+});
+```
+
 Endpoint 不会释放外部传入的适配器和客户端。停止服务时按创建的反序释放：先释放 Transport，再释放 pub/sub 适配器，最后关闭两个 Redis 连接。
 
 ## 配置网关
@@ -84,7 +96,13 @@ Nginx 指令参考：[一致性哈希](https://nginx.org/en/docs/http/ngx_http_u
 
 ## 运行示例
 
-准备 Docker 和 Docker Compose，在仓库根目录执行：
+准备 Docker、Docker Compose 和覆盖两个节点的许可证，在仓库根目录执行：
+
+```bash
+export UNIVER_LICENSE="$(cat license.txt)"
+export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
+```
+
 
 ```bash
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
@@ -98,7 +116,7 @@ docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 2. 把完整 URL 复制到另一个标签页，编辑同一份 Sheet，观察同步。
 3. 再创建几份文件，选择分配到另一节点的文件重复验证。
 
-`GATEWAY_PORT` 可修改默认端口 `3010`；`UNIVER_LICENSE` 可在构建时传入许可证。更新代码后重新执行启动命令，会同时重建服务节点和 Nginx，避免网关保留旧容器地址；随后重新打开页面。
+`GATEWAY_PORT` 可修改默认端口 `3010`；Compose 把 `UNIVER_LICENSE` 交给浏览器构建，把两个变量都交给节点。更新代码后重新执行启动命令，会同时重建服务节点和 Nginx，避免网关保留旧容器地址；随后重新打开页面。
 
 ## 示例范围
 

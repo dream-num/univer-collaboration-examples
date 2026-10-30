@@ -53,6 +53,18 @@ const endpoint = new UniverCollabEndpoint(service, { pubSub, ticketStore });
 
 `ioredis` and Redis Cluster are also supported, see the `@univerjs-pro/collaboration-cluster-redis` README.
 
+### License
+
+Every node reads the same License from `UNIVER_LICENSE` and `UNIVER_LICENSE_KEY`. The License must cover the number of nodes you run, two in this example. A node that receives a
+`pubSub` with a single-node License stops at startup with `LICENSE_POLICY_INVALID`. When more nodes run than the
+License covers, the newest ones go offline after a grace period; [`server/main.ts`](./server/main.ts) logs each change:
+
+```ts
+endpoint.license.on("nodesStatusChanged", ({ status, previousStatus, limit, reason }) => {
+  console.warn(`[${NODE_ID}] license.nodes ${previousStatus} -> ${status} limit=${limit}${reason ? ` reason=${reason}` : ""}`);
+});
+```
+
 The Endpoint does not dispose the adapters or the clients it was given. Shut down in reverse order of creation: dispose the transport, then the pub/sub adapter, then close both Redis connections.
 
 ## Configure the gateway
@@ -84,7 +96,13 @@ Nginx references: [hash](https://nginx.org/en/docs/http/ngx_http_upstream_module
 
 ## Run the example
 
-Install Docker with Docker Compose, then run from the repository root:
+Install Docker with Docker Compose and prepare a License that covers two nodes. From the repository root, run:
+
+```bash
+export UNIVER_LICENSE="$(cat license.txt)"
+export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
+```
+
 
 ```bash
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
@@ -98,7 +116,7 @@ Open <http://127.0.0.1:3010/>:
 2. Copy the complete URL into another tab, edit the same Sheet, and check synchronization.
 3. Create more files and repeat with one assigned to the other node.
 
-Set `GATEWAY_PORT` to change the default port of `3010`, or `UNIVER_LICENSE` to supply a license at build time. After code changes, rerun the startup command to recreate both the server nodes and Nginx, preventing stale container addresses in the gateway. Reopen the page afterward.
+Set `GATEWAY_PORT` to change the default port of `3010`, Compose passes `UNIVER_LICENSE` to the browser build and both variables to the nodes. After code changes, rerun the startup command to recreate both the server nodes and Nginx, preventing stale container addresses in the gateway. Reopen the page afterward.
 
 ## Scope
 

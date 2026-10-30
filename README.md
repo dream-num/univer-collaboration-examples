@@ -32,7 +32,7 @@ collaboration path, then choose another example for the capability you want to e
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
 | [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 | [`file-service`](./examples/file-service/README.md) | Application file service for images and attachments: upload, sign-url, and download routes with on-disk storage |
-| [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID |
+| [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID; needs a multi-node License |
 
 ## Run the examples
 
@@ -57,6 +57,20 @@ pnpm example:exchange
 pnpm example:file-service
 pnpm example:multi-node
 ```
+
+### License
+
+If you have a License, set two variables in the terminal before running the commands above:
+
+```bash
+export UNIVER_LICENSE="$(cat license.txt)"
+export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
+```
+
+The build writes `UNIVER_LICENSE` into the browser bundle; at startup the server passes `UNIVER_LICENSE` and
+`UNIVER_LICENSE_KEY` together to `UniverCollabService`. With neither set, the examples run on the free tier: one node
+with 3 collaborative editing connections. `multi-node` needs a License that covers multiple nodes.
+See [License](https://docs.univer.ai/server/license).
 
 The examples cover only teaching and copyable assembly. They do not include file spaces
 or a complete office suite. `file-service`, `exchange`, and `all-unit` keep uploaded files on the
