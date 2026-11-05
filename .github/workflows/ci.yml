@@ -38,14 +38,31 @@ jobs:
       - name: Build examples
         run: pnpm build
 
+  # Guards main: a -next branch carries an insider .npmrc and pre-release SDK versions
+  # until the SDK release is public, so this job runs only where that must not land.
   merge-gate:
     name: merge-gate
+    if: github.event_name == 'push' || github.base_ref == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Reject pre-release Univer SDK versions
+        run: |
+          manifests=$(git ls-files | grep -E '(^|/)package\.json$|^pnpm-workspace\.yaml$')
+          prerelease=$(grep -nE '@univerjs(-pro)?/.*[0-9]-(insiders|dev|nightly|alpha|beta|rc|experimental)[.-]' $manifests || true)
+          if [ -n "$prerelease" ]; then
+            echo "Pre-release Univer SDK versions detected:"
+            echo "$prerelease"
+            echo
+            echo "main depends only on publicly released SDK versions. Replace them with the"
+            echo "released versions before merging to main."
+            exit 1
+          fi
+          echo "No pre-release Univer SDK version is pinned."
 
       - name: Reject private npm registry configuration
         run: |
@@ -62,8 +79,6 @@ jobs:
             echo "Merging to main is not allowed while a private registry is configured."
             echo "Before merging to main, every npm package must be promoted to the public"
             echo "npm registry and the private registry configuration must be removed."
-            echo
-            echo "合入 main 前必须把所有 npm 包提升到公开 npm，并移除私有源配置。"
             exit 1
           fi
           echo "No private npm registry is configured."
