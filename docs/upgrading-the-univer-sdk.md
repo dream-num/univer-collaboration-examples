@@ -25,8 +25,8 @@ example's `package.json` pins exact SDK versions.
 
 Exception: upstream publishes an intermediate version, such as a patch cut
 from a release branch, that the `-next` branch does not wait for. Then `main`
-upgrades on its own as above, and afterwards the `-next` branch merges `main`
-and is renamed after the new published version (`git branch -m 1.3.1-next
+is upgraded through its own pull request as above, and afterwards the `-next`
+branch merges `main` and is renamed after the new published version (`git branch -m 1.3.1-next
 1.3.2-next`, then push), keeping its `.npmrc`.
 
 ## Workflow
