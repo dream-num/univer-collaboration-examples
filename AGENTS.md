@@ -4,11 +4,11 @@
   carries an `.npmrc`, and can always be installed from the public npm registry.
 - A change that works against the published SDK goes to `main` directly, whatever it is: a new
   example, a fix, documentation, or an upgrade to an SDK version that is already public.
-- A change that needs an SDK version that is not on the public registry yet goes to the `-next`
-  branch named after the currently published SDK version: while 1.3.1 is the published SDK, the
-  branch is `1.3.1-next`. It is created when the first such change is ready, collects everything that
-  waits for the next SDK release, and is the only such branch at a time. There is no permanent `dev`
-  branch.
+- A change that needs an SDK version that is not on the public registry yet goes to the
+  `<version>-next` branch, named after the currently published SDK version (for example `1.3.1-next`
+  while 1.3.1 is the published SDK). It is created when the first such change is ready, collects
+  everything that waits for the next SDK release, and is the only such branch at a time. There is no
+  permanent `dev` branch.
 - The `-next` branch commits a scoped `.npmrc` pointing `@univerjs` / `@univerjs-pro` at the
   insider registry (which also proxies the public registry) and pins insiders versions. Feature
   branches for such changes start from the `-next` branch and open pull requests against it, so they

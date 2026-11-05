@@ -27,7 +27,7 @@ example's `package.json` pins exact SDK versions.
 
 ```sh
 git fetch origin && git checkout main && git merge --ff-only origin/main
-git checkout -b 1.3.1-next   # named after the published SDK version it follows
+git checkout -b <version>-next   # the published SDK version it follows, e.g. 1.3.1-next
 ```
 
 If the `-next` branch already exists, start a feature branch from it and open
