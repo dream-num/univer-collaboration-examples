@@ -13,10 +13,13 @@
   insider registry (which also proxies the public registry) and pins insiders versions. Feature
   branches for such changes start from the `-next` branch and open pull requests against it, so they
   inherit the `.npmrc`.
-- When the next SDK version is on the public registry: on the `-next` branch, replace the insiders
-  versions with the released ones, delete the `.npmrc` and reinstall (the promoted tarballs are
-  bit-identical, so `pnpm-lock.yaml` keeps its integrity hashes), then open a pull request to `main`,
-  merge it and delete the branch. The procedure is in `docs/upgrading-the-univer-sdk.md`.
+- When the SDK version the `-next` branch waits for is on the public registry: on that branch,
+  replace the insiders versions with the released ones, delete the `.npmrc` and reinstall (the
+  promoted tarballs are bit-identical, so `pnpm-lock.yaml` keeps its integrity hashes), then open a
+  pull request to `main`, merge it and delete the branch. When the SDK publishes a version the branch
+  does not wait for, such as a patch release, `main` upgrades on its own and the `-next` branch merges
+  `main` and is renamed after the new published version. The procedure is in
+  `docs/upgrading-the-univer-sdk.md`.
 - The CI `merge-gate` check runs on pull requests targeting `main` and on `main` itself. It fails
   while a committed `.npmrc` points at a non-public registry or any `@univerjs` / `@univerjs-pro`
   dependency has a pre-release version, so the `-next` branch cannot reach `main` before its

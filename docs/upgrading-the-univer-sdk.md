@@ -14,12 +14,21 @@ example's `package.json` pins exact SDK versions.
 
 ## Which path
 
-- **The new SDK version is already on the public registry** and no `-next`
-  branch exists: upgrade on a short-lived branch from `main` and open the pull
-  request against `main`. Steps 1, 2, 4 and 5; skip step 3.
+- **The new SDK version is public and no `-next` branch exists**: upgrade on a
+  short-lived branch from `main` and open the pull request against `main`.
+  Steps 1, 2, 4 and 5; skip step 3.
+- **The new SDK version is public and the `-next` branch waits for it**: the
+  upgrade is the completion of that branch. Do steps 4 and 5 on the `-next`
+  branch; do not open a separate upgrade branch from `main`.
+- **The new SDK version is public but the `-next` branch waits for a later
+  one** (a patch release in between): upgrade `main` on a short-lived branch
+  (steps 1, 2, 4 and 5), then merge `main` into the `-next` branch, rename it
+  after the new published version (`git branch -m 1.3.1-next 1.3.2-next` and
+  push), and keep its `.npmrc`.
 - **Something needs an SDK version that is not public yet**: work on the
-  `-next` branch (steps 1 to 3). When upstream publishes the release, finish
-  with steps 4 and 5 on that branch.
+  `-next` branch (steps 1 to 3), creating it from `main` if it does not exist.
+  When upstream publishes the release, finish with steps 4 and 5 on that
+  branch.
 
 ## Workflow
 
