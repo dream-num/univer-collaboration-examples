@@ -18,9 +18,9 @@
   replace the insiders versions with the released ones, delete the `.npmrc` and reinstall (the
   promoted tarballs are bit-identical, so `pnpm-lock.yaml` keeps its integrity hashes), then open a
   pull request to `main`, merge it and delete the branch. Exceptionally, when the SDK publishes an
-  intermediate version the branch does not wait for, `main` is upgraded through its own pull request and the
-  `-next` branch then merges `main` and is renamed after the new published version. The procedure is in
-  `docs/upgrading-the-univer-sdk.md`.
+  intermediate version the branch does not wait for, `main` is upgraded through its own pull request
+  and the `-next` branch then merges `main` and is renamed after the new published version. The
+  procedure is in `docs/upgrading-the-univer-sdk.md`.
 - The CI `merge-gate` check runs on pull requests targeting `main` and on `main` itself. It fails
   while a committed `.npmrc` points at a non-public registry or any `@univerjs` / `@univerjs-pro`
   dependency has a pre-release version, so the `-next` branch cannot reach `main` before its
