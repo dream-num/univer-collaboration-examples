@@ -15,9 +15,8 @@
   branches for such changes start from the `-next` branch and open pull requests against it, so they
   inherit the `.npmrc`.
 - When the SDK version the `-next` branch waits for is on the public registry: on that branch,
-  replace the insiders versions with the released ones, delete the `.npmrc` and reinstall (the
-  promoted tarballs are bit-identical, so `pnpm-lock.yaml` keeps its integrity hashes), then open a
-  pull request to `main`, merge it and delete the branch. Exceptionally, when the SDK publishes an
+  replace the insiders versions with the released ones, delete the `.npmrc` and reinstall, then open
+  a pull request to `main`, merge it and delete the branch. Exceptionally, when the SDK publishes an
   intermediate version the branch does not wait for, `main` is upgraded through its own pull request
   and the `-next` branch then merges `main` and is renamed after the new published version. The
   procedure is in `docs/upgrading-the-univer-sdk.md`.
