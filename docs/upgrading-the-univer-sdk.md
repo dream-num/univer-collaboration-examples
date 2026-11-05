@@ -86,18 +86,20 @@ naturally on the next re-resolution.
 
 1. Confirm every `@univerjs` / `@univerjs-pro` package used by the examples is
    on the public registry (`npm view <pkg>@<version>`).
-2. Replace the pre-release versions from step 2 with the released ones, delete
-   the `.npmrc` and reinstall:
+2. If step 2 pinned insiders builds (`-insiders.` versions) rather than the
+   final version number, move the pins to the released version first. Then
+   delete the `.npmrc` and reinstall:
 
    ```sh
    git rm .npmrc
    pnpm install --no-frozen-lockfile
    ```
 
-3. Verify the lockfile did not drift: the package set and every integrity hash
-   must be identical to the pre-promotion lockfile, because the promoted
-   tarballs are bit-identical. (Recorded tarball URLs, if any, already point at
-   the public registry and stay valid.)
+3. Verify the lockfile. When the pins did not change, the package set and every
+   integrity hash must be identical to the pre-promotion lockfile, because the
+   promoted tarballs are bit-identical. (Recorded tarball URLs, if any, already
+   point at the public registry and stay valid.) When the pins moved from
+   insiders builds to the release, review the lockfile diff as for any upgrade.
 4. `pnpm install --frozen-lockfile`, `pnpm build`, `pnpm typecheck`, then
    commit and push.
 
