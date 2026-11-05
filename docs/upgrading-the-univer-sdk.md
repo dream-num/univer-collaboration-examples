@@ -7,18 +7,32 @@
 > meant to teach general Univer usage. For usage examples, see the directories
 > under `examples/`.
 
-The branch policy in [AGENTS.md](../AGENTS.md) applies: `main` targets the
-currently published SDK, `next/*` branches collect upgrades, and each
+The branch policy in [AGENTS.md](../AGENTS.md) applies: `main` depends only on
+the publicly released SDK, changes that need an unreleased SDK wait on the
+`<version>-next` branch named after the currently published version, and each
 example's `package.json` pins exact SDK versions.
+
+## Which path
+
+- **The new SDK version is already on the public registry** and no `-next`
+  branch exists: upgrade on a short-lived branch from `main` and open the pull
+  request against `main`. Steps 1, 2, 4 and 5; skip step 3.
+- **Something needs an SDK version that is not public yet**: work on the
+  `-next` branch (steps 1 to 3). When upstream publishes the release, finish
+  with steps 4 and 5 on that branch.
 
 ## Workflow
 
-### 1. Create the upgrade branch
+### 1. Create the branch
 
 ```sh
 git fetch origin && git checkout main && git merge --ff-only origin/main
-git checkout -b next/<version>   # e.g. next/1.3.1
+git checkout -b 1.3.1-next   # named after the published SDK version it follows
 ```
+
+If the `-next` branch already exists, start a feature branch from it and open
+the pull request against it instead; the feature branch inherits the `.npmrc`.
+For an upgrade to an already public version use any short-lived branch name.
 
 ### 2. Bump the SDK pins
 
@@ -49,9 +63,10 @@ pnpm build && pnpm typecheck
 ```
 
 Run the examples you touch and smoke-test them in a real browser before
-pushing. While the insider `.npmrc` is committed, the `merge-gate` CI check
-stays red on purpose: **the branch must not be merged while a private
-registry is configured.**
+pushing. Pull requests into the `-next` branch run the `quality` check only, so
+their CI result is meaningful. The `merge-gate` check runs on pull requests
+into `main` and rejects the committed `.npmrc` and the pre-release versions:
+**the `-next` branch cannot be merged into `main` until step 4 is done.**
 
 Known pnpm behavior (no setting can change it): the insider registry's
 metadata reports `registry.npmjs.org` tarball URLs, so pnpm records absolute
@@ -63,7 +78,8 @@ naturally on the next re-resolution.
 
 1. Confirm every `@univerjs` / `@univerjs-pro` package used by the examples is
    on the public registry (`npm view <pkg>@<version>`).
-2. Delete the `.npmrc` and reinstall:
+2. Replace the pre-release versions from step 2 with the released ones, delete
+   the `.npmrc` and reinstall:
 
    ```sh
    git rm .npmrc
@@ -79,7 +95,8 @@ naturally on the next re-resolution.
 
 ### 5. Merge
 
-Both CI checks must be green (`quality` and `merge-gate`), then squash-merge
-the pull request into `main` and delete the branch. To turn the `merge-gate`
-check into a hard block, a repository admin must add it to the branch
-protection required status checks.
+Open the pull request against `main`. Both CI checks must be green (`quality`
+and `merge-gate`), then squash-merge it and delete the branch. The next
+`-next` branch is created only when the first change that needs an unreleased
+SDK is ready. To turn the `merge-gate` check into a hard block, a repository
+admin must add it to the branch protection required status checks.
