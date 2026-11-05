@@ -60,8 +60,6 @@ jobs:
             echo
             echo "main depends only on publicly released SDK versions. Replace them with the"
             echo "released versions before merging to main."
-            echo
-            echo "main 只依赖已公开发布的 SDK 版本，合入前请改为正式版本号。"
             exit 1
           fi
           echo "No pre-release Univer SDK version is pinned."
@@ -81,8 +79,6 @@ jobs:
             echo "Merging to main is not allowed while a private registry is configured."
             echo "Before merging to main, every npm package must be promoted to the public"
             echo "npm registry and the private registry configuration must be removed."
-            echo
-            echo "合入 main 前必须把所有 npm 包提升到公开 npm，并移除私有源配置。"
             exit 1
           fi
           echo "No private npm registry is configured."
