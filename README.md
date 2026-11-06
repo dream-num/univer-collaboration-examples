@@ -24,7 +24,7 @@ collaboration path, then choose another example for the capability you want to e
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.md) | Minimal real-time Sheet collaboration path |
 | [`database-adapter`](./examples/database-adapter/README.md) | SQLite persistence and restart recovery |
-| [`all-unit`](./examples/all-unit/README.md) | Six Unit types with files, import/export, embedded attachments, comments, and history in one application |
+| [`all-unit`](./examples/all-unit/README.md) | Six Unit types with files, import/export, embedded attachments, comments, history, and print in one application |
 | [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
 | [`object-permissions`](./examples/object-permissions/README.md) | Worksheet and range protection with an application-owned ACL |
 | [`history`](./examples/history/README.md) | Version history service and browser entry |
