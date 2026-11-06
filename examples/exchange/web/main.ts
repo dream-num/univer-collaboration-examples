@@ -1,4 +1,9 @@
-import { LocaleType, LogLevel } from "@univerjs/core";
+import { IImageIoService, LocaleType, LogLevel } from "@univerjs/core";
+import { UniverDocsDrawingPlugin } from "@univerjs/docs-drawing";
+import { UniverDrawingPlugin } from "@univerjs/drawing";
+import { UniverDrawingUIPlugin } from "@univerjs/drawing-ui";
+import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
+import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -12,16 +17,15 @@ import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
+import UniverPresetSheetsDrawingEnUS from "@univerjs/preset-sheets-drawing/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "@univerjs-pro/collaboration-client/facade";
 import "@univerjs-pro/exchange-client/facade";
 import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
+import "@univerjs/preset-sheets-drawing/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
-
-document.querySelector<HTMLElement>("#status")!.textContent =
-  "Use the toolbar to import XLS/XLSX/CSV/TSV as a new Unit, or export the current revision.";
 
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
@@ -32,6 +36,7 @@ const { univerAPI } = createUniver({
   locales: {
     [LocaleType.EN_US]: mergeLocales(
       UniverPresetSheetsCoreEnUS,
+      UniverPresetSheetsDrawingEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
       // The two exchange packages do not publish locale entry points.
@@ -42,6 +47,11 @@ const { univerAPI } = createUniver({
   collaboration: true,
   presets: [UniverSheetsCorePreset({ container: "app" })],
   plugins: [
+    [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
+    UniverDrawingUIPlugin,
+    UniverDocsDrawingPlugin,
+    UniverSheetsDrawingPlugin,
+    UniverSheetsDrawingUIPlugin,
     [
       UniverLicensePlugin,
       { license: import.meta.env.UNIVER_LICENSE || undefined },
@@ -57,6 +67,9 @@ const { univerAPI } = createUniver({
         collabSubmitChangesetUrl: `${baseURL}/comb`,
         collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
+        uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+        signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+        downloadEndpointUrl: `${location.protocol}//${location.host}/`,
       },
     ],
     UniverCollaborationClientUIPlugin,
@@ -88,17 +101,20 @@ const status = document.querySelector<HTMLElement>("#status")!;
 toolbar.innerHTML = `
   <label class="exchange-action" for="exchange-import">Import</label>
   <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
-  <button class="exchange-action" id="exchange-export-xlsx" type="button">Export XLSX</button>
-  <button class="exchange-action" id="exchange-export-csv" type="button">Export CSV</button>
+  <button class="exchange-action" data-format="${ExchangeFormat.XLSX}" type="button">Export XLSX</button>
+  <button class="exchange-action" data-format="${ExchangeFormat.CSV}" type="button">Export CSV</button>
 `;
+status.textContent = "Use the toolbar to import XLS/XLSX/CSV/TSV as a new Unit, or export the current revision.";
 
-async function exportCurrentSheet(format: ExchangeFormat, extension: string) {
-  status.textContent = `Exporting ${extension.toUpperCase()}…`;
+async function exportCurrentSheet(format: ExchangeFormat) {
+  status.textContent = `Exporting ${format.toUpperCase()}…`;
   try {
-    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format);
+    // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
+    const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
+    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId);
     if (!file) throw new Error("Export did not produce a file.");
-    univerAPI.downloadFile(file, sheetUnitId, extension);
-    status.textContent = `Exported the current revision as ${extension.toUpperCase()}.`;
+    univerAPI.downloadFile(file, sheetUnitId, format);
+    status.textContent = `Exported the current revision as ${format.toUpperCase()}.`;
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : String(error);
   }
@@ -121,9 +137,6 @@ toolbar
     }
   });
 
-toolbar
-  .querySelector("#exchange-export-xlsx")!
-  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx"));
-toolbar
-  .querySelector("#exchange-export-csv")!
-  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.CSV, "csv"));
+for (const button of toolbar.querySelectorAll<HTMLButtonElement>("[data-format]")) {
+  button.addEventListener("click", () => void exportCurrentSheet(button.dataset.format as ExchangeFormat));
+}
