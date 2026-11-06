@@ -13,6 +13,7 @@ import {
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
+import { UniverDocsExchangeClientPlugin } from "@univerjs-pro/docs-exchange-client";
 import { ExchangeFormat, UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
@@ -24,6 +25,7 @@ import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-
 import UniverPresetSheetsDrawingEnUS from "@univerjs/preset-sheets-drawing/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "@univerjs-pro/collaboration-client/facade";
+import "@univerjs-pro/docs-exchange-client/facade";
 import "@univerjs-pro/exchange-client/facade";
 import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
@@ -33,15 +35,13 @@ import "@univerjs/preset-sheets-drawing/lib/index.css";
 import "@univerjs/preset-docs-drawing/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 
-document.querySelector<HTMLElement>("#status")!.textContent =
-  "Use the toolbar to import XLS/XLSX/CSV/TSV as a new Unit, or export the current revision.";
-
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
-if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
-const sheetUnitId: string = unitId;
-// Converted attachments open as Docs with `&type=1`.
+if (!unitId) throw new Error("Open the URL printed by the server; it names the Unit with ?unit=.");
+const currentUnitId: string = unitId;
+// Docs open with `&type=1`, including the ones converted from attachments.
 const isDoc = Number(new URLSearchParams(location.search).get("type")) === UniverInstanceType.UNIVER_DOC;
+const unitType = isDoc ? UniverInstanceType.UNIVER_DOC : UniverInstanceType.UNIVER_SHEET;
 const linkTo = (id: string, type: UniverInstanceType) => `/?unit=${encodeURIComponent(id)}&type=${type}`;
 const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
@@ -103,6 +103,7 @@ const { univerAPI } = createUniver({
       UniverSheetsExchangeClientPlugin,
       { minSheetRowCount: 100, minSheetColumnCount: 26 },
     ],
+    UniverDocsExchangeClientPlugin,
   ],
 });
 
@@ -114,24 +115,32 @@ if (!workbook) throw new Error("Document could not be loaded");
 // host application owns the entry points and calls the Facade instead.
 const toolbar = document.querySelector<HTMLElement>("#toolbar")!;
 const status = document.querySelector<HTMLElement>("#status")!;
+const importFormats = isDoc ? ".docx,.doc" : ".xlsx,.xls,.csv,.tsv";
+const exportFormats = isDoc ? [ExchangeFormat.DOCX] : [ExchangeFormat.XLSX, ExchangeFormat.CSV];
 toolbar.innerHTML = `
+  <a class="exchange-action" href="${linkTo("exchange-sheet", UniverInstanceType.UNIVER_SHEET)}">Sheet</a>
+  <a class="exchange-action" href="${linkTo("exchange-doc", UniverInstanceType.UNIVER_DOC)}">Doc</a>
   <label class="exchange-action" for="exchange-import">Import</label>
-  <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
-  <button class="exchange-action" id="exchange-export-xlsx" type="button">Export XLSX</button>
-  <button class="exchange-action" id="exchange-export-csv" type="button">Export CSV</button>
+  <input id="exchange-import" type="file" accept="${importFormats}" hidden />
+  ${exportFormats.map((format) => `<button class="exchange-action" data-format="${format}" type="button">Export ${format.toUpperCase()}</button>`).join("")}
 `;
-if (isDoc) toolbar.style.display = "none";
+status.textContent = `Use the toolbar to import ${importFormats} as a new Unit, or export the current revision.`;
 
-async function exportCurrentSheet(format: ExchangeFormat, extension: string) {
-  status.textContent = `Exporting ${extension.toUpperCase()}…`;
+function exportFile(format: ExchangeFormat) {
+  const online = { oleAttachmentSource: "online" } as const;
+  if (isDoc) return univerAPI.exportDocByUnitIdAsync(currentUnitId, online);
+  // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
+  const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
+  return univerAPI.exportSheetByUnitIdAsync(currentUnitId, format, sheetId, format === ExchangeFormat.XLSX ? online : undefined);
+}
+
+async function exportCurrentUnit(format: ExchangeFormat) {
+  status.textContent = `Exporting ${format.toUpperCase()}…`;
   try {
-    // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
-    const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
-    const options = format === ExchangeFormat.XLSX ? ({ oleAttachmentSource: "online" } as const) : undefined;
-    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId, options);
+    const file = await exportFile(format);
     if (!file) throw new Error("Export did not produce a file.");
-    univerAPI.downloadFile(file, sheetUnitId, extension);
-    status.textContent = `Exported the current revision as ${extension.toUpperCase()}.`;
+    univerAPI.downloadFile(file, currentUnitId, format);
+    status.textContent = `Exported the current revision as ${format.toUpperCase()}.`;
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : String(error);
   }
@@ -145,18 +154,17 @@ toolbar
     if (!file) return;
     status.textContent = `Importing ${file.name}…`;
     try {
-      const importedUnitId = await univerAPI.importSheetToUnitIdAsync(file);
+      const importedUnitId = isDoc
+        ? await univerAPI.importDocToUnitIdAsync(file)
+        : await univerAPI.importSheetToUnitIdAsync(file);
       if (!importedUnitId) throw new Error("Import did not produce a collaborative Unit.");
-      location.href = `/?unit=${encodeURIComponent(importedUnitId)}`;
+      location.href = linkTo(importedUnitId, unitType);
     } catch (error) {
       status.textContent = error instanceof Error ? error.message : String(error);
       input.value = "";
     }
   });
 
-toolbar
-  .querySelector("#exchange-export-xlsx")!
-  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx"));
-toolbar
-  .querySelector("#exchange-export-csv")!
-  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.CSV, "csv"));
+for (const button of toolbar.querySelectorAll<HTMLButtonElement>("[data-format]")) {
+  button.addEventListener("click", () => void exportCurrentUnit(button.dataset.format as ExchangeFormat));
+}

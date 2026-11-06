@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname, resolve } from "node:path";
 import express from "express";
-import { LocaleType, type IWorkbookData } from "@univerjs/core";
+import { getDocsEmptySnapshot, LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverExchangeEndpoint } from "@univerjs-pro/collaboration-exchange-endpoint";
@@ -15,11 +15,13 @@ import { UniverFileService } from "@univerjs-pro/collaboration-file-service";
 import {
   CollabError,
   UniverCollabService,
+  type CreateUnitFromDataInput,
 } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
 const UNIT_ID = "exchange-sheet";
+const DOC_UNIT_ID = "exchange-doc";
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const filename = ".data/collaboration.sqlite";
 // File contents are written here; their metadata shares the SQLite database with the collaboration data.
@@ -47,6 +49,10 @@ const unitData: IWorkbookData = {
   styles: {},
   resources: [],
 };
+const seedUnits: CreateUnitFromDataInput[] = [
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { type: UniverType.UNIVER_DOC, data: { ...getDocsEmptySnapshot(DOC_UNIT_ID), rev: 1, title: "Exchange Doc" } },
+];
 
 await mkdir(dirname(filename), { recursive: true });
 const database = new SQLiteDatabaseAdapter({ filename });
@@ -73,18 +79,17 @@ transport.register(endpoint);
 transport.register(new UniverFileEndpoint(fileService));
 transport.register(new UniverExchangeEndpoint(exchangeService));
 
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: USER_ID },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: USER_ID },
-  );
+for (const seed of seedUnits) {
+  try {
+    await service.getUnitLoadData(
+      { unitID: seed.data.id!, type: seed.type, revision: 0 },
+      { userID: USER_ID },
+    );
+  } catch (error) {
+    if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
+      throw error;
+    await service.createUnitFromData(seed, { userID: USER_ID });
+  }
 }
 
 const app = express();
