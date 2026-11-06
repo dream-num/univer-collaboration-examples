@@ -2,7 +2,7 @@ FROM node:24-bookworm-slim
 
 RUN npm install --global pnpm@10.32.1
 WORKDIR /app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json .npmrc* ./
 COPY examples/multi-node ./examples/multi-node
 RUN pnpm --filter @univerjs/collaboration-example-multi-node... install --frozen-lockfile
 
