@@ -76,6 +76,18 @@ importers:
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
+      '@univerjs-pro/collaboration-file-blob-local':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-database-sqlite':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-endpoint':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-file-service':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
       '@univerjs-pro/collaboration-service':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
@@ -268,9 +280,6 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
-      multer:
-        specifier: ^2.0.2
-        version: 2.5.0
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -284,9 +293,6 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
-      '@types/multer':
-        specifier: ^2.0.0
-        version: 2.3.0
       vite:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
@@ -460,6 +466,24 @@ importers:
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
+      '@univerjs-pro/collaboration-exchange-endpoint':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-exchange-service':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-file-blob-local':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-database-sqlite':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-endpoint':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-file-service':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
       '@univerjs-pro/collaboration-service':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
@@ -481,7 +505,19 @@ importers:
       '@univerjs/core':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-drawing':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/drawing':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/drawing-ui':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/preset-sheets-core':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/preset-sheets-drawing':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/presets':
@@ -490,12 +526,15 @@ importers:
       '@univerjs/protocol':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/sheets-drawing':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-drawing-ui':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       express:
         specifier: ^5.1.0
         version: 5.2.1
-      multer:
-        specifier: ^2.0.2
-        version: 2.5.0
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -509,9 +548,6 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
-      '@types/multer':
-        specifier: ^2.0.0
-        version: 2.3.0
       vite:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
@@ -533,6 +569,18 @@ importers:
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
+      '@univerjs-pro/collaboration-file-blob-local':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-database-sqlite':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))
+      '@univerjs-pro/collaboration-file-endpoint':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-file-service':
+        specifier: 1.3.1-insiders.20261105-784a4f3
+        version: 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
       '@univerjs-pro/collaboration-service':
         specifier: 1.3.1-insiders.20261105-784a4f3
         version: 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
@@ -560,9 +608,6 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
-      multer:
-        specifier: ^2.0.2
-        version: 2.5.0
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -576,9 +621,6 @@ importers:
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
-      '@types/multer':
-        specifier: ^2.0.0
-        version: 2.3.0
       vite:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
@@ -1166,6 +1208,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fastify/busboy@3.2.5':
+    resolution: {integrity: sha512-y8MTAeBlEQUNVnskmZQwpseZN3EgCksQNOULlfxWY6o6VEqh01+oExMgbM7gN6YLQ8pNDYeweNPKJRt8jQm2ZQ==}
 
   '@flatten-js/interval-tree@1.1.3':
     resolution: {integrity: sha512-xhFWUBoHJFF77cJO1D6REjdgJEMRf2Y2Z+eKEPav8evGKcLSnj1ud5pLXQSbGuxF3VSvT1rWhMfVpXEKJLTL+A==}
@@ -1766,9 +1811,6 @@ packages:
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
-  '@types/multer@2.3.0':
-    resolution: {integrity: sha512-i7STIm9V4K2MPH4ZYMtrZAwNxs3kglk2LgleaTuB9pUXgADBcQYQuYMd7+6xgTIxfoggIkFA/DkkvycdZpIARA==}
-
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
 
@@ -1911,6 +1953,51 @@ packages:
 
   '@univerjs-pro/collaboration-endpoint@1.3.1-insiders.20261105-784a4f3':
     resolution: {integrity: sha512-9rFtf+/GgAkmHbh60iiL7fpCOIJ3zWc7qvXlMmU5MgE4NA7IVdwPOtoJuwyHH0D3FHmQeOlyU6OhZQ7Q5XRFfQ==}
+
+  '@univerjs-pro/collaboration-exchange-endpoint@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-AogJCLn1wvJCyHrc0NCDI07584qGHcd4wrvNDudaMQONCv0XuoDVw7cIHDRE6os4PyiQw1G6o12HLXP2bcOaRA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-exchange-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/collaboration-transport-node': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-ikiMzLEoMf3ub1JTcwlHutdRkCc6mkp8h+TQnxvP+ozTCYA/Ap91r9ZTNuTp9POwe/EvFcVh7wbv+f0PZJRXLg==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/exchange-node': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-file-blob-local@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-gRcpfZd3Z8r+Wa4Umq1cceXARP2rCPZUHGnqgQYlwdO8lPW40u9LZaKPj+87xoADrS0UAzatNxpbKSnuhAopNA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-file-database-sqlite@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-f2nWUfisCt6lhBB4G3OYPP/okzExhHBdT2HxPbawbjZt3FZSZD1p0DYtkbJbcEyIgG74JDDHNHbted5R5TH5UQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-file-endpoint@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-WQSVD8eDlNYk6/1lGo3FH7StWvw6AX2Id/KgiyGjSDYcb+aacnEbarqKiWHUQaDxCezy3+Oc8djB3kUlympQFg==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs-pro/collaboration-transport-node': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3':
+    resolution: {integrity: sha512-CYYKQZJ6r2i0wDBn9YdfV8rytWxPN8luI27LWZY6Pt0SbB8GjhjXLrz1YIxxx03gGmmFW0PGbHVeZnyrsdPDiw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
 
   '@univerjs-pro/collaboration-history-database-sqlite@1.3.1-insiders.20261105-784a4f3':
     resolution: {integrity: sha512-NSHlzCLBNG8nG1lyXlDnvH3rW5fz8XFGJMwzep+E4AJCjXrLYkf2Mer5fxW7T9d7URtReFcMPkHSYtLYrvNXcA==}
@@ -2713,9 +2800,6 @@ packages:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
 
-  append-field@1.0.0:
-    resolution: {integrity: sha512-klpgFSWLW1ZEs8svjfb7g4qWY0YS5imI82dTg+QahUvJ8YqAY0P10Uk8tTyh9ZGuYEZEMaeJYCF5BFuX552hsw==}
-
   aria-hidden@1.2.6:
     resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
     engines: {node: '>=10'}
@@ -2726,10 +2810,6 @@ packages:
   body-parser@2.3.0:
     resolution: {integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==}
     engines: {node: '>=18'}
-
-  busboy@1.6.0:
-    resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
-    engines: {node: '>=10.16.0'}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -2773,6 +2853,10 @@ packages:
   content-disposition@1.1.0:
     resolution: {integrity: sha512-5jRCH9Z/+DRP7rkvY83B+yGIGX96OYdJmzngqnw2SBSxqCFPd0w2km3s5iawpGX8krnwSGmF0FW5Nhr0Hfai3g==}
     engines: {node: '>=18'}
+
+  content-disposition@3.0.0:
+    resolution: {integrity: sha512-ZH/0Xs9rMIFWCOmGdmS9eHBTF62qqQYNz4nVjQhkdIO/a0fCP4UIM3mRz/wiqL0L14YgAz/1xio4OaSY4+ON/A==}
+    engines: {node: '>=22'}
 
   content-type@1.0.5:
     resolution: {integrity: sha512-nTjqfcBFEipKdXCv4YDQWCfmcLZKm81ldF0pAopTvyrFGVbcR6P/VAAd5G7N+0tTr8QqiU0tFadD6FK4NtJwOA==}
@@ -3046,10 +3130,6 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  media-typer@0.3.0:
-    resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
-    engines: {node: '>= 0.6'}
-
   media-typer@1.1.1:
     resolution: {integrity: sha512-yz3xRaG20c6/BOzvYoDaGtPmGscs7YivItZEEqe6GbwNfHuxu9YNmvnEkMzKldAGY4/80pRcQRZSEnhquk9XuQ==}
     engines: {node: '>= 0.8'}
@@ -3058,16 +3138,8 @@ packages:
     resolution: {integrity: sha512-Snk314V5ayFLhp3fkUREub6WtjBfPdCPY1Ln8/8munuLuiYhsABgBVWsozAG+MWMbVEvcdcpbi9R7ww22l9Q3g==}
     engines: {node: '>=18'}
 
-  mime-db@1.52.0:
-    resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
-    engines: {node: '>= 0.6'}
-
   mime-db@1.54.0:
     resolution: {integrity: sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ==}
-    engines: {node: '>= 0.6'}
-
-  mime-types@2.1.35:
-    resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
     engines: {node: '>= 0.6'}
 
   mime-types@3.0.2:
@@ -3076,10 +3148,6 @@ packages:
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
-
-  multer@2.5.0:
-    resolution: {integrity: sha512-BsqOzYGVq49JcW2IzoSAxeKYRevb+dGGPPWleOR8Lrlk4igwxu1/9pwSXlByhCb7MVZDrNJFC0IBP5/O5nLYRw==}
-    engines: {node: '>= 10.16.0'}
 
   n-gram@2.0.2:
     resolution: {integrity: sha512-S24aGsn+HLBxUGVAUFOwGpKs7LBcG4RudKU//eWzt/mQ97/NMKQxDWHyHx63UNWk/OOdihgmzoETn1tf5nQDzQ==}
@@ -3331,10 +3399,6 @@ packages:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
-  streamsearch@1.1.0:
-    resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
-    engines: {node: '>=10.0.0'}
-
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -3361,10 +3425,6 @@ packages:
     resolution: {integrity: sha512-FDf4L4sYzKtzWYhU/Xm0AQFdTjdIxNo9ElTf2mxXM6k8YMHXzYUe4yODVaXP4V9uMFbVg8c0qyBccK2OOxb45Q==}
     engines: {node: '>=18.0.0'}
     hasBin: true
-
-  type-is@1.6.18:
-    resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
-    engines: {node: '>= 0.6'}
 
   type-is@2.1.0:
     resolution: {integrity: sha512-faYHw0anBbc/kWF3zFTEnxSFOAGUX9GFbOBthvDdLsIlEoWOFOtS0zgCiQYwIskL9iGXZL3kAXD8OoZ4GmMATA==}
@@ -3573,6 +3633,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
+
+  '@fastify/busboy@3.2.5': {}
 
   '@flatten-js/interval-tree@1.1.3': {}
 
@@ -4001,10 +4063,6 @@ snapshots:
 
   '@types/http-errors@2.0.5': {}
 
-  '@types/multer@2.3.0':
-    dependencies:
-      '@types/express': 5.0.6
-
   '@types/node@24.13.3':
     dependencies:
       undici-types: 7.18.2
@@ -4387,6 +4445,42 @@ snapshots:
       - bufferutil
       - react
       - utf-8-validate
+
+  '@univerjs-pro/collaboration-exchange-endpoint@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)':
+    dependencies:
+      '@univerjs-pro/collaboration-exchange-service': 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
+      '@univerjs-pro/collaboration-transport-node': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261105-784a4f3(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)':
+    dependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261105-784a4f3(react@19.3.0)
+      '@univerjs-pro/exchange-node': 1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+
+  '@univerjs-pro/collaboration-file-blob-local@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))':
+    dependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+
+  '@univerjs-pro/collaboration-file-database-sqlite@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))':
+    dependencies:
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      libsql: 0.5.29
+
+  '@univerjs-pro/collaboration-file-endpoint@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261105-784a4f3)(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)':
+    dependencies:
+      '@fastify/busboy': 3.2.5
+      '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)
+      '@univerjs-pro/collaboration-transport-node': 1.3.1-insiders.20261105-784a4f3
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
+      content-disposition: 3.0.0
+
+  '@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261105-784a4f3(@univerjs/protocol@1.3.1-insiders.20261105-784a4f3)':
+    dependencies:
+      '@univerjs/protocol': 1.3.1-insiders.20261105-784a4f3
 
   '@univerjs-pro/collaboration-history-database-sqlite@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/collaboration-history-service@1.3.1-insiders.20261105-784a4f3(@univerjs-pro/embed@1.3.1-insiders.20261105-784a4f3(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))':
     dependencies:
@@ -6476,8 +6570,6 @@ snapshots:
     dependencies:
       color-convert: 2.0.1
 
-  append-field@1.0.0: {}
-
   aria-hidden@1.2.6:
     dependencies:
       tslib: 2.8.1
@@ -6497,10 +6589,6 @@ snapshots:
       type-is: 2.1.0
     transitivePeerDependencies:
       - supports-color
-
-  busboy@1.6.0:
-    dependencies:
-      streamsearch: 1.1.0
 
   bytes@3.1.2: {}
 
@@ -6547,6 +6635,8 @@ snapshots:
   color-name@1.1.4: {}
 
   content-disposition@1.1.0: {}
+
+  content-disposition@3.0.0: {}
 
   content-type@1.0.5: {}
 
@@ -6814,31 +6904,17 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  media-typer@0.3.0: {}
-
   media-typer@1.1.1: {}
 
   merge-descriptors@2.0.0: {}
 
-  mime-db@1.52.0: {}
-
   mime-db@1.54.0: {}
-
-  mime-types@2.1.35:
-    dependencies:
-      mime-db: 1.52.0
 
   mime-types@3.0.2:
     dependencies:
       mime-db: 1.54.0
 
   ms@2.1.3: {}
-
-  multer@2.5.0:
-    dependencies:
-      append-field: 1.0.0
-      busboy: 1.6.0
-      type-is: 1.6.18
 
   n-gram@2.0.2: {}
 
@@ -7116,8 +7192,6 @@ snapshots:
 
   statuses@2.0.2: {}
 
-  streamsearch@1.1.0: {}
-
   string-width@4.2.3:
     dependencies:
       emoji-regex: 8.0.0
@@ -7147,11 +7221,6 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
-
-  type-is@1.6.18:
-    dependencies:
-      media-typer: 0.3.0
-      mime-types: 2.1.35
 
   type-is@2.1.0:
     dependencies:

@@ -2,10 +2,10 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A collaborative Sheet whose inserted images are uploaded to the application's own file service.
-The Collaboration SDK does not provide a file Endpoint: the three HTTP routes the Univer client
-calls, and the storage behind them, belong to the application. This example implements them with
-Express and the local disk so you can copy the shape and replace the storage.
+A collaborative Sheet whose inserted images are uploaded through `UniverFileEndpoint`.
+`UniverFileService` owns the ownership rules and expiry cleanup, and two adapters decide where
+metadata and contents live. This example uses SQLite and a local directory; moving to Postgres and
+S3 only replaces those two adapters.
 
 ```bash
 pnpm example:file-service
@@ -17,10 +17,8 @@ routes after a refresh or a server restart, and a second browser on the same URL
 
 - `web/main.ts` configures the collaboration client with the three file URLs and registers the
   Drawing preset in collaboration mode.
-- `server/files.ts` implements the upload, sign-url, and download routes.
-- `server/file-store.ts` stores file bytes under `.data/files/<fileID>` and metadata in
-  `.data/files/index.json`, and documents which uploads are temporary.
-- `server/main.ts` assembles the collaboration Service, Endpoint, Transport, and the file routes.
+- `server/main.ts` assembles the collaboration Service, Endpoint, Transport, and the File Service
+  and Endpoint.
 
 ## How the client calls the file service
 
@@ -61,19 +59,19 @@ as this example does. Without one, keep the base64 implementation instead: pass
 Drawing plugin before the collaboration client plugins, as [`comments`](../comments/README.md)
 and [`object-permissions`](../object-permissions/README.md) do.
 
-## What the application stores
+## Where files are stored
 
-`FileStore` writes the bytes to `.data/files/<fileID>` and keeps `fileName`, `contentType`,
-`size`, `source`, `assign`, and `createdAt` in `.data/files/index.json`, so files survive a
-server restart. Uploads are limited to 25 MiB and the download URL is unsigned. These are teaching
-choices; no cleanup task is implemented.
+`SQLiteFileDatabaseAdapter` writes metadata to the `collaboration_files` table in
+`.data/collaboration.sqlite`, and `LocalFileBlobStore` writes contents to `.data/files/<fileID>`, so
+files survive a server restart. The File Service's timer removes `HttpImport` and `HttpExport` files.
 
-## Replace it with your own file service
+## Replace the storage and add permissions
 
-Keep the three routes and move the bytes to object storage, with the metadata, including
-`source` and `assign`, in a database table keyed by file ID. Have the sign-url route return a
-time-limited signed URL, point `downloadEndpointUrl` at the storage or CDN origin, and
-authenticate the file routes, checking that the user may read the Unit named by `assign`.
+Swapping the adapters for `@univerjs-pro/collaboration-file-database-postgres` and
+`@univerjs-pro/collaboration-file-blob-s3` supports multi-node deployments. Every request in this
+example is the same user and Unit permissions are not checked; a real application uses
+`fileService.use("upload" | "signUrl" | "download", ...)` to check that the user may access the Unit
+named by `assign`.
 
-The [`exchange`](../exchange/README.md) and [`all-unit`](../all-unit/README.md) examples embed the
-same `FileStore` and routes next to their own features.
+The [`exchange`](../exchange/README.md) and [`all-unit`](../all-unit/README.md) examples connect the
+File Service the same way.
