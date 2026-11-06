@@ -20,6 +20,7 @@ import { loadCollaborativeUnit, registerCollaboration } from "./features/collabo
 import { registerComments } from "./features/comments";
 import { registerExchange } from "./features/exchange";
 import { registerHistory } from "./features/history";
+import { registerPrint } from "./features/print";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
 import { loadUnitStyles, registerUnitPlugins } from "./units";
@@ -49,6 +50,7 @@ export async function mountUniverEditor(
   registerExchange(univer, baseURL, options.unitType);
   registerComments(univer, options.unitType);
   registerHistory(univer, baseURL, options.container, options.unitType);
+  registerPrint(univer, options.unitType);
 
   univer.__getInjector().get(UserManagerService).setCurrentUser({
     userID: options.user.userId,

@@ -21,6 +21,7 @@ Open <http://127.0.0.1:3010> and switch Units in the sidebar.
 | Embedded Office attachments | Sheet, Doc | Import a file with an embedded Word or Excel object, then select it to preview, download, or convert it to an online Unit |
 | Comments | Sheet, Doc, Slide, Base, Board | Sheet: right-click a cell. Doc: **Insert** tab. Slide: right-click an element. Base: a record's actions. Board: the left toolbar |
 | Edit history | Sheet, Doc, Slide, Base, Board | Sheet, Doc, Slide, Base: the ribbon. Board: the settings menu at the top right |
+| Print | Sheet, Doc, Slide, Board, PDF | **Print** in the ribbon's Start tab; Board: the settings menu at the top right |
 
 Exports use the online version of converted attachments, so edits made in the converted Unit appear in
 the exported file.

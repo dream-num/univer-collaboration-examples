@@ -61,6 +61,9 @@ importers:
       '@univerjs-pro/boards-mind-ui':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-print':
+        specifier: 1.3.1-insiders.20261106-930c8f8
+        version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/boards-table':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -163,6 +166,9 @@ importers:
       '@univerjs-pro/docs-latex-ui':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-print':
+        specifier: 1.3.1-insiders.20261106-930c8f8
+        version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/docs-shape':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -208,6 +214,9 @@ importers:
       '@univerjs-pro/pdfs-exchange-client':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs-print':
+        specifier: 1.3.1-insiders.20261106-930c8f8
+        version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/pdfs-ui':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
@@ -223,6 +232,9 @@ importers:
       '@univerjs-pro/sheets-pivot':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-print':
+        specifier: 1.3.1-insiders.20261106-930c8f8
+        version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/slides':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -238,6 +250,9 @@ importers:
       '@univerjs-pro/slides-history-ui':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-print':
+        specifier: 1.3.1-insiders.20261106-930c8f8
+        version: 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/slides-table':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
@@ -2000,6 +2015,12 @@ packages:
   '@univerjs-pro/boards-mind@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-XVf8RGELpwb6kpTlZl1Li4p4ybnit6LPY+rsXj7bGSTo6q4lr/x9ETEogQO3e96BVJSeasnhOwvioI0Del2b2Q==}
 
+  '@univerjs-pro/boards-print@1.3.1-insiders.20261106-930c8f8':
+    resolution: {integrity: sha512-aXiVt7LgXhBpIj4tf8gzvSm1m7Bih82/QaVyfL0Adv+ezW2ALippK8+oNGgGW8qddbB4X2XtPO2nHv6QbCqjTg==}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
+
   '@univerjs-pro/boards-table-ui@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-8MPV+CunkVzUk/sS78kLZbIqDmvnbxgnmU9aqAtviZPRiTpAqzm4wRofw9PxPHuhcfK45HN4oIzcKbVx6pSLqg==}
     peerDependencies:
@@ -2251,6 +2272,12 @@ packages:
   '@univerjs-pro/docs-list@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-z2uFWrXQg9u4Gqnd2oUbgZAaNdKIKiH1gznASi5bX/7JSTgm75Q4R7pZ/nVFupwBROiV7kazS6xcjAbr/XkX3A==}
 
+  '@univerjs-pro/docs-print@1.3.1-insiders.20261106-930c8f8':
+    resolution: {integrity: sha512-d/sH4Br1xIdU3eC3lkcjs2SKnN8O4knPMJ/NH8vMnLDz/USfhVoJUeWKWH6r0NpPIRdl37opqbQlFXK4sOzPGQ==}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
+
   '@univerjs-pro/docs-quote-ui@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-1MVcxCkD8QEU+lLKoCdTsSeIoKRTr/IJ9MFnoSa1P9cpP71YnHdfMApqx7ePAZ2sLD5jkW1XIGXIXn48IGOCpw==}
     peerDependencies:
@@ -2490,6 +2517,12 @@ packages:
   '@univerjs-pro/pdfs-exchange-client@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-4pLLKVDULTYYNMzIFB5lnHgEIn4NTgS30U2g2uhEztEskYX81ir4lht3b87AQr1zC92ExOe3qjrmH820HfCuvQ==}
 
+  '@univerjs-pro/pdfs-print@1.3.1-insiders.20261106-930c8f8':
+    resolution: {integrity: sha512-c0+8DJDzR3WutFE1/pXsdhGBqP/+zNnARC0DBxCtujopAwGEspHio6IMcv9uhiPQAH2s34MH3Eu4K/IOD0MBZg==}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
+
   '@univerjs-pro/pdfs-ui@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-3hVhFAkjFc4I+T2hEaQAXmqIGniKYJ0hRcOOop1R+KeUDEnIBMBkgp1b5aqlcIXoGF3uH+wNhIkYMWOqmmzSDA==}
     peerDependencies:
@@ -2642,6 +2675,12 @@ packages:
 
   '@univerjs-pro/slides-history@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-JyK2Th5AB6qtJEw2YHakD3Bh6GHc1eagMgG8Ovi+9KhxddGmf0ZCCQrJGDM+mNZdZysLe7rMUqCebFGbzHxE/Q==}
+
+  '@univerjs-pro/slides-print@1.3.1-insiders.20261106-930c8f8':
+    resolution: {integrity: sha512-mr+wRW928VNZYNHpJ4jGLjS9L4dWxMeHG0kE/VPA8O5swNVeFlQryts3HDrhaBaf81sV4crDIESFS9TVNXb18A==}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-table-ui@1.3.1-insiders.20261106-930c8f8':
     resolution: {integrity: sha512-snaFnQlfmPU7tOs35WX0mjzdMRxGNxfou6tOLmo67yhoI03TEMeqo1+Pyt8xRgn3Y1mb47SmEi0PQP9vZ9A+hQ==}
@@ -4683,6 +4722,26 @@ snapshots:
       - react
       - rxjs
 
+  '@univerjs-pro/boards-print@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/boards': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-shape': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/print': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/shape-editor': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/design': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/engine-render': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.47.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
+
   '@univerjs-pro/boards-table-ui@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@univerjs-pro/boards': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -5409,6 +5468,23 @@ snapshots:
       - react
       - rxjs
 
+  '@univerjs-pro/docs-print@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/license': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/print': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-render': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.47.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
+
   '@univerjs-pro/docs-quote-ui@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/docs-column': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -5808,6 +5884,21 @@ snapshots:
       - react
       - react-dom
       - rxjs
+
+  '@univerjs-pro/pdfs-print@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/license': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
+      '@univerjs-pro/pdfs-ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.47.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
 
   '@univerjs-pro/pdfs-ui@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
@@ -6364,6 +6455,25 @@ snapshots:
       - '@univerjs-pro/embed'
       - react
       - rxjs
+
+  '@univerjs-pro/slides-print@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/license': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/print': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/design': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/engine-render': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/icons': 1.47.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@univerjs/protocol': 1.3.1-insiders.20261106-930c8f8
+      '@univerjs/ui': 1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+      react: 19.3.0
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-dom
 
   '@univerjs-pro/slides-table-ui@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:

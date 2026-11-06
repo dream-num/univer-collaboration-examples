@@ -10,3 +10,4 @@ import "@univerjs-pro/slides-table-ui/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 import "@univerjs/thread-comment-ui/lib/index.css";
 import "@univerjs-pro/slides-thread-comment-ui/lib/index.css";
+import "@univerjs-pro/slides-print/lib/index.css";

@@ -14,3 +14,4 @@ import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 import "@univerjs/thread-comment-ui/lib/index.css";
 import "@univerjs-pro/boards-thread-comment-ui/lib/index.css";
 import "@univerjs-pro/boards-history-ui/lib/index.css";
+import "@univerjs-pro/boards-print/lib/index.css";

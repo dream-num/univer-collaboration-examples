@@ -13,3 +13,4 @@ import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 import "@univerjs/sheets-thread-comment-ui/lib/index.css";
 import "@univerjs/thread-comment-ui/lib/index.css";
 import "@univerjs-pro/sheets-history-ui/lib/index.css";
+import "@univerjs-pro/sheets-print/lib/index.css";

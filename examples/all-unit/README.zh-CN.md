@@ -20,6 +20,7 @@ pnpm example:all-unit
 | 嵌入的 Office 附件 | Sheet、Doc | 导入带 Word 或 Excel 嵌入对象的文件，选中后可以预览、下载或转为在线 Unit |
 | 评论 | Sheet、Doc、Slide、Base、Board | Sheet 右键单元格；Doc 在 **Insert** 标签页；Slide 右键元素；Base 在记录的操作里；Board 在左侧工具栏 |
 | 编辑历史 | Sheet、Doc、Slide、Base、Board | Sheet、Doc、Slide、Base 在功能区；Board 在右上角设置菜单 |
+| 打印 | Sheet、Doc、Slide、Board、PDF | 功能区 Start 标签页的 **Print**；Board 在右上角设置菜单 |
 
 导出时使用已转换附件的在线版本，在转换出的 Unit 里做的修改会进入导出文件。
 
