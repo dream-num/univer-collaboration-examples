@@ -42,10 +42,7 @@ originals from the import; **Export XLSX (online attachments)** embeds the curre
 of converted attachments. Imported images and attachments are stored as files of the Unit, and the
 snapshot keeps only their file IDs.
 
-Import `fixtures/sheet-with-word.xlsx` (a Word document embedded in Excel) with **Import**. Starting
-with `SNAPSHOT_EVERY_REVISIONS=3 pnpm start` writes a snapshot every 3 revisions, which makes it easy
-to check that server-written snapshots keep images and attachments. The free export quota is 10 per
-machine per month; pointing `HOME` at a temporary directory leaves the machine's quota untouched.
+To try it, import `fixtures/sheet-with-word.xlsx` (a Word document embedded in Excel) with **Import**.
 
 The frontend changes carry `OLE:` comments: registering the drawing plugins with `ole.getLink`,
 configuring the file URLs on the collaboration client, opening `&type=1` Docs (the online documents

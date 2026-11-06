@@ -36,10 +36,7 @@ Office 文件里嵌入的文件（OLE 对象）导入后显示为画布上的文
 转为在线、重命名、删除。**Export XLSX** 嵌入导入时的原件；**Export XLSX (online attachments)**
 嵌入已转换附件的当前确认内容。导入的图片和附件存为 Unit 的文件，快照里只保存文件 ID。
 
-用工具栏的 **Import** 导入 `fixtures/sheet-with-word.xlsx`（Excel 里嵌了一份 Word）。用
-`SNAPSHOT_EVERY_REVISIONS=3 pnpm start` 启动时，协同服务每 3 个 revision 写一次快照，便于检查服务端
-写出的快照仍保留图片和附件。免费导出额度是每台机器每月 10 次；把 `HOME` 设为临时目录可以多试几次，
-不消耗本机额度。
+用工具栏的 **Import** 导入 `fixtures/sheet-with-word.xlsx`（Excel 里嵌了一份 Word）即可试用。
 
 前端相关改动都带 `OLE:` 注释：注册 drawing 插件并配置 `ole.getLink`，给协同客户端配置文件 URL，
 打开 `&type=1` 的 Doc（转换生成的在线文档），增加按在线版本导出的按钮。

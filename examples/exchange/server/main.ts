@@ -50,15 +50,7 @@ const unitData: IWorkbookData = {
 
 await mkdir(dirname(filename), { recursive: true });
 const database = new SQLiteDatabaseAdapter({ filename });
-// SNAPSHOT_EVERY_REVISIONS=<n> writes a snapshot after every n revisions, so a few edits are enough to
-// check that server-written snapshots keep images and attachments. Unset, the SDK default applies.
-const snapshotEvery = Number(process.env.SNAPSHOT_EVERY_REVISIONS);
-const service = new UniverCollabService({
-  dbAdapter: database,
-  ...(Number.isSafeInteger(snapshotEvery) && snapshotEvery > 0
-    ? { snapshotPolicy: { shouldCreate: ({ revisionsSinceLastSnapshot }) => revisionsSinceLastSnapshot >= snapshotEvery } }
-    : {}),
-});
+const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
 const fileService = new UniverFileService({
   database: new SQLiteFileDatabaseAdapter({ filename }),

@@ -136,8 +136,8 @@ async function exportCurrentSheet(
   status.textContent = `Exporting ${extension.toUpperCase()}…`;
   try {
     // OLE: `online` embeds the confirmed content of converted attachments instead of the originals.
-    // A CSV file holds one worksheet, so the export names which one.
-    const sheetId = format === ExchangeFormat.CSV ? univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId() : undefined;
+    // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
+    const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
     const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId, { oleAttachmentSource });
     if (!file) throw new Error("Export did not produce a file.");
     univerAPI.downloadFile(file, sheetUnitId, extension);
