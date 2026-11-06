@@ -1,4 +1,5 @@
 import type { Univer } from "@univerjs/core";
+import type { FUniver } from "@univerjs/core/facade";
 import { UniverType } from "@univerjs/protocol";
 import type { MountUniverEditorOptions } from "../types";
 import { registerBaseUnit } from "./base";
@@ -55,4 +56,16 @@ export function registerUnitPlugins(
   } else {
     throw new Error(`Unsupported Unit type: ${options.unitType}`);
   }
+}
+
+/** Load the Unit explicitly; call this after the current user has been set. */
+export async function loadUnit(univerAPI: FUniver, unitType: number, unitId: string) {
+  const collaboration = univerAPI.getCollaboration();
+  if (unitType === UniverType.UNIVER_DOC) return collaboration.loadDocAsync(unitId);
+  if (unitType === UniverType.UNIVER_SHEET) return collaboration.loadSheetAsync(unitId);
+  if (unitType === UniverType.UNIVER_SLIDE) return collaboration.loadSlideAsync(unitId);
+  if (unitType === UniverType.UNIVER_BOARD) return collaboration.loadBoardAsync(unitId);
+  if (unitType === UniverType.UNIVER_BASE) return collaboration.loadBaseAsync(unitId);
+  if (unitType === UniverType.UNIVER_PDF) return collaboration.loadPdfAsync(unitId);
+  throw new Error(`Unsupported Unit type: ${unitType}`);
 }

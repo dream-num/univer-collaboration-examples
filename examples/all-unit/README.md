@@ -27,8 +27,8 @@ Exports use the online version of converted attachments, so edits made in the co
 the exported file.
 
 Two gaps follow from the packages: the Exchange Service does not convert Boards, and Univer ships no
-comment or history UI for PDF. Each feature module under `web/univer/features/` registers the UI for
-the Unit types it covers and skips the rest.
+comment or history UI for PDF. Each `web/univer/units/<type>/index.ts` registers what its Unit type
+has and says what it lacks.
 
 PDF conversion is opt-in in `@univerjs-pro/exchange-node`: `server/main.ts` imports
 `@univerjs-pro/exchange-node/pdf` and the example depends on `@univerjs-pro/exchange-pdf-node-binding`.
@@ -41,10 +41,12 @@ Read these files together:
 - `server/main.ts` assembles the Collaboration, File, Exchange, Comment, and History Services and
   Endpoints. They all share `.data/collaboration.sqlite`; file contents go to `.data/files`.
 - `server/units.ts` defines the six Units and creates only the missing ones.
-- `web/univer/mount-editor.ts` creates the editor and registers each capability for the Unit types that
-  support it. Each one lives in `web/univer/features/`.
-- `web/univer/units/` assembles the plugins for each Unit type.
-- `web/univer/features/import-export/` holds the import and export menus, dialogs, and upload
+- `web/univer/mount-editor.ts` creates the Univer instance with the plugins every Unit type shares, then
+  hands over to the Unit type's module.
+- `web/univer/units/<type>/index.ts` registers that Unit type's plugins from top to bottom: editor,
+  comments, collaboration client, history, print, and import/export. `web/univer/config.ts` holds the
+  server routes they share.
+- `web/univer/import-export/` holds the import and export menus, dialogs, and upload
   notifications. Univer 1.2.0 removed them from the exchange packages; this is the
   [migration example from the Univer showcase](https://office.univer.ai/showcase/sheets/custom-import-export),
   copied per Unit type with only the `en-US` and `zh-CN` locales kept. Its views use Tailwind classes

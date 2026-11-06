@@ -16,14 +16,11 @@ import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
 import { defaultTheme, greenTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
 import { unitLink } from "../../shared/units";
-import { loadCollaborativeUnit, registerCollaboration } from "./features/collaboration";
-import { registerComments } from "./features/comments";
-import { registerExchange } from "./features/exchange";
-import { registerHistory } from "./features/history";
-import { registerPrint } from "./features/print";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
-import { loadUnitStyles, registerUnitPlugins } from "./units";
+import { loadUnit, loadUnitStyles, registerUnitPlugins } from "./units";
+
+import "./import-export/utilities.css";
 
 const MAX_UNIVER_IMAGE_BYTES = 20 * 1024 * 1024;
 
@@ -42,15 +39,8 @@ export async function mountUniverEditor(
   await loadUnitStyles(options.unitType);
 
   const univer = createUniver(options.unitType, options.locale);
+  // Each Unit type registers everything it needs, including the collaboration client.
   registerUnitPlugins(univer, options);
-
-  const baseURL = `${location.protocol}//${location.host}/universer-api`;
-  registerCollaboration(univer, baseURL);
-  // Each feature registers the UI for this Unit type and skips the types it does not cover.
-  registerExchange(univer, baseURL, options.unitType);
-  registerComments(univer, options.unitType);
-  registerHistory(univer, baseURL, options.container, options.unitType);
-  registerPrint(univer, options.unitType);
 
   univer.__getInjector().get(UserManagerService).setCurrentUser({
     userID: options.user.userId,
@@ -61,7 +51,7 @@ export async function mountUniverEditor(
   const univerAPI = FUniver.newAPI(univer);
   window.univer = univer;
   window.univerAPI = univerAPI;
-  const unit = await loadCollaborativeUnit(univerAPI, options.unitType, options.unitId);
+  const unit = await loadUnit(univerAPI, options.unitType, options.unitId);
   if (!unit) throw new Error("Unit could not be loaded");
 
   return {

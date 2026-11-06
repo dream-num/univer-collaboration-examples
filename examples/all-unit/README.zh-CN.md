@@ -25,7 +25,7 @@ pnpm example:all-unit
 导出时使用已转换附件的在线版本，在转换出的 Unit 里做的修改会进入导出文件。
 
 有两处空缺来自包本身：Exchange Service 不转换 Board，Univer 没有 PDF 的评论和历史 UI。
-`web/univer/features/` 下的每个能力模块只为自己覆盖的 Unit 类型注册 UI，其余类型跳过。
+每个 `web/univer/units/<type>/index.ts` 注册自己这类 Unit 有的能力，并注明没有的。
 
 PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts` 引入了 `@univerjs-pro/exchange-node/pdf`，
 示例依赖 `@univerjs-pro/exchange-pdf-node-binding`。从 PDF 文件导入的 Unit 可以连同编辑一起导出。侧边栏里空白创建的
@@ -37,10 +37,10 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 - `server/main.ts`：组装协同、File、Exchange、Comment 和 History 的 Service 与 Endpoint。它们共用
   `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
 - `server/units.ts`：定义六个 Unit，只创建缺失的 Unit。
-- `web/univer/mount-editor.ts`：创建编辑器，并按 Unit 类型注册各项能力，能力代码在
-  `web/univer/features/`。
-- `web/univer/units/`：组装每种 Unit 的插件。
-- `web/univer/features/import-export/`：导入导出的菜单、对话框和上传通知。Univer 1.2.0 起 exchange 包不再内置这些，
+- `web/univer/mount-editor.ts`：创建 Univer 实例并装上所有 Unit 类型共用的插件，然后交给对应类型的模块。
+- `web/univer/units/<type>/index.ts`：从上到下注册这类 Unit 的插件：编辑器、评论、协同客户端、历史、打印、导入导出。
+  共用的服务端地址在 `web/univer/config.ts`。
+- `web/univer/import-export/`：导入导出的菜单、对话框和上传通知。Univer 1.2.0 起 exchange 包不再内置这些，
   这里按 Unit 类型抄自 [Univer showcase 的迁移示例](https://office.univer.ai/showcase/sheets/custom-import-export)，只保留 `en-US` 和 `zh-CN` 语言。
   这些视图用到的 Tailwind 类有一部分没有任何 Univer 包提供，由 `import-export/utilities.css` 补齐。
 

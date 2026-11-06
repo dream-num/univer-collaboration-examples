@@ -25,7 +25,17 @@ import {
   UniverDocsHyperLinkUIPlugin,
 } from "@univerjs/preset-docs-hyper-link";
 import { UniverUIPlugin } from "@univerjs/ui";
+import { UniverDocsExchangeClientPlugin } from "@univerjs-pro/docs-exchange-client";
+import { UniverDocsHistoryUIPlugin } from "@univerjs-pro/docs-history-ui";
+import { UniverDocsPrintPlugin } from "@univerjs-pro/docs-print";
+import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
+import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
+import { UniverDocsThreadCommentUIPlugin } from "@univerjs/docs-thread-comment-ui";
 import type { MountUniverEditorOptions } from "../../types";
+import { registerCollaborationClient } from "../../collaboration";
+import { exchangeClientConfig, historyConfig } from "../../config";
+import { CustomDocsImportExportPlugin } from "../../import-export/docs/plugin";
 
 import "@univerjs-pro/chart-ui/facade";
 import "@univerjs-pro/docs-callout/facade";
@@ -35,6 +45,9 @@ import "@univerjs-pro/docs-latex/facade";
 import "@univerjs-pro/docs-shape/facade";
 import "@univerjs-pro/docs-table/facade";
 import "@univerjs-pro/engine-chart/facade";
+import "@univerjs-pro/docs-exchange-client/facade";
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
 
 export function registerDocUnit(
   univer: Univer,
@@ -66,4 +79,23 @@ export function registerDocUnit(
   univer.registerPlugin(UniverDocsShapeUIPlugin);
   univer.registerPlugin(UniverDocsTablePlugin);
   univer.registerPlugin(UniverDocsTableUIPlugin);
+
+  // comment
+  univer.registerPlugin(UniverDocsThreadCommentUIPlugin);
+
+  // collaboration
+  registerCollaborationClient(univer);
+  univer.registerPlugin(UniverThreadCommentDataSourcePlugin);
+
+  // history
+  univer.registerPlugin(UniverDocsHistoryUIPlugin, historyConfig(options.container));
+
+  // print
+  univer.registerPlugin(UniverDocsPrintPlugin);
+
+  // exchange: the Sheet client loads too, since a Doc can embed an Excel file
+  univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig);
+  univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
+  univer.registerPlugin(UniverDocsExchangeClientPlugin);
+  univer.registerPlugin(CustomDocsImportExportPlugin);
 }
