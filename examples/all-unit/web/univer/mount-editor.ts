@@ -26,6 +26,15 @@ import { loadUnitStyles, registerUnitPlugins } from "./units";
 
 const MAX_UNIVER_IMAGE_BYTES = 20 * 1024 * 1024;
 
+declare global {
+  interface Window {
+    /** The current editor's Univer instance, exposed for the browser console. */
+    univer?: Univer;
+    /** The current editor's Facade API, exposed for the browser console. */
+    univerAPI?: FUniver;
+  }
+}
+
 export async function mountUniverEditor(
   options: MountUniverEditorOptions,
 ): Promise<MountedUniverEditor> {
@@ -48,6 +57,8 @@ export async function mountUniverEditor(
   });
 
   const univerAPI = FUniver.newAPI(univer);
+  window.univer = univer;
+  window.univerAPI = univerAPI;
   const unit = await loadCollaborativeUnit(univerAPI, options.unitType, options.unitId);
   if (!unit) throw new Error("Unit could not be loaded");
 
@@ -56,6 +67,8 @@ export async function mountUniverEditor(
     dispose: () => {
       univerAPI.dispose();
       univer.dispose();
+      delete window.univer;
+      delete window.univerAPI;
     },
     setLocale: (locale) => univer.setLocale(toUniverLocale(locale)),
   };

@@ -52,6 +52,8 @@ Read these files together:
 Imported and converted Units are not in the sidebar. Their links carry the type, as in
 `/?unit=<id>&type=<type>`, and `shared/units.ts` builds them.
 
+The current editor's `univer` and `univerAPI` are on `window` for the browser console.
+
 Every request is the fixed `demo-user`, and all actions are allowed. This is local teaching
 configuration: login, members, and permissions are left out. See the
 [`permissions`](../permissions/README.md) example for those.

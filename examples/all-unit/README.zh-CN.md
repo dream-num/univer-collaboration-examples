@@ -46,6 +46,8 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 导入和转换出的 Unit 不在侧边栏里。它们的链接带类型，形如 `/?unit=<id>&type=<type>`，由
 `shared/units.ts` 生成。
 
+当前编辑器的 `univer` 和 `univerAPI` 挂在 `window` 上，方便在浏览器控制台调试。
+
 所有请求都是固定的 `demo-user`，所有操作都被允许。这只是本地教学配置，不包含登录、成员和权限；
 这些内容见 [`permissions`](../permissions/README.zh-CN.md) 示例。
 
