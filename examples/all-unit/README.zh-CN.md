@@ -16,7 +16,7 @@ pnpm example:all-unit
 | --- | --- | --- |
 | 实时协同 | Sheet、Doc、Slide、Board、Base、PDF | 在另一个浏览器打开同一个 Unit |
 | 图片和附件 | 支持插入的编辑器 | 插入图片，文件通过 File Endpoint 上传 |
-| 导入导出 | Sheet、Doc、Slide、Base、PDF | 功能区 Start 标签页的 **File** 菜单：**Open(File)** 和 **Save As**；Base 在表格工具栏右侧的 **File** |
+| 导入导出 | Sheet、Doc、Slide、Base、PDF | 功能区 Start 标签页的 **File** 菜单：**Open(File)** 和 **Save As**；Base 在表格工具栏右侧的 **File**。导入完成后右下角出现通知，点击其中的链接打开新 Unit |
 | 嵌入的 Office 附件 | Sheet、Doc | 导入带 Word 或 Excel 嵌入对象的文件，选中后可以预览、下载或转为在线 Unit |
 | 评论 | Sheet、Doc、Slide、Base、Board | Sheet 右键单元格；Doc 在 **Insert** 标签页；Slide 右键元素；Base 在记录的操作里；Board 在左侧工具栏 |
 | 编辑历史 | Sheet、Doc、Slide、Base、Board | Sheet、Doc、Slide、Base 在功能区；Board 在右上角设置菜单 |
@@ -41,6 +41,7 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 - `web/univer/units/`：组装每种 Unit 的插件。
 - `web/univer/features/import-export/`：导入导出的菜单、对话框和上传通知。Univer 1.2.0 起 exchange 包不再内置这些，
   这里按 Unit 类型抄自 [Univer showcase 的迁移示例](https://office.univer.ai/showcase/sheets/custom-import-export)，只保留 `en-US` 和 `zh-CN` 语言。
+  这些视图用到的 Tailwind 类有一部分没有任何 Univer 包提供，由 `import-export/utilities.css` 补齐。
 
 导入和转换出的 Unit 不在侧边栏里。它们的链接带类型，形如 `/?unit=<id>&type=<type>`，由
 `shared/units.ts` 生成。

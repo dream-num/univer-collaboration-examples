@@ -17,7 +17,7 @@ Open <http://127.0.0.1:3010> and switch Units in the sidebar.
 | --- | --- | --- |
 | Real-time collaboration | Sheet, Doc, Slide, Board, Base, PDF | Open the same Unit in another browser |
 | Images and attachments | Editors that support them | Insert an image; it is uploaded through the File Endpoint |
-| Import and export | Sheet, Doc, Slide, Base, PDF | **File** in the ribbon's Start tab: **Open(File)** and **Save As**. Base: **File** at the right of the table toolbar |
+| Import and export | Sheet, Doc, Slide, Base, PDF | **File** in the ribbon's Start tab: **Open(File)** and **Save As**. Base: **File** at the right of the table toolbar. An import finishes with a notification at the bottom right whose link opens the new Unit |
 | Embedded Office attachments | Sheet, Doc | Import a file with an embedded Word or Excel object, then select it to preview, download, or convert it to an online Unit |
 | Comments | Sheet, Doc, Slide, Base, Board | Sheet: right-click a cell. Doc: **Insert** tab. Slide: right-click an element. Base: a record's actions. Board: the left toolbar |
 | Edit history | Sheet, Doc, Slide, Base, Board | Sheet, Doc, Slide, Base: the ribbon. Board: the settings menu at the top right |
@@ -46,7 +46,8 @@ Read these files together:
 - `web/univer/features/import-export/` holds the import and export menus, dialogs, and upload
   notifications. Univer 1.2.0 removed them from the exchange packages; this is the
   [migration example from the Univer showcase](https://office.univer.ai/showcase/sheets/custom-import-export),
-  copied per Unit type with only the `en-US` and `zh-CN` locales kept.
+  copied per Unit type with only the `en-US` and `zh-CN` locales kept. Its views use Tailwind classes
+  that no Univer package ships, so `import-export/utilities.css` writes those out.
 
 Imported and converted Units are not in the sidebar. Their links carry the type, as in
 `/?unit=<id>&type=<type>`, and `shared/units.ts` builds them.

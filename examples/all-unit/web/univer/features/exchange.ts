@@ -18,6 +18,7 @@ import "@univerjs-pro/exchange-client/facade";
 import "@univerjs-pro/pdfs-exchange-client/facade";
 import "@univerjs-pro/sheets-exchange-client/facade";
 import "@univerjs-pro/slides-exchange-client/facade";
+import "./import-export/utilities.css";
 
 /** The Exchange Service converts these types. Board is not among them, so a Board page gets no exchange. */
 export const EXCHANGE_UNIT_TYPES: readonly number[] = [
