@@ -39,7 +39,7 @@ const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
 if (!unitId) throw new Error("Open the URL printed by the server; it names the Unit with ?unit=.");
 const currentUnitId: string = unitId;
-// Docs open with `&type=1`, including the ones converted from attachments.
+// Docs open with `&type=1`.
 const isDoc = Number(new URLSearchParams(location.search).get("type")) === UniverInstanceType.UNIVER_DOC;
 const unitType = isDoc ? UniverInstanceType.UNIVER_DOC : UniverInstanceType.UNIVER_SHEET;
 const linkTo = (id: string, type: UniverInstanceType) => `/?unit=${encodeURIComponent(id)}&type=${type}`;
@@ -63,7 +63,7 @@ const { univerAPI } = createUniver({
     isDoc ? UniverDocsCorePreset({ container: "app" }) : UniverSheetsCorePreset({ container: "app" }),
   ],
   plugins: [
-    [UniverDrawingPlugin, { override: [[IImageIoService, null]], ole: { getLink: linkTo } }],
+    [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
     UniverDrawingUIPlugin,
     UniverDocsDrawingPlugin,
     ...(isDoc ? [UniverDocsDrawingUIPlugin] : [UniverSheetsDrawingPlugin, UniverSheetsDrawingUIPlugin]),
@@ -127,11 +127,10 @@ toolbar.innerHTML = `
 status.textContent = `Use the toolbar to import ${importFormats} as a new Unit, or export the current revision.`;
 
 function exportFile(format: ExchangeFormat) {
-  const online = { oleAttachmentSource: "online" } as const;
-  if (isDoc) return univerAPI.exportDocByUnitIdAsync(currentUnitId, online);
+  if (isDoc) return univerAPI.exportDocByUnitIdAsync(currentUnitId);
   // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
   const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
-  return univerAPI.exportSheetByUnitIdAsync(currentUnitId, format, sheetId, format === ExchangeFormat.XLSX ? online : undefined);
+  return univerAPI.exportSheetByUnitIdAsync(currentUnitId, format, sheetId);
 }
 
 async function exportCurrentUnit(format: ExchangeFormat) {
