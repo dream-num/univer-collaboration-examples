@@ -15,7 +15,7 @@ pnpm example:all-unit
 
 - `server/units.ts`：固定列表与初始数据，仅创建缺失 Unit，重启不覆盖已有编辑。
 - `server/main.ts`：SQLite、Service、Endpoint、列表接口、文件接口与演示授权。
-- `server/files.ts` 与 `server/file-store.ts`：编辑器插入图片和附件时使用的上传、sign-url
+- File Service 与 Endpoint（在 `server/main.ts`）：编辑器插入图片和附件时使用的上传、sign-url
   和下载接口，文件落盘到 `.data/files/<fileID>` 并带 JSON 索引。
 - `web/main.ts`：加载列表、侧边栏、URL 选择与编辑器生命周期。
 - `web/univer/`：六类 Unit 插件装配、主题、语言资源和

@@ -2,9 +2,9 @@
 
 [English](./README.md) | 简体中文
 
-一个协同 Sheet，插入的图片上传到应用自己的文件服务。Collaboration SDK 不提供文件 Endpoint：
-Univer 客户端调用的三条 HTTP 路由和背后的存储都属于应用。本示例用 Express 和本地磁盘实现它们，
-你可以照搬接口形状，再换掉存储。
+一个协同 Sheet，插入的图片通过 `UniverFileEndpoint` 上传。`UniverFileService` 负责归属规则和过期
+清理，元数据和内容的存储由两个 adapter 决定：本示例用 SQLite 和本地目录，换成 Postgres 和 S3 只需替换
+这两个 adapter。
 
 ```bash
 pnpm example:file-service
@@ -15,10 +15,7 @@ pnpm example:file-service
 打开同一 URL 也能看到。
 
 - `web/main.ts`：在协同客户端上配置三个文件 URL，并以协同模式注册 Drawing preset。
-- `server/files.ts`：实现上传、sign-url 和下载三条路由。
-- `server/file-store.ts`：把文件内容写到 `.data/files/<fileID>`，元数据写到
-  `.data/files/index.json`，并注释说明哪些上传是临时文件。
-- `server/main.ts`：组装协同 Service、Endpoint、Transport 和文件路由。
+- `server/main.ts`：组装协同 Service、Endpoint、Transport，以及 File Service 和 Endpoint。
 
 ## 客户端如何调用文件服务
 
@@ -56,17 +53,18 @@ Unit 数据里只保存文件 ID，所以只要 sign-url 路由还能解析这�
 `override: [[IImageIoService, null]]`，并把 Drawing 插件注册在协同客户端插件之前，参见
 [`comments`](../comments/README.zh-CN.md) 和 [`object-permissions`](../object-permissions/README.zh-CN.md)。
 
-## 应用保存什么
+## 文件保存在哪里
 
-`FileStore` 把内容写到 `.data/files/<fileID>`，把 `fileName`、`contentType`、`size`、`source`、
-`assign`、`createdAt` 写到 `.data/files/index.json`，服务重启后文件仍在。上传限制 25 MiB，下载
-地址未签名。这些都是教学取舍，示例没有实现清理任务。
+`SQLiteFileDatabaseAdapter` 把元数据写入 `.data/collaboration.sqlite` 的 `collaboration_files` 表，
+`LocalFileBlobStore` 把内容写到 `.data/files/<fileID>`，服务重启后文件仍在。`HttpImport` 和
+`HttpExport` 文件由 File Service 的定时清理删除。
 
-## 替换为自己的文件服务
+## 替换存储和接入权限
 
-保留这三条路由，把文件内容换成对象存储，元数据（含 `source` 和 `assign`）放进以文件 ID 为键的
-数据库表。sign-url 路由返回带时效的签名地址，`downloadEndpointUrl` 指向存储或 CDN 的源站，并对
-文件接口做鉴权，检查用户是否有权读取 `assign` 指定的 Unit。
+把 adapter 换成 `@univerjs-pro/collaboration-file-database-postgres` 和
+`@univerjs-pro/collaboration-file-blob-s3` 就能用于多节点部署。本示例所有请求都是同一个用户，没有
+检查 Unit 权限；真实应用用 `fileService.use("upload" | "signUrl" | "download", ...)` 检查用户是否有权
+访问 `assign` 指定的 Unit。
 
-[`exchange`](../exchange/README.zh-CN.md) 和 [`all-unit`](../all-unit/README.zh-CN.md) 示例在各自
-功能旁边内嵌了同一份 `FileStore` 和路由。
+[`exchange`](../exchange/README.zh-CN.md) 和 [`all-unit`](../all-unit/README.zh-CN.md) 示例用同样的方式
+接入 File Service。

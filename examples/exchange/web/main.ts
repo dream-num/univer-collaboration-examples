@@ -1,4 +1,10 @@
-import { LocaleType, LogLevel } from "@univerjs/core";
+import { IImageIoService, LocaleType, LogLevel, UniverInstanceType } from "@univerjs/core";
+import { UniverDocsDrawingPlugin } from "@univerjs/docs-drawing";
+import { UniverDocsDrawingUIPlugin } from "@univerjs/docs-drawing-ui";
+import { UniverDrawingPlugin } from "@univerjs/drawing";
+import { UniverDrawingUIPlugin } from "@univerjs/drawing-ui";
+import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
+import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -10,14 +16,21 @@ import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/loc
 import { ExchangeFormat, UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
 import { UniverLicensePlugin } from "@univerjs-pro/license";
 import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import { UniverDocsCorePreset } from "@univerjs/preset-docs-core";
+import UniverPresetDocsCoreEnUS from "@univerjs/preset-docs-core/locales/en-US";
+import UniverPresetDocsDrawingEnUS from "@univerjs/preset-docs-drawing/locales/en-US";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
+import UniverPresetSheetsDrawingEnUS from "@univerjs/preset-sheets-drawing/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "@univerjs-pro/collaboration-client/facade";
 import "@univerjs-pro/exchange-client/facade";
 import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
+import "@univerjs/preset-docs-core/lib/index.css";
+import "@univerjs/preset-sheets-drawing/lib/index.css";
+import "@univerjs/preset-docs-drawing/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 
 document.querySelector<HTMLElement>("#status")!.textContent =
@@ -27,11 +40,18 @@ const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
 if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
 const sheetUnitId: string = unitId;
+// OLE: converting an embedded Word document creates a Doc, opened with `&type=1`.
+const isDoc = Number(new URLSearchParams(location.search).get("type")) === UniverInstanceType.UNIVER_DOC;
+// OLE: the application owns its routes. Univer stores only `{ unitId, type }` and asks for a URL on Open.
+const linkTo = (id: string, type: UniverInstanceType) => `/?unit=${encodeURIComponent(id)}&type=${type}`;
 const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
     [LocaleType.EN_US]: mergeLocales(
       UniverPresetSheetsCoreEnUS,
+      UniverPresetDocsCoreEnUS,
+      UniverPresetSheetsDrawingEnUS,
+      UniverPresetDocsDrawingEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
       // The two exchange packages do not publish locale entry points.
@@ -40,8 +60,16 @@ const { univerAPI } = createUniver({
   theme: defaultTheme,
   logLevel: LogLevel.WARN,
   collaboration: true,
-  presets: [UniverSheetsCorePreset({ container: "app" })],
+  presets: [
+    isDoc ? UniverDocsCorePreset({ container: "app" }) : UniverSheetsCorePreset({ container: "app" }),
+  ],
   plugins: [
+    // OLE: attachments are drawings. Both product UIs are bundled, which lets a Sheet preview an
+    // embedded Word document; only the host's drawing plugins are registered.
+    [UniverDrawingPlugin, { override: [[IImageIoService, null]], ole: { getLink: linkTo } }],
+    UniverDrawingUIPlugin,
+    UniverDocsDrawingPlugin,
+    ...(isDoc ? [UniverDocsDrawingUIPlugin] : [UniverSheetsDrawingPlugin, UniverSheetsDrawingUIPlugin]),
     [
       UniverLicensePlugin,
       { license: import.meta.env.UNIVER_LICENSE || undefined },
@@ -57,6 +85,10 @@ const { univerAPI } = createUniver({
         collabSubmitChangesetUrl: `${baseURL}/comb`,
         collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
+        // OLE: attachments are UnitEmbedded files read through sign-url, like inserted images.
+        uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+        signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+        downloadEndpointUrl: `${location.protocol}//${location.host}/`,
       },
     ],
     UniverCollaborationClientUIPlugin,
@@ -78,7 +110,8 @@ const { univerAPI } = createUniver({
   ],
 });
 
-const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
+const collaboration = univerAPI.getCollaboration();
+const workbook = isDoc ? await collaboration.loadDocAsync(unitId) : await collaboration.loadSheetAsync(unitId);
 if (!workbook) throw new Error("Document could not be loaded");
 
 // Since SDK 1.2.0 the exchange packages ship headless: there are no built-in ribbon entries, so the
@@ -89,13 +122,23 @@ toolbar.innerHTML = `
   <label class="exchange-action" for="exchange-import">Import</label>
   <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
   <button class="exchange-action" id="exchange-export-xlsx" type="button">Export XLSX</button>
+  <button class="exchange-action" id="exchange-export-xlsx-online" type="button">Export XLSX (online attachments)</button>
   <button class="exchange-action" id="exchange-export-csv" type="button">Export CSV</button>
 `;
+// OLE: this toolbar exchanges Sheets; a converted Doc only opens for editing.
+if (isDoc) toolbar.style.display = "none";
 
-async function exportCurrentSheet(format: ExchangeFormat, extension: string) {
+async function exportCurrentSheet(
+  format: ExchangeFormat,
+  extension: string,
+  oleAttachmentSource: "original" | "online" = "original",
+) {
   status.textContent = `Exporting ${extension.toUpperCase()}…`;
   try {
-    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format);
+    // OLE: `online` embeds the confirmed content of converted attachments instead of the originals.
+    // A CSV file holds one worksheet, so the export names which one.
+    const sheetId = format === ExchangeFormat.CSV ? univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId() : undefined;
+    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId, { oleAttachmentSource });
     if (!file) throw new Error("Export did not produce a file.");
     univerAPI.downloadFile(file, sheetUnitId, extension);
     status.textContent = `Exported the current revision as ${extension.toUpperCase()}.`;
@@ -124,6 +167,9 @@ toolbar
 toolbar
   .querySelector("#exchange-export-xlsx")!
   .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx"));
+toolbar
+  .querySelector("#exchange-export-xlsx-online")!
+  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx", "online"));
 toolbar
   .querySelector("#exchange-export-csv")!
   .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.CSV, "csv"));

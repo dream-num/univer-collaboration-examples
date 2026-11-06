@@ -3,8 +3,8 @@
 [English](./README.md) | 简体中文
 
 基于 `@univerjs-pro/exchange-node` 的可运行 Sheet 协同与服务端 Office 转换示例。前端注册
-`UniverExchangeClientPlugin` 和 `UniverSheetsExchangeClientPlugin`，Express 应用实现这两个
-插件需要的最小 exchange 协议。
+`UniverExchangeClientPlugin` 和 `UniverSheetsExchangeClientPlugin`，服务端用
+`UniverExchangeEndpoint` 和 `UniverFileEndpoint` 提供这两个插件调用的路由。
 
 ```bash
 pnpm example:exchange
@@ -20,21 +20,26 @@ ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Faca
 
 建议一起阅读：
 
-- `server/main.ts`：组装协同 Service、Endpoint、Transport 和 exchange 路由。
-- `server/exchange.ts`：实现上传、任务轮询、下载 URL、snapshot 导入和当前精确 revision
-  的 snapshot 导出；导出先通过 `getUnitLoadDataWithBlocks()` 读取自包含恢复数据，再用
-  `UnitSnapshotMaterializer` 补全后交给转换器。
+- `server/main.ts`：组装协同、File 和 Exchange 的 Service 与 Endpoint。文件元数据和协同数据共用
+  `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
 - `web/main.ts`：配置协同与 exchange 前端插件。
-- `server/file-store.ts`：把上传文件和导出结果写入 `.data/files/<fileID>`，并用 JSON 索引记录
-  文件名、MIME、大小、`source`、`assign` 和创建时间。
 
-协同 Unit 写入 `.data/collaboration.sqlite`，文件写入 `.data/files`，服务重启后都会保留。
-`exchange-sheet` 的初始内容只在首次创建 Unit 时写入；要从空库重新开始，先停止服务，再运行
-`pnpm --filter @univerjs/collaboration-example-exchange reset` 删除 `.data`。任务仍只存在于当前进程，
-进程停止后会丢失。上传接口会记录 Univer 客户端带上的 `source` 和 `assign`
-查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值。`HttpImport`（导入源文件）
-和 `HttpExport`（导出结果）是临时文件：导入
-完成后源文件会被删除，导出结果下载后即可删除；其余 `source` 包括缺省值都是持久文件，生命周期
-与 `assign` 指定的 Unit 相同。文件接口的更详细说明请参考
-[`file-service`](../file-service/README.zh-CN.md) 示例。Exchange HTTP 路由属于应用，
-Collaboration SDK 不提供 Exchange Endpoint。
+协同 Unit、文件元数据和文件内容都保留在 `.data`，服务重启后仍在。`exchange-sheet` 的初始内容只在
+首次创建 Unit 时写入；要从空库重新开始，先停止服务，再运行
+`pnpm --filter @univerjs/collaboration-example-exchange reset` 删除 `.data`。任务只存在于当前进程，
+进程停止后会丢失。导入的源文件在任务结束时删除；导出结果是临时文件，由 File Service 的过期清理删除。
+文件接口的更详细说明请参考 [`file-service`](../file-service/README.zh-CN.md) 示例。
+
+## OLE 附件与图片
+
+Office 文件里嵌入的文件（OLE 对象）导入后显示为画布上的文件图标。单击图标出现工具栏：预览、下载、
+转为在线、重命名、删除。**Export XLSX** 嵌入导入时的原件；**Export XLSX (online attachments)**
+嵌入已转换附件的当前确认内容。导入的图片和附件存为 Unit 的文件，快照里只保存文件 ID。
+
+用工具栏的 **Import** 导入 `fixtures/sheet-with-word.xlsx`（Excel 里嵌了一份 Word）。用
+`SNAPSHOT_EVERY_REVISIONS=3 pnpm start` 启动时，协同服务每 3 个 revision 写一次快照，便于检查服务端
+写出的快照仍保留图片和附件。免费导出额度是每台机器每月 10 次；把 `HOME` 设为临时目录可以多试几次，
+不消耗本机额度。
+
+前端相关改动都带 `OLE:` 注释：注册 drawing 插件并配置 `ole.getLink`，给协同客户端配置文件 URL，
+打开 `&type=1` 的 Doc（转换生成的在线文档），增加按在线版本导出的按钮。

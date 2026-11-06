@@ -4,8 +4,8 @@ English | [简体中文](./README.zh-CN.md)
 
 A runnable Sheet collaboration example with server-side Office conversion based on
 `@univerjs-pro/exchange-node`. The frontend registers `UniverExchangeClientPlugin` and
-`UniverSheetsExchangeClientPlugin`, while the Express application implements the minimal exchange
-protocol expected by those plugins.
+`UniverSheetsExchangeClientPlugin`, and the server serves the routes they call with
+`UniverExchangeEndpoint` and `UniverFileEndpoint`.
 
 ```bash
 pnpm example:exchange
@@ -21,24 +21,32 @@ the example owns the entry points: `web/main.ts` calls `importSheetToUnitIdAsync
 
 Read these files together:
 
-- `server/main.ts` assembles the collaboration Service, Endpoint, Transport, and exchange routes.
-- `server/exchange.ts` implements upload, task polling, signed download, snapshot import, and exact
-  current-revision snapshot export. Export reads self-contained recovery data through
-  `getUnitLoadDataWithBlocks()` and completes it with `UnitSnapshotMaterializer` before conversion.
+- `server/main.ts` assembles the collaboration, File, and Exchange Services and Endpoints. File
+  metadata shares `.data/collaboration.sqlite` with the collaboration data; contents go to
+  `.data/files`.
 - `web/main.ts` configures the collaboration and exchange plugins.
-- `server/file-store.ts` writes uploaded files and export results to `.data/files/<fileID>` with a
-  JSON index of name, MIME type, size, `source`, `assign`, and creation time.
 
-Collaboration Units are stored in `.data/collaboration.sqlite`, and files in `.data/files`; both
-survive server restarts. The seed text in `exchange-sheet` is written only when the Unit is first
-created; to start from a blank database, stop the server and run
-`pnpm --filter @univerjs/collaboration-example-exchange reset`, which deletes `.data`. Tasks remain
-process-local and disappear when the process stops. The
-upload route records the `source` and `assign` query parameters that Univer clients send; `source`
-is the numeric `FileSource` enum from `@univerjs/protocol`. Files with `HttpImport` (import
-sources) or `HttpExport` (export results) are temporary:
-the import route deletes its source file once the Unit exists, and an export result can be deleted
-after download. Any other `source`, including the default, is a persistent file that shares the
-lifecycle of the Unit named by `assign`. See the [`file-service`](../file-service/README.md)
-example for a fuller description of the file routes. Exchange HTTP routes belong to the
-application; the Collaboration SDK does not provide an Exchange Endpoint.
+Collaboration Units, file metadata, and file contents stay in `.data` and survive server restarts.
+The seed text in `exchange-sheet` is written only when the Unit is first created; to start from a
+blank database, stop the server and run
+`pnpm --filter @univerjs/collaboration-example-exchange reset`, which deletes `.data`. Tasks are
+process-local and disappear when the process stops. Import sources are deleted when the task ends;
+export results are temporary files that the File Service's expiry cleanup removes. See the
+[`file-service`](../file-service/README.md) example for a fuller description of the file routes.
+
+## OLE attachments and images
+
+Files embedded in Office documents (OLE objects) import as file icons on the canvas. Clicking an icon
+shows a toolbar: preview, download, convert to online, rename, delete. **Export XLSX** embeds the
+originals from the import; **Export XLSX (online attachments)** embeds the current confirmed content
+of converted attachments. Imported images and attachments are stored as files of the Unit, and the
+snapshot keeps only their file IDs.
+
+Import `fixtures/sheet-with-word.xlsx` (a Word document embedded in Excel) with **Import**. Starting
+with `SNAPSHOT_EVERY_REVISIONS=3 pnpm start` writes a snapshot every 3 revisions, which makes it easy
+to check that server-written snapshots keep images and attachments. The free export quota is 10 per
+machine per month; pointing `HOME` at a temporary directory leaves the machine's quota untouched.
+
+The frontend changes carry `OLE:` comments: registering the drawing plugins with `ole.getLink`,
+configuring the file URLs on the collaboration client, opening `&type=1` Docs (the online documents
+that conversion creates), and the button that exports online versions.
