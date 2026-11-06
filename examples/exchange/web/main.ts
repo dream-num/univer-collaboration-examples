@@ -40,9 +40,8 @@ const baseURL = `${location.protocol}//${location.host}/universer-api`;
 const unitId = new URLSearchParams(location.search).get("unit");
 if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
 const sheetUnitId: string = unitId;
-// OLE: converting an embedded Word document creates a Doc, opened with `&type=1`.
+// Converted attachments open as Docs with `&type=1`.
 const isDoc = Number(new URLSearchParams(location.search).get("type")) === UniverInstanceType.UNIVER_DOC;
-// OLE: the application owns its routes. Univer stores only `{ unitId, type }` and asks for a URL on Open.
 const linkTo = (id: string, type: UniverInstanceType) => `/?unit=${encodeURIComponent(id)}&type=${type}`;
 const { univerAPI } = createUniver({
   locale: LocaleType.EN_US,
@@ -64,8 +63,6 @@ const { univerAPI } = createUniver({
     isDoc ? UniverDocsCorePreset({ container: "app" }) : UniverSheetsCorePreset({ container: "app" }),
   ],
   plugins: [
-    // OLE: attachments are drawings. Both product UIs are bundled, which lets a Sheet preview an
-    // embedded Word document; only the host's drawing plugins are registered.
     [UniverDrawingPlugin, { override: [[IImageIoService, null]], ole: { getLink: linkTo } }],
     UniverDrawingUIPlugin,
     UniverDocsDrawingPlugin,
@@ -85,7 +82,6 @@ const { univerAPI } = createUniver({
         collabSubmitChangesetUrl: `${baseURL}/comb`,
         collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
-        // OLE: attachments are UnitEmbedded files read through sign-url, like inserted images.
         uploadFileServerUrl: `${baseURL}/stream/file/upload`,
         signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
         downloadEndpointUrl: `${location.protocol}//${location.host}/`,
@@ -122,23 +118,17 @@ toolbar.innerHTML = `
   <label class="exchange-action" for="exchange-import">Import</label>
   <input id="exchange-import" type="file" accept=".xlsx,.xls,.csv,.tsv" hidden />
   <button class="exchange-action" id="exchange-export-xlsx" type="button">Export XLSX</button>
-  <button class="exchange-action" id="exchange-export-xlsx-online" type="button">Export XLSX (online attachments)</button>
   <button class="exchange-action" id="exchange-export-csv" type="button">Export CSV</button>
 `;
-// OLE: this toolbar exchanges Sheets; a converted Doc only opens for editing.
 if (isDoc) toolbar.style.display = "none";
 
-async function exportCurrentSheet(
-  format: ExchangeFormat,
-  extension: string,
-  oleAttachmentSource: "original" | "online" = "original",
-) {
+async function exportCurrentSheet(format: ExchangeFormat, extension: string) {
   status.textContent = `Exporting ${extension.toUpperCase()}…`;
   try {
-    // OLE: `online` embeds the confirmed content of converted attachments instead of the originals.
     // A CSV file holds one worksheet, so the export names which one; XLSX ignores it.
     const sheetId = univerAPI.getActiveWorkbook()?.getActiveSheet().getSheetId();
-    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId, { oleAttachmentSource });
+    const options = format === ExchangeFormat.XLSX ? ({ oleAttachmentSource: "online" } as const) : undefined;
+    const file = await univerAPI.exportSheetByUnitIdAsync(sheetUnitId, format, sheetId, options);
     if (!file) throw new Error("Export did not produce a file.");
     univerAPI.downloadFile(file, sheetUnitId, extension);
     status.textContent = `Exported the current revision as ${extension.toUpperCase()}.`;
@@ -167,9 +157,6 @@ toolbar
 toolbar
   .querySelector("#exchange-export-xlsx")!
   .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx"));
-toolbar
-  .querySelector("#exchange-export-xlsx-online")!
-  .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.XLSX, "xlsx", "online"));
 toolbar
   .querySelector("#exchange-export-csv")!
   .addEventListener("click", () => void exportCurrentSheet(ExchangeFormat.CSV, "csv"));

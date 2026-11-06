@@ -17,7 +17,7 @@ Switching Units navigates to a new page; the selected Unit is preserved in the U
 - `server/units.ts`: fixed catalog and initial snapshots; only missing Units are created.
 - `server/main.ts`: SQLite, Service, Endpoint, HTTP list, file routes, and demo authorization.
 - The File Service and Endpoint (in `server/main.ts`): the upload, sign-url, and download routes the
-  editors use for images and attachments, backed by `.data/files/<fileID>` plus a JSON index.
+  editors use for images and attachments, with metadata in SQLite and contents in `.data/files/<fileID>`.
 - `web/main.ts`: list loading, sidebar, URL selection, and editor lifecycle.
 - `web/univer/`: editor assembly for the six Unit types, including plugins, themes,
   locales, and Base Worker. Only collaboration is wired to the

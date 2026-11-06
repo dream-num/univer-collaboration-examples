@@ -33,17 +33,3 @@ blank database, stop the server and run
 process-local and disappear when the process stops. Import sources are deleted when the task ends;
 export results are temporary files that the File Service's expiry cleanup removes. See the
 [`file-service`](../file-service/README.md) example for a fuller description of the file routes.
-
-## OLE attachments and images
-
-Files embedded in Office documents (OLE objects) import as file icons on the canvas. Clicking an icon
-shows a toolbar: preview, download, convert to online, rename, delete. **Export XLSX** embeds the
-originals from the import; **Export XLSX (online attachments)** embeds the current confirmed content
-of converted attachments. Imported images and attachments are stored as files of the Unit, and the
-snapshot keeps only their file IDs.
-
-To try it, import `fixtures/sheet-with-word.xlsx` (a Word document embedded in Excel) with **Import**.
-
-The frontend changes carry `OLE:` comments: registering the drawing plugins with `ole.getLink`,
-configuring the file URLs on the collaboration client, opening `&type=1` Docs (the online documents
-that conversion creates), and the button that exports online versions.

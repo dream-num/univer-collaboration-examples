@@ -29,14 +29,3 @@ ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Faca
 `pnpm --filter @univerjs/collaboration-example-exchange reset` 删除 `.data`。任务只存在于当前进程，
 进程停止后会丢失。导入的源文件在任务结束时删除；导出结果是临时文件，由 File Service 的过期清理删除。
 文件接口的更详细说明请参考 [`file-service`](../file-service/README.zh-CN.md) 示例。
-
-## OLE 附件与图片
-
-Office 文件里嵌入的文件（OLE 对象）导入后显示为画布上的文件图标。单击图标出现工具栏：预览、下载、
-转为在线、重命名、删除。**Export XLSX** 嵌入导入时的原件；**Export XLSX (online attachments)**
-嵌入已转换附件的当前确认内容。导入的图片和附件存为 Unit 的文件，快照里只保存文件 ID。
-
-用工具栏的 **Import** 导入 `fixtures/sheet-with-word.xlsx`（Excel 里嵌了一份 Word）即可试用。
-
-前端相关改动都带 `OLE:` 注释：注册 drawing 插件并配置 `ole.getLink`，给协同客户端配置文件 URL，
-打开 `&type=1` 的 Doc（转换生成的在线文档），增加按在线版本导出的按钮。
