@@ -15,7 +15,11 @@ import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
 import { defaultTheme, greenTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
+import { unitLink } from "../../shared/units";
 import { loadCollaborativeUnit, registerCollaboration } from "./features/collaboration";
+import { registerComments } from "./features/comments";
+import { registerExchange } from "./features/exchange";
+import { registerHistory } from "./features/history";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
 import { loadUnitStyles, registerUnitPlugins } from "./units";
@@ -32,6 +36,10 @@ export async function mountUniverEditor(
 
   const baseURL = `${location.protocol}//${location.host}/universer-api`;
   registerCollaboration(univer, baseURL);
+  // Each feature registers the UI for this Unit type and skips the types it does not cover.
+  registerExchange(univer, baseURL, options.unitType);
+  registerComments(univer, options.unitType);
+  registerHistory(univer, baseURL, options.container, options.unitType);
 
   univer.__getInjector().get(UserManagerService).setCurrentUser({
     userID: options.user.userId,
@@ -88,6 +96,8 @@ function createUniver(unitType: number, locale: EditorLocale) {
   univer.registerPlugin(UniverDrawingPlugin, {
     override: [[IImageIoService, null]],
     allowImageSize: MAX_UNIVER_IMAGE_BYTES,
+    // Embedded Office attachments open here after they are converted to online Units.
+    ole: { getLink: unitLink },
   });
 
   return univer;

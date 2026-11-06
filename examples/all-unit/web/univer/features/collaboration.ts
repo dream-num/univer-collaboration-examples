@@ -19,7 +19,7 @@ export function registerCollaboration(univer: Univer, baseURL: string) {
     collabSubmitChangesetUrl: `${baseURL}/comb`,
     collabWebSocketUrl: `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/universer-api/comb/connect`,
     wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
-    // Images and attachments are uploaded through the application's file routes (server/files.ts).
+    // Images and attachments are uploaded through the File Endpoint registered in server/main.ts.
     uploadFileServerUrl: `${baseURL}/stream/file/upload`,
     signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
     downloadEndpointUrl: `${location.protocol}//${location.host}/`,

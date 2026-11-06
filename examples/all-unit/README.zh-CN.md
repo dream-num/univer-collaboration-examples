@@ -2,36 +2,54 @@
 
 [English](./README.md) | 简体中文
 
-最简六类 Unit 协同示例：Sheet、Doc、Slide、Board、Base、PDF。服务端固定每类一个 Unit，
-通过 `GET /api/units` 返回 ID、类型和展示标签，前端侧边栏展示列表并打开对应编辑器。
+其他示例各讲一项能力，`all-unit` 把它们装配到同一个应用里，方便看清它们如何配合：六种 Unit、文件存储、
+服务端导入导出、嵌入的 Office 附件、评论和编辑历史。
 
 ```bash
 pnpm install
 pnpm example:all-unit
 ```
 
-打开 <http://127.0.0.1:3010>，将选中 Unit 的 URL 复制到另一个浏览器即可协同。
-切换 Unit 使用整页导航，URL 保留选中状态，刷新或前进后退均可恢复。
+打开 <http://127.0.0.1:3010>，在侧边栏切换 Unit。
 
-- `server/units.ts`：固定列表与初始数据，仅创建缺失 Unit，重启不覆盖已有编辑。
-- `server/main.ts`：SQLite、Service、Endpoint、列表接口、文件接口与演示授权。
-- File Service 与 Endpoint（在 `server/main.ts`）：编辑器插入图片和附件时使用的上传、sign-url
-  和下载接口，元数据存在 SQLite，文件内容写入 `.data/files/<fileID>`。
-- `web/main.ts`：加载列表、侧边栏、URL 选择与编辑器生命周期。
-- `web/univer/`：六类 Unit 插件装配、主题、语言资源和
-  Base Worker；只接入协同，不接入登录、成员管理、评论、历史和导入导出业务。
+| 能力 | 支持范围 | 怎么试 |
+| --- | --- | --- |
+| 实时协同 | Sheet、Doc、Slide、Board、Base、PDF | 在另一个浏览器打开同一个 Unit |
+| 图片和附件 | 支持插入的编辑器 | 插入图片，文件通过 File Endpoint 上传 |
+| 导入导出 | Sheet、Doc、Slide、Base、PDF | 功能区 Start 标签页的 **File** 菜单：**Open(File)** 和 **Save As**；Base 在表格工具栏右侧的 **File** |
+| 嵌入的 Office 附件 | Sheet、Doc | 导入带 Word 或 Excel 嵌入对象的文件，选中后可以预览、下载或转为在线 Unit |
+| 评论 | Sheet、Doc、Slide、Base、Board | Sheet 右键单元格；Doc 在 **Insert** 标签页；Slide 右键元素；Base 在记录的操作里；Board 在左侧工具栏 |
+| 编辑历史 | Sheet、Doc、Slide、Base、Board | Sheet、Doc、Slide、Base 在功能区；Board 在右上角设置菜单 |
 
-所有浏览器使用固定 `demo-user`，编辑权限固定允许，仅用于本地教学。侧边栏使用固定类型标签，
-不随文档标题修改。SQLite 数据默认保存在 `examples/all-unit/.data/collaboration.sqlite`，
-服务重启后继续保留。可通过 `HOST`、`PORT`、`DATABASE_PATH`、`FILES_PATH` 覆盖服务端配置。
+导出时使用已转换附件的在线版本，在转换出的 Unit 里做的修改会进入导出文件。
 
-插入的图片和附件通过 `POST /universer-api/stream/file/upload` 上传并返回 `FileId`，编辑器再通过
-`GET /universer-api/file/:fileID/sign-url` 换取地址，从 `GET /universer-api/file/:fileID/download`
-加载。前端地址在 `web/univer/features/collaboration.ts` 中配置。上传接口会记录 `source` 和
-`assign` 查询参数，`source` 是 `@univerjs/protocol` 的 `FileSource` 枚举数值：`HttpImport` 和
-`HttpExport` 是临时文件；其余 `source` 包括缺省值和
-`UnitEmbedded` 都是持久文件，生命周期与 `assign` 指定的 Unit 相同。更详细的说明请参考
-[`file-service`](../file-service/README.zh-CN.md) 示例。
+有两处空缺来自包本身：Exchange Service 不转换 Board，Univer 没有 PDF 的评论和历史 UI。
+`web/univer/features/` 下的每个能力模块只为自己覆盖的 Unit 类型注册 UI，其余类型跳过。
+
+PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts` 引入了 `@univerjs-pro/exchange-node/pdf`，
+示例依赖 `@univerjs-pro/exchange-pdf-node-binding`。从 PDF 文件导入的 Unit 可以连同编辑一起导出。侧边栏里空白创建的
+`PDF` Unit 在没有内容时可以导出，但加入文字框后导出会失败，错误是 `source-less PDF cannot apply imported semantic patches`：
+导出器把文字编辑应用到源 PDF 上，而这个 Unit 没有源文件。
+
+建议一起阅读：
+
+- `server/main.ts`：组装协同、File、Exchange、Comment 和 History 的 Service 与 Endpoint。它们共用
+  `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
+- `server/units.ts`：定义六个 Unit，只创建缺失的 Unit。
+- `web/univer/mount-editor.ts`：创建编辑器，并按 Unit 类型注册各项能力，能力代码在
+  `web/univer/features/`。
+- `web/univer/units/`：组装每种 Unit 的插件。
+- `web/univer/features/import-export/`：导入导出的菜单、对话框和上传通知。Univer 1.2.0 起 exchange 包不再内置这些，
+  这里按 Unit 类型抄自 [Univer showcase 的迁移示例](https://office.univer.ai/showcase/sheets/custom-import-export)，只保留 `en-US` 和 `zh-CN` 语言。
+
+导入和转换出的 Unit 不在侧边栏里。它们的链接带类型，形如 `/?unit=<id>&type=<type>`，由
+`shared/units.ts` 生成。
+
+所有请求都是固定的 `demo-user`，所有操作都被允许。这只是本地教学配置，不包含登录、成员和权限；
+这些内容见 [`permissions`](../permissions/README.zh-CN.md) 示例。
+
+Unit、评论、历史和文件在重启后都会保留，删除 `.data` 可以重新开始。`HOST`、`PORT`、`DATABASE_PATH`、
+`FILES_PATH` 可以覆盖服务端默认值。Exchange 任务只存在于当前进程，进程停止后会丢失。
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck

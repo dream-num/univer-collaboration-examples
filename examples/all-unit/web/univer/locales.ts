@@ -8,13 +8,35 @@ import CollaborationEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
 import CollaborationZhCN from "@univerjs-pro/collaboration-client/locale/zh-CN";
 import CollaborationUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
 import CollaborationUIZhCN from "@univerjs-pro/collaboration-client-ui/locale/zh-CN";
+import SheetsHistoryUIEnUS from "@univerjs-pro/sheets-history-ui/locale/en-US";
+import SheetsHistoryUIZhCN from "@univerjs-pro/sheets-history-ui/locale/zh-CN";
 import ShapeEditorUIEnUS from "@univerjs-pro/shape-editor-ui/locale/en-US";
 import ShapeEditorUIZhCN from "@univerjs-pro/shape-editor-ui/locale/zh-CN";
 import SlidesEnUS from "@univerjs-pro/slides/locale/en-US";
 import SlidesZhCN from "@univerjs-pro/slides/locale/zh-CN";
 import SlidesUIEnUS from "@univerjs-pro/slides-ui/locale/en-US";
 import SlidesUIZhCN from "@univerjs-pro/slides-ui/locale/zh-CN";
+import BasesHistoryUIEnUS from "@univerjs-pro/bases-history-ui/locale/en-US";
+import BasesHistoryUIZhCN from "@univerjs-pro/bases-history-ui/locale/zh-CN";
+import BasesThreadCommentUIEnUS from "@univerjs-pro/bases-thread-comment-ui/locale/en-US";
+import BasesThreadCommentUIZhCN from "@univerjs-pro/bases-thread-comment-ui/locale/zh-CN";
+import BoardsHistoryUIEnUS from "@univerjs-pro/boards-history-ui/locale/en-US";
+import BoardsHistoryUIZhCN from "@univerjs-pro/boards-history-ui/locale/zh-CN";
+import BoardsThreadCommentUIEnUS from "@univerjs-pro/boards-thread-comment-ui/locale/en-US";
+import BoardsThreadCommentUIZhCN from "@univerjs-pro/boards-thread-comment-ui/locale/zh-CN";
+import DocsHistoryUIEnUS from "@univerjs-pro/docs-history-ui/locale/en-US";
+import DocsHistoryUIZhCN from "@univerjs-pro/docs-history-ui/locale/zh-CN";
+import SlidesHistoryUIEnUS from "@univerjs-pro/slides-history-ui/locale/en-US";
+import SlidesHistoryUIZhCN from "@univerjs-pro/slides-history-ui/locale/zh-CN";
+import SlidesThreadCommentUIEnUS from "@univerjs-pro/slides-thread-comment-ui/locale/en-US";
+import SlidesThreadCommentUIZhCN from "@univerjs-pro/slides-thread-comment-ui/locale/zh-CN";
+import DocsThreadCommentUIEnUS from "@univerjs/docs-thread-comment-ui/locale/en-US";
+import DocsThreadCommentUIZhCN from "@univerjs/docs-thread-comment-ui/locale/zh-CN";
 import { LocaleType } from "@univerjs/core";
+import SheetsThreadCommentUIEnUS from "@univerjs/sheets-thread-comment-ui/locale/en-US";
+import SheetsThreadCommentUIZhCN from "@univerjs/sheets-thread-comment-ui/locale/zh-CN";
+import ThreadCommentUIEnUS from "@univerjs/thread-comment-ui/locale/en-US";
+import ThreadCommentUIZhCN from "@univerjs/thread-comment-ui/locale/zh-CN";
 import DesignEnUS from "@univerjs/design/locale/en-US";
 import DesignZhCN from "@univerjs/design/locale/zh-CN";
 import DocsUIEnUS from "@univerjs/docs-ui/locale/en-US";
@@ -60,6 +82,17 @@ export const univerLocales = {
     pdfLocales.enUS,
     CollaborationEnUS,
     CollaborationUIEnUS,
+    SheetsHistoryUIEnUS,
+    DocsHistoryUIEnUS,
+    SlidesHistoryUIEnUS,
+    BasesHistoryUIEnUS,
+    BoardsHistoryUIEnUS,
+    ThreadCommentUIEnUS,
+    SheetsThreadCommentUIEnUS,
+    DocsThreadCommentUIEnUS,
+    SlidesThreadCommentUIEnUS,
+    BasesThreadCommentUIEnUS,
+    BoardsThreadCommentUIEnUS,
   ),
   [LocaleType.ZH_CN]: mergeLocales(
     DesignZhCN,
@@ -83,5 +116,16 @@ export const univerLocales = {
     pdfLocales.zhCN,
     CollaborationZhCN,
     CollaborationUIZhCN,
+    SheetsHistoryUIZhCN,
+    DocsHistoryUIZhCN,
+    SlidesHistoryUIZhCN,
+    BasesHistoryUIZhCN,
+    BoardsHistoryUIZhCN,
+    ThreadCommentUIZhCN,
+    SheetsThreadCommentUIZhCN,
+    DocsThreadCommentUIZhCN,
+    SlidesThreadCommentUIZhCN,
+    BasesThreadCommentUIZhCN,
+    BoardsThreadCommentUIZhCN,
   ),
 };

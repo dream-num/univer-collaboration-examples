@@ -13,11 +13,10 @@ export function registerPdfUnit(
   univer: Univer,
   options: MountUniverEditorOptions,
 ) {
+  // The ribbon stays on, as in the official PDF example: the import and export menu lives there.
   univer.registerPlugin(UniverUIPlugin, {
     container: options.container,
     ribbonType: "grid",
-    header: false,
-    toolbar: false,
     footer: false,
   });
   univer.registerPlugin(UniverDocsPlugin);

@@ -10,3 +10,6 @@ import "@univerjs/preset-sheets-sort/lib/index.css";
 import "@univerjs/preset-sheets-table/lib/index.css";
 import "@univerjs/preset-sheets-advanced/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
+import "@univerjs/sheets-thread-comment-ui/lib/index.css";
+import "@univerjs/thread-comment-ui/lib/index.css";
+import "@univerjs-pro/sheets-history-ui/lib/index.css";
