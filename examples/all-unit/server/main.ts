@@ -6,16 +6,18 @@ import { fileURLToPath } from "node:url";
 import express from "express";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
+import { LocalFileBlobStore } from "@univerjs-pro/collaboration-file-blob-local";
+import { SQLiteFileDatabaseAdapter } from "@univerjs-pro/collaboration-file-database-sqlite";
+import { UniverFileEndpoint } from "@univerjs-pro/collaboration-file-endpoint";
+import { UniverFileService } from "@univerjs-pro/collaboration-file-service";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
 import type { UnitsResponse } from "../shared/units";
-import { FileStore } from "./file-store";
-import { createFileRouter } from "./files";
 import { DEMO_USER, ensureUnits, units } from "./units";
 
 const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
-// Images and attachments uploaded from the editors are written here; see file-store.ts for the lifecycle rules.
+// Contents of images and attachments uploaded from the editors; their metadata shares the SQLite database.
 const filesDirectory = process.env.FILES_PATH ?? fileURLToPath(new URL("../../.data/files", import.meta.url));
 await mkdir(dirname(filename), { recursive: true });
 
@@ -23,9 +25,14 @@ await mkdir(dirname(filename), { recursive: true });
 if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
 }
-const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
+const fileDatabase = new SQLiteFileDatabaseAdapter({ filename });
+const fileService = new UniverFileService({
+  database: fileDatabase,
+  blobStore: new LocalFileBlobStore({ directory: filesDirectory }),
+  cleanup: { context: { userID: "system:file-cleanup" } },
+});
 const transport = createNodeTransport();
 const endpoint = new UniverCollabEndpoint(service);
 transport.use(async (context, next) => {
@@ -37,12 +44,12 @@ endpoint.use("connect", async (context, next) => {
   await next();
 });
 transport.register(endpoint);
+transport.register(new UniverFileEndpoint(fileService));
 
 const app = express();
 app.get("/api/units", (_request, response) => {
   response.json({ units, user: DEMO_USER } satisfies UnitsResponse);
 });
-app.use("/universer-api", createFileRouter(files));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
   const body = request.body as { requests?: IAllowedRequest[] };
   response.json({
@@ -66,7 +73,9 @@ async function dispose() {
       server.close((error) => error ? reject(error) : resolve());
     });
   }
+  await fileService.dispose();
   await service.dispose();
+  await fileDatabase.dispose();
   await database.dispose();
 }
 

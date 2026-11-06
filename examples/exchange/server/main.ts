@@ -7,16 +7,20 @@ import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
+import { UniverExchangeEndpoint } from "@univerjs-pro/collaboration-exchange-endpoint";
+import { UniverExchangeService } from "@univerjs-pro/collaboration-exchange-service";
+import { LocalFileBlobStore } from "@univerjs-pro/collaboration-file-blob-local";
+import { SQLiteFileDatabaseAdapter } from "@univerjs-pro/collaboration-file-database-sqlite";
+import { UniverFileEndpoint } from "@univerjs-pro/collaboration-file-endpoint";
+import { UniverFileService } from "@univerjs-pro/collaboration-file-service";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
-import { createExchangeRouter } from "./exchange.js";
-import { FileStore } from "./file-store.js";
 
 const UNIT_ID = "exchange-sheet";
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const filename = ".data/collaboration.sqlite";
-// Uploads and export results are written here; see file-store.ts for which ones are temporary.
+// File contents are written here; their metadata shares the SQLite database with the collaboration data.
 const filesDirectory = resolve(".data/files");
 const unitData: IWorkbookData = {
   id: UNIT_ID,
@@ -48,10 +52,15 @@ await mkdir(dirname(filename), { recursive: true });
 if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
 }
-const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
+const fileService = new UniverFileService({
+  database: new SQLiteFileDatabaseAdapter({ filename }),
+  blobStore: new LocalFileBlobStore({ directory: filesDirectory }),
+  cleanup: { context: { userID: "system:file-cleanup" } },
+});
+const exchangeService = new UniverExchangeService({ collabService: service, fileService });
 const transport = createNodeTransport();
 
 transport.use(async (context, next) => {
@@ -63,6 +72,9 @@ endpoint.use("connect", async (context, next) => {
   await next();
 });
 transport.register(endpoint);
+// File first: the Transport disposes in reverse order, so Exchange is released before File.
+transport.register(new UniverFileEndpoint(fileService));
+transport.register(new UniverExchangeEndpoint(exchangeService));
 
 // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
 await service.createUnitFromData(
@@ -71,10 +83,6 @@ await service.createUnitFromData(
 );
 
 const app = express();
-app.use(
-  "/universer-api",
-  createExchangeRouter({ service, userID: USER_ID, files }),
-);
 app.post(
   "/universer-api/authz/-/object/-/batch_allowed",
   express.json(),
