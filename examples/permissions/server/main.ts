@@ -77,18 +77,11 @@ endpoint.use("joinUnit", async (context, next) => {
   await next();
 });
 transport.register(endpoint);
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "user-alice" },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "user-alice" },
-  );
-}
+// Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
+await service.createUnitFromData(
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { userID: "user-alice" },
+);
 
 const app = express();
 app.post("/login/:username", (request, response) => {

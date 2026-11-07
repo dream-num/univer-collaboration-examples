@@ -9,10 +9,7 @@ import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { SQLiteHistoryDatabaseAdapter } from "@univerjs-pro/collaboration-history-database-sqlite";
 import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpoint";
 import { UniverHistoryService } from "@univerjs-pro/collaboration-history-service";
-import {
-  CollabError,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 
@@ -75,19 +72,11 @@ endpoint.use("connect", async (context, next) => {
 });
 transport.register(new UniverHistoryEndpoint(historyService));
 transport.register(endpoint);
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: USER_ID },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: USER_ID },
-  );
-}
+// Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
+await service.createUnitFromData(
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { userID: USER_ID },
+);
 
 const app = express();
 app.post(

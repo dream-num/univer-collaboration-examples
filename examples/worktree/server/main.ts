@@ -9,10 +9,7 @@ import {
   MemorySessionTicketStore,
   UniverCollabEndpoint,
 } from "@univerjs-pro/collaboration-endpoint";
-import {
-  CollabError,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
 import { UniverCollabWorktreeEndpoint } from "@univerjs-pro/collaboration-worktree-endpoint";
@@ -75,19 +72,11 @@ worktreeEndpoint.use("connect", async (context, next) => {
 transport.register(endpoint);
 transport.register(worktreeEndpoint);
 
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: USER_ID },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: USER_ID },
-  );
-}
+// Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
+await service.createUnitFromData(
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { userID: USER_ID },
+);
 try {
   await worktreeService.getWorktree(
     { worktreeID: WORKTREE_ID },
