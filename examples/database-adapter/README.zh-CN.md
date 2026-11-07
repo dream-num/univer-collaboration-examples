@@ -55,21 +55,11 @@ const database = await PostgresDatabaseAdapter.create({ pool });
 
 ## 实现自己的 Adapter
 
-实现 `IDatabaseAdapter` 并作为 `dbAdapter` 传入。Service 不会为 Adapter 补上事务、CAS 或去重，这些要由
-Adapter 在自己的数据库上实现。Memory Adapter 是这份契约最短的完整实现，SQLite 和 PostgreSQL Adapter 展示同一
-契约如何落到数据库事务。
-
-### commitChangeset
-
-`commitChangeset` 是并发提交的关键：通过 revision CAS（比较并交换），只有数据库中的当前 head 等于
-`changeset.revision - 1` 时，才能写入 changeset，并将 head 更新为 `changeset.revision`。检查、写入和更新必须在
-数据库中原子完成，任一步骤失败都不能留下部分写入。
-
-提交成功返回 `committed`；head 不匹配时不写入数据，返回 `revision-mismatch` 和 `actualHeadRevision`，由 Service
-重新读取历史、处理并发变更后重试。SQLite Adapter 在一个写事务内完成这一过程，PostgreSQL Adapter 用 `FOR UPDATE`
-锁住 Unit 行。
-
-OT 和提交去重由 Service 处理，鉴权由 middleware 处理，实时广播由 Endpoint 处理。
+实现 `IDatabaseAdapter` 并作为 `dbAdapter` 传入。事务、revision CAS 以及 Unit 的删除和恢复都在 Adapter 内完成：
+`commitChangeset` 只在当前 head 等于 `changeset.revision - 1` 时写入 changeset，否则返回 `revision-mismatch`
+交给 Service 重试。三个内置 Adapter 的源码就是参考：[Memory Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-memory)
+是这份契约最短的完整实现，[SQLite](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-sqlite) 和
+[PostgreSQL](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-postgres) Adapter 展示同一契约如何落到数据库事务。
 
 ## 清空数据
 
