@@ -2,7 +2,9 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A Database Adapter stores documents (Units), snapshots, Sheet blocks, and changesets. This example uses the SDK's built-in `SQLiteDatabaseAdapter` by default and includes three custom implementations to help you understand the `IDatabaseAdapter` interface and use these implementations as a reference when connecting your own storage.
+A collaborative Sheet whose data survives a server restart. A Database Adapter stores Units,
+snapshots, Sheet blocks, and changesets; this example uses the SQLite Adapter and shows how to
+change to another one.
 
 ## Run the example
 
@@ -19,7 +21,8 @@ Open <http://127.0.0.1:3010/?unit=persistent-sheet>:
 2. Press `Ctrl+C` in the terminal to stop the server, then run the same startup command again.
 3. Refresh the page and confirm your edits are still there.
 
-Data is stored in `examples/database-adapter/.data/collaboration.sqlite`. The first start creates `persistent-sheet`; subsequent starts restore the document from stored snapshots and changesets.
+Data is stored in `examples/database-adapter/.data/collaboration.sqlite`. The first start creates
+`persistent-sheet`; subsequent starts restore the document from stored snapshots and changesets.
 
 ## Connect an Adapter
 
@@ -33,27 +36,58 @@ const database = new SQLiteDatabaseAdapter({ filename: ".data/collaboration.sqli
 const service = new UniverCollabService({ dbAdapter: database });
 ```
 
-The parent directory must exist before creating the Adapter; the full entry point creates it for you. To change storage, replace `dbAdapter`. The application owns the Adapter: stop the Services using it before calling `database.dispose()`.
+The parent directory must exist before creating the Adapter; the full entry point creates it for
+you. The application owns the Adapter: stop the Services using it before calling
+`database.dispose()`.
 
-## Custom Adapters
+## Change the storage
 
-All three implement `IDatabaseAdapter`. Start with the Memory version to understand the interface, then see how the SQLite and PostgreSQL versions implement it with database transactions:
+Replace `dbAdapter`. For tests and temporary services, the Memory Adapter keeps everything in the
+process:
 
-| Implementation | Focus |
-| --- | --- |
-| [CustomMemoryDatabaseAdapter](./server/custom-database-adapter/custom-memory-database-adapter.ts) | Uses Maps to demonstrate reads, revision checks, deletion, and recovery; data is lost when the process exits |
-| [CustomSQLiteDatabaseAdapter](./server/custom-database-adapter/custom-sqlite-database-adapter.ts) | Uses `libsql` and MessagePack to demonstrate schema, transactions, and protocol object storage; data survives restarts |
-| [CustomPostgresDatabaseAdapter](./server/custom-database-adapter/custom-postgres-database-adapter.ts) | Implements the same contract on PostgreSQL with `pg`, using row locks and CTEs to coordinate concurrent submissions, deletions, and recoveries |
+```ts
+import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
 
-To try one, uncomment its import and constructor in `server/main.ts`, comment out the current constructor, and rerun the startup command. Custom SQLite uses `.data/custom-collaboration.sqlite`; its schema differs from the built-in Adapter, so it must use a separate file. Custom PostgreSQL additionally requires a reachable server; follow the commented block in `server/main.ts` to connect and set it up.
+const database = new MemoryDatabaseAdapter();
+```
+
+For several nodes on one database, the PostgreSQL Adapter lets PostgreSQL make every write decision.
+The application owns the connection pool; `create` initializes an empty `collaboration` schema and
+verifies an existing one:
+
+```ts
+import { PostgresDatabaseAdapter } from "@univerjs-pro/collaboration-database-postgres";
+import { Pool } from "pg";
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const database = await PostgresDatabaseAdapter.create({ pool });
+```
+
+The [`multi-node`](../multi-node/README.md) example runs two nodes on it.
+
+## Write your own Adapter
+
+Implement `IDatabaseAdapter` and pass it as `dbAdapter`. The Service does not add transactions,
+CAS, or deduplication on top of an Adapter; the Adapter provides them on its own database. The
+semantics it must guarantee are listed in
+[Database Adapters](https://docs.univer.ai/server/collaboration/database-adapters). The Memory
+Adapter is the shortest complete implementation of the contract, and the SQLite and PostgreSQL
+Adapters show the same contract on database transactions.
 
 ### commitChangeset
 
-`commitChangeset` is the key to concurrent submissions. It uses revision CAS (compare-and-swap): a changeset can be inserted only when the current database head equals `changeset.revision - 1`, after which the head advances to `changeset.revision`. The check, insert, and head update must be atomic in the database, with no partial writes on failure.
+`commitChangeset` is the key to concurrent submissions. It uses revision CAS (compare-and-swap): a
+changeset can be inserted only when the current database head equals `changeset.revision - 1`,
+after which the head advances to `changeset.revision`. The check, insert, and head update must be
+atomic in the database, with no partial writes on failure.
 
-Return `committed` on success. If the head differs, leave the data unchanged and return `revision-mismatch` with `actualHeadRevision`, allowing the Service to reload history, handle concurrent changes, and retry. The custom SQLite example implements this with a `BEGIN IMMEDIATE` transaction.
+Return `committed` on success. If the head differs, leave the data unchanged and return
+`revision-mismatch` with `actualHeadRevision`, allowing the Service to reload history, handle
+concurrent changes, and retry. The SQLite Adapter does this in one write transaction; the PostgreSQL
+Adapter locks the Unit row with `FOR UPDATE`.
 
-The Service handles OT and submission deduplication, middleware handles authorization, and the Endpoint handles real-time broadcasts.
+The Service handles OT and submission deduplication, middleware handles authorization, and the
+Endpoint handles real-time broadcasts.
 
 ## Reset data
 
@@ -63,4 +97,16 @@ Stop the server, then run from the repository root:
 pnpm --filter @univerjs/collaboration-example-database-adapter reset
 ```
 
-This deletes both the built-in and custom SQLite database files for this example. PostgreSQL data is not touched; drop the `collaboration` schema manually if you need a blank state there. The next start creates a blank document.
+This deletes the SQLite database file of this example. The next start creates a blank document.
+
+## Packages
+
+The three Adapters are open source under Apache-2.0 in
+[univer-collaboration-sdk-community](https://github.com/dream-num/univer-collaboration-sdk-community) and are published to npm under the same names and versions
+as the rest of the SDK. Use them as they are, or take the source as the reference for your own.
+
+| Package | Description |
+| --- | --- |
+| [`@univerjs-pro/collaboration-database-sqlite`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-database-sqlite/README.md) | SQLite Adapter on `libsql`, for a single node. Used here. |
+| [`@univerjs-pro/collaboration-database-postgres`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-database-postgres/README.md) | PostgreSQL Adapter on `node-postgres`, for one or several nodes. |
+| [`@univerjs-pro/collaboration-database-memory`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-database-memory/README.md) | In-process Adapter for tests and temporary services. |

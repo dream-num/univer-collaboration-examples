@@ -29,7 +29,7 @@ flowchart LR
 
 - **协同服务节点**运行同样的代码，连接同一个 `DATABASE_URL` 和同一个 `REDIS_URL`。节点可以随时增减，没有任何状态绑定在某个节点上。
 - **Redis** 需要 6.2 及以上。生产环境使用高可用的 Redis：Redis 不可用时，签票请求失败，WebSocket 建连返回可重试的 `503`。
-- **数据库**必须让所有协同服务节点都能访问，并满足 SDK 数据库适配器契约。本例使用 PostgreSQL，适配器为 [`server/postgres-database-adapter.ts`](./server/postgres-database-adapter.ts)，复制自 [`database-adapter`](../database-adapter/README.zh-CN.md) 示例中的自定义适配器；应用的文件目录表也放在同一个数据库中。节点不负责建表：[`schema.sql`](./schema.sql) 在 PostgreSQL 首次初始化数据目录时执行一次，节点启动时只检查表是否存在。生产环境请用迁移工具管理这份 schema，并把迁移作为独立的部署步骤执行，而不是由服务自己建表。
+- **数据库**必须让所有协同服务节点都能访问，并满足 SDK 数据库适配器契约。本例通过 `@univerjs-pro/collaboration-database-postgres` 使用 PostgreSQL；应用的文件目录表也放在同一个数据库中。节点不负责建表：[`schema.sql`](./schema.sql) 在 PostgreSQL 首次初始化数据目录时执行一次，节点启动时只校验 schema 存在且版本符合 Adapter 的预期。生产环境请用迁移工具管理这份 schema，并把迁移作为独立的部署步骤执行，而不是由服务自己建表。
 - **网关**把同一文档的 WebSocket 和提交发到同一个节点，其余请求随意分配，见[配置网关](#配置网关)。可以换成任何网关或负载均衡；使用 Kubernetes 时由平台管理副本，套用同样的路由规则。
 
 ## 配置每个协同服务节点
@@ -108,7 +108,7 @@ export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 ```
 
-也可以运行 `pnpm example:multi-node`，依赖安装和构建都在容器内完成。使用独立 Compose 的环境，将 `docker compose` 替换为 `docker-compose`。
+也可以运行 `pnpm example:multi-node`，依赖安装和构建都在容器内完成。使用独立 Compose 的环境，将 `docker compose` 替换为 `docker-compose`。旧版本示例留下的 `collaboration-data` 卷使用不同的 schema，会让节点启动失败；用下文的停止命令加 `--volumes` 清理一次即可。
 
 打开 <http://127.0.0.1:3010/>：
 
