@@ -11,3 +11,5 @@ pnpm example:quick-start
 Open <http://127.0.0.1:3010/?unit=quick-start-sheet>, then copy the complete URL into another browser. Data is stored only in the Memory Adapter and is lost when the process stops.
 
 Read only `server/main.ts` and `web/main.ts`. The fixed user and fixed allowed responses are for local teaching only.
+
+`univer` and `univerAPI` are on `window` for the browser console.

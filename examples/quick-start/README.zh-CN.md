@@ -14,3 +14,5 @@ Adapter 中，停止进程后丢失。
 
 只需要阅读 `server/main.ts` 和 `web/main.ts`。固定用户和固定 allowed 只用于本地
 教学。
+
+`univer` 和 `univerAPI` 挂在 `window` 上，方便在浏览器控制台调试。
