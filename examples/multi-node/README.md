@@ -29,7 +29,7 @@ flowchart LR
 
 - **Collaboration nodes** run the same code with the same `DATABASE_URL` and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
 - **Redis** needs version 6.2 or later. Use a highly available Redis in production: when Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
-- **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example uses PostgreSQL through [`server/postgres-database-adapter.ts`](./server/postgres-database-adapter.ts), a copy of the custom adapter from the [`database-adapter`](../database-adapter/README.md) example; the application file catalog lives in the same database. The nodes do not create tables: [`schema.sql`](./schema.sql) is applied once when PostgreSQL initializes its data directory, and each node only checks on startup that the tables exist. In production, manage that schema with your migration tool and run migrations as a separate deployment step rather than from the service.
+- **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example uses PostgreSQL through `@univerjs-pro/collaboration-database-postgres`; the application file catalog lives in the same database. The nodes do not create tables: [`schema.sql`](./schema.sql) is applied once when PostgreSQL initializes its data directory, and on startup each node only verifies that the schema is present and at the version the Adapter expects. In production, manage that schema with your migration tool and run migrations as a separate deployment step rather than from the service.
 - **Gateway** sends a document's WebSocket and submissions to one node and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
 
 ## Set up every collaboration node
@@ -108,7 +108,7 @@ export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 ```
 
-Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside the containers. If you use standalone Compose, replace `docker compose` with `docker-compose`.
+Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside the containers. If you use standalone Compose, replace `docker compose` with `docker-compose`. A `collaboration-data` volume left by an earlier version of this example holds a different schema and makes the nodes fail at startup; remove it once with the stop command and `--volumes` below.
 
 Open <http://127.0.0.1:3010/>:
 
