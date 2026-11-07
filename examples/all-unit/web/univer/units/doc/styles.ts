@@ -10,3 +10,6 @@ import "@univerjs-pro/docs-latex-ui/lib/index.css";
 import "@univerjs-pro/docs-shape-ui/lib/index.css";
 import "@univerjs-pro/docs-table-ui/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
+import "@univerjs/thread-comment-ui/lib/index.css";
+import "@univerjs/docs-thread-comment-ui/lib/index.css";
+import "@univerjs-pro/docs-print/lib/index.css";

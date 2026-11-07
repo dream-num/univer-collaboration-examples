@@ -59,10 +59,25 @@ import {
   ViewSheetPermissionFromSheetBarCommand,
 } from "@univerjs/sheets-ui";
 import { UniverUIPlugin } from "@univerjs/ui";
+import { UniverDocsExchangeClientPlugin } from "@univerjs-pro/docs-exchange-client";
+import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
+import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import { UniverSheetsHistoryUIPlugin } from "@univerjs-pro/sheets-history-ui";
+import { UniverSheetsPrintPlugin } from "@univerjs-pro/sheets-print";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
+import { UniverSheetsThreadCommentUIPlugin } from "@univerjs/sheets-thread-comment-ui";
 import type { MountUniverEditorOptions } from "../../types";
+import { registerCollaborationClient } from "../../collaboration";
+import { exchangeClientConfig, historyConfig } from "../../config";
+import { CustomImportExportPlugin } from "../../import-export/sheets/plugin";
+import sheetFormulaWorkerUrl from "./worker?worker&url";
 
 import "@univerjs/sheets/facade";
 import "@univerjs/sheets-ui/facade";
+import "@univerjs-pro/docs-exchange-client/facade";
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
+import "@univerjs-pro/sheets-print/facade";
 
 export function registerSheetUnit(univer: Univer, options: MountUniverEditorOptions) {
   univer.registerPlugin(UniverNetworkPlugin);
@@ -120,4 +135,26 @@ export function registerSheetUnit(univer: Univer, options: MountUniverEditorOpti
   univer.registerPlugin(UniverSheetsShapeUIPlugin);
   univer.registerPlugin(UniverSheetSparklinePlugin);
   univer.registerPlugin(UniverSheetSparklineUIPlugin);
+
+  // comment
+  univer.registerPlugin(UniverSheetsThreadCommentUIPlugin);
+
+  // collaboration
+  registerCollaborationClient(univer);
+  univer.registerPlugin(UniverThreadCommentDataSourcePlugin);
+
+  // history: the viewer renders each version in its own Univer and only calculates formulas through this Worker
+  univer.registerPlugin(UniverSheetsHistoryUIPlugin, {
+    ...historyConfig(options.container),
+    workerURL: sheetFormulaWorkerUrl,
+  });
+
+  // print
+  univer.registerPlugin(UniverSheetsPrintPlugin);
+
+  // exchange: the Doc client loads too, since a Sheet can embed a Word file
+  univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig);
+  univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
+  univer.registerPlugin(UniverDocsExchangeClientPlugin);
+  univer.registerPlugin(CustomImportExportPlugin);
 }
