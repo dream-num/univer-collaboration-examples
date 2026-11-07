@@ -72,7 +72,7 @@ endpoint.use("connect", async (context, next) => {
   await next();
 });
 transport.register(endpoint);
-// File first: the Transport disposes in reverse order, so Exchange is released before File.
+// Exchange depends on File: register File before Exchange.
 transport.register(new UniverFileEndpoint(fileService));
 transport.register(new UniverExchangeEndpoint(exchangeService));
 

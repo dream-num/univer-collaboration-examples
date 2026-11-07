@@ -57,8 +57,7 @@ with the collaboration client.
 
 `UniverSheetsExchangeClientPlugin` sets the minimum row and column count of an imported worksheet.
 
-Since SDK 1.2.0 the exchange packages are headless, with no ribbon entries. The application provides
-the entry points and calls the Facade:
+The toolbar is the example's own; its buttons call the Facade API:
 
 ```ts
 import "@univerjs-pro/exchange-client/facade";
@@ -66,11 +65,12 @@ import "@univerjs-pro/sheets-exchange-client/facade";
 
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);
 
-const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX, sheetId);
+const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX);
 univerAPI.downloadFile(blob, unitId, ExchangeFormat.XLSX);
 ```
 
-`sheetId` names the worksheet for CSV, which holds one worksheet; XLSX ignores it.
+The Facade API, the plugin options, and how to keep the built-in menus are in
+[Sheets import and export](https://docs.univer.ai/guides/sheets/features/import-export).
 
 ## Server assembly
 
@@ -78,14 +78,14 @@ univerAPI.downloadFile(blob, unitId, ExchangeFormat.XLSX);
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
 
 transport.register(endpoint);
-// File first: the Transport disposes in reverse order, so Exchange is released before File.
+// Exchange depends on File: register File before Exchange.
 transport.register(new UniverFileEndpoint(fileService));
 transport.register(new UniverExchangeEndpoint(exchangeService));
 ```
 
 Conversion runs in the process through `@univerjs-pro/exchange-node`, which reads the License from
 the `UNIVER_LICENSE` and `UNIVER_LICENSE_KEY` environment variables. See
-[License](https://docs.univer.ai/server/license).
+[License](https://docs.univer.ai/server/import-export/license).
 
 Every request in this example is the same user and Unit permissions are not checked. Install them as
 middleware with `exchangeService.use("import" | "export", ...)`.
