@@ -1,4 +1,5 @@
-import { LocaleType, LogLevel } from "@univerjs/core";
+import { LocaleType, LogLevel, type Univer } from "@univerjs/core";
+import type { FUniver } from "@univerjs/core/facade";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -16,6 +17,15 @@ import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 
+declare global {
+  interface Window {
+    /** The Univer instance, exposed for the browser console. */
+    univer?: Univer;
+    /** The Facade API, exposed for the browser console. */
+    univerAPI?: FUniver;
+  }
+}
+
 document.querySelector<HTMLElement>("#status")!.textContent =
   "Open this URL in another browser and edit the same Sheet.";
 
@@ -25,7 +35,7 @@ const baseURL = `${httpProtocol}://${location.host}/universer-api`;
 
 const unitId = new URLSearchParams(location.search).get("unit");
 if (!unitId) throw new Error("Open the URL printed by the server; it names the Sheet with ?unit=.");
-const { univerAPI } = createUniver({
+const { univer, univerAPI } = createUniver({
   locale: LocaleType.EN_US,
   locales: {
     [LocaleType.EN_US]: mergeLocales(
@@ -59,6 +69,9 @@ const { univerAPI } = createUniver({
     UniverCollaborationClientUIPlugin,
   ],
 });
+
+window.univer = univer;
+window.univerAPI = univerAPI;
 
 const workbook = await univerAPI.getCollaboration().loadSheetAsync(unitId);
 if (!workbook) throw new Error("Document could not be loaded");
