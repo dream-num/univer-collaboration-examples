@@ -105,10 +105,10 @@ importers:
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
       '@univerjs-pro/collaboration-exchange-endpoint':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-exchange-service':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-file-blob-local':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))
@@ -192,10 +192,10 @@ importers:
         version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/exchange-node':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/exchange-pdf-node-binding':
-        specifier: 1.1.1-insiders.20261106-0a3a2fd
-        version: 1.1.1-insiders.20261106-0a3a2fd
+        specifier: 1.1.1-insiders.20261107-56cbced
+        version: 1.1.1-insiders.20261107-56cbced
       '@univerjs-pro/ink':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -576,10 +576,10 @@ importers:
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
       '@univerjs-pro/collaboration-exchange-endpoint':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-exchange-service':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-file-blob-local':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))
@@ -603,7 +603,7 @@ importers:
         version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/exchange-node':
         specifier: 1.3.1-insiders.20261106-930c8f8
-        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2)
+        version: 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/license':
         specifier: 1.3.1-insiders.20261106-930c8f8
         version: 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
@@ -2447,54 +2447,54 @@ packages:
       '@univerjs-pro/exchange-pdf-node-binding':
         optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-jgRK2SD/9SbCPKXbYMxgIZmCZfc1pEeRtHIo2FJaCv8gP4qm2ipYanbYt8mlUXTbQAWb3Comy7oX4FVQ5e6OwA==}
+  '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-yzYgkpN6s+k+6kLnJUce07/65IvadUW3zmsJ1/fHlwfmqs7Td6j3yXKaxsWgj+7Eg22w2UTdzSiMRzs3mJ+ewA==}
     engines: {node: '>=20'}
     cpu: [arm64]
     os: [darwin]
 
-  '@univerjs-pro/exchange-pdf-node-binding-darwin-x64@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-XgBkRn6xFz+8tGuPUYdmFBuQmFA4p7EOPiY11pone/YyVS0dN80u49yytvXGYIdMTXDYFfNJFGYRaBYYdiOrGQ==}
+  '@univerjs-pro/exchange-pdf-node-binding-darwin-x64@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-SH+muyG7J4eY1xyfUzs+IdaYgp1x2MSOvbCIfORKCRWRIP0AoH7PZSb4VO/18EckEz0Dy5qB1eQu/rFhOT6LVQ==}
     engines: {node: '>=20'}
     cpu: [x64]
     os: [darwin]
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-7t7/AeQz8CVXxIJY+kDlCOB+cltkrgdzOeylaklizhDlI/cGaNADtsk0iuRgRw2VYuBIaVMvKnwz9SLMBM7Jxg==}
+  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-Z+uCFR/Dg95ZfbIDttd+rSyapnQ2YXaD7oT8AO6AMRb9Qungnul/S/fiHPufwnPN2RptMbuKWy+FM5h+TodRBg==}
     engines: {node: '>=20'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-TrrpOhFUeh81FjPPIEKlijJxmDoWaL8oSYHWM0zWKH9/+qKtD58i+MoFl0yTVPt9badB1+c+eXVpf+aPdiMx9A==}
+  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-BC1JbOd4mj9uZMcPSfhLzuqVpMUTEVqOsU9INfU5TEcH+udwgyzZGVVd7CH677szurVVE2IcPlrxPZHUWPe4Xg==}
     engines: {node: '>=20'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-2KucUF2DHNuW8Jj7tNGYZt7QWm+T/gc6rJ7VvYcFY4OcqH7gP1P+jfwwqZ5RVSgiRHTxXm9SIEOpVQ1ILhEsXA==}
+  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-rXAjXc9U1Sayhj14tng1umAP4eO1Jn4DaaEzSlva9UZx/Ak0GYyycSEzPz2eu8LqeMikhUpSj7iC2dsbJE9nfw==}
     engines: {node: '>=20'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-Lw5QZewus0B4SKC+5fpCHfoMfkI9EKWcAEJgAbqZWCrvHQVW2teOrh4cdccC0xfYIReXgb3SLB/LEQFj/2Ix1A==}
+  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-iQI9B1mmgvy1APYmdkiKpIaZgQus1pGDoZOFvi+1prjk2Ofv624rKENA6q8/ngiQOX/zY46XD4iwntNHgGom/g==}
     engines: {node: '>=20'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-f+2bLVYmIskIMvdWMl6J9o20NEYK7+32kKVmb1mCA/wQcr2dsBvbfAM6XdSV0f9uFWiDAa1/dUPs3o+23hLCQw==}
+  '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-Ozn77SB0EHqBko24aO6Ies7Q9DztE0YhOzx2Zvf7NRr9RJV2YFyxA84YZm39mOOQewd+2g6yQBolR97Ox0VQhg==}
     engines: {node: '>=20'}
     cpu: [x64]
     os: [win32]
 
-  '@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd':
-    resolution: {integrity: sha512-A+2Zket1abr86JNkumbYAJuu/obGqvHz2llfXBpockQ73HROnMjic3qo5ErMwySZ/D1x2gzVx37seLmf8lp9sg==}
+  '@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced':
+    resolution: {integrity: sha512-UEmoVPf65bi76+IAhpBvix6KRaOxlV1kw3n/16AaARKEnGSt+U0XrXgWDBfIVSFyun1dLH5BpNxWObNFAYflGw==}
     engines: {node: '>=20'}
 
   '@univerjs-pro/ink-ui@1.3.1-insiders.20261106-930c8f8':
@@ -4970,19 +4970,19 @@ snapshots:
       - react
       - utf-8-validate
 
-  '@univerjs-pro/collaboration-exchange-endpoint@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)':
+  '@univerjs-pro/collaboration-exchange-endpoint@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.3.1-insiders.20261106-930c8f8)(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)':
     dependencies:
-      '@univerjs-pro/collaboration-exchange-service': 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
+      '@univerjs-pro/collaboration-exchange-service': 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
       '@univerjs-pro/collaboration-transport-node': 1.3.1-insiders.20261106-930c8f8
       '@univerjs/protocol': 1.3.1-insiders.20261106-930c8f8
 
-  '@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)':
+  '@univerjs-pro/collaboration-exchange-service@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))(@univerjs-pro/collaboration-service@1.3.1-insiders.20261106-930c8f8(react@19.3.0))(@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)':
     dependencies:
       '@univerjs-pro/collaboration-file-service': 1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8)
       '@univerjs-pro/collaboration-service': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)
-      '@univerjs-pro/exchange-node': 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/exchange-node': 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/protocol': 1.3.1-insiders.20261106-930c8f8
 
   '@univerjs-pro/collaboration-file-blob-local@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/collaboration-file-service@1.3.1-insiders.20261106-930c8f8(@univerjs/protocol@1.3.1-insiders.20261106-930c8f8))':
@@ -5775,7 +5775,7 @@ snapshots:
       '@univerjs-pro/exchange-node-binding-linux-x64-musl': 1.1.1-insiders.20261106-0a3a2fd
       '@univerjs-pro/exchange-node-binding-win32-x64-msvc': 1.1.1-insiders.20261106-0a3a2fd
 
-  '@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd)(react@19.3.0)(rxjs@7.8.2)':
+  '@univerjs-pro/exchange-node@1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced)(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/boards': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration': 1.3.1-insiders.20261106-930c8f8(@univerjs-pro/embed@1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
@@ -5785,42 +5785,42 @@ snapshots:
       '@univerjs/core': 1.3.1-insiders.20261106-930c8f8(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/protocol': 1.3.1-insiders.20261106-930c8f8
     optionalDependencies:
-      '@univerjs-pro/exchange-pdf-node-binding': 1.1.1-insiders.20261106-0a3a2fd
+      '@univerjs-pro/exchange-pdf-node-binding': 1.1.1-insiders.20261107-56cbced
     transitivePeerDependencies:
       - '@univerjs-pro/embed'
       - react
       - rxjs
 
-  '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-darwin-x64@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-darwin-x64@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu@1.1.1-insiders.20261107-56cbced':
     optional: true
 
-  '@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261106-0a3a2fd':
+  '@univerjs-pro/exchange-pdf-node-binding@1.1.1-insiders.20261107-56cbced':
     optionalDependencies:
-      '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-darwin-x64': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl': 1.1.1-insiders.20261106-0a3a2fd
-      '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu': 1.1.1-insiders.20261106-0a3a2fd
+      '@univerjs-pro/exchange-pdf-node-binding-darwin-arm64': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-darwin-x64': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-gnu': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-linux-arm64-musl': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-linux-x64-gnu': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-linux-x64-musl': 1.1.1-insiders.20261107-56cbced
+      '@univerjs-pro/exchange-pdf-node-binding-win32-x64-gnu': 1.1.1-insiders.20261107-56cbced
 
   '@univerjs-pro/ink-ui@1.3.1-insiders.20261106-930c8f8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
