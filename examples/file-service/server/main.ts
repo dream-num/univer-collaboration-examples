@@ -48,7 +48,6 @@ const endpoint = new UniverCollabEndpoint(service);
 const fileService = new UniverFileService({
   database: new SQLiteFileDatabaseAdapter({ filename }),
   blobStore: new LocalFileBlobStore({ directory: filesDirectory }),
-  cleanup: { context: { userID: "system:file-cleanup" } },
 });
 const transport = createNodeTransport();
 
