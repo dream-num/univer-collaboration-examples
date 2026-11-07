@@ -22,7 +22,6 @@ import "@univerjs-pro/boards-table/facade";
 import "@univerjs-pro/chart-ui/facade";
 import "@univerjs-pro/docs-latex/facade";
 import "@univerjs-pro/engine-chart/facade";
-import "@univerjs-pro/ink/facade";
 
 export function registerBoardUnit(
   univer: Univer,

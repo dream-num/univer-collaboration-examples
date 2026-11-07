@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -7,7 +8,7 @@ import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteCommentDatabaseAdapter } from "@univerjs-pro/collaboration-comment-database-sqlite";
 import { UniverCommentEndpoint } from "@univerjs-pro/collaboration-comment-endpoint";
 import { UniverCommentService } from "@univerjs-pro/collaboration-comment-service";
-import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
@@ -37,6 +38,11 @@ const unitData: IWorkbookData = {
 };
 
 await mkdir(dirname(filename), { recursive: true });
+
+// SDK 1.4.0 reads core schema v3; migrate an older database file in place (it backs up first).
+if (existsSync(filename)) {
+  await migrateSQLiteCore({ filename });
+}
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);

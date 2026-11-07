@@ -1,9 +1,10 @@
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
-import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
@@ -17,6 +18,11 @@ const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data
 // Images and attachments uploaded from the editors are written here; see file-store.ts for the lifecycle rules.
 const filesDirectory = process.env.FILES_PATH ?? fileURLToPath(new URL("../../.data/files", import.meta.url));
 await mkdir(dirname(filename), { recursive: true });
+
+// SDK 1.4.0 reads core schema v3; migrate an older database file in place (it backs up first).
+if (existsSync(filename)) {
+  await migrateSQLiteCore({ filename });
+}
 const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
