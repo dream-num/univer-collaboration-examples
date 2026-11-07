@@ -2,7 +2,6 @@ import { getBoardsEmptySnapshot } from "@univerjs-pro/boards";
 import { getPdfsEmptySnapshot } from "@univerjs-pro/pdfs";
 import { getSlidesEmptySnapshot } from "@univerjs-pro/slides";
 import {
-  CollabError,
   type CreateUnitFromDataInput,
   type IUniverCollabService,
 } from "@univerjs-pro/collaboration-service";
@@ -23,16 +22,7 @@ export const units: readonly UnitSummary[] = [
 
 export async function ensureUnits(service: IUniverCollabService): Promise<void> {
   for (const unit of units) {
-    try {
-      await service.getUnitLoadData(
-        { unitID: unit.unitId, type: unit.type, revision: 0 },
-        { userID: DEMO_USER.userId },
-      );
-    } catch (error) {
-      // Initialize only missing Units; preserve existing data and propagate other read failures.
-      if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
-      await service.createUnitFromData(initialData(unit), { userID: DEMO_USER.userId });
-    }
+    await service.createUnitFromData(initialData(unit), { userID: DEMO_USER.userId });
   }
 }
 

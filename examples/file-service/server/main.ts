@@ -6,10 +6,7 @@ import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
-import {
-  CollabError,
-  UniverCollabService,
-} from "@univerjs-pro/collaboration-service";
+import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
 import { FileStore } from "./file-store.js";
@@ -59,19 +56,10 @@ endpoint.use("connect", async (context, next) => {
 });
 transport.register(endpoint);
 
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: USER_ID },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND")
-    throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: USER_ID },
-  );
-}
+await service.createUnitFromData(
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { userID: USER_ID },
+);
 
 const app = express();
 // The file routes belong to the application; the Collaboration SDK has no file Endpoint.

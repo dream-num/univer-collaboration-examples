@@ -164,18 +164,10 @@ service.on("changesetCommitted", (event) => {
 transport.register(new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }));
 transport.register(new UniverHistoryEndpoint(historyService));
 transport.register(endpoint);
-try {
-  await service.getUnitLoadData(
-    { unitID: UNIT_ID, type: UniverType.UNIVER_SHEET, revision: 0 },
-    { userID: "user-alice" },
-  );
-} catch (error) {
-  if (!(error instanceof CollabError) || error.code !== "UNIT_NOT_FOUND") throw error;
-  await service.createUnitFromData(
-    { type: UniverType.UNIVER_SHEET, data: unitData },
-    { userID: "user-alice" },
-  );
-}
+await service.createUnitFromData(
+  { type: UniverType.UNIVER_SHEET, data: unitData },
+  { userID: "user-alice" },
+);
 
 function requireUser(request: express.Request, response: express.Response) {
   const user = currentUser(request);
