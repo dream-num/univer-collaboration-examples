@@ -2,9 +2,9 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A collaborative Sheet whose data survives a server restart. A Database Adapter stores Units,
-snapshots, Sheet blocks, and changesets; this example uses the SQLite Adapter and shows how to
-change to another one.
+A Database Adapter stores documents (Units), snapshots, Sheet blocks, and changesets. This example
+uses the SDK's built-in `SQLiteDatabaseAdapter` by default and shows how to change the storage and
+write an Adapter of your own.
 
 ## Run the example
 

@@ -2,8 +2,8 @@
 
 [English](./README.md) | 简体中文
 
-一个协同 Sheet，数据在服务重启后仍在。Database Adapter 保存 Unit、快照、Sheet blocks 和 changesets；本示例
-使用 SQLite Adapter，并展示如何换成其他 Adapter。
+Database Adapter 负责保存文档（Unit）、快照、Sheet blocks 和 changesets。本例默认使用 SDK 内置的
+`SQLiteDatabaseAdapter`，并说明如何更换存储和实现自己的 Adapter。
 
 ## 运行示例
 
