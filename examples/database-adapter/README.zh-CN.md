@@ -40,8 +40,8 @@ Service，再调用 `database.dispose()`。
 
 ## 更换存储
 
-替换 `dbAdapter` 即可。多个节点共用一个数据库时用 PostgreSQL Adapter，所有写入决策都由 PostgreSQL 做出。连接池由应用管理；`create`
-会初始化空的 `collaboration` schema，已有 schema 则只做校验：
+替换 `dbAdapter` 即可。多个节点共用一个数据库时用 PostgreSQL Adapter。连接池由应用管理；`create` 会初始化空的
+`collaboration` schema，已有 schema 则只做校验：
 
 ```ts
 import { PostgresDatabaseAdapter } from "@univerjs-pro/collaboration-database-postgres";

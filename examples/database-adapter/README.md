@@ -42,9 +42,8 @@ you. The application owns the Adapter: stop the Services using it before calling
 
 ## Change the storage
 
-Replace `dbAdapter`. For several nodes on one database, the PostgreSQL Adapter lets PostgreSQL
-make every write decision.
-The application owns the connection pool; `create` initializes an empty `collaboration` schema and
+Replace `dbAdapter`. For several nodes on one database, use the PostgreSQL Adapter. The
+application owns the connection pool; `create` initializes an empty `collaboration` schema and
 verifies an existing one:
 
 ```ts
