@@ -42,16 +42,8 @@ you. The application owns the Adapter: stop the Services using it before calling
 
 ## Change the storage
 
-Replace `dbAdapter`. For tests and temporary services, the Memory Adapter keeps everything in the
-process:
-
-```ts
-import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
-
-const database = new MemoryDatabaseAdapter();
-```
-
-For several nodes on one database, the PostgreSQL Adapter lets PostgreSQL make every write decision.
+Replace `dbAdapter`. For several nodes on one database, the PostgreSQL Adapter lets PostgreSQL
+make every write decision.
 The application owns the connection pool; `create` initializes an empty `collaboration` schema and
 verifies an existing one:
 

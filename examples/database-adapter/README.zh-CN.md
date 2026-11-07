@@ -40,15 +40,7 @@ Service，再调用 `database.dispose()`。
 
 ## 更换存储
 
-替换 `dbAdapter` 即可。测试和临时服务可用 Memory Adapter，数据只在进程内：
-
-```ts
-import { MemoryDatabaseAdapter } from "@univerjs-pro/collaboration-database-memory";
-
-const database = new MemoryDatabaseAdapter();
-```
-
-多个节点共用一个数据库时用 PostgreSQL Adapter，所有写入决策都由 PostgreSQL 做出。连接池由应用管理；`create`
+替换 `dbAdapter` 即可。多个节点共用一个数据库时用 PostgreSQL Adapter，所有写入决策都由 PostgreSQL 做出。连接池由应用管理；`create`
 会初始化空的 `collaboration` schema，已有 schema 则只做校验：
 
 ```ts
