@@ -67,10 +67,9 @@ endpoint.use("connect", async (context, next) => {
   context.member.name = context.session.userID;
   await next();
 });
-transport.register(
-  new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }),
-);
+// Main Endpoint first: the Transport disposes in reverse order, so Comment is released before its roomHost.
 transport.register(endpoint);
+transport.register(new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }));
 // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },

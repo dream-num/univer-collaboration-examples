@@ -10,7 +10,7 @@ pnpm example:history
 
 打开 <http://127.0.0.1:3010/?unit=history-sheet>，编辑后点击页面上方的 `History` 查看版本。这个示例刻意把
 History 作为可选派生能力：`server/main.ts` 先组装 core，再通过 `collabService` 传入 History Service，并按
-认证 → History Endpoint → Collaboration Endpoint 的顺序注册。
+认证 → Collaboration Endpoint → History Endpoint 的顺序注册。
 
 History 索引与 core 数据使用不同 Adapter，本示例让它们共享
 `.data/collaboration.sqlite`。两者都会在重启后保留，生产环境也需要分别纳入持久化和备份
