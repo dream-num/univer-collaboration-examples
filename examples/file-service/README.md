@@ -2,10 +2,45 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A collaborative Sheet whose inserted images are uploaded through `UniverFileEndpoint`.
-`UniverFileService` owns the ownership rules and expiry cleanup, and two adapters decide where
-metadata and contents live. This example uses SQLite and a local directory; moving to Postgres and
-S3 only replaces those two adapters.
+A collaborative Sheet whose inserted images are stored by the application's own file service
+instead of inside the Unit data.
+
+## Why an application needs a file service
+
+Collaboration stores a Unit as changesets and snapshots. Binary files do not belong in that stream:
+the images and attachments inserted into a Unit, and the source files and results of server-side
+import and export. The Univer client uploads them to HTTP routes served by the application, keeps
+only a file ID in the Unit data, and asks the same routes for a URL whenever it shows or downloads
+the file.
+
+Without a file service the Drawing plugin embeds images as base64 in the Unit data. That is fine for
+a demo, but every image inflates the snapshots and changesets that collaboration stores and sends,
+and server-side import and export have nowhere to transfer files. The File Service and File Endpoint
+give the application those routes on storage it controls, and the same files then serve images,
+attachments, and import and export.
+
+## Packages
+
+The four file packages this example uses are open source under Apache-2.0 in
+[univer-collaboration-sdk-community](https://github.com/dream-num/univer-collaboration-sdk-community).
+They are published to npm under the same names and versions as the rest of the SDK.
+
+| Package | Role in this example |
+| --- | --- |
+| [`@univerjs-pro/collaboration-file-service`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-service/README.md) | `UniverFileService`: ownership rules, permission middleware, and expiry cleanup of temporary files. It has no storage of its own and writes through the two adapters below. |
+| [`@univerjs-pro/collaboration-file-endpoint`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-endpoint/README.md) | `UniverFileEndpoint`: the upload, sign-url, and download routes the Univer frontend calls, registered on the Transport next to the collaboration Endpoint. |
+| [`@univerjs-pro/collaboration-file-database-sqlite`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-sqlite/README.md) | `SQLiteFileDatabaseAdapter`: file metadata (`IFileDatabaseAdapter`) in the `collaboration_files` table of `.data/collaboration.sqlite`, shared with the collaboration data. |
+| [`@univerjs-pro/collaboration-file-blob-local`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-local/README.md) | `LocalFileBlobStore`: file contents (`IFileBlobStore`) in `.data/files/<fileID>`. |
+
+Metadata and content are separate contracts, so each adapter is replaced on its own.
+[`collaboration-file-database-postgres`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-postgres/README.md)
+and [`collaboration-file-blob-s3`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-s3/README.md)
+support multi-node deployments and direct download links;
+[`collaboration-file-memory`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-memory/README.md)
+implements both for tests. The built-in adapters are also the reference implementations for writing
+your own against the storage the application already runs.
+
+## Run the example
 
 ```bash
 pnpm example:file-service
@@ -17,8 +52,11 @@ routes after a refresh or a server restart, and a second browser on the same URL
 
 - `web/main.ts` configures the collaboration client with the three file URLs and registers the
   Drawing preset in collaboration mode.
-- `server/main.ts` assembles the collaboration Service, Endpoint, Transport, and the File Service
-  and Endpoint.
+- `server/main.ts` assembles the collaboration Service, Endpoint, and Transport, then the File
+  Service with its two adapters and the File Endpoint.
+
+Files survive a server restart. The File Service's timer removes temporary `HttpImport` and
+`HttpExport` files; images stay as long as the Unit does.
 
 ## How the client calls the file service
 
@@ -59,19 +97,14 @@ as this example does. Without one, keep the base64 implementation instead: pass
 Drawing plugin before the collaboration client plugins, as [`comments`](../comments/README.md)
 and [`object-permissions`](../object-permissions/README.md) do.
 
-## Where files are stored
+## Permissions and production settings
 
-`SQLiteFileDatabaseAdapter` writes metadata to the `collaboration_files` table in
-`.data/collaboration.sqlite`, and `LocalFileBlobStore` writes contents to `.data/files/<fileID>`, so
-files survive a server restart. The File Service's timer removes `HttpImport` and `HttpExport` files.
-
-## Replace the storage and add permissions
-
-Swapping the adapters for `@univerjs-pro/collaboration-file-database-postgres` and
-`@univerjs-pro/collaboration-file-blob-s3` supports multi-node deployments. Every request in this
-example is the same user and Unit permissions are not checked; a real application uses
-`fileService.use("upload" | "signUrl" | "download", ...)` to check that the user may access the Unit
-named by `assign`.
+Every request in this example is the same user and Unit permissions are not checked. The File
+Service does not know the application's Unit permissions; a real application installs them as
+middleware with `fileService.use("upload" | "signUrl" | "download", ...)` and checks that the user
+may access the Unit named by `assign`. Upload size limits, timeouts, and authentication for image
+loading (cookies, bearer tokens, or direct links signed by the blob store) are options of the File
+Endpoint; see the two package READMEs linked above.
 
 The [`exchange`](../exchange/README.md) and [`all-unit`](../all-unit/README.md) examples connect the
 File Service the same way.

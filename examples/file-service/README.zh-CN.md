@@ -2,9 +2,39 @@
 
 [English](./README.md) | 简体中文
 
-一个协同 Sheet，插入的图片通过 `UniverFileEndpoint` 上传。`UniverFileService` 负责归属规则和过期
-清理，元数据和内容的存储由两个 adapter 决定：本示例用 SQLite 和本地目录，换成 Postgres 和 S3 只需替换
-这两个 adapter。
+一个协同 Sheet，插入的图片由应用自己的文件服务保存，而不是存在 Unit 数据里。
+
+## 为什么应用需要文件服务
+
+协同以 changeset 和快照的形式保存 Unit。二进制文件不属于这条数据流：插入到 Unit 里的图片和附件，
+以及服务端导入导出的源文件和结果文件。Univer 客户端把它们上传到应用提供的 HTTP 路由，Unit 数据里只
+保留一个文件 ID，显示或下载时再向同一组路由换取 URL。
+
+没有文件服务时，Drawing 插件会把图片以 base64 嵌进 Unit 数据。演示够用，但每张图片都会撑大协同存储
+和传输的快照与 changeset，服务端导入导出也没有地方传文件。File Service 和 File Endpoint 把这组路由
+建在应用自己掌控的存储之上，同一套文件同时服务图片、附件和导入导出。
+
+## 相关的包
+
+本示例用到的四个文件相关的包都已在
+[univer-collaboration-sdk-community](https://github.com/dream-num/univer-collaboration-sdk-community)
+以 Apache-2.0 开源，发布到 npm 时与 SDK 其余部分使用相同的包名和版本号。
+
+| 包 | 在本示例中的角色 |
+| --- | --- |
+| [`@univerjs-pro/collaboration-file-service`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-service/README.zh-CN.md) | `UniverFileService`：归属规则、权限中间件、临时文件的过期清理。它自己不存数据，通过下面两个 adapter 读写。 |
+| [`@univerjs-pro/collaboration-file-endpoint`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-endpoint/README.zh-CN.md) | `UniverFileEndpoint`：Univer 前端调用的上传、sign-url、下载三条路由，和协同 Endpoint 一起注册在 Transport 上。 |
+| [`@univerjs-pro/collaboration-file-database-sqlite`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-sqlite/README.zh-CN.md) | `SQLiteFileDatabaseAdapter`：文件元数据（`IFileDatabaseAdapter`），写在 `.data/collaboration.sqlite` 的 `collaboration_files` 表，与协同数据同库。 |
+| [`@univerjs-pro/collaboration-file-blob-local`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-local/README.zh-CN.md) | `LocalFileBlobStore`：文件内容（`IFileBlobStore`），写在 `.data/files/<fileID>`。 |
+
+元数据和内容是两份独立的契约，adapter 可以各自替换。
+[`collaboration-file-database-postgres`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-postgres/README.zh-CN.md)
+和 [`collaboration-file-blob-s3`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-s3/README.zh-CN.md)
+支持多节点部署和直链下载；
+[`collaboration-file-memory`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-memory/README.zh-CN.md)
+同时实现两份契约，用于测试。内置 adapter 也是参考实现，可照着对接应用已有的存储。
+
+## 运行示例
 
 ```bash
 pnpm example:file-service
@@ -15,7 +45,11 @@ pnpm example:file-service
 打开同一 URL 也能看到。
 
 - `web/main.ts`：在协同客户端上配置三个文件 URL，并以协同模式注册 Drawing preset。
-- `server/main.ts`：组装协同 Service、Endpoint、Transport，以及 File Service 和 Endpoint。
+- `server/main.ts`：组装协同 Service、Endpoint、Transport，再组装 File Service、它的两个 adapter 和
+  File Endpoint。
+
+文件在服务重启后仍在。File Service 的定时清理只删除临时的 `HttpImport` 和 `HttpExport` 文件，图片与
+Unit 同生命周期。
 
 ## 客户端如何调用文件服务
 
@@ -53,18 +87,12 @@ Unit 数据里只保存文件 ID，所以只要 sign-url 路由还能解析这�
 `override: [[IImageIoService, null]]`，并把 Drawing 插件注册在协同客户端插件之前，参见
 [`comments`](../comments/README.zh-CN.md) 和 [`object-permissions`](../object-permissions/README.zh-CN.md)。
 
-## 文件保存在哪里
+## 权限与生产配置
 
-`SQLiteFileDatabaseAdapter` 把元数据写入 `.data/collaboration.sqlite` 的 `collaboration_files` 表，
-`LocalFileBlobStore` 把内容写到 `.data/files/<fileID>`，服务重启后文件仍在。`HttpImport` 和
-`HttpExport` 文件由 File Service 的定时清理删除。
-
-## 替换存储和接入权限
-
-把 adapter 换成 `@univerjs-pro/collaboration-file-database-postgres` 和
-`@univerjs-pro/collaboration-file-blob-s3` 就能用于多节点部署。本示例所有请求都是同一个用户，没有
-检查 Unit 权限；真实应用用 `fileService.use("upload" | "signUrl" | "download", ...)` 检查用户是否有权
-访问 `assign` 指定的 Unit。
+本示例所有请求都是同一个用户，没有检查 Unit 权限。File Service 不知道应用的 Unit 权限，真实应用用
+`fileService.use("upload" | "signUrl" | "download", ...)` 以中间件的形式接入，检查用户是否有权访问
+`assign` 指定的 Unit。上传大小限制、超时，以及图片加载的鉴权方式（Cookie、Bearer token，或由 blob
+store 签发的直链）都是 File Endpoint 的选项，见上面链接的两个包的 README。
 
 [`exchange`](../exchange/README.zh-CN.md) 和 [`all-unit`](../all-unit/README.zh-CN.md) 示例用同样的方式
 接入 File Service。
