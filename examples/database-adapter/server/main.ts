@@ -66,6 +66,7 @@ endpoint.use("connect", async (context, next) => {
 });
 transport.register(endpoint);
 
+// Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
   { userID: USER_ID },
