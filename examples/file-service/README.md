@@ -2,22 +2,33 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A collaborative Sheet whose inserted images are stored by the application's own file service
-instead of inside the Unit data.
+A collaborative Sheet whose inserted images are uploaded to the application's file service and
+referenced by ID from the Unit data.
 
-## Why an application needs a file service
+## Two ways to store an image
 
-Collaboration stores a Unit as changesets and snapshots. Binary files do not belong in that stream:
-the images and attachments inserted into a Unit, and the source files and results of server-side
-import and export. The Univer client uploads them to HTTP routes served by the application, keeps
-only a file ID in the Unit data, and asks the same routes for a URL whenever it shows or downloads
-the file.
+When someone inserts an image into a Sheet, the bytes have to live somewhere. Univer supports two
+places.
 
-Without a file service the Drawing plugin embeds images as base64 in the Unit data. That is fine for
-a demo, but every image inflates the snapshots and changesets that collaboration stores and sends,
-and server-side import and export have nowhere to transfer files. The File Service and File Endpoint
-give the application those routes on storage it controls, and the same files then serve images,
-attachments, and import and export.
+**Embedded in the Unit.** The Drawing plugin's default image service turns the file into a base64
+data URL and writes it into the Unit data next to the drawing's position and size. The server plays
+no part; this is how a standalone Univer page stores images.
+
+**Referenced from the Unit.** The client uploads the file to the application, which stores it and
+answers with a file ID. The Unit data keeps only that ID. When the image is shown, the client
+exchanges the ID for a URL and the browser loads the file from there.
+
+Embedding fits a single-user page but not collaboration, because the Unit data is exactly what
+collaboration sends and stores. An embedded image rides inside a changeset that every collaborator
+receives and inside every snapshot the server keeps, so a few photos turn a workbook of a few
+kilobytes into megabytes that are loaded in full on every open. Attachments and server-side import
+and export move whole files between browser and server, so they cannot be built on embedding at all.
+
+The File Service and File Endpoint are the server side of the second way. The Endpoint serves the
+three routes the client calls (upload, sign-url, download), the Service applies ownership rules and
+permission middleware and removes expired temporary files, and two adapters decide where metadata and
+contents are stored. The same routes also carry attachments and the source files and results of
+server-side import and export, so one file service serves every file a Unit refers to.
 
 ## Packages
 
