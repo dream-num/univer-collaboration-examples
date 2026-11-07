@@ -4,12 +4,22 @@ import { createServer } from "node:http";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+// PDF conversion is opt-in: this side-effect import enables it before the Exchange Service starts.
+import "@univerjs-pro/exchange-node/pdf";
+import { SQLiteCommentDatabaseAdapter } from "@univerjs-pro/collaboration-comment-database-sqlite";
+import { UniverCommentEndpoint } from "@univerjs-pro/collaboration-comment-endpoint";
+import { UniverCommentService } from "@univerjs-pro/collaboration-comment-service";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
+import { UniverExchangeEndpoint } from "@univerjs-pro/collaboration-exchange-endpoint";
+import { UniverExchangeService } from "@univerjs-pro/collaboration-exchange-service";
 import { LocalFileBlobStore } from "@univerjs-pro/collaboration-file-blob-local";
 import { SQLiteFileDatabaseAdapter } from "@univerjs-pro/collaboration-file-database-sqlite";
 import { UniverFileEndpoint } from "@univerjs-pro/collaboration-file-endpoint";
 import { UniverFileService } from "@univerjs-pro/collaboration-file-service";
+import { SQLiteHistoryDatabaseAdapter } from "@univerjs-pro/collaboration-history-database-sqlite";
+import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpoint";
+import { UniverHistoryService } from "@univerjs-pro/collaboration-history-service";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
@@ -33,6 +43,30 @@ const fileService = new UniverFileService({
   blobStore: new LocalFileBlobStore({ directory: filesDirectory }),
   cleanup: { context: { userID: "system:file-cleanup" } },
 });
+const exchangeService = new UniverExchangeService({ collabService: service, fileService });
+// Comments and history show who wrote what, so both ask the application for its users.
+const userProvider = {
+  async getUsers(userIDs: string[]) {
+    return userIDs.map((userID) => ({
+      userID,
+      name: userID === DEMO_USER.userId ? DEMO_USER.displayName : userID,
+      avatar: "",
+      anonymous: false,
+      canBindAnonymous: false,
+      phone: "",
+      email: "",
+      createTimestamp: 0,
+    }));
+  },
+};
+const commentDatabase = new SQLiteCommentDatabaseAdapter({ filename });
+const commentService = new UniverCommentService({ database: commentDatabase, userProvider });
+const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
+const historyService = new UniverHistoryService({
+  collabService: service,
+  dbAdapter: historyDatabase,
+  userProvider,
+});
 const transport = createNodeTransport();
 const endpoint = new UniverCollabEndpoint(service);
 transport.use(async (context, next) => {
@@ -43,8 +77,12 @@ endpoint.use("connect", async (context, next) => {
   context.member.name = DEMO_USER.displayName;
   await next();
 });
+transport.register(new UniverCommentEndpoint({ service: commentService, roomHost: endpoint }));
+transport.register(new UniverHistoryEndpoint(historyService));
 transport.register(endpoint);
+// File first: the Transport disposes in reverse order, so Exchange is released before File.
 transport.register(new UniverFileEndpoint(fileService));
+transport.register(new UniverExchangeEndpoint(exchangeService));
 
 const app = express();
 app.get("/api/units", (_request, response) => {
@@ -73,8 +111,12 @@ async function dispose() {
       server.close((error) => error ? reject(error) : resolve());
     });
   }
+  await historyService.dispose();
+  await commentService.dispose();
   await fileService.dispose();
   await service.dispose();
+  await historyDatabase.dispose();
+  await commentDatabase.dispose();
   await fileDatabase.dispose();
   await database.dispose();
 }

@@ -1,0 +1,24 @@
+/*
+ * The views under ./<type>/views use Tailwind utility classes. Univer's packages ship only the
+ * classes their own components use, and the univer-pro examples compile the rest with Tailwind.
+ * This example has no Tailwind build, so the utilities those views need and no package provides
+ * are written out here with Tailwind's default values.
+ */
+.univer-bottom-12 { bottom: 3rem; }
+.univer-right-3 { right: 0.75rem; }
+.univer-z-\[1000\] { z-index: 1000; }
+.univer-w-48 { width: 12rem; }
+.univer-w-\[324px\] { width: 324px; }
+.univer-w-\[372px\] { width: 372px; }
+.univer-w-\[calc\(100\%-48px\)\] { width: calc(100% - 48px); }
+.univer-h-1\.5 { height: 0.375rem; }
+.univer-ml-1\.5 { margin-left: 0.375rem; }
+.univer-pl-1\.5 { padding-left: 0.375rem; }
+.univer-pr-4 { padding-right: 1rem; }
+.univer-pt-5 { padding-top: 1.25rem; }
+.univer-no-underline { text-decoration-line: none; }
+.univer-transition-\[width\] {
+  transition-property: width;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}

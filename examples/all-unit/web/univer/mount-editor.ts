@@ -15,12 +15,23 @@ import { UniverDrawingPlugin } from "@univerjs/drawing";
 import { UniverRenderEnginePlugin } from "@univerjs/engine-render";
 import { UniverType } from "@univerjs/protocol";
 import { defaultTheme, greenTheme, purpleTheme, redTheme, yellowTheme } from "@univerjs/themes";
-import { loadCollaborativeUnit, registerCollaboration } from "./features/collaboration";
+import { unitLink } from "../../shared/units";
 import { univerLocales } from "./locales";
 import type { EditorLocale, MountedUniverEditor, MountUniverEditorOptions } from "./types";
-import { loadUnitStyles, registerUnitPlugins } from "./units";
+import { loadUnit, loadUnitStyles, registerUnitPlugins } from "./units";
+
+import "./import-export/utilities.css";
 
 const MAX_UNIVER_IMAGE_BYTES = 20 * 1024 * 1024;
+
+declare global {
+  interface Window {
+    /** The current editor's Univer instance, exposed for the browser console. */
+    univer?: Univer;
+    /** The current editor's Facade API, exposed for the browser console. */
+    univerAPI?: FUniver;
+  }
+}
 
 export async function mountUniverEditor(
   options: MountUniverEditorOptions,
@@ -28,10 +39,8 @@ export async function mountUniverEditor(
   await loadUnitStyles(options.unitType);
 
   const univer = createUniver(options.unitType, options.locale);
+  // Each Unit type registers everything it needs, including the collaboration client.
   registerUnitPlugins(univer, options);
-
-  const baseURL = `${location.protocol}//${location.host}/universer-api`;
-  registerCollaboration(univer, baseURL);
 
   univer.__getInjector().get(UserManagerService).setCurrentUser({
     userID: options.user.userId,
@@ -40,7 +49,9 @@ export async function mountUniverEditor(
   });
 
   const univerAPI = FUniver.newAPI(univer);
-  const unit = await loadCollaborativeUnit(univerAPI, options.unitType, options.unitId);
+  window.univer = univer;
+  window.univerAPI = univerAPI;
+  const unit = await loadUnit(univerAPI, options.unitType, options.unitId);
   if (!unit) throw new Error("Unit could not be loaded");
 
   return {
@@ -48,6 +59,8 @@ export async function mountUniverEditor(
     dispose: () => {
       univerAPI.dispose();
       univer.dispose();
+      delete window.univer;
+      delete window.univerAPI;
     },
     setLocale: (locale) => univer.setLocale(toUniverLocale(locale)),
   };
@@ -88,6 +101,8 @@ function createUniver(unitType: number, locale: EditorLocale) {
   univer.registerPlugin(UniverDrawingPlugin, {
     override: [[IImageIoService, null]],
     allowImageSize: MAX_UNIVER_IMAGE_BYTES,
+    // Embedded Office attachments open here after they are converted to online Units.
+    ole: { getLink: unitLink },
   });
 
   return univer;
