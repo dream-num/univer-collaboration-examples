@@ -52,7 +52,7 @@ File Service 的原因。
 
 `UniverSheetsExchangeClientPlugin` 设置导入后工作表的最小行数和列数。
 
-自 SDK 1.2.0 起 exchange 包是 headless 的，没有 ribbon 入口。入口由应用提供，调用 Facade：
+工具栏由示例自己提供，按钮调用 Facade API：
 
 ```ts
 import "@univerjs-pro/exchange-client/facade";
@@ -60,11 +60,12 @@ import "@univerjs-pro/sheets-exchange-client/facade";
 
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);
 
-const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX, sheetId);
+const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX);
 univerAPI.downloadFile(blob, unitId, ExchangeFormat.XLSX);
 ```
 
-`sheetId` 指定 CSV 导出哪一个工作表，CSV 只含一个工作表；XLSX 忽略它。
+Facade API、插件选项以及如何保留内置菜单见
+[Sheets 导入导出](https://docs.univer.ai/zh-CN/guides/sheets/features/import-export)。
 
 ## 服务端组装
 
@@ -72,13 +73,13 @@ univerAPI.downloadFile(blob, unitId, ExchangeFormat.XLSX);
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
 
 transport.register(endpoint);
-// File first: the Transport disposes in reverse order, so Exchange is released before File.
+// Exchange depends on File: register File before Exchange.
 transport.register(new UniverFileEndpoint(fileService));
 transport.register(new UniverExchangeEndpoint(exchangeService));
 ```
 
 转换在进程内通过 `@univerjs-pro/exchange-node` 完成，它从环境变量 `UNIVER_LICENSE` 和 `UNIVER_LICENSE_KEY`
-读取 License，见 [License](https://docs.univer.ai/server/license)。
+读取 License，见[许可证](https://docs.univer.ai/zh-CN/server/import-export/license)。
 
 本示例所有请求都是同一个用户，没有检查 Unit 权限。通过 `exchangeService.use("import" | "export", ...)`
 以中间件的形式接入。
