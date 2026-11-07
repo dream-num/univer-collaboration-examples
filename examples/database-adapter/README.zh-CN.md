@@ -57,9 +57,13 @@ const database = await PostgresDatabaseAdapter.create({ pool });
 
 实现 `IDatabaseAdapter` 并作为 `dbAdapter` 传入。事务、revision CAS 以及 Unit 的删除和恢复都在 Adapter 内完成：
 `commitChangeset` 只在当前 head 等于 `changeset.revision - 1` 时写入 changeset，否则返回 `revision-mismatch`
-交给 Service 重试。三个内置 Adapter 的源码就是参考：[Memory Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-memory)
-是这份契约最短的完整实现，[SQLite](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-sqlite) 和
-[PostgreSQL](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-postgres) Adapter 展示同一契约如何落到数据库事务。
+交给 Service 重试。三个内置 Adapter 的源码就是参考：
+
+| 源码 | 展示内容 |
+| --- | --- |
+| [Memory Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-memory) | 这份契约最短的完整实现 |
+| [SQLite Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-sqlite) | 同一契约在单文件数据库上用写事务实现 |
+| [PostgreSQL Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-postgres) | 同一契约在多节点共用的数据库上用行锁实现 |
 
 ## 清空数据
 

@@ -61,11 +61,13 @@ The [`multi-node`](../multi-node/README.md) example runs two nodes on it.
 Implement `IDatabaseAdapter` and pass it as `dbAdapter`. Transactions, revision CAS, and Unit
 deletion and recovery live inside the Adapter; `commitChangeset` inserts a changeset only when the
 current head equals `changeset.revision - 1` and otherwise returns `revision-mismatch` for the
-Service to retry. The three built-in Adapters are the reference: the
-[Memory Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-memory) is the shortest complete implementation of the
-contract, and the [SQLite](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-sqlite) and
-[PostgreSQL](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-postgres) Adapters show the same contract on database
-transactions.
+Service to retry. The three built-in Adapters are the reference:
+
+| Source | What it shows |
+| --- | --- |
+| [Memory Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-memory) | The shortest complete implementation of the contract |
+| [SQLite Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-sqlite) | The contract on a single-file database with write transactions |
+| [PostgreSQL Adapter](https://github.com/dream-num/univer-collaboration-sdk-community/tree/main/packages/collaboration-database-postgres) | The contract on a shared database with row locks for several nodes |
 
 ## Reset data
 
