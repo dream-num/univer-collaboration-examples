@@ -70,8 +70,8 @@ endpoint.use("connect", async (context, next) => {
   context.member.name = context.session.userID;
   await next();
 });
-transport.register(new UniverHistoryEndpoint(historyService));
 transport.register(endpoint);
+transport.register(new UniverHistoryEndpoint(historyService));
 // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
 await service.createUnitFromData(
   { type: UniverType.UNIVER_SHEET, data: unitData },
