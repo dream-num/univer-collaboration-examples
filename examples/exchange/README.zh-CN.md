@@ -2,30 +2,101 @@
 
 [English](./README.md) | 简体中文
 
-基于 `@univerjs-pro/exchange-node` 的可运行 Sheet 协同与服务端 Office 转换示例。前端注册
-`UniverExchangeClientPlugin` 和 `UniverSheetsExchangeClientPlugin`，服务端用
-`UniverExchangeEndpoint` 和 `UniverFileEndpoint` 提供这些插件调用的路由。
+一个协同 Sheet，服务端把 Office 文件导入为协同 Unit，把 Unit 导出为文件。
+
+## 运行示例
 
 ```bash
 pnpm example:exchange
 ```
 
-打开 <http://127.0.0.1:3010/?unit=exchange-sheet>，用编辑器上方的 **Import** / **Export** 工具栏把
-XLS/XLSX/CSV/TSV 导入为新的协同 Unit，或把当前 confirmed revision 导出为 XLSX/CSV。导入完成后浏览器会跳转到
-新建的 Unit。
+打开 <http://127.0.0.1:3010/?unit=exchange-sheet>。编辑器上方的 **Import** / **Export** 工具栏把 XLS、XLSX、
+CSV、TSV 导入为新的协同 Unit，把当前 confirmed revision 导出为 XLSX 或 CSV。导入完成后浏览器跳转到新 Unit。
 
-自 SDK 1.2.0 起，`exchange-client` 与 `sheets-exchange-client` 只提供 headless 能力（不再带
-ribbon 入口），所以入口由示例自己提供：`web/main.ts` 调用 Facade 的
-`importSheetToUnitIdAsync`、`exportSheetByUnitIdAsync` 和 `downloadFile`。
+- `server/main.ts`：组装协同、File、Exchange 的 Service 与 Endpoint。
+- `web/main.ts`：配置协同与 exchange 插件，提供工具栏。
 
-建议一起阅读：
+Unit、文件元数据和文件内容都在 `.data`，服务重启后仍在；`pnpm --filter @univerjs/collaboration-example-exchange reset`
+删除它。任务只在进程内，重启后不再可查。
 
-- `server/main.ts`：组装协同、File 和 Exchange 的 Service 与 Endpoint。文件元数据和协同数据共用
-  `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
-- `web/main.ts`：配置协同与 exchange 前端插件。
+## 工作方式
 
-协同 Unit、文件元数据和文件内容都保留在 `.data`，服务重启后仍在。`exchange-sheet` 的初始内容只在
-首次创建 Unit 时写入；要从空库重新开始，先停止服务，再运行
-`pnpm --filter @univerjs/collaboration-example-exchange reset` 删除 `.data`。任务只存在于当前进程，
-进程停止后会丢失。导入的源文件在任务结束时删除；导出结果是临时文件，由 File Service 的过期清理删除。
-文件接口的更详细说明请参考 [`file-service`](../file-service/README.zh-CN.md) 示例。
+导入和导出都是任务：客户端创建任务，然后轮询直到完成或失败。两者都经过 File Service。
+
+| | 客户端 | 服务端 |
+| --- | --- | --- |
+| 导入 | 把源文件上传到 File 的上传路由，带文件 ID 调用导入路由，轮询任务 | 转换文件，通过协同 Service 创建 Unit，返回新 Unit ID |
+| 导出 | 带 Unit ID 和格式调用导出路由，轮询任务，用结果文件 ID 走 sign-url 下载 | 读取 Unit，转换，结果存为临时文件，返回文件 ID |
+
+源文件在任务结束时删除；结果文件保留到 File Service 的过期清理删除。这就是示例在 Exchange 之外还要组装
+File Service 的原因。
+
+## 客户端配置
+
+`UniverExchangeClientPlugin` 需要六个 URL：三条 exchange 路由，以及与协同客户端共用的三个 File URL。
+
+```ts
+[
+  UniverExchangeClientPlugin,
+  {
+    importServerUrl: `${baseURL}/exchange/{type}/import`,
+    exportServerUrl: `${baseURL}/exchange/{type}/export`,
+    getTaskServerUrl: `${baseURL}/exchange/task/{taskID}`,
+    uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+    signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+    downloadEndpointUrl: `${location.protocol}//${location.host}/`,
+  },
+],
+[UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 }],
+```
+
+`UniverSheetsExchangeClientPlugin` 设置导入后工作表的最小行数和列数。
+
+自 SDK 1.2.0 起 exchange 包是 headless 的，没有 ribbon 入口。入口由应用提供，调用 Facade：
+
+```ts
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
+
+const unitId = await univerAPI.importSheetToUnitIdAsync(file);
+
+const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX, sheetId);
+univerAPI.downloadFile(blob, unitId, ExchangeFormat.XLSX);
+```
+
+`sheetId` 指定 CSV 导出哪一个工作表，CSV 只含一个工作表；XLSX 忽略它。
+
+## 服务端组装
+
+```ts
+const exchangeService = new UniverExchangeService({ collabService: service, fileService });
+
+transport.register(endpoint);
+// File first: the Transport disposes in reverse order, so Exchange is released before File.
+transport.register(new UniverFileEndpoint(fileService));
+transport.register(new UniverExchangeEndpoint(exchangeService));
+```
+
+转换在进程内通过 `@univerjs-pro/exchange-node` 完成，它从环境变量 `UNIVER_LICENSE` 和 `UNIVER_LICENSE_KEY`
+读取 License，见 [License](https://docs.univer.ai/server/license)。
+
+本示例所有请求都是同一个用户，没有检查 Unit 权限。通过 `exchangeService.use("import" | "export", ...)`
+以中间件的形式接入。
+
+## 相关的包
+
+Exchange 的 Service 和 Endpoint 在
+[univer-collaboration-sdk-community](https://github.com/dream-num/univer-collaboration-sdk-community)
+以 Apache-2.0 开源，发布到 npm 时与 SDK 其余部分使用相同的包名和版本号。可以直接使用，也可以参考源码实现
+自己的定制。
+
+| 包 | 说明 |
+| --- | --- |
+| [`@univerjs-pro/collaboration-exchange-service`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/README.zh-CN.md) | `UniverExchangeService`：请求校验、归属、权限中间件和任务。通过 `exchange-node` 转换，通过协同 Service 创建和读取 Unit，通过 File Service 存取文件。 |
+| [`@univerjs-pro/collaboration-exchange-endpoint`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-endpoint/README.zh-CN.md) | `UniverExchangeEndpoint`：导入、导出、任务三条路由。 |
+
+File 相关的包见 [`file-service`](../file-service/README.zh-CN.md) 示例。
+
+转换本身是闭源的。`@univerjs-pro/exchange-node` 负责 Office 文件与 Univer 数据之间的转换，并决定支持哪些格式；
+`@univerjs-pro/exchange-client` 和 `@univerjs-pro/sheets-exchange-client` 是它的客户端。流程、权限和存储在
+Service 与 Endpoint 中定制，转换不可定制。
