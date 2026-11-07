@@ -2,10 +2,32 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A collaborative Sheet whose inserted images are uploaded through `UniverFileEndpoint`.
-`UniverFileService` owns the ownership rules and expiry cleanup, and two adapters decide where
-metadata and contents live. This example uses SQLite and a local directory; moving to Postgres and
-S3 only replaces those two adapters.
+A collaboration application with its own file service: files a Unit refers to are stored by the
+application, and the Unit data keeps only file IDs. The demonstration is an image inserted into a
+Sheet.
+
+## Why a file service
+
+Take images as the example. An image inserted into a Unit is stored in one of two ways:
+
+- **Embedded.** The Drawing plugin's default image service encodes the file as base64 and writes it
+  into the Unit data. The server is not involved.
+- **Referenced.** The file is uploaded to the application. The Unit data records only a file ID,
+  which the client exchanges for a URL when it displays the image.
+
+An embedded image becomes part of the Unit data, so snapshots and changesets grow with it, and the
+client loads all of it on every open, slowing the first render. Referencing moves the file out of
+the Unit data and leaves only the ID behind.
+
+The need is not limited to images. Attachments are stored by reference in the same way, and the
+source and result files of import and export need temporary storage. The file service is the set of
+routes the application provides for these files: it accepts uploads and returns a download URL for
+a file ID, on storage the application chooses.
+
+In the SDK, the File Endpoint serves the routes, the File Service applies ownership rules,
+permission middleware, and temporary-file cleanup, and adapters store metadata and content.
+
+## Run the example
 
 ```bash
 pnpm example:file-service
@@ -17,19 +39,68 @@ routes after a refresh or a server restart, and a second browser on the same URL
 
 - `web/main.ts` configures the collaboration client with the three file URLs and registers the
   Drawing preset in collaboration mode.
-- `server/main.ts` assembles the collaboration Service, Endpoint, Transport, and the File Service
-  and Endpoint.
+- `server/main.ts` assembles the collaboration Service, Endpoint, and Transport, then the File
+  Service with its two adapters and the File Endpoint.
 
-## How the client calls the file service
+Files survive a server restart. The File Service's timer removes temporary `HttpImport` and
+`HttpExport` files; images stay as long as the Unit does.
 
-Set three URLs on `UniverCollaborationClientPlugin`. The image service (inserted images) and the
-attachment service (file attachments) in `@univerjs-pro/collaboration-client` both use them.
+## Client configuration
+
+The client needs two things: the file URLs, and exactly one image service.
+
+**File URLs.** Set three URLs on `UniverCollaborationClientPlugin`. The image service (inserted
+images) and the attachment service (file attachments) in `@univerjs-pro/collaboration-client` both
+use them.
 
 ```ts
-uploadFileServerUrl: `${baseURL}/stream/file/upload`,
-signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
-downloadEndpointUrl: `${location.protocol}//${location.host}/`,
+[
+  UniverCollaborationClientPlugin,
+  {
+    // ...collaboration URLs
+    uploadFileServerUrl: `${baseURL}/stream/file/upload`,
+    signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
+    downloadEndpointUrl: `${location.protocol}//${location.host}/`,
+  },
+],
 ```
+
+**Image service.** Only one implementation of `IImageIoService` may be registered. The Drawing plugin
+ships the base64 one and the collaboration client ships the uploading one; registering both fails
+with `Expect 1 dependency item(s) but get 2`.
+
+With a file service, drop the base64 one, as this example does:
+
+```ts
+presets: [
+  UniverSheetsCorePreset({ container: "app" }),
+  UniverSheetsDrawingPreset({ collaboration: true }),
+],
+```
+
+Without presets, pass the override to the Drawing plugin directly:
+
+```ts
+univer.registerPlugin(UniverDrawingPlugin, { override: [[IImageIoService, null]] });
+```
+
+Without a file service, keep the base64 one instead: drop the uploading one from the collaboration
+client and register the Drawing plugin first, because the collaboration client plugins resolve the
+image service at startup.
+
+```ts
+plugins: [
+  UniverCollaborationPlugin,
+  UniverDrawingPlugin,
+  [UniverCollaborationClientPlugin, { /* ...URLs */ override: [[IImageIoService, null]] }],
+  UniverCollaborationClientUIPlugin,
+],
+```
+
+## Routes the client calls
+
+The three URLs map to these requests. `UniverFileEndpoint` serves them under `/universer-api` by
+default.
 
 | Step | Request from the client | Response from the application |
 | --- | --- | --- |
@@ -50,28 +121,31 @@ long as the sign-url route can still resolve the ID.
 | `UnitEmbedded` (`3`) | The image and attachment services | Unit ID | Persistent: lives as long as the Unit |
 | Anything else, including omitted | — | — | Treat as persistent |
 
-Only one image service may be registered. The Drawing plugin ships a base64 implementation and
-the collaboration client ships the uploading one; registering both fails with
-`Expect 1 dependency item(s) but get 2`. With a file service, pass `collaboration: true` to
-`UniverSheetsDrawingPreset` (or `override: [[IImageIoService, null]]` to `UniverDrawingPlugin`)
-as this example does. Without one, keep the base64 implementation instead: pass
-`override: [[IImageIoService, null]]` to `UniverCollaborationClientPlugin` and register the
-Drawing plugin before the collaboration client plugins, as [`comments`](../comments/README.md)
-and [`object-permissions`](../object-permissions/README.md) do.
+## Permissions
 
-## Where files are stored
+Every request in this example is the same user and Unit permissions are not checked. The File
+Service does not know the application's Unit permissions; install them as middleware with
+`fileService.use("upload" | "signUrl" | "download", ...)` and check that the user may access the
+Unit named by `assign`.
 
-`SQLiteFileDatabaseAdapter` writes metadata to the `collaboration_files` table in
-`.data/collaboration.sqlite`, and `LocalFileBlobStore` writes contents to `.data/files/<fileID>`, so
-files survive a server restart. The File Service's timer removes `HttpImport` and `HttpExport` files.
+## Packages
 
-## Replace the storage and add permissions
+The File packages are open source under Apache-2.0 in
+[univer-collaboration-sdk-community](https://github.com/dream-num/univer-collaboration-sdk-community)
+and are published to npm under the same names and versions as the rest of the SDK. The File Service
+and File Endpoint are open source as well, so they can serve as the reference for an implementation
+of your own.
 
-Swapping the adapters for `@univerjs-pro/collaboration-file-database-postgres` and
-`@univerjs-pro/collaboration-file-blob-s3` supports multi-node deployments. Every request in this
-example is the same user and Unit permissions are not checked; a real application uses
-`fileService.use("upload" | "signUrl" | "download", ...)` to check that the user may access the Unit
-named by `assign`.
+| Package | Description |
+| --- | --- |
+| [`@univerjs-pro/collaboration-file-service`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-service/README.md) | `UniverFileService`: ownership rules, permission middleware, and expiry cleanup of temporary files. Reads and writes through the adapters below. |
+| [`@univerjs-pro/collaboration-file-endpoint`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-endpoint/README.md) | `UniverFileEndpoint`: the upload, sign-url, and download routes, registered on the Transport next to the collaboration Endpoint. |
+| [`@univerjs-pro/collaboration-file-database-sqlite`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-sqlite/README.md) | Metadata adapter on SQLite. Used here: the `collaboration_files` table in `.data/collaboration.sqlite`, shared with the collaboration data. |
+| [`@univerjs-pro/collaboration-file-database-postgres`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-database-postgres/README.md) | Metadata adapter on PostgreSQL. |
+| [`@univerjs-pro/collaboration-file-blob-local`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-local/README.md) | Blob store in a local directory. Used here: `.data/files/<fileID>`. |
+| [`@univerjs-pro/collaboration-file-blob-s3`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-blob-s3/README.md) | Blob store on S3-compatible object storage; can sign direct download links. |
+| [`@univerjs-pro/collaboration-file-memory`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-file-memory/README.md) | In-process metadata adapter and blob store for tests. |
 
-The [`exchange`](../exchange/README.md) and [`all-unit`](../all-unit/README.md) examples connect the
-File Service the same way.
+Metadata (`IFileDatabaseAdapter`) and content (`IFileBlobStore`) are separate contracts, so each
+adapter is replaced on its own, and the built-in ones are the reference for adapters on the storage
+the application already runs.

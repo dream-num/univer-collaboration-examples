@@ -64,7 +64,7 @@ const { univerAPI } = createUniver({
         collabWebSocketUrl: `${wsProtocol}://${location.host}/universer-api/comb/connect`,
         wsSessionTicketUrl: `${baseURL}/user/session-ticket`,
         // File service. The image and attachment services upload here, exchange a file ID for a
-        // URL here, and resolve that URL against the download endpoint (see server/files.ts).
+        // URL here, and resolve that URL against the download endpoint (see server/main.ts).
         uploadFileServerUrl: `${baseURL}/stream/file/upload`,
         signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
         downloadEndpointUrl: `${httpProtocol}://${location.host}/`,
