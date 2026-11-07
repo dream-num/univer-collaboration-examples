@@ -61,7 +61,7 @@ The [`multi-node`](../multi-node/README.md) example runs two nodes on it.
 Implement `IDatabaseAdapter` and pass it as `dbAdapter`. Transactions, revision CAS, and Unit
 deletion and recovery live inside the Adapter; `commitChangeset` inserts a changeset only when the
 current head equals `changeset.revision - 1` and otherwise returns `revision-mismatch` for the
-Service to retry. The three built-in Adapters are the reference:
+Service to retry. Refer to these Adapter implementations:
 
 | Source | What it shows |
 | --- | --- |

@@ -57,7 +57,7 @@ const database = await PostgresDatabaseAdapter.create({ pool });
 
 实现 `IDatabaseAdapter` 并作为 `dbAdapter` 传入。事务、revision CAS 以及 Unit 的删除和恢复都在 Adapter 内完成：
 `commitChangeset` 只在当前 head 等于 `changeset.revision - 1` 时写入 changeset，否则返回 `revision-mismatch`
-交给 Service 重试。三个内置 Adapter 的源码就是参考：
+交给 Service 重试。可参考以下 Adapter 实现：
 
 | 源码 | 展示内容 |
 | --- | --- |
