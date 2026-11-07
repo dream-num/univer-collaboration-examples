@@ -60,10 +60,8 @@ The [`multi-node`](../multi-node/README.md) example runs two nodes on it.
 
 Implement `IDatabaseAdapter` and pass it as `dbAdapter`. The Service does not add transactions,
 CAS, or deduplication on top of an Adapter; the Adapter provides them on its own database. The
-semantics it must guarantee are listed in
-[Database Adapters](https://docs.univer.ai/server/collaboration/database-adapters). The Memory
-Adapter is the shortest complete implementation of the contract, and the SQLite and PostgreSQL
-Adapters show the same contract on database transactions.
+Memory Adapter is the shortest complete implementation of the contract, and the SQLite and
+PostgreSQL Adapters show the same contract on database transactions.
 
 ### commitChangeset
 

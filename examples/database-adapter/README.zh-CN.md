@@ -56,9 +56,8 @@ const database = await PostgresDatabaseAdapter.create({ pool });
 ## 实现自己的 Adapter
 
 实现 `IDatabaseAdapter` 并作为 `dbAdapter` 传入。Service 不会为 Adapter 补上事务、CAS 或去重，这些要由
-Adapter 在自己的数据库上实现。必须保证的语义见
-[Database Adapters](https://docs.univer.ai/zh-CN/server/collaboration/database-adapters)。Memory Adapter 是这份
-契约最短的完整实现，SQLite 和 PostgreSQL Adapter 展示同一契约如何落到数据库事务。
+Adapter 在自己的数据库上实现。Memory Adapter 是这份契约最短的完整实现，SQLite 和 PostgreSQL Adapter 展示同一
+契约如何落到数据库事务。
 
 ### commitChangeset
 
