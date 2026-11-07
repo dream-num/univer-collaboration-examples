@@ -48,11 +48,7 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
-const fileService = new UniverFileService({
-  database: fileDatabase,
-  blobStore,
-  cleanup: { context: { userID: "system:file-cleanup" } },
-});
+const fileService = new UniverFileService({ database: fileDatabase, blobStore });
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
 const commentService = new UniverCommentService({ database: commentDatabase, userProvider });
 const historyService = new UniverHistoryService({
