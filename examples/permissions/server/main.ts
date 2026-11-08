@@ -6,7 +6,7 @@ import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
-import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
+import { CollabError, isCommentOnlyChangeset, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UnitAction, UniverType, type IAllowedRequest } from "@univerjs/protocol";
 import { isAllowed, UNIT_ID, UNIT_NAME } from "./permissions";
@@ -73,8 +73,10 @@ service.use("readUnitData", async (context, next) => {
   await next();
 });
 service.use("submitChangeset", async (context, next) => {
-  if (!isAllowed(context.userID, context.request.changeset.unitID, UnitAction.Edit))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+  // A changeset made only of comment mutations needs Comment, not Edit, so viewers can comment.
+  const action = isCommentOnlyChangeset(context.request.changeset) ? UnitAction.Comment : UnitAction.Edit;
+  if (!isAllowed(context.userID, context.request.changeset.unitID, action))
+    throw new CollabError("PERMISSION_DENIED", `Needs ${UnitAction[action]} on this Unit`);
   await next();
 });
 endpoint.use("joinUnit", async (context, next) => {

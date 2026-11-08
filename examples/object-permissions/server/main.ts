@@ -13,7 +13,7 @@ import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { SQLiteHistoryDatabaseAdapter } from "@univerjs-pro/collaboration-history-database-sqlite";
 import { UniverHistoryEndpoint } from "@univerjs-pro/collaboration-history-endpoint";
 import { UniverHistoryService } from "@univerjs-pro/collaboration-history-service";
-import { CollabError, UniverCollabService } from "@univerjs-pro/collaboration-service";
+import { CollabError, isCommentOnlyChangeset, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { UnitAction, UniverType } from "@univerjs/protocol";
 import { AuthzError, createAclStore, initializeAclSchema, isObjectActionAllowed } from "./acl";
@@ -123,8 +123,10 @@ service.use("readUnitData", async (context, next) => {
   await next();
 });
 service.use("submitChangeset", async (context, next) => {
-  if (!isUnitActionAllowed(context.userID, context.request.changeset.unitID, UnitAction.Edit))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+  // A changeset made only of comment mutations needs Comment, not Edit, so viewers can comment.
+  const action = isCommentOnlyChangeset(context.request.changeset) ? UnitAction.Comment : UnitAction.Edit;
+  if (!isUnitActionAllowed(context.userID, context.request.changeset.unitID, action))
+    throw new CollabError("PERMISSION_DENIED", `Needs ${UnitAction[action]} on this Unit`);
   await next();
 });
 endpoint.use("joinUnit", async (context, next) => {

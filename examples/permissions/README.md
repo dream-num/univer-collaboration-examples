@@ -41,7 +41,7 @@ The edit button follows a permission query the client receives. Reading the file
 | The client's `batch_allowed` request shape | Fills each `allowed` with `isAllowed` |
 | Does not store roles | The role map and action sets in `server/permissions.ts` |
 
-A viewer may View, Copy, Comment, and ViewHistory. An editor and the creator may also Edit, including sheet structure and cell operations. ManageCollaborator and Delete belong to the creator. Any action outside these sets returns false. `isAllowed` answers both `batch_allowed` and the three hooks.
+A viewer may View, Copy, Comment, and ViewHistory. An editor and the creator may also Edit, including sheet structure and cell operations. ManageCollaborator and Delete belong to the creator. Any action outside these sets returns false. `isAllowed` answers both `batch_allowed` and the three hooks. A changeset made only of comment mutations asks for Comment instead of Edit (`isCommentOnlyChangeset`), so a viewer can submit comment anchors.
 
 ## Add it to your service
 
@@ -87,8 +87,10 @@ service.use("readUnitData", async (context, next) => {
   await next();
 });
 service.use("submitChangeset", async (context, next) => {
-  if (!isAllowed(context.userID, context.request.changeset.unitID, UnitAction.Edit))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+  // A changeset made only of comment mutations needs Comment, not Edit, so viewers can comment.
+  const action = isCommentOnlyChangeset(context.request.changeset) ? UnitAction.Comment : UnitAction.Edit;
+  if (!isAllowed(context.userID, context.request.changeset.unitID, action))
+    throw new CollabError("PERMISSION_DENIED", `Needs ${UnitAction[action]} on this Unit`);
   await next();
 });
 endpoint.use("joinUnit", async (context, next) => {

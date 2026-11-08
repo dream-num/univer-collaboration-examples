@@ -41,7 +41,7 @@ pnpm example:permissions
 | 客户端 `batch_allowed` 的请求格式 | 用 `isAllowed` 填写每个 `allowed` |
 | 不保存角色 | `server/permissions.ts` 里的角色和动作集合 |
 
-查看者可以 View、Copy、Comment、ViewHistory。编辑者和创建者还可以 Edit，以及表格结构和单元格操作。ManageCollaborator 和 Delete 只要创建者。没有列进这些集合的动作返回 false。`isAllowed` 同时回答 `batch_allowed` 和三个钩子。
+查看者可以 View、Copy、Comment、ViewHistory。编辑者和创建者还可以 Edit，以及表格结构和单元格操作。ManageCollaborator 和 Delete 只要创建者。没有列进这些集合的动作返回 false。`isAllowed` 同时回答 `batch_allowed` 和三个钩子。只由评论 mutation 组成的 changeset 查的是 Comment 而不是 Edit（`isCommentOnlyChangeset`），所以查看者可以提交评论锚点。
 
 ## 接到你的服务
 
@@ -87,8 +87,10 @@ service.use("readUnitData", async (context, next) => {
   await next();
 });
 service.use("submitChangeset", async (context, next) => {
-  if (!isAllowed(context.userID, context.request.changeset.unitID, UnitAction.Edit))
-    throw new CollabError("PERMISSION_DENIED", "Cannot edit this Unit");
+  // A changeset made only of comment mutations needs Comment, not Edit, so viewers can comment.
+  const action = isCommentOnlyChangeset(context.request.changeset) ? UnitAction.Comment : UnitAction.Edit;
+  if (!isAllowed(context.userID, context.request.changeset.unitID, action))
+    throw new CollabError("PERMISSION_DENIED", `Needs ${UnitAction[action]} on this Unit`);
   await next();
 });
 endpoint.use("joinUnit", async (context, next) => {
