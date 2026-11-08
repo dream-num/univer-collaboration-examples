@@ -24,14 +24,14 @@ collaboration path, then choose another example for the capability you want to e
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.md) | Minimal real-time Sheet collaboration path |
 | [`database-adapter`](./examples/database-adapter/README.md) | SQLite persistence and restart recovery |
-| [`all-unit`](./examples/all-unit/README.md) | Six Unit types with files, import/export, embedded attachments, comments, history, and print in one application |
 | [`permissions`](./examples/permissions/README.md) | Trusted identity and server-side permission boundaries |
 | [`object-permissions`](./examples/object-permissions/README.md) | Worksheet and range protection with an application-owned ACL |
 | [`history`](./examples/history/README.md) | Version history service and browser entry |
 | [`comments`](./examples/comments/README.md) | Thread Comment service and frontend entry |
 | [`worktree`](./examples/worktree/README.md) | Complete draft, ready, reopen, and merge lifecycle |
-| [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
 | [`file-service`](./examples/file-service/README.md) | File Service and File Endpoint for images and attachments; Unit data records only the file ID |
+| [`exchange`](./examples/exchange/README.md) | Server-side Sheet import/export with `exchange-node` |
+| [`all-unit`](./examples/all-unit/README.md) | Six Unit types with files, import/export, embedded attachments, comments, history, and print in one application |
 | [`multi-node`](./examples/multi-node/README.md) | File creation and listing across two collaboration nodes with Redis cross-node delivery and Nginx consistent hashing by unitID; needs a multi-node License |
 
 ## Run the examples
@@ -47,14 +47,14 @@ The other examples use the same command form:
 
 ```bash
 pnpm example:database-adapter
-pnpm example:all-unit
 pnpm example:permissions
 pnpm example:object-permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree
-pnpm example:exchange
 pnpm example:file-service
+pnpm example:exchange
+pnpm example:all-unit
 pnpm example:multi-node
 ```
 
