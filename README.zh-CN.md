@@ -22,14 +22,14 @@
 | --- | --- |
 | [`quick-start`](./examples/quick-start/README.zh-CN.md) | 最小 Sheet 实时协同链路 |
 | [`database-adapter`](./examples/database-adapter/README.zh-CN.md) | SQLite 持久化与重启恢复 |
-| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 在一个应用里组合六种 Unit、文件、导入导出、嵌入附件、评论、历史和打印 |
 | [`permissions`](./examples/permissions/README.zh-CN.md) | 可信身份与服务端权限边界 |
 | [`object-permissions`](./examples/object-permissions/README.zh-CN.md) | 工作表与区域保护，ACL 由应用持有 |
 | [`history`](./examples/history/README.zh-CN.md) | 版本历史服务与浏览器入口 |
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
+| [`file-service`](./examples/file-service/README.zh-CN.md) | 接入 File Service 与 File Endpoint：图片与附件上传到服务端，Unit 数据只记录文件 ID |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
-| [`file-service`](./examples/file-service/README.zh-CN.md) | 图片与附件的应用文件服务：上传、sign-url、下载三条路由与本地落盘 |
+| [`all-unit`](./examples/all-unit/README.zh-CN.md) | 在一个应用里组合六种 Unit、文件、导入导出、嵌入附件、评论、历史和打印 |
 | [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由；需要多节点许可证 |
 
 ## 运行示例
@@ -45,14 +45,14 @@ pnpm example:quick-start
 
 ```bash
 pnpm example:database-adapter
-pnpm example:all-unit
 pnpm example:permissions
 pnpm example:object-permissions
 pnpm example:history
 pnpm example:comments
 pnpm example:worktree
-pnpm example:exchange
 pnpm example:file-service
+pnpm example:exchange
+pnpm example:all-unit
 pnpm example:multi-node
 ```
 
