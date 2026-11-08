@@ -140,7 +140,7 @@ endpoint.use("joinUnit", async (context, next) => {
 });
 ```
 
-这一步通过的标志：Casey 改任意格子被拒绝，但仍能添加评论，此时还没有区域保护。
+这一步通过的标志：Casey 改任意格子，提交被拒绝，此时还没有区域保护。
 
 ### 3. 实现 batch_allowed
 

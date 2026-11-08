@@ -140,7 +140,7 @@ endpoint.use("joinUnit", async (context, next) => {
 });
 ```
 
-This step is done when Casey's edit of any cell is rejected while Casey can still add a comment, before any range protection exists.
+This step is done when Casey's edit of any cell is rejected, before any range protection exists.
 
 ### 3. Implement batch_allowed
 
