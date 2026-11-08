@@ -29,7 +29,7 @@
 | [`comments`](./examples/comments/README.zh-CN.md) | Thread Comment 服务与前端入口 |
 | [`worktree`](./examples/worktree/README.zh-CN.md) | draft、ready、reopen 和 merge 的完整生命周期 |
 | [`exchange`](./examples/exchange/README.zh-CN.md) | 基于 `exchange-node` 的 Sheet 服务端导入导出 |
-| [`file-service`](./examples/file-service/README.zh-CN.md) | 图片与附件的应用文件服务：上传、sign-url、下载三条路由与本地落盘 |
+| [`file-service`](./examples/file-service/README.zh-CN.md) | 接入 File Service 与 File Endpoint：图片与附件上传到服务端，Unit 数据只记录文件 ID |
 | [`multi-node`](./examples/multi-node/README.zh-CN.md) | 文件创建与列表、两个协同节点经 Redis 跨节点投递，Nginx 按 unitID 一致性哈希路由；需要多节点许可证 |
 
 ## 运行示例
