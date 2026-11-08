@@ -11,6 +11,22 @@ import type { UnitSummary } from "../shared/units";
 
 export const DEMO_USER = { userId: "demo-user", displayName: "Demo User" };
 
+// Comments and history show who wrote what, so both ask the application for its users.
+export const userProvider = {
+  async getUsers(userIDs: string[]) {
+    return userIDs.map((userID) => ({
+      userID,
+      name: userID === DEMO_USER.userId ? DEMO_USER.displayName : userID,
+      avatar: "",
+      anonymous: false,
+      canBindAnonymous: false,
+      phone: "",
+      email: "",
+      createTimestamp: 0,
+    }));
+  },
+};
+
 export const units: readonly UnitSummary[] = [
   { unitId: "all-unit-sheet", type: UniverType.UNIVER_SHEET, name: "Sheet" },
   { unitId: "all-unit-doc", type: UniverType.UNIVER_DOC, name: "Doc" },

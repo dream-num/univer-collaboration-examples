@@ -1,4 +1,4 @@
-import type { UnitsResponse } from "../shared/units";
+import { unitLink, type UnitsResponse, type UnitSummary } from "../shared/units";
 import type { MountedUniverEditor } from "./univer/types";
 import "./styles.css";
 
@@ -11,18 +11,15 @@ async function main() {
   if (!response.ok) throw new Error(`Unable to load units (${response.status})`);
   const { units, user } = await response.json() as UnitsResponse;
   const url = new URL(location.href);
-  const selected = units.find((unit) => unit.unitId === url.searchParams.get("unit")) ?? units[0];
+  const selected = selectUnit(units, url.searchParams);
   if (!selected) throw new Error("No units available");
 
   // Keep the selected Unit in the URL so the page can be shared and reloaded.
-  url.searchParams.set("unit", selected.unitId);
-  history.replaceState(null, "", url);
+  history.replaceState(null, "", unitLink(selected.unitId, selected.type));
 
   for (const unit of units) {
     const link = document.createElement("a");
-    const target = new URL(location.pathname, location.origin);
-    target.searchParams.set("unit", unit.unitId);
-    link.href = target.href;
+    link.href = unitLink(unit.unitId, unit.type);
     link.textContent = unit.name;
     if (unit.unitId === selected.unitId) link.setAttribute("aria-current", "page");
     navigation.append(link);
@@ -36,6 +33,14 @@ async function main() {
     unitType: selected.type, unitId: selected.unitId,
   });
   status.hidden = true;
+}
+
+function selectUnit(units: readonly UnitSummary[], params: URLSearchParams): UnitSummary | undefined {
+  const unitId = params.get("unit");
+  const known = units.find((unit) => unit.unitId === unitId);
+  if (known) return known;
+  const type = Number(params.get("type"));
+  return unitId && type ? { unitId, type, name: "Imported" } : units[0];
 }
 
 window.addEventListener("pagehide", () => editor?.dispose());

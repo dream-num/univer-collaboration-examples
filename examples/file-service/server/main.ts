@@ -7,16 +7,18 @@ import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
+import { LocalFileBlobStore } from "@univerjs-pro/collaboration-file-blob-local";
+import { SQLiteFileDatabaseAdapter } from "@univerjs-pro/collaboration-file-database-sqlite";
+import { UniverFileEndpoint } from "@univerjs-pro/collaboration-file-endpoint";
+import { UniverFileService } from "@univerjs-pro/collaboration-file-service";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
-import { FileStore } from "./file-store.js";
-import { createFileRouter } from "./files.js";
 
 const UNIT_ID = "file-service-sheet";
 const USER_ID = `User-${randomUUID().slice(0, 4)}`;
 const filename = ".data/collaboration.sqlite";
-// Uploaded images and attachments are written here; see file-store.ts for the lifecycle rules.
+// File contents are written here; their metadata shares the SQLite database with the collaboration data.
 const filesDirectory = resolve(".data/files");
 const unitData: IWorkbookData = {
   id: UNIT_ID,
@@ -46,10 +48,13 @@ await mkdir(dirname(filename), { recursive: true });
 if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
 }
-const files = await FileStore.open(filesDirectory);
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
 const endpoint = new UniverCollabEndpoint(service);
+const fileService = new UniverFileService({
+  database: new SQLiteFileDatabaseAdapter({ filename }),
+  blobStore: new LocalFileBlobStore({ directory: filesDirectory }),
+});
 const transport = createNodeTransport();
 
 transport.use(async (context, next) => {
@@ -61,6 +66,7 @@ endpoint.use("connect", async (context, next) => {
   await next();
 });
 transport.register(endpoint);
+transport.register(new UniverFileEndpoint(fileService));
 
 // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
 await service.createUnitFromData(
@@ -69,8 +75,6 @@ await service.createUnitFromData(
 );
 
 const app = express();
-// The file routes belong to the application; the Collaboration SDK has no file Endpoint.
-app.use("/universer-api", createFileRouter(files));
 app.post(
   "/universer-api/authz/-/object/-/batch_allowed",
   express.json(),

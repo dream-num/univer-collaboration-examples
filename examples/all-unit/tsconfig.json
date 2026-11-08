@@ -1,11 +1,27 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2024",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["vite/client", "node"],
-    "noEmit": true
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "noUncheckedIndexedAccess": false
   },
-  "include": ["web/**/*.ts", "server/**/*.ts", "shared/**/*.ts", "vite.config.ts"]
+  "include": [
+    "web/**/*.ts",
+    "web/**/*.tsx",
+    "server/**/*.ts",
+    "shared/**/*.ts",
+    "vite.config.ts"
+  ]
 }

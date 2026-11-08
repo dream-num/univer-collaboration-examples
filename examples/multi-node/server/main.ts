@@ -4,11 +4,11 @@ import express from "express";
 import { Pool } from "pg";
 import { createClient } from "redis";
 import { RedisPubSubAdapter, RedisSessionTicketStore } from "@univerjs-pro/collaboration-cluster-redis";
+import { PostgresDatabaseAdapter } from "@univerjs-pro/collaboration-database-postgres";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, UniverType } from "@univerjs/protocol";
-import { CustomPostgresDatabaseAdapter } from "./postgres-database-adapter.js";
 import { createUnitData } from "./unit-data.js";
 
 const USER_ID = "demo-user";
@@ -16,12 +16,12 @@ const NODE_ID = process.env.NODE_ID ?? "node-a";
 const databaseURL = process.env.DATABASE_URL ?? "postgres://univer:univer@127.0.0.1:5432/collaboration";
 const redisURL = process.env.REDIS_URL ?? "redis://127.0.0.1:6379";
 
-// Both nodes use the same PostgreSQL database through the database adapter.
-// The schema comes from schema.sql, applied when the database is provisioned; nodes never run DDL.
+// Both nodes share one PostgreSQL database through the PostgreSQL Adapter.
+// schema.sql provisions the tables; the Adapter only verifies the schema version on startup.
 const pool = new Pool({ connectionString: databaseURL });
 pool.on("error", (error) => console.error(`[${NODE_ID}] postgres idle connection error: ${error.message}`));
 await requireDatabaseSchema();
-const database = new CustomPostgresDatabaseAdapter(pool);
+const database = await PostgresDatabaseAdapter.create({ pool });
 const service = new UniverCollabService({ dbAdapter: database });
 
 // Share real-time delivery and session tickets through Redis so any node can serve any request.
@@ -111,8 +111,8 @@ async function shutdown() {
   await pubSub.dispose();
   await Promise.all([redis.close(), redisSubscriber.close()]);
   await service.dispose();
-  // The adapter owns the pool and closes it, which also closes the catalog connections.
-  await database.dispose();
+  // The Adapter never ends the pool it was given; the application owns it and the catalog queries.
+  await pool.end();
 }
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => void shutdown().catch(() => {

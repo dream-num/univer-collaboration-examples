@@ -14,7 +14,13 @@ import type { Univer } from "@univerjs/core";
 import { UniverDocsPlugin } from "@univerjs/docs";
 import { UniverDocsUIPlugin } from "@univerjs/docs-ui";
 import { UniverUIPlugin } from "@univerjs/ui";
+import { UniverBoardsHistoryUIPlugin } from "@univerjs-pro/boards-history-ui";
+import { UniverBoardsPrintPlugin } from "@univerjs-pro/boards-print";
+import { UniverBoardsThreadCommentUIPlugin } from "@univerjs-pro/boards-thread-comment-ui";
+import { UniverThreadCommentDataSourcePlugin } from "@univerjs-pro/thread-comment-datasource";
 import type { MountUniverEditorOptions } from "../../types";
+import { registerCollaborationClient } from "../../collaboration";
+import { historyConfig } from "../../config";
 
 import "@univerjs-pro/boards-chart/facade";
 import "@univerjs-pro/boards-mind/facade";
@@ -49,4 +55,19 @@ export function registerBoardUnit(
   univer.registerPlugin(UniverBoardsMindUIPlugin);
   univer.registerPlugin(UniverBoardsTablePlugin);
   univer.registerPlugin(UniverBoardsTableUIPlugin);
+
+  // comment
+  univer.registerPlugin(UniverBoardsThreadCommentUIPlugin);
+
+  // collaboration
+  registerCollaborationClient(univer);
+  univer.registerPlugin(UniverThreadCommentDataSourcePlugin);
+
+  // history
+  univer.registerPlugin(UniverBoardsHistoryUIPlugin, historyConfig(options.container));
+
+  // print
+  univer.registerPlugin(UniverBoardsPrintPlugin);
+
+  // The Exchange Service does not convert Boards, so there is no exchange here.
 }
