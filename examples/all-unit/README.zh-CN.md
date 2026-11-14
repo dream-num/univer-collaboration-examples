@@ -12,6 +12,12 @@ pnpm example:all-unit
 
 打开 <http://127.0.0.1:3010>，在侧边栏切换 Unit。
 
+- **New Unit**：选择 Sheet、Doc、Slide、Board、Base 或 PDF，填写名称并创建。
+- **Import**：选择本地 Office、CSV、TSV 或 PDF 文件。表格文件可选择导入为 Sheet 或 Base。
+  导入成功后自动打开新 Unit；停止等待不会取消服务端已经开始的转换。
+- 侧边栏显示已保存的 Unit，包括默认示例、新建、导入和附件转在线的结果。当前页面操作完成后立即更新，
+  页面可见时每 5 秒刷新，也会在返回页面时刷新。
+
 | 能力 | 支持范围 | 怎么试 |
 | --- | --- | --- |
 | 实时协同 | Sheet、Doc、Slide、Board、Base、PDF | 在另一个浏览器打开同一个 Unit |
@@ -34,8 +40,14 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 建议一起阅读：
 
 - `server/main.ts`：组装协同、File、Exchange、Comment 和 History 的 Service 与 Endpoint。它们共用
-  `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
-- `server/units.ts`：定义六个 Unit，只创建缺失的 Unit。
+  `.data/all-unit-metadata.sqlite`，文件内容写入 `.data/files`。
+- `server/units.ts`：定义六个默认 Unit，并为新建操作提供空白内容。
+- `server/unit-routes.ts`：提供 Unit 列表和新建接口。
+- `server/unit-metadata.ts`：通过 Service 创建 middleware 设置 Unit 名称和来源，覆盖文件导入和附件转换。
+- `server/database/unit-catalog.ts`：查询 SQLite 中的 Unit 列表。名称和来源保存在
+  `UnitRecord.metadata`，持久化由内置 SQLite Adapter 完成。
+- `web/app.ts`：协调侧边栏、创建和导入弹层、列表刷新与编辑器加载。
+- `web/api/import.ts`：通过 File 和 Exchange Endpoint 上传文件并等待导入结果。
 - `web/univer/mount-editor.ts`：创建 Univer 实例并装上所有 Unit 类型共用的插件，然后交给对应类型的模块。
 - `web/univer/units/<type>/index.ts`：从上到下注册这类 Unit 的插件：编辑器、评论、协同客户端、历史、打印、导入导出。
   共用的服务端地址在 `web/univer/config.ts`。
@@ -43,8 +55,7 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
   这里按 Unit 类型抄自 [Univer showcase 的迁移示例](https://office.univer.ai/showcase/sheets/custom-import-export)，只保留 `en-US` 和 `zh-CN` 语言。
   这些视图用到的 Tailwind 类有一部分没有任何 Univer 包提供，由 `import-export/utilities.css` 补齐。
 
-导入和转换出的 Unit 不在侧边栏里。它们的链接带类型，形如 `/?unit=<id>&type=<type>`，由
-`shared/units.ts` 生成。
+Unit 链接带类型，形如 `/?unit=<id>&type=<type>`，可以复制到另一个浏览器进行协同。
 
 当前编辑器的 `univer` 和 `univerAPI` 挂在 `window` 上，方便在浏览器控制台调试。
 
@@ -53,6 +64,8 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 
 Unit、评论、历史和文件在重启后都会保留，删除 `.data` 可以重新开始。`HOST`、`PORT`、`DATABASE_PATH`、
 `FILES_PATH` 可以覆盖服务端默认值。Exchange 任务只存在于当前进程，进程停止后会丢失。
+
+自定义 `DATABASE_PATH` 时请使用本例创建的新数据库文件。
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck

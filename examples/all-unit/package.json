@@ -9,6 +9,7 @@
   "scripts": {
     "build": "vite build && vite build --ssr server/main.ts --outDir dist/server && tsc --noEmit",
     "typecheck": "tsc --noEmit",
+    "test": "node --test server/database/unit-catalog.test.mts",
     "start": "node dist/server/main.js"
   },
   "dependencies": {
@@ -133,6 +134,7 @@
     "@univerjs/thread-comment-ui": "1.5.2",
     "@univerjs/ui": "1.5.2",
     "express": "^5.1.0",
+    "libsql": "^0.5.29",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "rxjs": "^7.8.2"

@@ -385,6 +385,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
+      libsql:
+        specifier: ^0.5.29
+        version: 0.5.29
       react:
         specifier: ^19.3.0
         version: 19.3.0

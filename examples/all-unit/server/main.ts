@@ -1,4 +1,3 @@
-import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -9,7 +8,7 @@ import "@univerjs-pro/exchange-node/pdf";
 import { SQLiteCommentDatabaseAdapter } from "@univerjs-pro/collaboration-comment-database-sqlite";
 import { UniverCommentEndpoint } from "@univerjs-pro/collaboration-comment-endpoint";
 import { UniverCommentService } from "@univerjs-pro/collaboration-comment-service";
-import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverExchangeEndpoint } from "@univerjs-pro/collaboration-exchange-endpoint";
 import { UniverExchangeService } from "@univerjs-pro/collaboration-exchange-service";
@@ -23,11 +22,13 @@ import { UniverHistoryService } from "@univerjs-pro/collaboration-history-servic
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
-import type { UnitsResponse } from "../shared/units";
-import { DEMO_USER, ensureUnits, units, userProvider } from "./units";
+import { UnitCatalog } from "./database/unit-catalog";
+import { initializeUnitMetadata } from "./unit-metadata";
+import { createUnitRouter } from "./unit-routes";
+import { DEMO_USER, ensureUnits, userProvider } from "./units";
 
 // Configuration
-const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
+const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/all-unit-metadata.sqlite", import.meta.url));
 // Contents of images and attachments uploaded from the editors; their metadata shares the SQLite database.
 const filesDirectory = process.env.FILES_PATH ?? fileURLToPath(new URL("../../.data/files", import.meta.url));
 const host = process.env.HOST ?? "127.0.0.1";
@@ -36,11 +37,8 @@ const port = Number(process.env.PORT ?? 3010);
 // Storage
 await mkdir(dirname(filename), { recursive: true });
 
-// SDK 1.5.0 reads core schema v4; migrate an older database file in place (it backs up first).
-if (existsSync(filename)) {
-  await migrateSQLiteCore({ filename });
-}
 const database = new SQLiteDatabaseAdapter({ filename });
+const catalog = new UnitCatalog(filename);
 const fileDatabase = new SQLiteFileDatabaseAdapter({ filename });
 const blobStore = new LocalFileBlobStore({ directory: filesDirectory });
 const commentDatabase = new SQLiteCommentDatabaseAdapter({ filename });
@@ -48,8 +46,21 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
+service.use("createUnit", initializeUnitMetadata);
 const fileService = new UniverFileService({ database: fileDatabase, blobStore });
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
+// Supply display details for the createUnit middleware, including editor menu imports and
+// converted attachments. Only the middleware's explicit Unit metadata fields are persisted.
+exchangeService.use("import", async (context, next) => {
+  const file = await fileService.getFile(context.request.fileID, context);
+  if (file) {
+    context.customData.allUnitCreation = {
+      name: file.name.replace(/\.[^.]+$/, "") || file.name,
+      origin: context.request.sourceUnitID ? "attachment" : "import",
+    };
+  }
+  await next();
+});
 const commentService = new UniverCommentService({ database: commentDatabase, userProvider });
 const historyService = new UniverHistoryService({
   collabService: service,
@@ -78,9 +89,7 @@ transport.register(new UniverExchangeEndpoint(exchangeService));
 
 // HTTP
 const app = express();
-app.get("/api/units", (_request, response) => {
-  response.json({ units, user: DEMO_USER } satisfies UnitsResponse);
-});
+app.use("/api/units", createUnitRouter(catalog, service));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
   const body = request.body as { requests?: IAllowedRequest[] };
   response.json({
@@ -116,6 +125,7 @@ async function dispose() {
   await commentDatabase.dispose();
   await blobStore.dispose();
   await fileDatabase.dispose();
+  catalog.dispose();
   await database.dispose();
 }
 
