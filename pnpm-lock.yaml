@@ -592,24 +592,12 @@ importers:
       '@univerjs-pro/exchange-node':
         specifier: 1.4.0
         version: 1.4.0(@univerjs-pro/embed@1.4.0(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/exchange-pdf-node-binding@1.1.0)(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs-pro/license':
-        specifier: 1.4.0
-        version: 1.4.0(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs-pro/sheets-exchange-client':
-        specifier: 1.4.0
-        version: 1.4.0(@univerjs-pro/embed@1.4.0(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/core':
         specifier: 1.4.0
         version: 1.4.0(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs/docs-drawing':
+      '@univerjs/preset-sheets-advanced':
         specifier: 1.4.0
-        version: 1.4.0(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs/drawing':
-        specifier: 1.4.0
-        version: 1.4.0(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs/drawing-ui':
-        specifier: 1.4.0
-        version: 1.4.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
+        version: 1.4.0(@types/react@19.3.0)(@univerjs-pro/embed@1.4.0(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/preset-sheets-core':
         specifier: 1.4.0
         version: 1.4.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
@@ -622,12 +610,6 @@ importers:
       '@univerjs/protocol':
         specifier: 1.4.0
         version: 1.4.0
-      '@univerjs/sheets-drawing':
-        specifier: 1.4.0
-        version: 1.4.0(react@19.3.0)(rxjs@7.8.2)
-      '@univerjs/sheets-drawing-ui':
-        specifier: 1.4.0
-        version: 1.4.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       express:
         specifier: ^5.1.0
         version: 5.2.1

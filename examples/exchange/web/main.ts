@@ -1,9 +1,4 @@
-import { IImageIoService, LocaleType, LogLevel } from "@univerjs/core";
-import { UniverDocsDrawingPlugin } from "@univerjs/docs-drawing";
-import { UniverDrawingPlugin } from "@univerjs/drawing";
-import { UniverDrawingUIPlugin } from "@univerjs/drawing-ui";
-import { UniverSheetsDrawingPlugin } from "@univerjs/sheets-drawing";
-import { UniverSheetsDrawingUIPlugin } from "@univerjs/sheets-drawing-ui";
+import { LocaleType, LogLevel } from "@univerjs/core";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
 import CollaborationClientEnUS from "@univerjs-pro/collaboration-client/locale/en-US";
@@ -12,19 +7,19 @@ import {
   UniverCollaborationClientUIPlugin,
 } from "@univerjs-pro/collaboration-client-ui";
 import CollaborationClientUIEnUS from "@univerjs-pro/collaboration-client-ui/locale/en-US";
-import { ExchangeFormat, UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
-import { UniverLicensePlugin } from "@univerjs-pro/license";
-import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import { ExchangeFormat } from "@univerjs-pro/exchange-client";
 import { UniverSheetsCorePreset } from "@univerjs/preset-sheets-core";
 import UniverPresetSheetsCoreEnUS from "@univerjs/preset-sheets-core/locales/en-US";
+import { UniverSheetsDrawingPreset } from "@univerjs/preset-sheets-drawing";
 import UniverPresetSheetsDrawingEnUS from "@univerjs/preset-sheets-drawing/locales/en-US";
+import { UniverSheetsAdvancedPreset } from "@univerjs/preset-sheets-advanced";
+import UniverPresetSheetsAdvancedEnUS from "@univerjs/preset-sheets-advanced/locales/en-US";
 import { createUniver, defaultTheme, mergeLocales } from "@univerjs/presets";
 import "@univerjs-pro/collaboration-client/facade";
-import "@univerjs-pro/exchange-client/facade";
-import "@univerjs-pro/sheets-exchange-client/facade";
 import "./styles.css";
 import "@univerjs/preset-sheets-core/lib/index.css";
 import "@univerjs/preset-sheets-drawing/lib/index.css";
+import "@univerjs/preset-sheets-advanced/lib/index.css";
 import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 
 const baseURL = `${location.protocol}//${location.host}/universer-api`;
@@ -37,25 +32,25 @@ const { univerAPI } = createUniver({
     [LocaleType.EN_US]: mergeLocales(
       UniverPresetSheetsCoreEnUS,
       UniverPresetSheetsDrawingEnUS,
+      UniverPresetSheetsAdvancedEnUS,
       CollaborationClientEnUS,
       CollaborationClientUIEnUS,
-      // The two exchange packages do not publish locale entry points.
     ),
   },
   theme: defaultTheme,
   logLevel: LogLevel.WARN,
   collaboration: true,
-  presets: [UniverSheetsCorePreset({ container: "app" })],
+  presets: [
+    UniverSheetsCorePreset({ container: "app" }),
+    // collaboration keeps Drawing from registering its own image service.
+    UniverSheetsDrawingPreset({ collaboration: true }),
+    UniverSheetsAdvancedPreset({
+      license: import.meta.env.UNIVER_LICENSE || undefined,
+      universerEndpoint: location.origin,
+      exchangeClientOptions: { minSheetRowCount: 100, minSheetColumnCount: 26 },
+    }),
+  ],
   plugins: [
-    [UniverDrawingPlugin, { override: [[IImageIoService, null]] }],
-    UniverDrawingUIPlugin,
-    UniverDocsDrawingPlugin,
-    UniverSheetsDrawingPlugin,
-    UniverSheetsDrawingUIPlugin,
-    [
-      UniverLicensePlugin,
-      { license: import.meta.env.UNIVER_LICENSE || undefined },
-    ],
     UniverCollaborationPlugin,
     [
       UniverCollaborationClientPlugin,
@@ -73,21 +68,6 @@ const { univerAPI } = createUniver({
       },
     ],
     UniverCollaborationClientUIPlugin,
-    [
-      UniverExchangeClientPlugin,
-      {
-        uploadFileServerUrl: `${baseURL}/stream/file/upload`,
-        getTaskServerUrl: `${baseURL}/exchange/task/{taskID}`,
-        signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
-        importServerUrl: `${baseURL}/exchange/{type}/import`,
-        exportServerUrl: `${baseURL}/exchange/{type}/export`,
-        downloadEndpointUrl: `${location.protocol}//${location.host}/`,
-      },
-    ],
-    [
-      UniverSheetsExchangeClientPlugin,
-      { minSheetRowCount: 100, minSheetColumnCount: 26 },
-    ],
   ],
 });
 

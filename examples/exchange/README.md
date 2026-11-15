@@ -37,32 +37,25 @@ removes them. This is why the example assembles the File Service next to Exchang
 
 ## Client configuration
 
-`UniverExchangeClientPlugin` takes six URLs: three exchange routes and the three File URLs it shares
-with the collaboration client.
+The Drawing preset uses the collaboration client’s image service. The Advanced preset configures the File and Exchange routes under `/universer-api` from the server origin and loads the Exchange Facade.
+
+The example uses the following presets alongside Sheets Core.
 
 ```ts
-[
-  UniverExchangeClientPlugin,
-  {
-    importServerUrl: `${baseURL}/exchange/{type}/import`,
-    exportServerUrl: `${baseURL}/exchange/{type}/export`,
-    getTaskServerUrl: `${baseURL}/exchange/task/{taskID}`,
-    uploadFileServerUrl: `${baseURL}/stream/file/upload`,
-    signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
-    downloadEndpointUrl: `${location.protocol}//${location.host}/`,
-  },
+presets: [
+  UniverSheetsCorePreset({ container: "app" }),
+  UniverSheetsDrawingPreset({ collaboration: true }),
+  UniverSheetsAdvancedPreset({
+    license: import.meta.env.UNIVER_LICENSE || undefined,
+    universerEndpoint: location.origin,
+    exchangeClientOptions: { minSheetRowCount: 100, minSheetColumnCount: 26 },
+  }),
 ],
-[UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 }],
 ```
 
-`UniverSheetsExchangeClientPlugin` sets the minimum row and column count of an imported worksheet.
-
-The toolbar is the example's own; its buttons call the Facade API:
+The imported worksheet has at least 100 rows and 26 columns. The toolbar calls the Facade API.
 
 ```ts
-import "@univerjs-pro/exchange-client/facade";
-import "@univerjs-pro/sheets-exchange-client/facade";
-
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);
 
 const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX);

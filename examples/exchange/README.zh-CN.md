@@ -33,31 +33,25 @@ File Service 的原因。
 
 ## 客户端配置
 
-`UniverExchangeClientPlugin` 需要六个 URL：三条 exchange 路由，以及与协同客户端共用的三个 File URL。
+Drawing preset 使用协同客户端的图片服务。Advanced preset 根据服务端 origin 配置 `/universer-api` 下的 File 与 Exchange 路由，并加载 Exchange Facade。
+
+示例在 Sheets Core 之外注册这两个 preset。
 
 ```ts
-[
-  UniverExchangeClientPlugin,
-  {
-    importServerUrl: `${baseURL}/exchange/{type}/import`,
-    exportServerUrl: `${baseURL}/exchange/{type}/export`,
-    getTaskServerUrl: `${baseURL}/exchange/task/{taskID}`,
-    uploadFileServerUrl: `${baseURL}/stream/file/upload`,
-    signUrlServerUrl: `${baseURL}/file/{fileID}/sign-url`,
-    downloadEndpointUrl: `${location.protocol}//${location.host}/`,
-  },
+presets: [
+  UniverSheetsCorePreset({ container: "app" }),
+  UniverSheetsDrawingPreset({ collaboration: true }),
+  UniverSheetsAdvancedPreset({
+    license: import.meta.env.UNIVER_LICENSE || undefined,
+    universerEndpoint: location.origin,
+    exchangeClientOptions: { minSheetRowCount: 100, minSheetColumnCount: 26 },
+  }),
 ],
-[UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 }],
 ```
 
-`UniverSheetsExchangeClientPlugin` 设置导入后工作表的最小行数和列数。
-
-工具栏由示例自己提供，按钮调用 Facade API：
+导入后的工作表至少有 100 行、26 列。示例的工具栏通过 Facade API 执行导入和导出。
 
 ```ts
-import "@univerjs-pro/exchange-client/facade";
-import "@univerjs-pro/sheets-exchange-client/facade";
-
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);
 
 const blob = await univerAPI.exportSheetByUnitIdAsync(unitId, ExchangeFormat.XLSX);
