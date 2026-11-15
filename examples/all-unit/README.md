@@ -32,9 +32,8 @@ has and says what it lacks.
 
 PDF conversion is opt-in in `@univerjs-pro/exchange-node`: `server/main.ts` imports
 `@univerjs-pro/exchange-node/pdf` and the example depends on `@univerjs-pro/exchange-pdf-node-binding`.
-A PDF Unit imported from a PDF file exports with its edits. The blank `PDF` Unit in the sidebar exports
-while it is empty, but once a text box is added the export fails with `source-less PDF cannot apply
-imported semantic patches`: the exporter applies text edits onto a source PDF and this Unit has none.
+A PDF Unit imported from a PDF file exports with its edits. The blank `PDF` Unit in the sidebar can
+also export inserted images and text boxes, including image moves and text edits.
 
 Read these files together:
 
