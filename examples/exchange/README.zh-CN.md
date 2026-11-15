@@ -49,7 +49,41 @@ presets: [
 ],
 ```
 
-导入后的工作表至少有 100 行、26 列。示例的工具栏通过 Facade API 执行导入和导出。
+### 默认请求地址
+
+浏览器默认向当前页面的源地址发送以下请求，本地示例为 `http://127.0.0.1:3010`。如果后端独立部署，将 `universerEndpoint` 设为后端的源地址，preset 会自动拼接 `/universer-api` 前缀。
+
+| 插件配置项 | HTTP | 默认路径 |
+| --- | --- | --- |
+| `uploadFileServerUrl` | POST | `/universer-api/stream/file/upload` |
+| `importServerUrl` | POST | `/universer-api/exchange/{type}/import` |
+| `exportServerUrl` | POST | `/universer-api/exchange/{type}/export` |
+| `getTaskServerUrl` | GET | `/universer-api/exchange/task/{taskID}` |
+| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
+
+拿到 sign-url 响应后，客户端使用 `downloadEndpointUrl` 补全相对下载地址。preset 将它设为服务端源地址加 `/`。
+
+### 插件模式
+
+如果应用按插件组装 Univer，可以安装与当前 Univer 版本一致的 License、Exchange Client 和 Sheets Exchange Client 包，在已有的 `univer` 实例上注册插件，并加载两个 Facade 模块。使用 Advanced preset 时，它会完成这些注册。
+
+```ts
+import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
+import { UniverLicensePlugin } from "@univerjs-pro/license";
+import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
+
+univer.registerPlugin(UniverLicensePlugin, { license: import.meta.env.UNIVER_LICENSE || undefined });
+univer.registerPlugin(UniverExchangeClientPlugin);
+univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
+```
+
+插件模式使用相同的默认请求路径。需要自定义某条路由时，在注册 `UniverExchangeClientPlugin` 时传入对应配置项即可，例如 `{ getTaskServerUrl: "/api/tasks/{taskID}" }`。
+
+### 工具栏
+
+两种配置下，工具栏都可以调用相同的 Facade 方法。
 
 ```ts
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);

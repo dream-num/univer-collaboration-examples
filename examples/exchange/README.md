@@ -53,7 +53,42 @@ presets: [
 ],
 ```
 
-The imported worksheet has at least 100 rows and 26 columns. The toolbar calls the Facade API.
+### Default request URLs
+
+By default, the browser sends these requests to the page origin (`http://127.0.0.1:3010` in this example).
+To use the preset with a separate backend, set `universerEndpoint` to its origin. The preset appends `/universer-api` to form the API paths.
+
+| Plugin option | HTTP | Default path |
+| --- | --- | --- |
+| `uploadFileServerUrl` | POST | `/universer-api/stream/file/upload` |
+| `importServerUrl` | POST | `/universer-api/exchange/{type}/import` |
+| `exportServerUrl` | POST | `/universer-api/exchange/{type}/export` |
+| `getTaskServerUrl` | GET | `/universer-api/exchange/task/{taskID}` |
+| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
+
+After the sign-url response, the client resolves a relative download URL against `downloadEndpointUrl`, which the preset sets to the server origin followed by `/`.
+
+### Plugin mode
+
+In an application that registers plugins individually, add the License, Exchange Client, and Sheets Exchange Client packages at the same version as the rest of your Univer installation. Register them on your existing `univer` instance and load both Facade modules. The Advanced preset already performs these registrations in preset mode.
+
+```ts
+import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
+import { UniverLicensePlugin } from "@univerjs-pro/license";
+import { UniverSheetsExchangeClientPlugin } from "@univerjs-pro/sheets-exchange-client";
+import "@univerjs-pro/exchange-client/facade";
+import "@univerjs-pro/sheets-exchange-client/facade";
+
+univer.registerPlugin(UniverLicensePlugin, { license: import.meta.env.UNIVER_LICENSE || undefined });
+univer.registerPlugin(UniverExchangeClientPlugin);
+univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
+```
+
+The Exchange client uses the same default paths in plugin mode. To customize a route, pass its option when registering `UniverExchangeClientPlugin`, for example `{ getTaskServerUrl: "/api/tasks/{taskID}" }`.
+
+### Toolbar
+
+Both setups expose the same Facade methods to the toolbar.
 
 ```ts
 const unitId = await univerAPI.importSheetToUnitIdAsync(file);
