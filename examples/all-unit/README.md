@@ -17,7 +17,8 @@ Open <http://127.0.0.1:3010> and switch Units in the sidebar.
 - **Import**: choose a local Office, CSV, TSV, or PDF file. Spreadsheet files can become a Sheet or
   Base. A successful import opens the new Unit. Stopping the wait does not cancel a conversion
   that has already started on the server.
-- The sidebar lists all saved Units, most recently modified first.
+- The sidebar lists the newest Units first, with ties sorted by Unit ID in ascending order.
+  Editing a Unit updates its displayed modification time and keeps it in place.
 
 | Capability | Available on | Where to try it |
 | --- | --- | --- |

@@ -18,7 +18,7 @@ export class UnitCatalog {
   constructor(filename: string) {
     this._database = new Database(filename, { readonly: true, fileMustExist: true });
     try {
-      this._list = this._database.prepare(`${SUMMARY_QUERY} ORDER BY updatedAt DESC, unit_id`);
+      this._list = this._database.prepare(`${SUMMARY_QUERY} ORDER BY created_at_ms DESC, unit_id ASC`);
       this._get = this._database.prepare(`${SUMMARY_QUERY} AND unit_id = ?`);
     } catch (error) {
       this._database.close();

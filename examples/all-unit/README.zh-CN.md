@@ -15,7 +15,7 @@ pnpm example:all-unit
 - **New Unit**：选择 Sheet、Doc、Slide、Board、Base 或 PDF，填写名称并创建。
 - **Import**：选择本地 Office、CSV、TSV 或 PDF 文件。表格文件可选择导入为 Sheet 或 Base。
   导入成功后自动打开新 Unit；停止等待不会取消服务端已经开始的转换。
-- 侧边栏按最近修改时间列出所有已保存的 Unit。
+- 侧边栏按创建时间从新到旧排列，创建时间相同时按 Unit ID 升序排列。编辑后，列表中的修改时间会更新，位置不变。
 
 | 能力 | 支持范围 | 怎么试 |
 | --- | --- | --- |
