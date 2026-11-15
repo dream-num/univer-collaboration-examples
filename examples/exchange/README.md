@@ -70,7 +70,7 @@ After the sign-url response, the client resolves a relative download URL against
 
 ### Plugin mode
 
-In an application that registers plugins individually, add the License, Exchange Client, and Sheets Exchange Client packages at the same version as the rest of your Univer installation. Register them on your existing `univer` instance and load both Facade modules. The Advanced preset already performs these registrations in preset mode.
+Register the plugins directly to use the default URLs listed above. To override a URL, pass its option to `UniverExchangeClientPlugin`.
 
 ```ts
 import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
@@ -83,10 +83,6 @@ univer.registerPlugin(UniverLicensePlugin, { license: import.meta.env.UNIVER_LIC
 univer.registerPlugin(UniverExchangeClientPlugin);
 univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
 ```
-
-The Exchange client uses the same default paths in plugin mode. To customize a route, pass its option when registering `UniverExchangeClientPlugin`, for example `{ getTaskServerUrl: "/api/tasks/{taskID}" }`.
-
-For a runnable plugin-mode example, see `all-unit`. Its [client configuration](../all-unit/web/univer/config.ts) defines `exchangeClientConfig` with the File and Exchange URLs. Its [Sheet setup](../all-unit/web/univer/units/sheet/index.ts) passes that object to `univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig)`, then registers the Sheets Exchange client. It also registers the Docs Exchange client for embedded Word files and a custom plugin for the import/export menu.
 
 ### Toolbar
 

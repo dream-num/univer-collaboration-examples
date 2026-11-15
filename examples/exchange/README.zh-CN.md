@@ -65,7 +65,7 @@ presets: [
 
 ### 插件模式
 
-如果应用按插件组装 Univer，可以安装与当前 Univer 版本一致的 License、Exchange Client 和 Sheets Exchange Client 包，在已有的 `univer` 实例上注册插件，并加载两个 Facade 模块。使用 Advanced preset 时，它会完成这些注册。
+直接注册插件即可使用上表中的默认地址。如需修改某个地址，在注册 `UniverExchangeClientPlugin` 时传入对应配置项。
 
 ```ts
 import { UniverExchangeClientPlugin } from "@univerjs-pro/exchange-client";
@@ -78,10 +78,6 @@ univer.registerPlugin(UniverLicensePlugin, { license: import.meta.env.UNIVER_LIC
 univer.registerPlugin(UniverExchangeClientPlugin);
 univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100, minSheetColumnCount: 26 });
 ```
-
-插件模式使用相同的默认请求路径。需要自定义某条路由时，在注册 `UniverExchangeClientPlugin` 时传入对应配置项即可，例如 `{ getTaskServerUrl: "/api/tasks/{taskID}" }`。
-
-可运行的插件模式示例见 `all-unit`。它在[客户端配置](../all-unit/web/univer/config.ts)中用 `exchangeClientConfig` 集中定义 File 和 Exchange 地址，在 [Sheet 装配入口](../all-unit/web/univer/units/sheet/index.ts)调用 `univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig)`，再注册 Sheets Exchange 客户端。为支持表格内嵌的 Word 文件和编辑器内的导入导出菜单，`all-unit` 还分别注册了 Docs Exchange 客户端和自定义菜单插件。
 
 ### 工具栏
 
