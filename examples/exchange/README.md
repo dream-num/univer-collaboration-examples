@@ -61,10 +61,10 @@ To use the preset with a separate backend, set `universerEndpoint` to its origin
 | Plugin option | HTTP | Default path |
 | --- | --- | --- |
 | `uploadFileServerUrl` | POST | `/universer-api/stream/file/upload` |
+| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
 | `importServerUrl` | POST | `/universer-api/exchange/{type}/import` |
 | `exportServerUrl` | POST | `/universer-api/exchange/{type}/export` |
 | `getTaskServerUrl` | GET | `/universer-api/exchange/task/{taskID}` |
-| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
 
 After the sign-url response, the client resolves a relative download URL against `downloadEndpointUrl`, which the preset sets to the server origin followed by `/`.
 

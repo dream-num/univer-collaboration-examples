@@ -56,10 +56,10 @@ presets: [
 | 插件配置项 | HTTP | 默认路径 |
 | --- | --- | --- |
 | `uploadFileServerUrl` | POST | `/universer-api/stream/file/upload` |
+| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
 | `importServerUrl` | POST | `/universer-api/exchange/{type}/import` |
 | `exportServerUrl` | POST | `/universer-api/exchange/{type}/export` |
 | `getTaskServerUrl` | GET | `/universer-api/exchange/task/{taskID}` |
-| `signUrlServerUrl` | GET | `/universer-api/file/{fileID}/sign-url` |
 
 拿到 sign-url 响应后，客户端使用 `downloadEndpointUrl` 补全相对下载地址。preset 将它设为服务端源地址加 `/`。
 
