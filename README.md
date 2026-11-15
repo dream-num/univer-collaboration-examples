@@ -78,8 +78,7 @@ local disk rather than in a production file service; [`file-service`](./examples
 explains the routes the Univer client calls and what to change for production.
 
 `quick-start` uses the Memory Adapter to keep setup minimal. The other single-node examples store
-collaboration data in their own `.data/collaboration.sqlite` file (`all-unit` uses `.data/all-unit-metadata.sqlite`)
-so state survives server restarts.
+collaboration data in their own `.data/collaboration.sqlite` file so state survives server restarts.
 `multi-node` requires Docker Compose and builds inside its containers. Both nodes share one PostgreSQL
 database whose data lives in a Docker volume.
 

@@ -9,8 +9,6 @@ export const UNIT_TYPES = [
   { type: UniverType.UNIVER_PDF, label: "PDF", defaultName: "Untitled PDF" },
 ] as const;
 
-export type UnitOrigin = "seed" | "create" | "import" | "attachment";
-
 export function isUnitType(value: unknown): value is UniverType {
   return UNIT_TYPES.some(({ type }) => type === value);
 }
@@ -19,8 +17,7 @@ export interface UnitSummary {
   readonly unitId: string;
   readonly type: UniverType;
   readonly name: string;
-  readonly origin: UnitOrigin | null;
-  readonly createdAt: number;
+  readonly updatedAt: number;
 }
 
 export interface CreateUnitInput {

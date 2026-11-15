@@ -29,7 +29,7 @@ export function createUnitRouter(catalog: UnitCatalog, service: IUniverCollabSer
 
     const unitId = randomUUID();
     await service.createUnitFromData({
-      ...initialData({ unitId, type, name }), metadata: { name, origin: "create" },
+      ...initialData({ unitId, type, name }), metadata: { name },
     }, { userID: DEMO_USER.userId });
     const unit = catalog.getUnitSummary(unitId);
     if (!unit) throw new Error("The created Unit is missing from the application catalog");

@@ -1,6 +1,8 @@
 import { UNIT_TYPES, unitLink, type UnitSummary } from "../../shared/units";
 import { icon, unitIcon } from "./icons";
 
+const modifiedTime = new Intl.DateTimeFormat(undefined, { dateStyle: "short", timeStyle: "short" });
+
 interface SidebarOptions {
   onCreate(): void;
   onImport(): void;
@@ -81,13 +83,14 @@ export function createSidebar(options: SidebarOptions) {
           links.set(unit.unitId, link);
         }
         link.href = unitLink(unit.unitId, unit.type);
-        link.title = unit.name;
         const label = UNIT_TYPES.find(item => item.type === unit.type)?.label ?? "Unit";
-        const origin = unit.origin === "import" ? " · Imported" : unit.origin === "attachment" ? " · Converted" : "";
+        const modified = modifiedTime.format(unit.updatedAt);
+        link.title = `${unit.name} · Last modified ${modified}`;
+        const details = `${label} · ${modified}`;
         const name = link.querySelector(".au-unit-name")!;
         const meta = link.querySelector(".au-unit-meta")!;
         if (name.textContent !== unit.name) name.textContent = unit.name;
-        if (meta.textContent !== label + origin) meta.textContent = label + origin;
+        if (meta.textContent !== details) meta.textContent = details;
         if (unit.unitId === selectedId) link.setAttribute("aria-current", "page");
         else link.removeAttribute("aria-current");
         // Retain existing links when polling so keyboard focus and scroll position stay put.

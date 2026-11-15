@@ -24,12 +24,11 @@ import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
 import { UnitCatalog } from "./database/unit-catalog";
-import { initializeUnitMetadata } from "./unit-metadata";
 import { createUnitRouter } from "./unit-routes";
 import { DEMO_USER, ensureUnits, userProvider } from "./units";
 
 // Configuration
-const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/all-unit-metadata.sqlite", import.meta.url));
+const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
 // Contents of images and attachments uploaded from the editors; their metadata shares the SQLite database.
 const filesDirectory = process.env.FILES_PATH ?? fileURLToPath(new URL("../../.data/files", import.meta.url));
 const host = process.env.HOST ?? "127.0.0.1";
@@ -51,18 +50,25 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
-service.use("createUnit", initializeUnitMetadata);
+service.use("createUnit", async ({ unit, customData, request }, next) => {
+  const { snapshot } = request;
+  unit.metadata.name ??= typeof customData.importName === "string" ? customData.importName
+    : snapshot.workbook?.name || snapshot.doc?.name || snapshot.slide?.name || snapshot.board?.name
+      || snapshot.pdf?.name || unit.unitID;
+  unit.metadata.updatedAt = unit.createdAt;
+  await next();
+});
+service.use("commitChangeset", async ({ unit }, next) => {
+  unit.metadata.updatedAt = Date.now();
+  await next();
+});
 const fileService = new UniverFileService({ database: fileDatabase, blobStore });
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
-// Supply display details for the createUnit middleware, including editor menu imports and
-// converted attachments. Only the middleware's explicit Unit metadata fields are persisted.
+// The imported Unit takes its name from the uploaded file.
 exchangeService.use("import", async (context, next) => {
   const file = await fileService.getFile(context.request.fileID, context);
   if (file) {
-    context.customData.allUnitCreation = {
-      name: file.name.replace(/\.[^.]+$/, "") || file.name,
-      origin: context.request.sourceUnitID ? "attachment" : "import",
-    };
+    context.customData.importName = file.name.replace(/\.[^.]+$/, "").trim() || file.name;
   }
   await next();
 });

@@ -17,9 +17,7 @@ Open <http://127.0.0.1:3010> and switch Units in the sidebar.
 - **Import**: choose a local Office, CSV, TSV, or PDF file. Spreadsheet files can become a Sheet or
   Base. A successful import opens the new Unit. Stopping the wait does not cancel a conversion
   that has already started on the server.
-- The sidebar lists saved Units, including the seeded examples, newly created Units, imports, and
-  converted attachments. It refreshes after local actions, every 5 seconds while visible, and when
-  the page regains focus.
+- The sidebar lists all saved Units, most recently modified first.
 
 | Capability | Available on | Where to try it |
 | --- | --- | --- |
@@ -46,13 +44,10 @@ also export inserted images and text boxes, including image moves and text edits
 Read these files together:
 
 - `server/main.ts` assembles the Collaboration, File, Exchange, Comment, and History Services and
-  Endpoints. They all share `.data/all-unit-metadata.sqlite`; file contents go to `.data/files`.
+  Endpoints. They all share `.data/collaboration.sqlite`. File contents go to `.data/files`.
 - `server/units.ts` defines the six default Units and the blank content used for new Units.
 - `server/unit-routes.ts` serves the Unit list and creation endpoints.
-- `server/unit-metadata.ts` sets Unit names and origins through Service creation middleware, including
-  imported files and converted attachments.
-- `server/database/unit-catalog.ts` reads the Unit list from SQLite. Names and origins are stored in
-  `UnitRecord.metadata`; the built-in SQLite Adapter handles persistence.
+- `server/database/unit-catalog.ts` reads Unit names and modification times from SQLite.
 - `web/app.ts` coordinates the sidebar, creation and import dialogs, list refreshes, and editor loading.
 - `web/api/import.ts` uploads files and waits for results through the File and Exchange Endpoints.
 - `web/univer/mount-editor.ts` creates the Univer instance with the plugins every Unit type shares, then

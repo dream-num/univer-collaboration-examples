@@ -15,8 +15,7 @@ pnpm example:all-unit
 - **New Unit**：选择 Sheet、Doc、Slide、Board、Base 或 PDF，填写名称并创建。
 - **Import**：选择本地 Office、CSV、TSV 或 PDF 文件。表格文件可选择导入为 Sheet 或 Base。
   导入成功后自动打开新 Unit；停止等待不会取消服务端已经开始的转换。
-- 侧边栏显示已保存的 Unit，包括默认示例、新建、导入和附件转在线的结果。当前页面操作完成后立即更新，
-  页面可见时每 5 秒刷新，也会在返回页面时刷新。
+- 侧边栏按最近修改时间列出所有已保存的 Unit。
 
 | 能力 | 支持范围 | 怎么试 |
 | --- | --- | --- |
@@ -40,12 +39,10 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 建议一起阅读：
 
 - `server/main.ts`：组装协同、File、Exchange、Comment 和 History 的 Service 与 Endpoint。它们共用
-  `.data/all-unit-metadata.sqlite`，文件内容写入 `.data/files`。
+  `.data/collaboration.sqlite`，文件内容写入 `.data/files`。
 - `server/units.ts`：定义六个默认 Unit，并为新建操作提供空白内容。
 - `server/unit-routes.ts`：提供 Unit 列表和新建接口。
-- `server/unit-metadata.ts`：通过 Service 创建 middleware 设置 Unit 名称和来源，覆盖文件导入和附件转换。
-- `server/database/unit-catalog.ts`：查询 SQLite 中的 Unit 列表。名称和来源保存在
-  `UnitRecord.metadata`，持久化由内置 SQLite Adapter 完成。
+- `server/database/unit-catalog.ts`：从 SQLite 读取 Unit 名称和最近修改时间。
 - `web/app.ts`：协调侧边栏、创建和导入弹层、列表刷新与编辑器加载。
 - `web/api/import.ts`：通过 File 和 Exchange Endpoint 上传文件并等待导入结果。
 - `web/univer/mount-editor.ts`：创建 Univer 实例并装上所有 Unit 类型共用的插件，然后交给对应类型的模块。

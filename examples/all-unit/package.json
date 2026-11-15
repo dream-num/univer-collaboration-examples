@@ -9,7 +9,6 @@
   "scripts": {
     "build": "vite build && vite build --ssr server/main.ts --outDir dist/server && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node --test server/database/unit-catalog.test.mts",
     "start": "node dist/server/main.js"
   },
   "dependencies": {

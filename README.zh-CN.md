@@ -73,8 +73,7 @@ export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
 `all-unit` 把上传文件放在本地磁盘，不代替生产文件服务；[`file-service`](./examples/file-service/README.zh-CN.md)
 说明 Univer 客户端调用的路由和生产环境要改什么。
 
-`quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`
-（`all-unit` 使用 `.data/all-unit-metadata.sqlite`），服务重启后仍会保留。
+`quick-start` 为保持最短装配刻意保留 Memory Adapter。其余单节点示例把协同数据写入各自的 `.data/collaboration.sqlite`，服务重启后仍会保留。
 `multi-node` 需要 Docker Compose，在容器内构建，两个节点共用一个 PostgreSQL 数据库，数据保存在 Docker volume 中。
 
 固定用户、演示授权和本地密钥仅用于教学，不是生产配置。生产接入前请阅读

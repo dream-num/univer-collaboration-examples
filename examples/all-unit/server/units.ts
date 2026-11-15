@@ -40,7 +40,7 @@ export async function ensureUnits(service: IUniverCollabService): Promise<void> 
   for (const unit of units) {
     // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
     await service.createUnitFromData({
-      ...initialData(unit), metadata: { name: unit.name, origin: "seed" },
+      ...initialData(unit), metadata: { name: unit.name },
     }, { userID: DEMO_USER.userId });
   }
 }
