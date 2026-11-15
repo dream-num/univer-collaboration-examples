@@ -86,6 +86,8 @@ univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100,
 
 The Exchange client uses the same default paths in plugin mode. To customize a route, pass its option when registering `UniverExchangeClientPlugin`, for example `{ getTaskServerUrl: "/api/tasks/{taskID}" }`.
 
+For a runnable plugin-mode example, see `all-unit`. Its [client configuration](../all-unit/web/univer/config.ts) defines `exchangeClientConfig` with the File and Exchange URLs. Its [Sheet setup](../all-unit/web/univer/units/sheet/index.ts) passes that object to `univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig)`, then registers the Sheets Exchange client. It also registers the Docs Exchange client for embedded Word files and a custom plugin for the import/export menu.
+
 ### Toolbar
 
 Both setups expose the same Facade methods to the toolbar.

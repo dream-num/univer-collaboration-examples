@@ -81,6 +81,8 @@ univer.registerPlugin(UniverSheetsExchangeClientPlugin, { minSheetRowCount: 100,
 
 插件模式使用相同的默认请求路径。需要自定义某条路由时，在注册 `UniverExchangeClientPlugin` 时传入对应配置项即可，例如 `{ getTaskServerUrl: "/api/tasks/{taskID}" }`。
 
+可运行的插件模式示例见 `all-unit`。它在[客户端配置](../all-unit/web/univer/config.ts)中用 `exchangeClientConfig` 集中定义 File 和 Exchange 地址，在 [Sheet 装配入口](../all-unit/web/univer/units/sheet/index.ts)调用 `univer.registerPlugin(UniverExchangeClientPlugin, exchangeClientConfig)`，再注册 Sheets Exchange 客户端。为支持表格内嵌的 Word 文件和编辑器内的导入导出菜单，`all-unit` 还分别注册了 Docs Exchange 客户端和自定义菜单插件。
+
 ### 工具栏
 
 两种配置下，工具栏都可以调用相同的 Facade 方法。
