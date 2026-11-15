@@ -72,6 +72,15 @@ test("lists saved Unit metadata and exposes only the sidebar fields", async t =>
   assert.deepEqual(catalog.listUnits(), [summary]);
 });
 
+test("lists a Unit with empty metadata by ID and leaves its origin unknown", async t => {
+  const { database, catalog } = await fixture(t);
+  const { record, snapshot } = unit("existing-unit");
+  await database.createUnit(context, { record: { ...record, metadata: {} }, snapshot });
+  assert.deepEqual(catalog.listUnits(), [{
+    unitId: record.unitID, type: record.type, name: record.unitID, origin: null, createdAt: record.createdAt,
+  }]);
+});
+
 test("duplicate creation keeps the original metadata and a single catalog entry", async t => {
   const { database, catalog, service } = await fixture(t);
   const { snapshot, record } = unit("duplicate-unit");

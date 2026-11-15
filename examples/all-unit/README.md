@@ -78,7 +78,8 @@ Units, comments, history, and files survive restarts. Delete `.data` to start ag
 `DATABASE_PATH`, and `FILES_PATH` override server defaults. Exchange tasks are process-local and
 disappear when the process stops.
 
-When overriding `DATABASE_PATH`, use a new database file created by this example.
+At startup, the example backs up an older SDK database before upgrading its core schema.
+Units without a name in their metadata appear under their Unit ID in the sidebar.
 
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck

@@ -3,7 +3,7 @@ import type { UnitSummary } from "../../shared/units";
 
 const SUMMARY_COLUMNS = `
   unit_id AS unitId, type, created_at_ms AS createdAt,
-  json_extract(metadata, '$.name') AS name,
+  COALESCE(json_extract(metadata, '$.name'), unit_id) AS name,
   json_extract(metadata, '$.origin') AS origin
 `;
 

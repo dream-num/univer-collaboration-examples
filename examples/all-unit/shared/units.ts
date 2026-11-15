@@ -19,7 +19,7 @@ export interface UnitSummary {
   readonly unitId: string;
   readonly type: UniverType;
   readonly name: string;
-  readonly origin: UnitOrigin;
+  readonly origin: UnitOrigin | null;
   readonly createdAt: number;
 }
 

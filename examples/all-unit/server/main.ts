@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
@@ -8,7 +9,7 @@ import "@univerjs-pro/exchange-node/pdf";
 import { SQLiteCommentDatabaseAdapter } from "@univerjs-pro/collaboration-comment-database-sqlite";
 import { UniverCommentEndpoint } from "@univerjs-pro/collaboration-comment-endpoint";
 import { UniverCommentService } from "@univerjs-pro/collaboration-comment-service";
-import { SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
+import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverExchangeEndpoint } from "@univerjs-pro/collaboration-exchange-endpoint";
 import { UniverExchangeService } from "@univerjs-pro/collaboration-exchange-service";
@@ -37,6 +38,10 @@ const port = Number(process.env.PORT ?? 3010);
 // Storage
 await mkdir(dirname(filename), { recursive: true });
 
+// SDK 1.5.0 reads core schema v4; migrate an older database file in place (it backs up first).
+if (existsSync(filename)) {
+  await migrateSQLiteCore({ filename });
+}
 const database = new SQLiteDatabaseAdapter({ filename });
 const catalog = new UnitCatalog(filename);
 const fileDatabase = new SQLiteFileDatabaseAdapter({ filename });
