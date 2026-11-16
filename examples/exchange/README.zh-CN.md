@@ -28,8 +28,11 @@ Unit、文件元数据和文件内容都在 `.data`，服务重启后仍在；`p
 | 导入 | 把源文件上传到 File 的上传路由，带文件 ID 调用导入路由，轮询任务 | 转换文件，通过协同 Service 创建 Unit，返回新 Unit ID |
 | 导出 | 带 Unit ID 和格式调用导出路由，轮询任务，用结果文件 ID 走 sign-url 下载 | 读取 Unit，转换，结果存为临时文件，返回文件 ID |
 
-源文件在任务结束时删除；结果文件保留到 File Service 的过期清理删除。这就是示例在 Exchange 之外还要组装
-File Service 的原因。
+任务结束时会删除上传的源文件，导出结果由 File Service 到期清理。
+
+导入 XLSX 时，Exchange Service 会单独保存工作簿中嵌入的图片和附件，并将这些文件关联到新建的 Unit。导出 XLSX 时，服务会按 Unit 中的引用读取这些文件。
+
+自行接入文件存储时，可以参考 [Exchange Service 对 `files.store` 和 `files.load` 的实现](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/src/files.ts)。
 
 ## 客户端配置
 
