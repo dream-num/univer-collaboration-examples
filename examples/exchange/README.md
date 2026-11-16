@@ -32,8 +32,9 @@ go through the File Service.
 | Import | Uploads the source file to the File upload route, calls the import route with the file ID, polls the task | Converts the file, creates the Unit through the collaboration Service, reports the new Unit ID |
 | Export | Calls the export route with the Unit ID and format, polls the task, resolves the result file ID through sign-url, downloads it | Reads the Unit, converts it, stores the result as a temporary file, reports the file ID |
 
-The source file is deleted when its task ends; results stay until the File Service's expiry cleanup
-removes them. This is why the example assembles the File Service next to Exchange.
+The uploaded source file is deleted when its task ends. The File Service removes export results when they expire.
+
+When an XLSX workbook contains embedded images or attachments, the Exchange Service stores them as files of the new Unit on import and reads them back by reference on XLSX export. To connect your own storage, see [how the Exchange Service implements `files.store` and `files.load`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/src/files.ts).
 
 ## Client configuration
 
