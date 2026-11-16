@@ -32,7 +32,7 @@ Unit、文件元数据和文件内容都在 `.data`，服务重启后仍在；`p
 
 导入 XLSX 时，Exchange Service 会单独保存工作簿中嵌入的图片和附件，并将这些文件关联到新建的 Unit。导出 XLSX 时，服务会按 Unit 中的引用读取这些文件。
 
-自行接入文件存储时，可以参考 [Exchange Service 对 `files.store` 和 `files.load` 的实现](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/src/files.ts)。
+接入自己的文件存储时，可参考 [Exchange Service README 中的导入导出示例](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/README.zh-CN.md#导入与导出的核心)。
 
 ## 客户端配置
 
