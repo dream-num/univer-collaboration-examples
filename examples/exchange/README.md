@@ -34,7 +34,7 @@ go through the File Service.
 
 The uploaded source file is deleted when its task ends. The File Service removes export results when they expire.
 
-When an XLSX workbook contains embedded images or attachments, the Exchange Service stores them as files of the new Unit on import and reads them back by reference on XLSX export. To connect your own storage, see [how the Exchange Service implements `files.store` and `files.load`](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/src/files.ts).
+When an XLSX workbook contains embedded images or attachments, the Exchange Service stores them as files of the new Unit on import and reads them back by reference on XLSX export. To connect your own file storage, see the [import and export example in the Exchange Service README](https://github.com/dream-num/univer-collaboration-sdk-community/blob/main/packages/collaboration-exchange-service/README.md#the-core-of-an-import-and-an-export).
 
 ## Client configuration
 
