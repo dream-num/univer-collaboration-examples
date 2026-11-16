@@ -108,7 +108,20 @@ export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 ```
 
-也可以运行 `pnpm example:multi-node`，依赖安装和构建都在容器内完成。使用独立 Compose 的环境，将 `docker compose` 替换为 `docker-compose`。旧版本示例留下的 `collaboration-data` 卷使用不同的 schema，会让节点启动失败；用下文的停止命令加 `--volumes` 清理一次即可。
+也可以运行 `pnpm example:multi-node`，依赖安装和构建都在容器内完成。使用独立 Compose 的环境，将 `docker compose` 替换为 `docker-compose`。
+
+SDK 1.5.0 使用 core schema v2，新卷由 `schema.sql` 初始化。要保留已有 v1 卷中的 Unit，先停止两个写入节点、
+备份 PostgreSQL，再执行事务迁移：
+
+```bash
+docker compose -f examples/multi-node/compose.yaml stop node-a node-b
+docker compose -f examples/multi-node/compose.yaml exec -T postgres pg_dump -U univer -d collaboration > collaboration-v1-backup.sql
+docker compose -f examples/multi-node/compose.yaml exec -T postgres psql -U univer -d collaboration -v ON_ERROR_STOP=1 < examples/multi-node/migrate-v1-to-v2.sql
+docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
+```
+
+迁移添加空的 Unit/changeset metadata，保留原有 payload。若只需重置可丢弃的演示数据，仍可在下文的停止命令后
+加 `--volumes` 清空整个卷。
 
 打开 <http://127.0.0.1:3010/>：
 

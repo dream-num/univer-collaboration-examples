@@ -37,3 +37,7 @@ ready 的 draft 交回去再改一轮；Discard 放弃 draft，不影响 trunk�
 只需要阅读 `server/main.ts` 和 `web/main.ts`。Worktree 有独立 Service、Adapter 和协同路径，
 只与 trunk Endpoint 共享一次性 ticket store。trunk 与 Worktree SQLite Adapter 共享
 `.data/collaboration.sqlite`，数据与 Worktree 状态都会在服务重启后保留。
+
+SDK 1.5.0 使用 core 和 Worktree schema v4。升级前先停止旧服务。示例在启动时先备份并迁移已有的
+v3 数据，再打开 Adapter；Worktree 备份写在数据库旁，后缀为 `.worktree-v3.<id>.backup`。
+已有 Unit、draft 和 Worktree 状态都会保留。

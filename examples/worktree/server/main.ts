@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
@@ -12,7 +13,7 @@ import {
 } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import { SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
+import { migrateSQLiteWorktreeV3ToV4, SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
 import { UniverCollabWorktreeEndpoint } from "@univerjs-pro/collaboration-worktree-endpoint";
 import {
   UniverCollabWorktreeService,
@@ -46,9 +47,23 @@ const unitData: IWorkbookData = {
 
 await mkdir(dirname(filename), { recursive: true });
 
-// SDK 1.4.0 reads core schema v3; migrate an older database file in place (it backs up first).
+// SDK 1.5.0 reads core schema v4; migrate an older database file in place (it backs up first).
 if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
+  const stored = new DatabaseSync(filename);
+  let worktreeVersion: unknown;
+  try {
+    worktreeVersion = stored.prepare(
+      "SELECT version FROM collaboration_schema_versions WHERE component = 'worktree'",
+    ).get()?.version;
+    if (worktreeVersion === 3) {
+      // Back up the complete file, including any uncheckpointed WAL pages, before migrating drafts.
+      stored.prepare("VACUUM INTO ?").run(`${filename}.worktree-v3.${randomUUID()}.backup`);
+    }
+  } finally {
+    stored.close();
+  }
+  if (worktreeVersion === 3) migrateSQLiteWorktreeV3ToV4({ filename });
 }
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });

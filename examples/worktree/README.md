@@ -40,3 +40,8 @@ to delete `.data`, and start it again.
 Read only `server/main.ts` and `web/main.ts`. Worktree has its own Service, Adapter, and collaboration
 path and shares only the one-time ticket store with the trunk Endpoint. The trunk and Worktree SQLite
 Adapters share `.data/collaboration.sqlite`; both data and Worktree status survive server restarts.
+
+SDK 1.5.0 uses core and Worktree schema v4. Stop the old server before upgrading. On startup, the
+example backs up and migrates existing v3 data before opening either Adapter; a Worktree backup is
+written next to the database with a `.worktree-v3.<id>.backup` suffix. Existing Units, drafts and
+Worktree status are preserved.

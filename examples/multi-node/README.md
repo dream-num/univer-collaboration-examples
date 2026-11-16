@@ -108,7 +108,20 @@ export UNIVER_LICENSE_KEY="$(cat licenseKey.txt)"
 docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 ```
 
-Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside the containers. If you use standalone Compose, replace `docker compose` with `docker-compose`. A `collaboration-data` volume left by an earlier version of this example holds a different schema and makes the nodes fail at startup; remove it once with the stop command and `--volumes` below.
+Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside the containers. If you use standalone Compose, replace `docker compose` with `docker-compose`.
+
+SDK 1.5.0 uses core schema v2. A new volume receives it from `schema.sql`. To preserve Units in an
+existing v1 volume, stop both writers, back up PostgreSQL, and apply the transactional migration:
+
+```bash
+docker compose -f examples/multi-node/compose.yaml stop node-a node-b
+docker compose -f examples/multi-node/compose.yaml exec -T postgres pg_dump -U univer -d collaboration > collaboration-v1-backup.sql
+docker compose -f examples/multi-node/compose.yaml exec -T postgres psql -U univer -d collaboration -v ON_ERROR_STOP=1 < examples/multi-node/migrate-v1-to-v2.sql
+docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
+```
+
+The migration adds empty Unit/changeset metadata and preserves the existing payloads. For disposable
+demo data, the shutdown command with `--volumes` below still resets the entire volume instead.
 
 Open <http://127.0.0.1:3010/>:
 

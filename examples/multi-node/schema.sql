@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS collaboration.units (
   head_revision INTEGER NOT NULL CHECK (head_revision >= 1),
   creator_id TEXT NOT NULL,
   created_at_ms BIGINT NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
   deleted_at_ms BIGINT,
   deleted_status TEXT CHECK (deleted_status IN ('soft', 'hard')),
   CHECK ((deleted_status IS NULL) = (deleted_at_ms IS NULL))
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS collaboration.changesets (
   req_id INTEGER NOT NULL CHECK (req_id >= 1),
   created_at_ms BIGINT NOT NULL,
   payload BYTEA NOT NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (unit_id, revision),
   UNIQUE (unit_id, sid, req_id)
 );
@@ -47,7 +49,7 @@ CREATE TABLE IF NOT EXISTS collaboration.sheet_blocks (
   PRIMARY KEY (unit_id, block_id)
 );
 INSERT INTO collaboration.schema_versions (component, version)
-VALUES ('core', 1)
+VALUES ('core', 2)
 ON CONFLICT (component) DO NOTHING;
 
 -- Application catalog: the file list shown in the sidebar.

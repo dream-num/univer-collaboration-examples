@@ -29,8 +29,7 @@ pnpm example:all-unit
 
 PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts` 引入了 `@univerjs-pro/exchange-node/pdf`，
 示例依赖 `@univerjs-pro/exchange-pdf-node-binding`。从 PDF 文件导入的 Unit 可以连同编辑一起导出。侧边栏里空白创建的
-`PDF` Unit 在没有内容时可以导出，但加入文字框后导出会失败，错误是 `source-less PDF cannot apply imported semantic patches`：
-导出器把文字编辑应用到源 PDF 上，而这个 Unit 没有源文件。
+`PDF` Unit 也可以导出插入的图片和文字框，包括移动图片和编辑文字后的结果。
 
 建议一起阅读：
 
