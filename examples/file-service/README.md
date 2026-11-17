@@ -15,14 +15,14 @@ Take images as the example. An image inserted into a Unit is stored in one of tw
 - **Referenced.** The file is uploaded to the application. The Unit data records only a file ID,
   which the client exchanges for a URL when it displays the image.
 
-An embedded image becomes part of the Unit data, so snapshots and changesets grow with it, and the
-client loads all of it on every open, slowing the first render. Referencing moves the file out of
-the Unit data and leaves only the ID behind.
+Embedding images makes snapshots and changesets larger. They take up more space in the database,
+and the client has more data to load when it opens a Unit, slowing the first render. When importing
+files such as XLSX, DOCX, or PPTX, we recommend storing their images and attachments in the file
+service as well. See the [server-side import and export example](../exchange/README.md).
 
-The need is not limited to images. Attachments are stored by reference in the same way, and the
-source and result files of import and export need temporary storage. The file service is the set of
-routes the application provides for these files: it accepts uploads and returns a download URL for
-a file ID, on storage the application chooses.
+The file service also provides temporary storage for import source files and export results. It
+accepts uploads and returns a download URL for a given file ID. The application chooses where to
+store the files.
 
 In the SDK, the File Endpoint serves the routes, the File Service applies ownership rules,
 permission middleware, and temporary-file cleanup, and adapters store metadata and content.
