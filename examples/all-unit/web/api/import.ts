@@ -24,11 +24,6 @@ const importTypes: Readonly<Record<string, readonly UniverType[]>> = {
 
 export const IMPORT_ACCEPT = Object.keys(importTypes).map((extension) => `.${extension}`).join(",");
 
-export interface ImportProgress {
-  readonly stage: "uploading" | "converting";
-  readonly percent?: number;
-}
-
 export function getImportTypes(fileName: string): readonly UniverType[] {
   const dot = fileName.lastIndexOf(".");
   if (dot < 0) return noTypes;
@@ -41,10 +36,7 @@ export function getImportTypes(fileName: string): readonly UniverType[] {
 export async function importUnit(
   file: File,
   type: UniverType,
-  options: {
-    signal?: AbortSignal;
-    onProgress?: (progress: ImportProgress) => void;
-  } = {},
+  options: { signal?: AbortSignal } = {},
 ): Promise<string> {
   options.signal?.throwIfAborted();
   if (!getImportTypes(file.name).includes(type)) {
@@ -61,7 +53,6 @@ export async function importUnit(
   const { signal } = controller;
 
   try {
-    options.onProgress?.({ stage: "uploading" });
     const body = new FormData();
     body.append("file", file);
     const query = new URLSearchParams({
@@ -75,8 +66,6 @@ export async function importUnit(
       "File upload",
     );
     const fileID = requiredString(uploaded.FileId, "The upload response did not include a FileId.");
-    options.onProgress?.({ stage: "uploading", percent: 100 });
-    options.onProgress?.({ stage: "converting" });
 
     const created = await request(
       `${API_PREFIX}/exchange/${type}/import`,

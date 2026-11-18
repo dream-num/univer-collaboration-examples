@@ -1,14 +1,11 @@
 import type { UniverType } from "@univerjs/protocol";
 import { UNIT_TYPES } from "../../shared/units";
-import { getImportTypes, IMPORT_ACCEPT, type ImportProgress } from "../api/import";
+import { getImportTypes, IMPORT_ACCEPT } from "../api/import";
 import { createDialog, errorMessage } from "./dialog";
 import { icon, unitIcon } from "./icons";
 
 interface ImportUnitDialogOptions {
-  onImport(file: File, type: UniverType, options: {
-    signal: AbortSignal;
-    onProgress(progress: ImportProgress): void;
-  }): Promise<void>;
+  onImport(file: File, type: UniverType, options: { signal: AbortSignal }): Promise<void>;
 }
 
 export function createImportUnitDialog(options: ImportUnitDialogOptions) {
@@ -27,11 +24,7 @@ export function createImportUnitDialog(options: ImportUnitDialogOptions) {
       <p class="au-field-hint">Choose a spreadsheet or a structured database.</p>
     </div>
     <p class="au-import-type-label" hidden></p>
-    <div class="au-import-progress" hidden>
-      <p class="au-progress-label" role="status"></p>
-      <progress class="au-progress" max="100" aria-label="Import progress"></progress>
-      <p class="au-field-hint">You can stop waiting. An import already started on the server may still finish and appear in your units.</p>
-    </div>
+    <p class="au-import-hint au-field-hint" hidden>You can stop waiting. An import already started on the server may still finish and appear in your units.</p>
   `;
   view.content.querySelector(".au-upload-icon")!.append(icon("upload"));
   const input = view.content.querySelector<HTMLInputElement>("#import-unit-file")!;
@@ -40,9 +33,7 @@ export function createImportUnitDialog(options: ImportUnitDialogOptions) {
   const select = view.content.querySelector<HTMLSelectElement>("#import-unit-type")!;
   const typeLabel = view.content.querySelector<HTMLParagraphElement>(".au-import-type-label")!;
   const detail = view.content.querySelector<HTMLParagraphElement>(".au-file-detail")!;
-  const progress = view.content.querySelector<HTMLDivElement>(".au-import-progress")!;
-  const progressLabel = view.content.querySelector<HTMLParagraphElement>(".au-progress-label")!;
-  const progressBar = view.content.querySelector<HTMLProgressElement>("progress")!;
+  const waitingHint = view.content.querySelector<HTMLParagraphElement>(".au-import-hint")!;
   let file: File | undefined;
   let candidates: readonly UniverType[] = [];
   let busy = false;
@@ -59,7 +50,7 @@ export function createImportUnitDialog(options: ImportUnitDialogOptions) {
     view.close.setAttribute("aria-label", value ? "Stop waiting and close dialog" : "Close dialog");
     input.disabled = value;
     select.disabled = value;
-    progress.hidden = !value;
+    waitingHint.hidden = !value;
   }
 
   function close() {
@@ -68,15 +59,6 @@ export function createImportUnitDialog(options: ImportUnitDialogOptions) {
     controller = undefined;
     setBusy(false);
     view.dialog.close();
-  }
-
-  function showProgress(value: ImportProgress) {
-    const percent = value.percent === undefined ? undefined : Math.max(0, Math.min(100, value.percent));
-    progressLabel.textContent = value.stage === "converting"
-      ? "Converting your file…"
-      : percent === undefined ? "Uploading your file…" : `Uploading your file… ${Math.round(percent)}%`;
-    if (value.stage === "uploading" && percent !== undefined) progressBar.value = percent;
-    else progressBar.removeAttribute("value");
   }
 
   input.addEventListener("change", () => {
@@ -118,11 +100,7 @@ export function createImportUnitDialog(options: ImportUnitDialogOptions) {
     controller = new AbortController();
     view.error.hidden = true;
     setBusy(true);
-    showProgress({ stage: "uploading" });
-    void options.onImport(file, type, {
-      signal: controller.signal,
-      onProgress: value => { if (!disposed && version === generation) showProgress(value); },
-    }).then(() => {
+    void options.onImport(file, type, { signal: controller.signal }).then(() => {
       if (!disposed && version === generation) view.dialog.close();
     }).catch((error: unknown) => {
       if (disposed || version !== generation) return;
