@@ -43,7 +43,7 @@ PDF 转换在 `@univerjs-pro/exchange-node` 里是可选模块：`server/main.ts
 - `server/units.ts`：定义六个默认 Unit，并为新建操作提供空白内容。
 - `server/unit-routes.ts`：提供 Unit 列表和新建接口。
 - `server/database/unit-catalog.ts`：从 SQLite 读取 Unit 名称和最近修改时间。
-- `web/app.ts`：协调侧边栏、创建和导入弹层、列表刷新与编辑器加载。
+- `web/app.tsx`：组装 React 页面，侧边栏和弹窗组件放在 `web/ui/`。
 - `web/api/import.ts`：通过 File 和 Exchange Endpoint 上传文件并等待导入结果。
 - `web/univer/mount-editor.ts`：创建 Univer 实例并装上所有 Unit 类型共用的插件，然后交给对应类型的模块。
 - `web/univer/units/<type>/index.ts`：从上到下注册这类 Unit 的插件：编辑器、评论、协同客户端、历史、打印、导入导出。
