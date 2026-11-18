@@ -5,42 +5,31 @@ const IMPORT_TIMEOUT_MS = 5 * 60 * 1000;
 const POLL_INTERVAL_MS = 750;
 const UNIT_OUTPUT_TYPE = 1;
 
-const spreadsheetTypes = Object.freeze([UniverType.UNIVER_SHEET, UniverType.UNIVER_BASE]);
-const documentTypes = Object.freeze([UniverType.UNIVER_DOC]);
-const presentationTypes = Object.freeze([UniverType.UNIVER_SLIDE]);
-const pdfTypes = Object.freeze([UniverType.UNIVER_PDF]);
-const noTypes: readonly UniverType[] = Object.freeze([]);
-const importTypes: Readonly<Record<string, readonly UniverType[]>> = {
-  xls: spreadsheetTypes,
-  xlsx: spreadsheetTypes,
-  csv: spreadsheetTypes,
-  tsv: spreadsheetTypes,
-  doc: documentTypes,
-  docx: documentTypes,
-  ppt: presentationTypes,
-  pptx: presentationTypes,
-  pdf: pdfTypes,
+const importTypes: Readonly<Record<string, UniverType>> = {
+  ".xls": UniverType.UNIVER_SHEET,
+  ".xlsx": UniverType.UNIVER_SHEET,
+  ".csv": UniverType.UNIVER_SHEET,
+  ".tsv": UniverType.UNIVER_SHEET,
+  ".doc": UniverType.UNIVER_DOC,
+  ".docx": UniverType.UNIVER_DOC,
+  ".ppt": UniverType.UNIVER_SLIDE,
+  ".pptx": UniverType.UNIVER_SLIDE,
+  ".pdf": UniverType.UNIVER_PDF,
 };
 
-export const IMPORT_ACCEPT = Object.keys(importTypes).map((extension) => `.${extension}`).join(",");
-
-export function getImportTypes(fileName: string): readonly UniverType[] {
-  const dot = fileName.lastIndexOf(".");
-  if (dot < 0) return noTypes;
-  const extension = fileName.slice(dot + 1).toLowerCase();
-  return Object.hasOwn(importTypes, extension) ? importTypes[extension] : noTypes;
-}
+export const IMPORT_ACCEPT = Object.keys(importTypes).join(",");
 
 // The import belongs to the page, so changing or disposing an editor does not cancel it.
 // Aborting stops this client's requests and polling; the server may still finish its task.
 export async function importUnit(
   file: File,
-  type: UniverType,
   options: { signal?: AbortSignal } = {},
-): Promise<string> {
+): Promise<{ unitId: string; type: UniverType }> {
   options.signal?.throwIfAborted();
-  if (!getImportTypes(file.name).includes(type)) {
-    throw new Error(`Cannot import "${file.name}" as the selected Unit type.`);
+  const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+  const type = importTypes[extension];
+  if (type === undefined) {
+    throw new Error("This file format is not supported. Choose an Excel, CSV, TSV, Word, PowerPoint or PDF file.");
   }
 
   const timeout = AbortSignal.timeout(IMPORT_TIMEOUT_MS);
@@ -78,7 +67,7 @@ export async function importUnit(
       if (task.status === "done") {
         const unitID = task.import?.unitID;
         if (typeof unitID !== "string" || !unitID.trim()) throw new Error("The import completed without creating a Unit.");
-        return unitID;
+        return { unitId: unitID, type };
       }
       if (task.status !== "pending") {
         throw new Error(task.status === "failed" ? "Import failed." : "The server returned an invalid import status.");

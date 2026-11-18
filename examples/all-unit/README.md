@@ -14,9 +14,9 @@ pnpm example:all-unit
 Open <http://127.0.0.1:3010> and switch Units in the sidebar.
 
 - **New Unit**: choose Sheet, Doc, Slide, Board, Base, or PDF, enter a name, and create it.
-- **Import**: choose a local Office, CSV, TSV, or PDF file. Spreadsheet files can become a Sheet or
-  Base. A successful import opens the new Unit. Stopping the wait does not cancel a conversion
-  that has already started on the server.
+- **Import**: opens the file picker and imports the selected file immediately. Excel, CSV, and TSV
+  become Sheet Units; Word, PowerPoint, and PDF become Doc, Slide, and PDF Units. A successful import
+  opens the new Unit. Stopping the wait does not cancel a conversion already started on the server.
 - The sidebar lists the newest Units first, with ties sorted by Unit ID in ascending order.
   It refreshes when the page loads or you return to the tab. Edits update a Unit's modification time
   without changing its list position.

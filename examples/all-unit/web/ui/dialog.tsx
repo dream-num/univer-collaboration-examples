@@ -7,11 +7,10 @@ interface DialogProps {
   children: ReactNode;
   onClose(): void;
   closeDisabled?: boolean;
-  closeLabel?: string;
 }
 
 export function Dialog({
-  title, description, children, onClose, closeDisabled = false, closeLabel = "Close dialog",
+  title, description, children, onClose, closeDisabled = false,
 }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const id = useId();
@@ -40,7 +39,7 @@ export function Dialog({
         <div><h2 id={`${id}-title`}>{title}</h2><p id={`${id}-description`}>{description}</p></div>
         <button
           className="au-button au-button-icon au-close" type="button"
-          aria-label={closeLabel} disabled={closeDisabled} onClick={close}
+          aria-label="Close dialog" disabled={closeDisabled} onClick={close}
         >
           <Icon name="close" />
         </button>

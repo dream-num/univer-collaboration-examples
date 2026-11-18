@@ -61,9 +61,12 @@ body.all-unit-app {
 .au-brand-symbol .au-icon { width: 19px; height: 19px; }
 .au-brand h2 { font-size: 16px; font-weight: 650; letter-spacing: -.45px; line-height: 1.3; }
 .au-brand p { color: var(--au-muted); font-size: 11px; margin-top: 2px; }
-.au-sidebar-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 25px 0; }
+.au-sidebar-actions { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 8px; margin: 25px 0; }
 .au-sidebar-actions .au-button { min-width: 0; padding: 8px; font-size: 12px; gap: 5px; white-space: nowrap; }
 .au-sidebar-actions .au-icon { width: 14px; height: 14px; }
+.au-import { display: grid; gap: 6px; min-width: 0; }
+.au-import-message { color: var(--au-secondary); font-size: 11px; overflow-wrap: anywhere; }
+.au-import-message[role="alert"] { color: #b04444; }
 .au-list-heading { display: flex; justify-content: space-between; align-items: center; color: var(--au-muted); font-size: 11px; font-weight: 550; padding: 0 10px; margin-bottom: 9px; }
 .au-unit-count { font-variant-numeric: tabular-nums; font-weight: 400; }
 .au-unit-list { display: flex; flex: 1; flex-direction: column; gap: 3px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 3px; margin: -3px; scrollbar-width: thin; }
@@ -126,19 +129,11 @@ body.all-unit-app {
 .au-type-option .au-unit-icon .au-icon { width: 22px; height: 22px; }
 .au-type-check { position: absolute; right: 8px; top: 8px; color: var(--au-accent); }
 .au-type-check .au-icon { width: 12px; height: 12px; }
-.au-text-input, .au-select { display: block; width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid #d8dce5; border-radius: 7px; background: #fff; color: var(--au-text); font: inherit; line-height: 1.5; }
-.au-text-input:focus, .au-select:focus { outline: 2px solid var(--au-accent); outline-offset: 1px; }
-.au-text-input:disabled, .au-select:disabled { color: var(--au-secondary); background: var(--au-side); }
+.au-text-input { display: block; width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid #d8dce5; border-radius: 7px; background: #fff; color: var(--au-text); font: inherit; line-height: 1.5; }
+.au-text-input:focus { outline: 2px solid var(--au-accent); outline-offset: 1px; }
+.au-text-input:disabled { color: var(--au-secondary); background: var(--au-side); }
 .au-dialog-footer { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px; padding: 16px 25px; border-top: 1px solid var(--au-line); }
 .au-dialog .au-dialog-error { margin: -6px 25px 20px; padding: 10px 12px; border-radius: 6px; background: #fdf0f0; color: #ab3636; font-size: 12px; overflow-wrap: anywhere; }
-.au-file-picker { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 22px 14px; border: 1px dashed #d8dce5; border-radius: 8px; background: var(--au-side); }
-.au-file-input { max-width: 100%; width: 100%; font: inherit; font-size: 12px; color: var(--au-secondary); }
-.au-file-input::file-selector-button { padding: 7px 10px; margin-right: 8px; border: 1px solid var(--au-line); border-radius: 6px; background: #fff; color: var(--au-text); font: inherit; cursor: pointer; }
-.au-dialog .au-file-formats { font-size: 11px; color: var(--au-muted); text-align: center; }
-.au-dialog .au-file-detail { margin-top: 10px; font-size: 12px; color: var(--au-secondary); overflow-wrap: anywhere; }
-.au-import-target { margin-top: 20px; }
-.au-dialog .au-field-hint { font-size: 11px; line-height: 1.6; color: var(--au-muted); margin-top: 8px; }
-.au-dialog .au-import-type-label { display: flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 12px; color: var(--au-secondary); }
 
 @media (max-width: 760px) {
   .au-sidebar { width: 196px; flex-basis: 196px; padding-left: 9px; padding-right: 9px; }
@@ -168,6 +163,5 @@ body.all-unit-app {
 }
 @media (pointer: coarse) {
   .au-button, .au-mobile-switcher { min-height: 44px; }
-  .au-text-input, .au-select { font-size: 16px; }
-  .au-file-input::file-selector-button { min-height: 44px; }
+  .au-text-input { font-size: 16px; }
 }

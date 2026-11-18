@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { UNIT_TYPES, unitLink, type UnitSummary } from "../../shared/units";
 import { Icon, UnitIcon } from "./icons";
+import { ImportUnitButton } from "./import-unit-button";
 
 const modifiedTime = new Intl.DateTimeFormat(undefined, { dateStyle: "short", timeStyle: "short" });
 
@@ -11,10 +12,9 @@ interface SidebarProps {
   loaded: boolean;
   error: string | null;
   onCreate(): void;
-  onImport(): void;
 }
 
-export function Sidebar({ units, selectedId, loading, loaded, error, onCreate, onImport }: SidebarProps) {
+export function Sidebar({ units, selectedId, loading, loaded, error, onCreate }: SidebarProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -27,9 +27,7 @@ export function Sidebar({ units, selectedId, loading, loaded, error, onCreate, o
         <button className="au-button au-button-primary" type="button" onClick={onCreate}>
           <Icon name="plus" />New Unit
         </button>
-        <button className="au-button au-button-secondary" type="button" onClick={onImport}>
-          <Icon name="upload" />Import
-        </button>
+        <ImportUnitButton />
       </div>
       <div className="au-list-heading"><span>ALL UNITS</span><span className="au-unit-count">{units.length}</span></div>
       <button className="au-mobile-switcher" type="button" aria-controls="units"

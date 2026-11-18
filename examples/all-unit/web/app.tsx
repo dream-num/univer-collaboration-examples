@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { unitLink, type UnitsResponse } from "../shared/units";
 import { getUnits } from "./api/units";
 import { CreateUnitDialog } from "./ui/create-unit-dialog";
-import { ImportUnitDialog } from "./ui/import-unit-dialog";
 import { Sidebar } from "./ui/sidebar";
 import { Editor } from "./univer/editor";
 
@@ -10,7 +9,7 @@ export function App() {
   const [selectedId, setSelectedId] = useState(() => new URL(location.href).searchParams.get("unit") || null);
   const [catalog, setCatalog] = useState<UnitsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<"create" | "import" | null>(null);
+  const [creating, setCreating] = useState(false);
   const units = catalog?.units ?? [];
   const selected = units.find((unit) => unit.unitId === selectedId);
 
@@ -65,8 +64,7 @@ export function App() {
         loading={!catalog && !error}
         loaded={catalog !== null}
         error={error}
-        onCreate={() => setDialog("create")}
-        onImport={() => setDialog("import")}
+        onCreate={() => setCreating(true)}
       />
       <main id="workspace">
         <header className="au-document-header">
@@ -84,8 +82,7 @@ export function App() {
           )}
         </div>
       </main>
-      {dialog === "create" && <CreateUnitDialog onClose={() => setDialog(null)} />}
-      {dialog === "import" && <ImportUnitDialog onClose={() => setDialog(null)} />}
+      {creating && <CreateUnitDialog onClose={() => setCreating(false)} />}
     </>
   );
 }

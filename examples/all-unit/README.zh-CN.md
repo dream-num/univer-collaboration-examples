@@ -13,8 +13,8 @@ pnpm example:all-unit
 打开 <http://127.0.0.1:3010>，在侧边栏切换 Unit。
 
 - **New Unit**：选择 Sheet、Doc、Slide、Board、Base 或 PDF，填写名称并创建。
-- **Import**：选择本地 Office、CSV、TSV 或 PDF 文件。表格文件可选择导入为 Sheet 或 Base。
-  导入成功后自动打开新 Unit；停止等待不会取消服务端已经开始的转换。
+- **Import**：直接打开文件选择器，选完立即导入。Excel、CSV、TSV 导入为 Sheet，Word、PowerPoint、PDF
+  分别导入为 Doc、Slide、PDF。导入成功后自动打开新 Unit；停止等待不会取消服务端已经开始的转换。
 - 侧边栏按创建时间从新到旧排列，创建时间相同时按 Unit ID 升序排列。页面加载和切回标签页时刷新列表；
   编辑会更新 Unit 的修改时间，列表位置不变。
 
