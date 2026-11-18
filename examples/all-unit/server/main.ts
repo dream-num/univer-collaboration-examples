@@ -25,7 +25,7 @@ import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node"
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
 import { UnitCatalog } from "./database/unit-catalog";
 import { createUnitRouter } from "./unit-routes";
-import { DEMO_USER, ensureUnits, userProvider } from "./units";
+import { DEMO_USER, ensureUnits, getSnapshotName, userProvider } from "./units";
 
 // Configuration
 const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
@@ -51,10 +51,8 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
 service.use("createUnit", async ({ unit, customData, request }, next) => {
-  const { snapshot } = request;
   unit.metadata.name ??= typeof customData.importName === "string" ? customData.importName
-    : snapshot.workbook?.name || snapshot.doc?.name || snapshot.slide?.name || snapshot.board?.name
-      || snapshot.pdf?.name || unit.unitID;
+    : getSnapshotName(request.snapshot) || unit.unitID;
   unit.metadata.updatedAt = unit.createdAt;
   await next();
 });

@@ -6,7 +6,7 @@ import {
   type IUniverCollabService,
 } from "@univerjs-pro/collaboration-service";
 import { getBasesEmptySnapshot, getDocsEmptySnapshot, LocaleType } from "@univerjs/core";
-import { UniverType } from "@univerjs/protocol";
+import { UniverType, type ISnapshot } from "@univerjs/protocol";
 import type { UnitSummary } from "../shared/units";
 
 export const DEMO_USER = { userId: "demo-user", displayName: "Demo User" };
@@ -35,6 +35,11 @@ export const units: readonly Pick<UnitSummary, "unitId" | "type" | "name">[] = [
   { unitId: "all-unit-base", type: UniverType.UNIVER_BASE, name: "Base" },
   { unitId: "all-unit-pdf", type: UniverType.UNIVER_PDF, name: "PDF" },
 ];
+
+export function getSnapshotName(snapshot: ISnapshot): string | undefined {
+  return snapshot.workbook?.name || snapshot.doc?.name || snapshot.slide?.name
+    || snapshot.board?.name || snapshot.pdf?.name;
+}
 
 export async function ensureUnits(service: IUniverCollabService): Promise<void> {
   for (const unit of units) {
