@@ -63,8 +63,6 @@ Unit 链接带类型，形如 `/?unit=<id>&type=<type>`，可以复制到另一�
 Unit、评论、历史和文件在重启后都会保留，删除 `.data` 可以重新开始。`HOST`、`PORT`、`DATABASE_PATH`、
 `FILES_PATH` 可以覆盖服务端默认值。Exchange 任务只存在于当前进程，进程停止后会丢失。
 
-启动时，示例会先备份旧版 SDK 数据库，再升级其核心 schema。metadata 中没有名称的 Unit 在侧边栏显示为 Unit ID。
-
 ```bash
 pnpm --filter @univerjs/collaboration-example-all-unit typecheck
 ```
