@@ -9,11 +9,12 @@ interface SidebarProps {
   selectedId?: string | undefined;
   loading: boolean;
   loaded: boolean;
+  error: string | null;
   onCreate(): void;
   onImport(): void;
 }
 
-export function Sidebar({ units, selectedId, loading, loaded, onCreate, onImport }: SidebarProps) {
+export function Sidebar({ units, selectedId, loading, loaded, error, onCreate, onImport }: SidebarProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -54,7 +55,9 @@ export function Sidebar({ units, selectedId, loading, loaded, onCreate, onImport
           );
         })}
       </nav>
-      {units.length === 0 && (loading || loaded) && (
+      {error ? (
+        <p className="au-list-message" role="alert">{error}</p>
+      ) : units.length === 0 && (loading || loaded) && (
         <p className="au-list-message" role="status">
           {loading ? "Loading units…" : "No units yet. Create or import one to get started."}
         </p>

@@ -43,14 +43,8 @@ export async function importUnit(
     throw new Error(`Cannot import "${file.name}" as the selected Unit type.`);
   }
 
-  const controller = new AbortController();
-  const cancel = () => controller.abort(options.signal?.reason);
-  options.signal?.addEventListener("abort", cancel, { once: true });
-  const timeout = setTimeout(() => controller.abort(new DOMException(
-    "Import timed out. The server may still finish it; check the Unit list before importing again.",
-    "TimeoutError",
-  )), IMPORT_TIMEOUT_MS);
-  const { signal } = controller;
+  const timeout = AbortSignal.timeout(IMPORT_TIMEOUT_MS);
+  const signal = options.signal ? AbortSignal.any([options.signal, timeout]) : timeout;
 
   try {
     const body = new FormData();
@@ -60,37 +54,31 @@ export async function importUnit(
       source: String(FileSource.HttpImport),
       flate: "false",
     });
-    const uploaded = await request(
+    const uploaded = await request<{ FileId: string }>(
       `${API_PREFIX}/stream/file/upload?${query}`,
       { method: "POST", body, signal },
       "File upload",
     );
-    const fileID = requiredString(uploaded.FileId, "The upload response did not include a FileId.");
-
-    const created = await request(
+    const created = await request<{ taskID: string }>(
       `${API_PREFIX}/exchange/${type}/import`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileID, outputType: UNIT_OUTPUT_TYPE }),
+        body: JSON.stringify({ fileID: uploaded.FileId, outputType: UNIT_OUTPUT_TYPE }),
         signal,
       },
       "Starting import",
     );
-    const taskID = requiredString(created.taskID, "The import response did not include a taskID.");
-
     while (true) {
-      const task = await request(
-        `${API_PREFIX}/exchange/task/${encodeURIComponent(taskID)}`,
+      const task = await request<{ status: "pending" | "done" | "failed"; import?: { unitID: string } }>(
+        `${API_PREFIX}/exchange/task/${encodeURIComponent(created.taskID)}`,
         { signal },
         "Checking import",
       );
-      if (task.taskID !== taskID) throw new Error("The server returned a different import task.");
       if (task.status === "done") {
-        if (!isRecord(task.import) || task.import.outputType !== UNIT_OUTPUT_TYPE) {
-          throw new Error("The import completed without creating a Unit.");
-        }
-        return requiredString(task.import.unitID, "The completed import did not include a unitID.");
+        const unitID = task.import?.unitID;
+        if (typeof unitID !== "string" || !unitID.trim()) throw new Error("The import completed without creating a Unit.");
+        return unitID;
       }
       if (task.status !== "pending") {
         throw new Error(task.status === "failed" ? "Import failed." : "The server returned an invalid import status.");
@@ -98,45 +86,23 @@ export async function importUnit(
       await waitForNextPoll(signal);
     }
   } catch (error) {
+    if (signal.aborted && signal.reason?.name === "TimeoutError") {
+      throw new Error("Import timed out. The server may still finish it; check the Unit list before importing again.");
+    }
     if (signal.aborted) throw signal.reason;
     throw error;
-  } finally {
-    clearTimeout(timeout);
-    options.signal?.removeEventListener("abort", cancel);
   }
 }
 
-async function request(url: string, init: RequestInit, operation: string): Promise<Record<string, unknown>> {
+async function request<T>(url: string, init: RequestInit, operation: string): Promise<T> {
   const response = await fetch(url, { ...init, credentials: "same-origin", cache: "no-store" });
-  let result: unknown;
-  try {
-    result = await response.json();
-  } catch {
-    throw new Error(response.ok
-      ? `${operation} returned an invalid response.`
-      : `${operation} failed (HTTP ${response.status}).`);
-  }
-
-  const error = isRecord(result) && isRecord(result.error) ? result.error : undefined;
-  const message = typeof error?.message === "string" && error.message.trim() ? error.message : undefined;
-  if (!response.ok) throw new Error(message ?? `${operation} failed (HTTP ${response.status}).`);
-  if (!isRecord(result) || typeof error?.code !== "number") {
-    throw new Error(`${operation} returned an invalid response.`);
-  }
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error?.message || `${operation} failed (HTTP ${response.status}).`);
   // Exchange returns HTTP 200 for domain failures, including failures reported by task polling.
-  if (error.code !== ErrorCode.OK) {
-    throw new Error(message ?? `${operation} failed (code ${error.code}).`);
+  if (result.error?.code !== ErrorCode.OK) {
+    throw new Error(result.error?.message || `${operation} failed.`);
   }
-  return result;
-}
-
-function requiredString(value: unknown, message: string): string {
-  if (typeof value !== "string" || value.trim().length === 0) throw new Error(message);
-  return value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return result as T;
 }
 
 function waitForNextPoll(signal: AbortSignal): Promise<void> {
