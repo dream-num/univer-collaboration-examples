@@ -7,8 +7,6 @@ import { RefreshNotice } from "./ui/refresh-notice";
 import { Sidebar } from "./ui/sidebar";
 import { Editor } from "./univer/editor";
 
-const LIST_REFRESH_INTERVAL_MS = 5_000;
-
 export function App() {
   const [selectedId, setSelectedId] = useState(() => new URL(location.href).searchParams.get("unit"));
   const [catalog, setCatalog] = useState<UnitsResponse | null>(null);
@@ -46,20 +44,15 @@ export function App() {
       }
     }
 
-    function backgroundRefresh() {
+    function refreshWhenVisible() {
       if (!document.hidden) void refresh();
     }
 
     void refresh();
-    // Include imports from editor menus, converted attachments, and other browser tabs.
-    const timer = window.setInterval(backgroundRefresh, LIST_REFRESH_INTERVAL_MS);
-    window.addEventListener("focus", backgroundRefresh);
-    document.addEventListener("visibilitychange", backgroundRefresh);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
     return () => {
       controller.abort();
-      window.clearInterval(timer);
-      window.removeEventListener("focus", backgroundRefresh);
-      document.removeEventListener("visibilitychange", backgroundRefresh);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
   }, []);
 

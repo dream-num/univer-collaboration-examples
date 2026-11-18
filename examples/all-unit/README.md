@@ -18,7 +18,8 @@ Open <http://127.0.0.1:3010> and switch Units in the sidebar.
   Base. A successful import opens the new Unit. Stopping the wait does not cancel a conversion
   that has already started on the server.
 - The sidebar lists the newest Units first, with ties sorted by Unit ID in ascending order.
-  Editing a Unit updates its displayed modification time and keeps it in place.
+  It refreshes when the page loads or you return to the tab. Edits update a Unit's modification time
+  without changing its list position.
 
 | Capability | Available on | Where to try it |
 | --- | --- | --- |

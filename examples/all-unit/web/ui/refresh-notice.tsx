@@ -14,7 +14,7 @@ export function RefreshNotice() {
     <div className="au-notifications" aria-label="Notifications">
       <div className="au-notification au-notification-error" role="alert">
         <Icon name="close" />
-        <span>Unable to refresh Units. Retrying shortly.</span>
+        <span>Unable to refresh Units.</span>
         <button className="au-button au-button-icon" type="button" aria-label="Dismiss notification" onClick={() => setVisible(false)}>
           <Icon name="close" />
         </button>
