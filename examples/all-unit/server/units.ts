@@ -6,7 +6,7 @@ import {
   type IUniverCollabService,
 } from "@univerjs-pro/collaboration-service";
 import { getBasesEmptySnapshot, getDocsEmptySnapshot, LocaleType } from "@univerjs/core";
-import { UniverType } from "@univerjs/protocol";
+import { UniverType, type ISnapshot } from "@univerjs/protocol";
 import type { UnitSummary } from "../shared/units";
 
 export const DEMO_USER = { userId: "demo-user", displayName: "Demo User" };
@@ -27,7 +27,7 @@ export const userProvider = {
   },
 };
 
-export const units: readonly UnitSummary[] = [
+export const units: readonly Pick<UnitSummary, "unitId" | "type" | "name">[] = [
   { unitId: "all-unit-sheet", type: UniverType.UNIVER_SHEET, name: "Sheet" },
   { unitId: "all-unit-doc", type: UniverType.UNIVER_DOC, name: "Doc" },
   { unitId: "all-unit-slide", type: UniverType.UNIVER_SLIDE, name: "Slide" },
@@ -36,14 +36,21 @@ export const units: readonly UnitSummary[] = [
   { unitId: "all-unit-pdf", type: UniverType.UNIVER_PDF, name: "PDF" },
 ];
 
+export function getSnapshotName(snapshot: ISnapshot): string | undefined {
+  return snapshot.workbook?.name || snapshot.doc?.name || snapshot.slide?.name
+    || snapshot.board?.name || snapshot.pdf?.name;
+}
+
 export async function ensureUnits(service: IUniverCollabService): Promise<void> {
   for (const unit of units) {
     // Seed the demo Unit; if it already exists, this returns "already-exists" instead of creating it or throwing.
-    await service.createUnitFromData(initialData(unit), { userID: DEMO_USER.userId });
+    await service.createUnitFromData({
+      ...initialData(unit), metadata: { name: unit.name },
+    }, { userID: DEMO_USER.userId });
   }
 }
 
-function initialData(unit: UnitSummary): CreateUnitFromDataInput {
+export function initialData(unit: Pick<UnitSummary, "unitId" | "type" | "name">): CreateUnitFromDataInput {
   const { unitId, name, type } = unit;
   switch (type) {
     case UniverType.UNIVER_SHEET:

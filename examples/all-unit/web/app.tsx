@@ -1,0 +1,88 @@
+import { useEffect, useState } from "react";
+import { unitLink, type UnitsResponse } from "../shared/units";
+import { getUnits } from "./api/units";
+import { CreateUnitDialog } from "./ui/create-unit-dialog";
+import { Sidebar } from "./ui/sidebar";
+import { Editor } from "./univer/editor";
+
+export function App() {
+  const [selectedId, setSelectedId] = useState(() => new URL(location.href).searchParams.get("unit") || null);
+  const [catalog, setCatalog] = useState<UnitsResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const units = catalog?.units ?? [];
+  const selected = units.find((unit) => unit.unitId === selectedId);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let refreshing = false;
+
+    async function refresh() {
+      if (refreshing || controller.signal.aborted) return;
+      refreshing = true;
+      try {
+        const result = await getUnits(controller.signal);
+        if (controller.signal.aborted) return;
+        setCatalog(result);
+        setSelectedId((current) => current ?? (
+          result.units.find((unit) => unit.unitId === "all-unit-sheet") ?? result.units[0]
+        )?.unitId ?? null);
+        setError(null);
+      } catch (cause) {
+        if (controller.signal.aborted) return;
+        console.error(cause);
+        setError(cause instanceof Error && cause.message ? cause.message : "Unable to load Units.");
+      } finally {
+        refreshing = false;
+      }
+    }
+
+    function refreshWhenVisible() {
+      if (!document.hidden) void refresh();
+    }
+
+    void refresh();
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      controller.abort();
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selected) {
+      history.replaceState(null, "", unitLink(selected.unitId, selected.type));
+      document.title = `${selected.name} · All Unit`;
+    }
+  }, [selected?.unitId, selected?.type, selected?.name]);
+
+  return (
+    <>
+      <Sidebar
+        units={units}
+        selectedId={selected?.unitId}
+        loading={!catalog && !error}
+        loaded={catalog !== null}
+        error={error}
+        onCreate={() => setCreating(true)}
+      />
+      <main id="workspace">
+        <header className="au-document-header">
+          <h1 id="document-name">{selected?.name ?? "All Unit"}</h1>
+          <span className="au-document-caption">Univer Collaboration</span>
+        </header>
+        <div className="au-editor-area">
+          {selected && catalog ? (
+            <Editor unitId={selected.unitId} unitType={selected.type} user={catalog.user} />
+          ) : !error && (
+            <p id="status" role="status">
+              {!catalog ? "Loading units…" : selectedId
+                ? "This Unit could not be found." : "Create or import a Unit to get started."}
+            </p>
+          )}
+        </div>
+      </main>
+      {creating && <CreateUnitDialog onClose={() => setCreating(false)} />}
+    </>
+  );
+}

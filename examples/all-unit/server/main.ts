@@ -23,8 +23,9 @@ import { UniverHistoryService } from "@univerjs-pro/collaboration-history-servic
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
-import type { UnitsResponse } from "../shared/units";
-import { DEMO_USER, ensureUnits, units, userProvider } from "./units";
+import { UnitCatalog } from "./database/unit-catalog";
+import { createUnitRouter } from "./unit-routes";
+import { DEMO_USER, ensureUnits, getSnapshotName, userProvider } from "./units";
 
 // Configuration
 const filename = process.env.DATABASE_PATH ?? fileURLToPath(new URL("../../.data/collaboration.sqlite", import.meta.url));
@@ -41,6 +42,7 @@ if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
 }
 const database = new SQLiteDatabaseAdapter({ filename });
+const catalog = new UnitCatalog(filename);
 const fileDatabase = new SQLiteFileDatabaseAdapter({ filename });
 const blobStore = new LocalFileBlobStore({ directory: filesDirectory });
 const commentDatabase = new SQLiteCommentDatabaseAdapter({ filename });
@@ -48,8 +50,26 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
+service.use("createUnit", async ({ unit, customData, request }, next) => {
+  unit.metadata.name ??= customData.importName
+    ?? (getSnapshotName(request.snapshot) || unit.unitID);
+  unit.metadata.updatedAt = unit.createdAt;
+  await next();
+});
+service.use("commitChangeset", async ({ unit }, next) => {
+  unit.metadata.updatedAt = Date.now();
+  await next();
+});
 const fileService = new UniverFileService({ database: fileDatabase, blobStore });
 const exchangeService = new UniverExchangeService({ collabService: service, fileService });
+// The imported Unit takes its name from the uploaded file.
+exchangeService.use("import", async (context, next) => {
+  const file = await fileService.getFile(context.request.fileID, context);
+  if (file) {
+    context.customData.importName = file.name.replace(/\.[^.]+$/, "").trim() || file.name;
+  }
+  await next();
+});
 const commentService = new UniverCommentService({ database: commentDatabase, userProvider });
 const historyService = new UniverHistoryService({
   collabService: service,
@@ -78,9 +98,7 @@ transport.register(new UniverExchangeEndpoint(exchangeService));
 
 // HTTP
 const app = express();
-app.get("/api/units", (_request, response) => {
-  response.json({ units, user: DEMO_USER } satisfies UnitsResponse);
-});
+app.use("/api/units", createUnitRouter(catalog, service));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
   const body = request.body as { requests?: IAllowedRequest[] };
   response.json({
@@ -116,6 +134,7 @@ async function dispose() {
   await commentDatabase.dispose();
   await blobStore.dispose();
   await fileDatabase.dispose();
+  catalog.dispose();
   await database.dispose();
 }
 
