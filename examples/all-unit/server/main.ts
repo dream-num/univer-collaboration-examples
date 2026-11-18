@@ -51,8 +51,8 @@ const historyDatabase = new SQLiteHistoryDatabaseAdapter({ filename });
 // Services
 const service = new UniverCollabService({ dbAdapter: database });
 service.use("createUnit", async ({ unit, customData, request }, next) => {
-  unit.metadata.name ??= typeof customData.importName === "string" ? customData.importName
-    : getSnapshotName(request.snapshot) || unit.unitID;
+  unit.metadata.name ??= customData.importName
+    ?? (getSnapshotName(request.snapshot) || unit.unitID);
   unit.metadata.updatedAt = unit.createdAt;
   await next();
 });
