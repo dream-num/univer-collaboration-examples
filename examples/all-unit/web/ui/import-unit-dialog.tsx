@@ -90,7 +90,7 @@ export function ImportUnitDialog({ onClose }: { onClose(): void }) {
             </p>
           )}
           {busy && (
-            <p className="au-import-hint au-field-hint">
+            <p className="au-field-hint">
               You can stop waiting. An import already started on the server may still finish and appear in your units.
             </p>
           )}

@@ -30,7 +30,9 @@ export function CreateUnitDialog({ onClose }: { onClose(): void }) {
         onClose();
       }
     } catch (error) {
-      if (mounted.current) setError(errorMessage(error, "Unable to create the Unit. Please try again."));
+      if (mounted.current) setError(error instanceof Error && error.name === "TimeoutError"
+        ? "Creation timed out. Reload the page to check whether the Unit was created."
+        : errorMessage(error, "Unable to create the Unit. Please try again."));
     } finally {
       if (mounted.current) setBusy(false);
     }

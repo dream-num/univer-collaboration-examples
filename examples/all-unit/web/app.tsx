@@ -8,7 +8,7 @@ import { Sidebar } from "./ui/sidebar";
 import { Editor } from "./univer/editor";
 
 export function App() {
-  const [selectedId, setSelectedId] = useState(() => new URL(location.href).searchParams.get("unit"));
+  const [selectedId, setSelectedId] = useState(() => new URL(location.href).searchParams.get("unit") || null);
   const [catalog, setCatalog] = useState<UnitsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshFailed, setRefreshFailed] = useState(false);
@@ -69,6 +69,7 @@ export function App() {
         units={units}
         selectedId={selected?.unitId}
         loading={!catalog && !error}
+        loaded={catalog !== null}
         onCreate={() => setDialog("create")}
         onImport={() => setDialog("import")}
       />

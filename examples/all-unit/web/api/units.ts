@@ -18,5 +18,6 @@ export async function createUnit(input: CreateUnitInput): Promise<CreateUnitResp
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
+    signal: AbortSignal.timeout(15_000),
   }));
 }

@@ -8,29 +8,30 @@ interface SidebarProps {
   units: readonly UnitSummary[];
   selectedId?: string | undefined;
   loading: boolean;
+  loaded: boolean;
   onCreate(): void;
   onImport(): void;
 }
 
-export function Sidebar({ units, selectedId, loading, onCreate, onImport }: SidebarProps) {
+export function Sidebar({ units, selectedId, loading, loaded, onCreate, onImport }: SidebarProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <aside id="sidebar" className="au-sidebar" aria-label="Unit sidebar" data-expanded={expanded}>
+    <aside className="au-sidebar" aria-label="Unit sidebar" data-expanded={expanded}>
       <div className="au-brand">
         <span className="au-brand-symbol"><Icon name="brand" /></span>
         <div><h2>All Unit</h2><p>Univer Collaboration</p></div>
       </div>
       <div className="au-sidebar-actions" role="group" aria-label="Add a Unit">
-        <button className="au-button au-button-primary" type="button" data-action="new" onClick={onCreate}>
+        <button className="au-button au-button-primary" type="button" onClick={onCreate}>
           <Icon name="plus" />New Unit
         </button>
-        <button className="au-button au-button-secondary" type="button" data-action="import" onClick={onImport}>
+        <button className="au-button au-button-secondary" type="button" onClick={onImport}>
           <Icon name="upload" />Import
         </button>
       </div>
       <div className="au-list-heading"><span>ALL UNITS</span><span className="au-unit-count">{units.length}</span></div>
-      <button id="unit-switcher" className="au-mobile-switcher" type="button" aria-controls="units"
+      <button className="au-mobile-switcher" type="button" aria-controls="units"
         aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>
         <span>All units <span className="au-unit-count">{units.length}</span></span>
         <Icon name="chevron" />
@@ -53,7 +54,7 @@ export function Sidebar({ units, selectedId, loading, onCreate, onImport }: Side
           );
         })}
       </nav>
-      {units.length === 0 && (
+      {units.length === 0 && (loading || loaded) && (
         <p className="au-list-message" role="status">
           {loading ? "Loading units…" : "No units yet. Create or import one to get started."}
         </p>
