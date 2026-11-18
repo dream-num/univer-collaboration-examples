@@ -132,8 +132,6 @@ body.all-unit-app {
 .au-dialog-footer { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px; padding: 16px 25px; border-top: 1px solid var(--au-line); }
 .au-dialog .au-dialog-error { margin: -6px 25px 20px; padding: 10px 12px; border-radius: 6px; background: #fdf0f0; color: #ab3636; font-size: 12px; overflow-wrap: anywhere; }
 .au-file-picker { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 22px 14px; border: 1px dashed #d8dce5; border-radius: 8px; background: var(--au-side); }
-.au-upload-icon { display: grid; place-items: center; width: 36px; height: 36px; color: var(--au-accent); background: var(--au-selected); border-radius: 9px; }
-.au-upload-icon .au-icon { width: 20px; height: 20px; }
 .au-file-input { max-width: 100%; width: 100%; font: inherit; font-size: 12px; color: var(--au-secondary); }
 .au-file-input::file-selector-button { padding: 7px 10px; margin-right: 8px; border: 1px solid var(--au-line); border-radius: 6px; background: #fff; color: var(--au-text); font: inherit; cursor: pointer; }
 .au-dialog .au-file-formats { font-size: 11px; color: var(--au-muted); text-align: center; }

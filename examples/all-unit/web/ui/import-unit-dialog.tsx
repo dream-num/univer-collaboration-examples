@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { UNIT_TYPES, unitLink } from "../../shared/units";
 import { getImportTypes, IMPORT_ACCEPT, importUnit } from "../api/import";
 import { Dialog, errorMessage } from "./dialog";
-import { Icon, UnitIcon } from "./icons";
+import { UnitIcon } from "./icons";
 
 export function ImportUnitDialog({ onClose }: { onClose(): void }) {
   const [file, setFile] = useState<File>();
@@ -61,7 +61,6 @@ export function ImportUnitDialog({ onClose }: { onClose(): void }) {
         <div className="au-dialog-content">
           <label className="au-field-label" htmlFor="import-unit-file">File</label>
           <div className="au-file-picker">
-            <span className="au-upload-icon"><Icon name="upload" /></span>
             <input
               ref={input} id="import-unit-file" className="au-file-input" type="file"
               accept={IMPORT_ACCEPT} disabled={busy}
