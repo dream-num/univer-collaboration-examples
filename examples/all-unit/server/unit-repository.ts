@@ -1,5 +1,5 @@
 import Database from "libsql";
-import type { UnitSummary } from "../../shared/units";
+import type { UnitSummary } from "../shared/units";
 
 const SUMMARY_QUERY = `
   SELECT unit_id AS unitId, type,
@@ -10,7 +10,7 @@ const SUMMARY_QUERY = `
 `;
 
 // The SDK owns all writes. This application query projects the metadata used by the sidebar.
-export class UnitCatalog {
+export class UnitRepository {
   private readonly _database: Database.Database;
   private readonly _list: Database.Statement;
   private readonly _get: Database.Statement;

@@ -23,8 +23,9 @@ import { UniverHistoryService } from "@univerjs-pro/collaboration-history-servic
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { ErrorCode, type IAllowedRequest } from "@univerjs/protocol";
-import { UnitCatalog } from "./database/unit-catalog";
+import { UnitRepository } from "./unit-repository";
 import { createUnitRouter } from "./unit-routes";
+import { UnitService } from "./unit-service";
 import { DEMO_USER, ensureUnits, getSnapshotName, userProvider } from "./units";
 
 // Configuration
@@ -42,7 +43,7 @@ if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
 }
 const database = new SQLiteDatabaseAdapter({ filename });
-const catalog = new UnitCatalog(filename);
+const unitRepository = new UnitRepository(filename);
 const fileDatabase = new SQLiteFileDatabaseAdapter({ filename });
 const blobStore = new LocalFileBlobStore({ directory: filesDirectory });
 const commentDatabase = new SQLiteCommentDatabaseAdapter({ filename });
@@ -97,7 +98,8 @@ transport.register(new UniverExchangeEndpoint(exchangeService));
 
 // HTTP
 const app = express();
-app.use("/api/units", createUnitRouter(catalog, service));
+const units = new UnitService(service, unitRepository);
+app.use("/api/units", createUnitRouter(units));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
   const body = request.body as { requests?: IAllowedRequest[] };
   response.json({
@@ -133,7 +135,7 @@ async function dispose() {
   await commentDatabase.dispose();
   await blobStore.dispose();
   await fileDatabase.dispose();
-  catalog.dispose();
+  unitRepository.dispose();
   await database.dispose();
 }
 

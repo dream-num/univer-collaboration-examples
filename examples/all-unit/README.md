@@ -49,7 +49,8 @@ Read these files together:
   Endpoints. They all share `.data/collaboration.sqlite`. File contents go to `.data/files`.
 - `server/units.ts` defines the six default Units and the blank content used for new Units.
 - `server/unit-routes.ts` serves the Unit list and creation endpoints.
-- `server/database/unit-catalog.ts` reads Unit names and modification times from SQLite.
+- `server/unit-service.ts` creates Units through the Collaboration Service and reads their summaries from the catalog.
+- `server/unit-repository.ts` reads Unit names and modification times from SQLite.
 - `web/app.tsx` assembles the React page, with sidebar and dialog components in `web/ui/`.
 - `web/api/import.ts` uploads files and waits for results through the File and Exchange Endpoints.
 - `web/univer/mount-editor.ts` creates the Univer instance with the plugins every Unit type shares, then
