@@ -1,18 +1,17 @@
-import { randomUUID } from "node:crypto";
-import { CollabError, type IUniverCollabService } from "@univerjs-pro/collaboration-service";
+import { CollabError } from "@univerjs-pro/collaboration-service";
 import express, { type ErrorRequestHandler, type Router } from "express";
 import { isUnitType, UNIT_TYPES, type CreateUnitResponse, type UnitsResponse } from "../shared/units";
-import type { UnitCatalog } from "./database/unit-catalog";
-import { DEMO_USER, initialData } from "./units";
+import type { UnitService } from "./unit-service";
+import { DEMO_USER } from "./units";
 
-export function createUnitRouter(catalog: UnitCatalog, service: IUniverCollabService): Router {
+export function createUnitRouter(units: UnitService): Router {
   const router = express.Router();
   router.use((_request, response, next) => {
     response.setHeader("Cache-Control", "no-store");
     next();
   });
   router.get("/", async (_request, response) => {
-    response.json({ units: catalog.listUnits(), user: DEMO_USER } satisfies UnitsResponse);
+    response.json({ units: units.listUnits(), user: DEMO_USER } satisfies UnitsResponse);
   });
   router.post("/", express.json({ limit: "16kb" }), async (request, response) => {
     const body: unknown = request.body;
@@ -27,12 +26,11 @@ export function createUnitRouter(catalog: UnitCatalog, service: IUniverCollabSer
     const name = (rawName as string | undefined)?.trim() || UNIT_TYPES.find((item) => item.type === type)!.defaultName;
     if (name.length > 120) throw new CollabError("INVALID_REQUEST", "Unit name must be 120 characters or fewer");
 
-    const unitId = randomUUID();
-    await service.createUnitFromData({
-      ...initialData({ unitId, type, name }), metadata: { name },
-    }, { userID: DEMO_USER.userId });
-    const unit = catalog.getUnitSummary(unitId);
-    if (!unit) throw new Error("The created Unit is missing from the application catalog");
+    const unit = await units.createUnit({ type, name }, DEMO_USER.userId);
+    if (unit === null) {
+      response.status(409).json({ error: { message: "Could not allocate a new Unit ID. Please try again." } });
+      return;
+    }
     response.status(201).json({ unit } satisfies CreateUnitResponse);
   });
 
