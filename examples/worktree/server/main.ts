@@ -3,7 +3,6 @@ import { existsSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { dirname } from "node:path";
-import { DatabaseSync } from "node:sqlite";
 import express from "express";
 import { LocaleType, type IWorkbookData } from "@univerjs/core";
 import { migrateSQLiteCore, SQLiteDatabaseAdapter } from "@univerjs-pro/collaboration-database-sqlite";
@@ -13,7 +12,7 @@ import {
 } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import { migrateSQLiteWorktreeV3ToV4, SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
+import { migrateSQLiteWorktree, SQLiteWorktreeDatabaseAdapter } from "@univerjs-pro/collaboration-worktree-database-sqlite";
 import { UniverCollabWorktreeEndpoint } from "@univerjs-pro/collaboration-worktree-endpoint";
 import {
   UniverCollabWorktreeService,
@@ -47,23 +46,9 @@ const unitData: IWorkbookData = {
 
 await mkdir(dirname(filename), { recursive: true });
 
-// SDK 1.5.0 reads core schema v4; migrate an older database file in place (it backs up first).
 if (existsSync(filename)) {
   await migrateSQLiteCore({ filename });
-  const stored = new DatabaseSync(filename);
-  let worktreeVersion: unknown;
-  try {
-    worktreeVersion = stored.prepare(
-      "SELECT version FROM collaboration_schema_versions WHERE component = 'worktree'",
-    ).get()?.version;
-    if (worktreeVersion === 3) {
-      // Back up the complete file, including any uncheckpointed WAL pages, before migrating drafts.
-      stored.prepare("VACUUM INTO ?").run(`${filename}.worktree-v3.${randomUUID()}.backup`);
-    }
-  } finally {
-    stored.close();
-  }
-  if (worktreeVersion === 3) migrateSQLiteWorktreeV3ToV4({ filename });
+  await migrateSQLiteWorktree({ filename });
 }
 const database = new SQLiteDatabaseAdapter({ filename });
 const service = new UniverCollabService({ dbAdapter: database });
@@ -143,3 +128,29 @@ server.listen(port, host, () =>
     `Worktree is running at http://${host}:${port}/?unit=${UNIT_ID}&worktree=${WORKTREE_ID}`,
   ),
 );
+
+async function shutdown() {
+  const httpClosed = new Promise<void>((resolve, reject) => {
+    server.close((error) => error ? reject(error) : resolve());
+    server.closeAllConnections();
+  });
+  // Transport drains the Endpoints before their Services and shared store are released.
+  await Promise.all([httpClosed, transport.dispose()]);
+  await worktreeService.dispose();
+  await service.dispose();
+  await worktreeDatabase.dispose();
+  await database.dispose();
+  await ticketStore.dispose();
+}
+
+let stopping = false;
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    if (stopping) return;
+    stopping = true;
+    void shutdown().catch((error: unknown) => {
+      console.error("Failed to shut down the Worktree server", error);
+      process.exitCode = 1;
+    });
+  });
+}
