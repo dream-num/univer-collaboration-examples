@@ -16,8 +16,9 @@ import { UniverHistoryService } from "@univerjs-pro/collaboration-history-servic
 import { CollabError, isCommentOnlyChangeset, UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
 import { UnitAction, UniverType } from "@univerjs/protocol";
-import { AuthzError, createAclStore, initializeAclSchema, isObjectActionAllowed } from "./acl";
-import { createAuthzRouter } from "./authz";
+import { createAclRepository, initializeAclSchema } from "./acl-repository";
+import { AclService, AuthzError } from "./acl-service";
+import { createAuthzRouter } from "./authz-routes";
 import { isUnitActionAllowed, UNIT_ID, UNIT_NAME } from "./permissions";
 import { currentUser, signIn, signOut, users } from "./users";
 
@@ -96,7 +97,7 @@ aclDatabase.pragma("foreign_keys = ON");
 // The SDK adapters sharing this file wait up to 5 s for write locks; do the same instead of failing with SQLITE_BUSY.
 aclDatabase.pragma("busy_timeout = 5000");
 initializeAclSchema(aclDatabase);
-const acl = createAclStore(aclDatabase);
+const aclService = new AclService(createAclRepository(aclDatabase));
 
 // Transport identifies the user; Endpoint sets the member profile.
 transport.use(async (context, next) => {
@@ -142,7 +143,7 @@ endpoint.use("joinUnit", async (context, next) => {
 // not a worksheet ID or range address; the Service has already validated the binding.
 service.use("commitChangeset", async (context, next) => {
   for (const requirement of context.requiredUnitPermissions) {
-    const granted = isObjectActionAllowed(acl, context.userID, {
+    const granted = aclService.isObjectActionAllowed(context.userID, {
       unitID: requirement.unitID,
       objectID: requirement.objectID,
       objectType: requirement.objectType,
@@ -208,7 +209,7 @@ app.get("/universer-api/demo/me", (request, response) => {
 app.use(
   "/universer-api/authz",
   express.json({ limit: "64kb" }),
-  createAuthzRouter({ store: acl, requireUser }),
+  createAuthzRouter({ service: aclService, requireUser }),
 );
 app.use(
   (error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {

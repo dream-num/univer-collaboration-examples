@@ -54,7 +54,7 @@ pnpm example:object-permissions
 
 `GET /universer-api/authz/collaborator?unitID=object-permissions-sheet&objectID=object-permissions-sheet`
 
-`objectID` 与 `unitID` 相同，返回文件成员，不返回某一块区域上的人。`id` 用 userID。
+`objectID` 与 `unitID` 相同时返回文件成员。本示例在 `subject.userID` 和 `id` 两个字段中都返回用户 ID。
 
 ### 验证
 
@@ -78,8 +78,10 @@ pnpm example:object-permissions
 | --- | --- |
 | `web/main.ts` | 协同插件加上 `authzUrl`、`objectPermissionTypes`，并把当前用户的 `userID` 设成和后端一致 |
 | `server/permissions.ts` | 文件角色。把内存 `Map` 换成你的用户系统。动作划分见 [`permissions`](../permissions/README.zh-CN.md) |
-| `server/acl.ts` | 保护对象的存储和 `isObjectActionAllowed`。表可以换，这个函数的规则先保持 |
-| `server/authz.ts` | 挂到 `authzUrl` 下面的 HTTP |
+| `server/acl-repository.ts` | 保护对象与协作者的 SQLite 建表和读写 |
+| `server/acl-service.ts` | 保护对象创建、更新和读取时的授权与校验 |
+| `server/acl-types.ts` | 保护对象、策略和协作者的共用类型 |
+| `server/authz-routes.ts` | 挂到 `authzUrl` 下面的 HTTP |
 | `server/main.ts` | 身份、三个文件级钩子、`enableUnitPermissionAnalysis`、`commitChangeset` |
 
 `server/users.ts` 里的 Cookie 只为演示。
@@ -147,24 +149,24 @@ endpoint.use("joinUnit", async (context, next) => {
 路由挂载在 `server/main.ts`：
 
 ```ts
-app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ store: acl, requireUser }));
+app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ service: aclService, requireUser }));
 ```
 
-`objectID` 等于 `unitID` 时按文件角色回答，请求形状见 [`permissions`](../permissions/README.zh-CN.md)。保护对象走 `server/acl.ts` 的 `isObjectActionAllowed`。按钮灰不灰看这个响应。它不代替第 5 步的提交检查。
+`objectID` 等于 `unitID` 时按文件角色回答，请求形状见 [`permissions`](../permissions/README.zh-CN.md)。保护对象通过 `aclService.isObjectActionAllowed` 判定。按钮灰不灰看这个响应。它不代替第 5 步的提交检查。
 
 ### 4. 实现「保护行列」面板调用的接口
 
-从工具栏「保护」或工作表标签添加区域保护时，这个面板会调用下面的路由，都在 `server/authz.ts`：
+从工具栏「保护」或工作表标签添加区域保护时，这个面板会调用下面的路由，都在 `server/authz-routes.ts`：
 
 | 方法 | 路径 | 何时调用 |
 | --- | --- | --- |
 | POST | `/-/object/-/batch_allowed` | 打开文件、刷新按钮和保护状态 |
 | POST | `/-/object/list` | 读取已有保护对象 |
 | POST | `/:objectType/object` | 新建区域或工作表保护 |
-| PUT | `/:objectType/object/:objectId` | 改范围、改开关、改编辑名单 |
+| PUT | `/:objectType/object/:objectId` | 更新已有保护对象的策略、可见或可编辑范围、编辑名单 |
 | GET | `/collaborator` | 选人框拉取候选人 |
 
-`PUT` 时如果 `strategies` 是空数组，保持原策略，不要写成空。示例用 `body.strategies.length` 判断。选人、范围和开关都写在创建和更新里，没有单独的协作者写入接口。
+修改编辑名单时，区域保护面板可能创建新的权限对象，再通过 changeset 把原区域绑定到新对象。通过 `PUT` 原地更新时，空的 `strategies` 数组保留原策略，省略 `scope` 保留原范围设置。工作表权限开关弹窗省略 `collaborators` 以保留名单。在 `PUT` 中传 `{"collaborators":{"collaborators":[]}}` 或 `{"collaborators":{}}` 都会清空名单。创建者始终保有对象的 Owner 权限。
 
 工作表上的操作开关（复制、改值、插入行列等）走 `PUT`，每个动作一条 strategy：开着 `role` 为 1（Editor），关掉 `role` 为 2（Owner）。没有评论开关。
 
@@ -180,7 +182,7 @@ const service = new UniverCollabService({
 
 service.use("commitChangeset", async (context, next) => {
   for (const requirement of context.requiredUnitPermissions) {
-    const granted = isObjectActionAllowed(acl, context.userID, {
+    const granted = aclService.isObjectActionAllowed(context.userID, {
       unitID: requirement.unitID,
       objectID: requirement.objectID,
       objectType: requirement.objectType,
