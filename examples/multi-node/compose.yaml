@@ -25,7 +25,7 @@ x-health: &health
   retries: 20
 
 services:
-  # Shared persistent storage for both nodes: collaboration tables and the file catalog.
+  # Shared persistent storage for both nodes: collaboration tables, including Unit metadata.
   # schema.sql runs once when the data directory is first initialized; the nodes never run DDL.
   postgres:
     image: postgres:17.6-alpine
@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: univer
       POSTGRES_DB: collaboration
     volumes:
-      - collaboration-data:/var/lib/postgresql/data
+      - collaboration-data-v1:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     healthcheck:
       # Check over TCP: during initialization only a temporary socket-only server is up.
@@ -89,4 +89,4 @@ services:
         condition: service_healthy
 
 volumes:
-  collaboration-data:
+  collaboration-data-v1:

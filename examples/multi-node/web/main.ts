@@ -1,3 +1,4 @@
+import type { UnitSummary } from "../shared/units";
 import { LocaleType, LogLevel } from "@univerjs/core";
 import { UniverCollaborationPlugin } from "@univerjs-pro/collaboration";
 import { UniverCollaborationClientPlugin } from "@univerjs-pro/collaboration-client";
@@ -19,7 +20,6 @@ import "@univerjs-pro/collaboration-client-ui/lib/index.css";
 const status = document.querySelector<HTMLElement>("#status")!;
 const picker = document.querySelector<HTMLElement>("#picker")!;
 
-interface FileEntry { unitID: string; name: string }
 const unitID = new URLSearchParams(location.search).get("unit");
 const nameInput = document.querySelector<HTMLInputElement>("#file-name")!;
 const createButton = document.querySelector<HTMLButtonElement>("#new-file")!;
@@ -30,10 +30,10 @@ function fileURL(unitID: string) {
   return `/?unit=${encodeURIComponent(unitID)}`;
 }
 
-async function listFiles(): Promise<FileEntry[]> {
-  const response = await fetch("/api/files", { cache: "no-store" });
+async function listFiles(): Promise<UnitSummary[]> {
+  const response = await fetch("/api/units", { cache: "no-store" });
   if (!response.ok) throw new Error("Could not load the file list.");
-  return (await response.json() as { files: FileEntry[] }).files;
+  return (await response.json() as { units: UnitSummary[] }).units;
 }
 
 async function refreshFiles() {
@@ -88,7 +88,7 @@ async function main() {
     if (createButton.disabled) return;
     createButton.disabled = true;
     try {
-      const response = await fetch("/api/files", {
+      const response = await fetch("/api/units", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: nameInput.value }),
@@ -98,8 +98,8 @@ async function main() {
         const result = await response.json().catch(() => null) as { error?: string } | null;
         throw new Error(result?.error ?? "Could not create the file. Please try again.");
       }
-      const result = await response.json() as FileEntry;
-      location.assign(fileURL(result.unitID));
+      const { unit } = await response.json() as { unit: UnitSummary };
+      location.assign(fileURL(unit.unitID));
     } catch (error) {
       showError(error);
       createButton.disabled = false;

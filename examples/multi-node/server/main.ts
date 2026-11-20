@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import express from "express";
 import { Pool } from "pg";
@@ -8,8 +7,10 @@ import { PostgresDatabaseAdapter } from "@univerjs-pro/collaboration-database-po
 import { UniverCollabEndpoint } from "@univerjs-pro/collaboration-endpoint";
 import { UniverCollabService } from "@univerjs-pro/collaboration-service";
 import { createNodeTransport } from "@univerjs-pro/collaboration-transport-node";
-import { ErrorCode, UniverType } from "@univerjs/protocol";
-import { createUnitData } from "./unit-data.js";
+import { ErrorCode } from "@univerjs/protocol";
+import { UnitRepository } from "./unit-repository.js";
+import { createUnitRouter } from "./unit-routes.js";
+import { UnitService } from "./unit-service.js";
 
 const USER_ID = "demo-user";
 const NODE_ID = process.env.NODE_ID ?? "node-a";
@@ -54,32 +55,8 @@ transport.register(endpoint);
 
 const app = express();
 app.get("/healthz", (_request, response) => response.json({ node: NODE_ID }));
-app.get("/api/files", async (_request, response) => {
-  const { rows: files } = await pool.query<{ unitID: string; name: string }>(
-    'SELECT unit_id AS "unitID", name FROM files ORDER BY created_at DESC, unit_id',
-  );
-  response.json({ files });
-});
-app.post("/api/files", express.json({ limit: "4kb" }), async (request, response) => {
-  const name: unknown = request.body?.name;
-  if (typeof name !== "string" || !name.trim() || name.trim().length > 80) {
-    response.status(400).json({ error: "Enter a file name between 1 and 80 characters." });
-    return;
-  }
-  // Assign a new ID for each creation so nodes can concurrently create files with the same name.
-  const unitID = randomUUID();
-  const data = createUnitData(unitID, name.trim());
-  const result = await service.createUnitFromData({ type: UniverType.UNIVER_SHEET, data }, { userID: USER_ID });
-  if (result.status !== "created") {
-    response.status(409).json({ error: "Could not allocate a new file ID. Please try again." });
-    return;
-  }
-  // Add the file to the application catalog only after the Unit is created.
-  await pool.query("INSERT INTO files (unit_id, name, created_at) VALUES ($1, $2, $3)", [unitID, data.name, Date.now()]);
-  console.info(`[${NODE_ID}] file.created unitID=${unitID}`);
-  response.setHeader("X-Collab-Node", NODE_ID);
-  response.status(201).json({ unitID, name: data.name });
-});
+const units = new UnitService(service, new UnitRepository(pool));
+app.use("/api/units", createUnitRouter(units, USER_ID, NODE_ID));
 // Use the collaboration hash rule so the UI can display the document's assigned node.
 app.get("/api/node", (_request, response) => response.json({ node: NODE_ID }));
 app.post("/universer-api/authz/-/object/-/batch_allowed", express.json(), (request, response) => {
