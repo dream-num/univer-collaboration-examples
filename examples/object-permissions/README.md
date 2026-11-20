@@ -54,7 +54,7 @@ Adding a person in the panel loads file members:
 
 `GET /universer-api/authz/collaborator?unitID=object-permissions-sheet&objectID=object-permissions-sheet`
 
-When `objectID` equals `unitID`, return file members, not the people on one range. `id` is the userID.
+When `objectID` equals `unitID`, return file members. This example returns the user's ID in both `subject.userID` and `id`.
 
 ### Verify
 
@@ -163,10 +163,10 @@ Adding a range protection from Protection on the toolbar, or from the sheet tab,
 | POST | `/-/object/-/batch_allowed` | Opening the file, and refreshing buttons and protection state |
 | POST | `/-/object/list` | Reading existing protection objects |
 | POST | `/:objectType/object` | Creating a range or worksheet protection |
-| PUT | `/:objectType/object/:objectId` | Changing the range, the switches, or the editor list |
+| PUT | `/:objectType/object/:objectId` | Updating an existing object's strategies, scope, or editor list |
 | GET | `/collaborator` | Loading candidates for the people picker |
 
-On `PUT`, an empty `strategies` array keeps the previous strategies. This example checks `body.strategies.length`. People, range, and switches all travel on create and update. There is no separate collaborator-write route.
+When the editor list changes, the range protection panel can create a new permission object and bind the existing range to it in a changeset. When it updates the object in place with `PUT`, an empty `strategies` array preserves the strategies. Omitting `scope` preserves the scope. The worksheet action dialog omits `collaborators` to keep the current people. To clear the list on `PUT`, send `{"collaborators":{"collaborators":[]}}` or `{"collaborators":{}}`. The creator remains the object owner.
 
 Worksheet action switches (copy, edit values, insert rows and columns, and so on) use `PUT`, one strategy per action: on means `role` `1` (Editor), off means `role` `2` (Owner). There is no comment switch.
 

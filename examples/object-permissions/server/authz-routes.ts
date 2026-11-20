@@ -9,7 +9,7 @@ import type {
 } from "@univerjs/protocol";
 import { ErrorCode, UnitObject, UnitRole } from "@univerjs/protocol";
 import { Router, type Request, type Response, type Router as ExpressRouter } from "express";
-import { AuthzError, defaultStrategies, type AclService } from "./acl-service";
+import { AuthzError, type AclService } from "./acl-service";
 import type { ObjectCollaborator } from "./acl-types";
 import { users } from "./users";
 import type { DemoUser } from "../shared/types";
@@ -34,6 +34,29 @@ function toUser(userId: string): IUser | undefined {
 
 function toCollaborator(entry: ObjectCollaborator): ICollaborator {
   return { id: entry.userId, role: entry.role, subject: toUser(entry.userId) };
+}
+
+function readCollaborators(entries: readonly ICollaborator[] | undefined): ObjectCollaborator[] {
+  if (entries == null) return [];
+  if (!Array.isArray(entries)) {
+    throw new AuthzError(400, "INVALID_REQUEST", "Expected a collaborators array");
+  }
+  return entries.map((entry: ICollaborator) => {
+    const userId = entry?.subject?.userID || entry?.id;
+    const role = entry?.role ?? UnitRole.Reader;
+    if (typeof userId !== "string" || !userId || !Number.isInteger(role)) {
+      throw new AuthzError(400, "INVALID_COLLABORATOR", "Invalid collaborator");
+    }
+    return { userId, role };
+  });
+}
+
+function readCollaboratorUpdate(wrapper: IUpdatePermPointRequest["collaborators"]) {
+  if (wrapper == null) return undefined;
+  if (typeof wrapper !== "object" || Array.isArray(wrapper)) {
+    throw new AuthzError(400, "INVALID_REQUEST", "Expected a collaborators object");
+  }
+  return readCollaborators(wrapper.collaborators);
 }
 
 function textParam(value: string | string[] | undefined): string {
@@ -126,11 +149,18 @@ export function createAuthzRouter(options: {
     if (body.objectType === UnitObject.SelectRange) {
       if (!body.selectRangeObject) throw new AuthzError(400, "INVALID_REQUEST", "Missing range object");
       objectId = service.createObject(user.userId, {
-        ...body.selectRangeObject, objectType: body.objectType, strategies: defaultStrategies,
+        ...body.selectRangeObject,
+        objectType: body.objectType,
+        collaborators: readCollaborators(body.selectRangeObject.collaborators),
       });
     } else if (body.objectType === UnitObject.Worksheet) {
       if (!body.worksheetObject) throw new AuthzError(400, "INVALID_REQUEST", "Missing worksheet object");
-      objectId = service.createObject(user.userId, { ...body.worksheetObject, objectType: body.objectType });
+      objectId = service.createObject(user.userId, {
+        ...body.worksheetObject,
+        objectType: body.objectType,
+        strategies: body.worksheetObject.strategies ?? [],
+        collaborators: readCollaborators(body.worksheetObject.collaborators),
+      });
     } else {
       throw new AuthzError(400, "UNSUPPORTED_OBJECT_TYPE", "Unsupported permission object type");
     }
@@ -142,7 +172,15 @@ export function createAuthzRouter(options: {
     if (!user) return;
     const body = request.body as IUpdatePermPointRequest;
     assertRouteIdentity(request, body);
-    service.updateObject(user.userId, { ...body, collaborators: body.collaborators?.collaborators });
+    service.updateObject(user.userId, {
+      unitID: body.unitID,
+      objectID: body.objectID,
+      objectType: body.objectType,
+      name: body.name,
+      strategies: body.strategies ?? [],
+      scope: body.scope,
+      collaborators: readCollaboratorUpdate(body.collaborators),
+    });
     // The Service reads policies on every submission, so edits apply to new changesets at once.
     // Already-connected clients learn about policy changes on their next batch_allowed query;
     // production apps should push UPDATE_PERMISSION_OBJ-style notifications instead.

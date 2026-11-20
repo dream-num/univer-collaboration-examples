@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { ObjectScope, UnitAction, UnitObject, UnitRole, type ICollaborator } from "@univerjs/protocol";
+import { ObjectScope, UnitAction, UnitObject, UnitRole } from "@univerjs/protocol";
 import type { AclRepository } from "./acl-repository";
 import type { ObjectCollaborator, PermissionObject, PermissionObjectScope, PermissionStrategy } from "./acl-types";
 import { isUnitActionAllowed, listUnitMembers, resolveUnitRole, UNIT_ID } from "./permissions";
 
-export const defaultStrategies: PermissionStrategy[] = [
+const defaultRangeStrategies: PermissionStrategy[] = [
   { action: UnitAction.View, role: UnitRole.Reader },
   { action: UnitAction.Edit, role: UnitRole.Editor },
   { action: UnitAction.ManageCollaborator, role: UnitRole.Owner },
@@ -37,10 +37,20 @@ interface ObjectActionRequest {
 
 interface ObjectInput {
   unitID: string;
-  objectType: UnitObject;
   name: string;
-  strategies: readonly PermissionStrategy[];
   scope: PermissionObjectScope | undefined;
+}
+
+type CreateObjectInput = ObjectInput & { collaborators: readonly ObjectCollaborator[] } & (
+  | { objectType: UnitObject.SelectRange }
+  | { objectType: UnitObject.Worksheet; strategies: readonly PermissionStrategy[] }
+);
+
+interface UpdateObjectInput extends ObjectInput {
+  objectID: string;
+  objectType: UnitObject;
+  strategies: readonly PermissionStrategy[];
+  collaborators: readonly ObjectCollaborator[] | undefined;
 }
 
 export class AclService {
@@ -80,7 +90,7 @@ export class AclService {
     return this.repository.listCollaborators(objectId);
   }
 
-  createObject(userId: string, input: ObjectInput & { collaborators: readonly ICollaborator[] }) {
+  createObject(userId: string, input: CreateObjectInput) {
     // Creating a protection object is a Unit-level decision; the object afterwards
     // belongs to its creator.
     this.assertUnitAction(userId, input.unitID, UnitAction.CreatePermissionObject);
@@ -93,7 +103,9 @@ export class AclService {
         objectType: input.objectType,
         creatorUserId: userId,
         name: input.name,
-        strategies: normalizeStrategies(input.strategies),
+        strategies: normalizeStrategies(
+          input.objectType === UnitObject.SelectRange ? defaultRangeStrategies : input.strategies,
+        ),
         scope: normalizeScope(input.scope),
       },
       normalizeCollaborators(input.unitID, userId, input.collaborators),
@@ -101,7 +113,7 @@ export class AclService {
     return objectId;
   }
 
-  updateObject(userId: string, input: ObjectInput & { objectID: string; collaborators: readonly ICollaborator[] | undefined }) {
+  updateObject(userId: string, input: UpdateObjectInput) {
     const object = this.requireManagedObject(userId, input.unitID, input.objectID);
     if (object.objectType !== input.objectType) {
       throw new AuthzError(400, "INVALID_REQUEST", "Object type mismatch");
@@ -111,7 +123,7 @@ export class AclService {
       objectId: object.objectId,
       name: input.name,
       strategies: input.strategies.length ? normalizeStrategies(input.strategies) : object.strategies,
-      scope: normalizeScope(input.scope),
+      scope: normalizeScope(input.scope) ?? object.scope,
       collaborators: input.collaborators
         ? normalizeCollaborators(object.unitId, object.creatorUserId, input.collaborators)
         : undefined,
@@ -212,21 +224,19 @@ function normalizeScope(scope: PermissionObjectScope | undefined) {
 function normalizeCollaborators(
   unitId: string,
   creatorUserId: string,
-  collaborators: readonly ICollaborator[],
+  collaborators: readonly ObjectCollaborator[],
 ): ObjectCollaborator[] {
   const result = new Map<string, UnitRole>();
-  for (const collaborator of collaborators) {
-    const userId = collaborator.subject?.userID || collaborator.id;
+  for (const { userId, role } of collaborators) {
     if (
-      !userId ||
-      userId === creatorUserId ||
-      collaborator.role < UnitRole.Reader ||
-      collaborator.role > UnitRole.Owner ||
+      role < UnitRole.Reader ||
+      role > UnitRole.Owner ||
       !resolveUnitRole(userId, unitId)
     ) {
       throw new AuthzError(400, "INVALID_COLLABORATOR", "Invalid collaborator");
     }
-    result.set(userId, collaborator.role);
+    // The worksheet dialog sends every Unit member, including the implicit object owner.
+    if (userId !== creatorUserId) result.set(userId, role);
   }
   return [...result].map(([userId, role]) => ({ userId, role }));
 }

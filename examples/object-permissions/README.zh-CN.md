@@ -54,7 +54,7 @@ pnpm example:object-permissions
 
 `GET /universer-api/authz/collaborator?unitID=object-permissions-sheet&objectID=object-permissions-sheet`
 
-`objectID` 与 `unitID` 相同，返回文件成员，不返回某一块区域上的人。`id` 用 userID。
+`objectID` 与 `unitID` 相同时返回文件成员。本示例在 `subject.userID` 和 `id` 两个字段中都返回用户 ID。
 
 ### 验证
 
@@ -163,10 +163,10 @@ app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRout
 | POST | `/-/object/-/batch_allowed` | 打开文件、刷新按钮和保护状态 |
 | POST | `/-/object/list` | 读取已有保护对象 |
 | POST | `/:objectType/object` | 新建区域或工作表保护 |
-| PUT | `/:objectType/object/:objectId` | 改范围、改开关、改编辑名单 |
+| PUT | `/:objectType/object/:objectId` | 更新已有保护对象的策略、可见或可编辑范围、编辑名单 |
 | GET | `/collaborator` | 选人框拉取候选人 |
 
-`PUT` 时如果 `strategies` 是空数组，保持原策略，不要写成空。示例用 `body.strategies.length` 判断。选人、范围和开关都写在创建和更新里，没有单独的协作者写入接口。
+修改编辑名单时，区域保护面板可能创建新的权限对象，再通过 changeset 把原区域绑定到新对象。通过 `PUT` 原地更新时，空的 `strategies` 数组保留原策略，省略 `scope` 保留原范围设置。工作表权限开关弹窗省略 `collaborators` 以保留名单。在 `PUT` 中传 `{"collaborators":{"collaborators":[]}}` 或 `{"collaborators":{}}` 都会清空名单。创建者始终保有对象的 Owner 权限。
 
 工作表上的操作开关（复制、改值、插入行列等）走 `PUT`，每个动作一条 strategy：开着 `role` 为 1（Editor），关掉 `role` 为 2（Owner）。没有评论开关。
 
