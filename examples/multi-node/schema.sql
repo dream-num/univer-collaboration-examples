@@ -51,10 +51,3 @@ CREATE TABLE IF NOT EXISTS collaboration.sheet_blocks (
 INSERT INTO collaboration.schema_versions (component, version)
 VALUES ('core', 2)
 ON CONFLICT (component) DO NOTHING;
-
--- Application catalog: the file list shown in the sidebar.
-CREATE TABLE IF NOT EXISTS files (
-  unit_id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  created_at BIGINT NOT NULL
-);

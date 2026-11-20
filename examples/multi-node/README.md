@@ -29,7 +29,7 @@ flowchart LR
 
 - **Collaboration nodes** run the same code with the same `DATABASE_URL` and the same `REDIS_URL`. Add or remove nodes freely; nothing is pinned to a node.
 - **Redis** needs version 6.2 or later. Use a highly available Redis in production: when Redis is unavailable, ticket requests fail and WebSocket connections are rejected with a retryable `503`.
-- **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example uses PostgreSQL through `@univerjs-pro/collaboration-database-postgres`; the application file catalog lives in the same database. The nodes do not create tables: [`schema.sql`](./schema.sql) is applied once when PostgreSQL initializes its data directory, and on startup each node only verifies that the schema is present and at the version the Adapter expects. In production, manage that schema with your migration tool and run migrations as a separate deployment step rather than from the service.
+- **Database** must be reachable by every collaboration node and satisfy the SDK database adapter contract. The example uses PostgreSQL through `@univerjs-pro/collaboration-database-postgres`. The sidebar lists active Sheets through `/api/units` and reads their names from Unit metadata. The nodes do not create tables: [`schema.sql`](./schema.sql) is applied once when PostgreSQL initializes its data directory, and on startup each node only verifies that the schema is present and at the version the Adapter expects. In production, manage that schema with your migration tool and run migrations as a separate deployment step rather than from the service.
 - **Gateway** sends a document's WebSocket and submissions to one node and spreads everything else, see [Configure the gateway](#configure-the-gateway). Replace Nginx with any gateway or load balancer; on Kubernetes, let the platform manage replicas and apply the same routing rules.
 
 ## Set up every collaboration node
@@ -110,18 +110,7 @@ docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
 
 Alternatively, run `pnpm example:multi-node`. Dependencies and builds run inside the containers. If you use standalone Compose, replace `docker compose` with `docker-compose`.
 
-SDK 1.5.0 uses core schema v2. A new volume receives it from `schema.sql`. To preserve Units in an
-existing v1 volume, stop both writers, back up PostgreSQL, and apply the transactional migration:
-
-```bash
-docker compose -f examples/multi-node/compose.yaml stop node-a node-b
-docker compose -f examples/multi-node/compose.yaml exec -T postgres pg_dump -U univer -d collaboration > collaboration-v1-backup.sql
-docker compose -f examples/multi-node/compose.yaml exec -T postgres psql -U univer -d collaboration -v ON_ERROR_STOP=1 < examples/multi-node/migrate-v1-to-v2.sql
-docker compose -f examples/multi-node/compose.yaml up --build --force-recreate
-```
-
-The migration adds empty Unit/changeset metadata and preserves the existing payloads. For disposable
-demo data, the shutdown command with `--volumes` below still resets the entire volume instead.
+Compose stores PostgreSQL data in the `collaboration-data-v1` volume. On first use, PostgreSQL initializes it from `schema.sql`.
 
 Open <http://127.0.0.1:3010/>:
 
