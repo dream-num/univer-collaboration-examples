@@ -1,28 +1,40 @@
-import { randomUUID } from "node:crypto";
 import type {
   IAllowedRequest,
+  ICollaborator,
+  IUser,
   ICreateRequest,
   IListPermPointRequest,
   IPermissionPoint,
   IUpdatePermPointRequest,
 } from "@univerjs/protocol";
-import { ErrorCode, UnitAction, UnitObject, UnitRole } from "@univerjs/protocol";
+import { ErrorCode, UnitObject, UnitRole } from "@univerjs/protocol";
 import { Router, type Request, type Response, type Router as ExpressRouter } from "express";
-import {
-  AuthzError,
-  defaultStrategies,
-  isObjectActionAllowed,
-  normalizeCollaborators,
-  normalizeScope,
-  normalizeStrategies,
-  toCollaborator,
-  toUser,
-  type AclStore,
-} from "./acl";
-import { isUnitActionAllowed, listUnitMembers, UNIT_ID } from "./permissions";
+import { AuthzError, defaultStrategies, type AclService } from "./acl-service";
+import type { ObjectCollaborator } from "./acl-types";
+import { users } from "./users";
 import type { DemoUser } from "../shared/types";
 
 const ok = { code: ErrorCode.OK, message: "" } as const;
+
+function toUser(userId: string): IUser | undefined {
+  const user = users.find((user) => user.userId === userId);
+  return user
+    ? {
+        userID: user.userId,
+        name: user.username,
+        avatar: user.avatar,
+        anonymous: false,
+        canBindAnonymous: false,
+        phone: "",
+        email: "",
+        createTimestamp: 0,
+      }
+    : undefined;
+}
+
+function toCollaborator(entry: ObjectCollaborator): ICollaborator {
+  return { id: entry.userId, role: entry.role, subject: toUser(entry.userId) };
+}
 
 function textParam(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
@@ -44,44 +56,22 @@ function assertRouteIdentity(request: Request, body: { objectType: number; objec
  * the server-side enforcement, so what the UI shows matches what the Service rejects.
  */
 export function createAuthzRouter(options: {
-  store: AclStore;
+  service: AclService;
   requireUser: (request: Request, response: Response) => DemoUser | undefined;
 }): ExpressRouter {
-  const { store } = options;
+  const { service } = options;
   const router = Router();
-
-  function assertUnitAction(userId: string, unitId: string, action: UnitAction) {
-    if (unitId !== UNIT_ID || !isUnitActionAllowed(userId, unitId, action)) {
-      throw new AuthzError(403, "PERMISSION_DENIED", "Permission denied");
-    }
-  }
 
   function allowed(userId: string, request: IAllowedRequest) {
     return request.actions.map((action) => ({
       action,
-      allowed: isObjectActionAllowed(store, userId, {
+      allowed: service.isObjectActionAllowed(userId, {
         unitID: request.unitID,
         objectID: request.objectID,
         objectType: request.objectType,
         action,
       }),
     }));
-  }
-
-  function requireManagedObject(userId: string, unitId: string, objectId: string) {
-    const object = store.getObject(unitId, objectId);
-    if (!object) throw new AuthzError(404, "OBJECT_NOT_FOUND", "Permission object not found");
-    if (
-      !isObjectActionAllowed(store, userId, {
-        unitID: unitId,
-        objectID: objectId,
-        objectType: object.objectType,
-        action: UnitAction.ManageCollaborator,
-      })
-    ) {
-      throw new AuthzError(403, "PERMISSION_DENIED", "Permission denied");
-    }
-    return object;
   }
 
   // The client batches permission checks to render the toolbar and gate editing.
@@ -103,9 +93,8 @@ export function createAuthzRouter(options: {
     const user = options.requireUser(request, response);
     if (!user) return;
     const body = request.body as IListPermPointRequest;
-    assertUnitAction(user.userId, body.unitID, UnitAction.View);
-    const objects: IPermissionPoint[] = store
-      .listObjects(body.unitID, body.objectIDs)
+    const objects: IPermissionPoint[] = service
+      .listObjects(user.userId, body.unitID, body.objectIDs)
       .map((object) => ({
         objectID: object.objectId,
         unitID: object.unitId,
@@ -133,37 +122,18 @@ export function createAuthzRouter(options: {
     const body = request.body as ICreateRequest;
     assertRouteIdentity(request, body);
 
-    let input: { unitID: string; name: string; strategies: typeof defaultStrategies; scope?: Parameters<typeof normalizeScope>[0]; collaborators: readonly import("@univerjs/protocol").ICollaborator[] };
+    let objectId: string;
     if (body.objectType === UnitObject.SelectRange) {
-      if (!body.selectRangeObject) {
-        throw new AuthzError(400, "INVALID_REQUEST", "Missing range object");
-      }
-      input = { ...body.selectRangeObject, strategies: defaultStrategies };
+      if (!body.selectRangeObject) throw new AuthzError(400, "INVALID_REQUEST", "Missing range object");
+      objectId = service.createObject(user.userId, {
+        ...body.selectRangeObject, objectType: body.objectType, strategies: defaultStrategies,
+      });
     } else if (body.objectType === UnitObject.Worksheet) {
-      if (!body.worksheetObject) {
-        throw new AuthzError(400, "INVALID_REQUEST", "Missing worksheet object");
-      }
-      input = body.worksheetObject;
+      if (!body.worksheetObject) throw new AuthzError(400, "INVALID_REQUEST", "Missing worksheet object");
+      objectId = service.createObject(user.userId, { ...body.worksheetObject, objectType: body.objectType });
     } else {
       throw new AuthzError(400, "UNSUPPORTED_OBJECT_TYPE", "Unsupported permission object type");
     }
-    // Creating a protection object is a Unit-level decision; the object afterwards
-    // belongs to its creator.
-    assertUnitAction(user.userId, input.unitID, UnitAction.CreatePermissionObject);
-
-    const objectId = randomUUID();
-    store.createObject(
-      {
-        objectId,
-        unitId: input.unitID,
-        objectType: body.objectType,
-        creatorUserId: user.userId,
-        name: input.name,
-        strategies: normalizeStrategies(input.strategies),
-        scope: normalizeScope(input.scope),
-      },
-      normalizeCollaborators(input.unitID, user.userId, input.collaborators),
-    );
     response.json({ error: ok, objectID: objectId });
   });
 
@@ -172,20 +142,7 @@ export function createAuthzRouter(options: {
     if (!user) return;
     const body = request.body as IUpdatePermPointRequest;
     assertRouteIdentity(request, body);
-    const object = requireManagedObject(user.userId, body.unitID, body.objectID);
-    if (object.objectType !== body.objectType) {
-      throw new AuthzError(400, "INVALID_REQUEST", "Object type mismatch");
-    }
-    store.updateObject({
-      unitId: object.unitId,
-      objectId: object.objectId,
-      name: body.name,
-      strategies: body.strategies.length ? normalizeStrategies(body.strategies) : object.strategies,
-      scope: normalizeScope(body.scope),
-      collaborators: body.collaborators
-        ? normalizeCollaborators(object.unitId, object.creatorUserId, body.collaborators.collaborators)
-        : undefined,
-    });
+    service.updateObject(user.userId, { ...body, collaborators: body.collaborators?.collaborators });
     // The Service reads policies on every submission, so edits apply to new changesets at once.
     // Already-connected clients learn about policy changes on their next batch_allowed query;
     // production apps should push UPDATE_PERMISSION_OBJ-style notifications instead.
@@ -197,22 +154,9 @@ export function createAuthzRouter(options: {
     if (!user) return;
     const unitId = textParam(request.query.unitID as string | string[] | undefined);
     const objectId = textParam(request.query.objectID as string | string[] | undefined);
-    assertUnitAction(user.userId, unitId, UnitAction.View);
-    // Unit-root queries list document members from the Unit policy; object queries
-    // read the ACL. Same special case as isObjectActionAllowed makes for the root.
-    if (objectId === unitId) {
-      response.json({
-        error: ok,
-        collaborators: listUnitMembers(unitId).map(toCollaborator),
-        cfgEnableObjInherit: false,
-      });
-      return;
-    }
-    const object = store.getObject(unitId, objectId);
-    if (!object) throw new AuthzError(404, "OBJECT_NOT_FOUND", "Permission object not found");
     response.json({
       error: ok,
-      collaborators: store.listCollaborators(objectId).map(toCollaborator),
+      collaborators: service.listCollaborators(user.userId, unitId, objectId).map(toCollaborator),
       cfgEnableObjInherit: false,
     });
   });

@@ -78,8 +78,10 @@ pnpm example:object-permissions
 | --- | --- |
 | `web/main.ts` | 协同插件加上 `authzUrl`、`objectPermissionTypes`，并把当前用户的 `userID` 设成和后端一致 |
 | `server/permissions.ts` | 文件角色。把内存 `Map` 换成你的用户系统。动作划分见 [`permissions`](../permissions/README.zh-CN.md) |
-| `server/acl.ts` | 保护对象的存储和 `isObjectActionAllowed`。表可以换，这个函数的规则先保持 |
-| `server/authz.ts` | 挂到 `authzUrl` 下面的 HTTP |
+| `server/acl-repository.ts` | 保护对象与协作者的 SQLite 建表和读写 |
+| `server/acl-service.ts` | 保护对象创建、更新和读取时的授权与校验 |
+| `server/acl-types.ts` | 保护对象、策略和协作者的共用类型 |
+| `server/authz-routes.ts` | 挂到 `authzUrl` 下面的 HTTP |
 | `server/main.ts` | 身份、三个文件级钩子、`enableUnitPermissionAnalysis`、`commitChangeset` |
 
 `server/users.ts` 里的 Cookie 只为演示。
@@ -147,14 +149,14 @@ endpoint.use("joinUnit", async (context, next) => {
 路由挂载在 `server/main.ts`：
 
 ```ts
-app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ store: acl, requireUser }));
+app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ service: aclService, requireUser }));
 ```
 
-`objectID` 等于 `unitID` 时按文件角色回答，请求形状见 [`permissions`](../permissions/README.zh-CN.md)。保护对象走 `server/acl.ts` 的 `isObjectActionAllowed`。按钮灰不灰看这个响应。它不代替第 5 步的提交检查。
+`objectID` 等于 `unitID` 时按文件角色回答，请求形状见 [`permissions`](../permissions/README.zh-CN.md)。保护对象通过 `aclService.isObjectActionAllowed` 判定。按钮灰不灰看这个响应。它不代替第 5 步的提交检查。
 
 ### 4. 实现「保护行列」面板调用的接口
 
-从工具栏「保护」或工作表标签添加区域保护时，这个面板会调用下面的路由，都在 `server/authz.ts`：
+从工具栏「保护」或工作表标签添加区域保护时，这个面板会调用下面的路由，都在 `server/authz-routes.ts`：
 
 | 方法 | 路径 | 何时调用 |
 | --- | --- | --- |
@@ -180,7 +182,7 @@ const service = new UniverCollabService({
 
 service.use("commitChangeset", async (context, next) => {
   for (const requirement of context.requiredUnitPermissions) {
-    const granted = isObjectActionAllowed(acl, context.userID, {
+    const granted = aclService.isObjectActionAllowed(context.userID, {
       unitID: requirement.unitID,
       objectID: requirement.objectID,
       objectType: requirement.objectType,

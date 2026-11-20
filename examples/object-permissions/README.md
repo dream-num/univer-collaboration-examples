@@ -78,8 +78,10 @@ UI hiding alone still accepts a forged submission. The check in `commitChangeset
 | --- | --- |
 | `web/main.ts` | Add `authzUrl` and `objectPermissionTypes` to the collaboration plugin, and set the current user's `userID` to the same value the server uses |
 | `server/permissions.ts` | File roles. Replace the in-memory `Map` with your user system. The action split is in [`permissions`](../permissions/README.md) |
-| `server/acl.ts` | Storage for protection objects, and `isObjectActionAllowed`. The tables can change; keep this function's rules first |
-| `server/authz.ts` | HTTP mounted under `authzUrl` |
+| `server/acl-repository.ts` | SQLite schema and queries for protection objects and their collaborators |
+| `server/acl-service.ts` | Authorizes creation, updates, and reads of protection objects |
+| `server/acl-types.ts` | Shared types for protection objects, strategies, and collaborators |
+| `server/authz-routes.ts` | HTTP mounted under `authzUrl` |
 | `server/main.ts` | Identity, the three file-level hooks, `enableUnitPermissionAnalysis`, and `commitChangeset` |
 
 The cookie in `server/users.ts` is only for the demo.
@@ -147,14 +149,14 @@ This step is done when Casey's edit of any cell is rejected, before any range pr
 The route is mounted in `server/main.ts`:
 
 ```ts
-app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ store: acl, requireUser }));
+app.use("/universer-api/authz", express.json({ limit: "64kb" }), createAuthzRouter({ service: aclService, requireUser }));
 ```
 
-When `objectID` equals `unitID`, answer from the file role. The request shape is in [`permissions`](../permissions/README.md). A protection object goes through `isObjectActionAllowed` in `server/acl.ts`. The toolbar follows this response. It does not replace the submission check in step 5.
+When `objectID` equals `unitID`, answer from the file role. The request shape is in [`permissions`](../permissions/README.md). A protection object goes through `aclService.isObjectActionAllowed`. The toolbar follows this response. It does not replace the submission check in step 5.
 
 ### 4. Implement the routes the Protect Rows and Columns panel calls
 
-Adding a range protection from Protection on the toolbar, or from the sheet tab, makes this panel call the routes in `server/authz.ts`:
+Adding a range protection from Protection on the toolbar, or from the sheet tab, makes this panel call the routes in `server/authz-routes.ts`:
 
 | Method | Path | When |
 | --- | --- | --- |
@@ -180,7 +182,7 @@ const service = new UniverCollabService({
 
 service.use("commitChangeset", async (context, next) => {
   for (const requirement of context.requiredUnitPermissions) {
-    const granted = isObjectActionAllowed(acl, context.userID, {
+    const granted = aclService.isObjectActionAllowed(context.userID, {
       unitID: requirement.unitID,
       objectID: requirement.objectID,
       objectType: requirement.objectType,

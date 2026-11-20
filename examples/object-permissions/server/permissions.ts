@@ -8,7 +8,7 @@ export const UNIT_NAME = "Object Permissions Sheet";
  * This is a demo application policy. Real applications should define their own
  * role-to-action mapping and may introduce roles such as "commenter".
  *
- * Unit roles gate the document as a whole; object-level ACLs in acl.ts further
+ * Unit roles gate the document as a whole; object-level ACLs in acl-service.ts further
  * restrict protected worksheets and ranges within it.
  */
 const roleRank: Record<UnitRoleName, number> = { viewer: 0, editor: 1, creator: 2 };
