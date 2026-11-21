@@ -1,7 +1,7 @@
 import { UniverBaseDashboardUIPlugin } from "@univerjs-pro/bases-dashboard-ui";
 import { UniverBasesPlugin } from "@univerjs-pro/bases";
 import { UniverBasesUIPlugin } from "@univerjs-pro/bases-ui";
-import { IAttachmentIoService } from "@univerjs-pro/collaboration-client";
+import { IAttachmentIoService } from "@univerjs-pro/resources";
 import { UniverProFormulaEnginePlugin } from "@univerjs-pro/engine-formula";
 import type { Univer } from "@univerjs/core";
 import { UniverRPCMainThreadPlugin } from "@univerjs/rpc";
