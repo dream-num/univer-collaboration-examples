@@ -38,6 +38,9 @@ jobs:
       - name: Build examples
         run: pnpm build
 
+      - name: Test
+        run: pnpm test
+
   # Guards main: a -next branch carries an insider .npmrc and pre-release SDK versions
   # until the SDK release is public, so this job runs only where that must not land.
   merge-gate:

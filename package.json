@@ -9,6 +9,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
     "example:quick-start": "pnpm --filter @univerjs/collaboration-example-quick-start build && pnpm --filter @univerjs/collaboration-example-quick-start start",
     "example:database-adapter": "pnpm --filter @univerjs/collaboration-example-database-adapter build && pnpm --filter @univerjs/collaboration-example-database-adapter start",
     "example:permissions": "pnpm --filter @univerjs/collaboration-example-permissions build && pnpm --filter @univerjs/collaboration-example-permissions start",
