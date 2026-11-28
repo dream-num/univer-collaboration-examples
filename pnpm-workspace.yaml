@@ -1,5 +1,6 @@
 packages:
   - examples/*
+  - tools/*
 
 packageExtensions:
   '@univerjs/preset-sheets-core@1.6.2':

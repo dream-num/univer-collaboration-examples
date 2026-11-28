@@ -90,7 +90,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-comment-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-comment-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -99,16 +99,16 @@ importers:
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-exchange-endpoint':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-exchange-service':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-file-blob-local':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))
@@ -123,7 +123,7 @@ importers:
         version: 1.6.2(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-history-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))
+        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(react@19.3.0)(rxjs@7.8.2))
       '@univerjs-pro/collaboration-history-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
@@ -427,7 +427,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-comment-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-comment-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -436,7 +436,7 @@ importers:
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -506,7 +506,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -567,16 +567,16 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-exchange-endpoint':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-exchange-service':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-file-blob-local':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))
@@ -670,7 +670,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -743,13 +743,13 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-history-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))
+        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(react@19.3.0)(rxjs@7.8.2))
       '@univerjs-pro/collaboration-history-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
@@ -816,10 +816,10 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-cluster-redis':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
+        version: 1.6.2(react@19.3.0)
       '@univerjs-pro/collaboration-database-postgres':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)(pg@8.23.0)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)(pg@8.23.0)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -886,7 +886,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-comment-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-comment-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -895,13 +895,13 @@ importers:
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-history-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))
+        version: 1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(react@19.3.0)(rxjs@7.8.2))
       '@univerjs-pro/collaboration-history-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
@@ -983,7 +983,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -1041,7 +1041,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-memory':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -1099,7 +1099,7 @@ importers:
         version: 1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)
+        version: 1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-endpoint':
         specifier: 1.6.2
         version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -1111,16 +1111,16 @@ importers:
         version: 1.6.2
       '@univerjs-pro/collaboration-worktree-client':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+        version: 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-worktree-database-sqlite':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+        version: 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-worktree-endpoint':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+        version: 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-worktree-service':
         specifier: 1.6.2
-        version: 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+        version: 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/license':
         specifier: 1.6.2
         version: 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -1156,7 +1156,125 @@ importers:
         specifier: ^8.0.0
         version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12)
 
+  tools/universer-migration:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1161.0
+        version: 3.1178.0
+      '@msgpack/msgpack':
+        specifier: ^3.1.3
+        version: 3.1.3
+      '@univerjs-pro/collaboration-comment-database-postgres':
+        specifier: 1.6.2
+        version: 1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2)(@univerjs/protocol@1.6.2)(pg@8.23.0)
+      '@univerjs-pro/collaboration-database-postgres-s3':
+        specifier: 1.6.2
+        version: 1.6.2(@aws-sdk/client-s3@3.1178.0)(@univerjs-pro/collaboration-service@1.6.2)(@univerjs/protocol@1.6.2)(pg@8.23.0)
+      '@univerjs-pro/collaboration-file-database-postgres':
+        specifier: 1.6.2
+        version: 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(pg@8.23.0)
+      '@univerjs-pro/collaboration-file-service':
+        specifier: 1.6.2
+        version: 1.6.2(@univerjs/protocol@1.6.2)
+      '@univerjs-pro/collaboration-service':
+        specifier: 1.6.2
+        version: 1.6.2
+      '@univerjs/protocol':
+        specifier: 1.6.2
+        version: 1.6.2
+      pg:
+        specifier: ^8.16.0
+        version: 8.23.0
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.13.3
+      '@types/pg':
+        specifier: ^8.15.0
+        version: 8.23.1
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.12
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.12(@types/node@24.13.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12))
+
 packages:
+
+  '@aws-sdk/checksums@3.1002.7':
+    resolution: {integrity: sha512-J2L1/AdkQOyAEt440r+U4vdh3UcyDk+ybwGd0hWLTNCbS+t2TykGcp3/tNK2H8zHjIzsrsF2B/5YiGCt5tl5yA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-s3@3.1178.0':
+    resolution: {integrity: sha512-T71AGkyhQTx8l0Neb79dtM+3HOSIjIwWfPXWoNESeDF7oiJgRV2Hk5CCjDX5fK1LhPjwF3mtr653XDJB9TnHJQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/core@3.981.2':
+    resolution: {integrity: sha512-N3XKZdfa+Dcm7Kl8NJnaaHLx860Ts3QYHOraj/wuKOYHqqCApQBIKwzSxrpwZdwrqfbPt7BvJdYVhVMPpsRoGA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-env@3.972.86':
+    resolution: {integrity: sha512-ZFIkIzLAiOLOakfrzUuOz938+AF+q4nc/MYINYwFlgBbl8CsI8ofJ8Ueh0/Pp7hXMJfpq10eJdnQ7aaE6kfikQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-http@3.972.88':
+    resolution: {integrity: sha512-92dpM3lwCyDjcDI3R+olUI2IG8R+qfUdnMQgxWZB4XM37P+N+oBaRd5xGc7uOH7FqMQY03XsrVKQeuWbPfIrKg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-ini@3.973.32':
+    resolution: {integrity: sha512-MdIAf70d701Hj04Yo7AKqI1RfjTW5dFf+tEvUirYFMbs3NRHWiwqQj/C9wGFptZtmX+z/c57H3gQfzTt5Bsn8A==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-login@3.972.94':
+    resolution: {integrity: sha512-sSq1PxdXT1kqR11/dRvE5AC2dEWMbYJCXzRU03Ulu4stu6vv08zju8uUNhVdqiIX+OrMIcEHHT1maLrUZDBGDA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-node@3.972.99':
+    resolution: {integrity: sha512-AgS2qV8P9XmT4M44LfGcFtKbbt/yLgBydETKxPvqN9y7gMnKYv8GY+QfH7JsNvu6eQgDl600uAjvzC6K7ilkJQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-process@3.972.86':
+    resolution: {integrity: sha512-9x/+gtSDNxMQrRXgwIdwdNCVGxzUZtTZArjEeLfsn9xDvyXdsgs4my1g7JN5wKxT61ZLx4bKPREaDXnO8j7gkg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-sso@3.973.30':
+    resolution: {integrity: sha512-sMvwUIaKQEeprbMT5LXrI6nhM1IUEBDRpJAydEkAMrI7brrsRl7pxnOAJ6nweg/Hn5pJOVS7JgieJIv6CvJ7Sw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/credential-provider-web-identity@3.972.92':
+    resolution: {integrity: sha512-AKaUwpy1wPN3B/byFWuvL6v+Qk8Gm840InZJw/bA1A+ciCL3zkzBUyEgxdeghJPEe79VKLs6BvbME74MQa3YKg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/middleware-sdk-s3@3.972.92':
+    resolution: {integrity: sha512-HNN7mJUSPXxXpbyPwp3wx0dtIJSbUF3iHuoHVNHObMCN2/txIpg9JsJ/V2vroPGXSSqNImEaZkDfGJFqffSX6g==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/nested-clients@3.998.5':
+    resolution: {integrity: sha512-9w5mkwVLOuGqlJkPR1uhod6ZP+TOtaxrKtvK2pY9G/+FEx0e8wYRLIDeg30dYQjFDx27jHGSzEA+OaMqxeyTPg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/signature-v4-multi-region@3.996.52':
+    resolution: {integrity: sha512-6W6SjGc8OXUhMzNxU1X922ghD+PP1XvzmCk5Scui0jaYsLezycMYR1RaLp5xTIOUrhTXyb4DnAbPr3fBgmdnzg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/token-providers@3.1177.0':
+    resolution: {integrity: sha512-KFQ/2YqE7OIGNu05hys6y9ZUyoNxxLJVHM7NCvjfyjV0Mki0u0Euwjduj5M/HMurdbZJfBV0NjMNQQkGlJEQqg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/types@3.975.1':
+    resolution: {integrity: sha512-7rGxUkCB2QPoQOeJmonmAICTN2zrH+fpmi1p4Iwu72lnxNaMhOgqcbpyddifnM1DBb19TWQ1u6z/XjkaFNEDWw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/xml-builder@3.972.43':
+    resolution: {integrity: sha512-rG8QVx4DOrJWptsogu1Aq+CDsnPKaBrAlJpKLxrJrIDXAq1ElnW0yQjjBnlWSXll0cDakCG6UDvaqwz0A9d9Og==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws/lambda-invoke-store@0.3.0':
+    resolution: {integrity: sha512-sl4Bm6yiMNYrZKkqqDFWN0UfnWhlS8ivKxrYl+6t0gCLrqr8y3B2IqZZbFRkfaVVp7C/baApyh71P+LeE1A2sQ==}
+    engines: {node: '>=18.0.0'}
 
   '@esbuild/aix-ppc64@0.28.2':
     resolution: {integrity: sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ==}
@@ -1343,6 +1461,9 @@ packages:
     resolution: {integrity: sha512-wtF6h+DY6M3YaDBPAmvuuA6jV8Sif9MjtOI5euKFWRgCDl5PeDpPsHR9u2l6St5ceY8AZgoNDww5+HvEsXFsGg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  '@jridgewell/sourcemap-codec@1.6.0':
+    resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
@@ -1901,11 +2022,47 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
+  '@smithy/core@3.41.1':
+    resolution: {integrity: sha512-24LyiHSY0R/MLcbTylurWXU6Uy4lzI6KJgsdzxkNnjT9/OLWc2zGPb/3k5AM1f0vcgCGrExanUG339t+TBiIrA==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/credential-provider-imds@4.5.2':
+    resolution: {integrity: sha512-A9uSdn72ozbRUSit0eib0TW7nXuNPlaeM0zcGkJ+nE6tFcSDbnmtwoxbTCFBukVQcszDAyvsd7+rTduPTXpygg==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/fetch-http-handler@5.8.1':
+    resolution: {integrity: sha512-h8BdMUrUBhMhMaeK7QqAdINRZezCGuYOCpcOZZ1ewxbHST9rdTd09xwNpvLTYfzDRehxQiReK4SKbdYZxBA+ew==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/node-http-handler@4.14.2':
+    resolution: {integrity: sha512-i1uORV1v3qBqP43ayRKzIdm1q5x14tf8N4Dd06/QUX1Szm6VxHMrTsu20X5E63UFsaNZCRjI4SXG0jDmqYa+3w==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/signature-v4@5.7.5':
+    resolution: {integrity: sha512-WPjdr5oWOk1LArpI4pavu+fSo+/evi0Re1olxGvqwuZopd4gYR1UGCi+Soyn/IjmafqbWs+ZC+3AKxJS3ZpwUg==}
+    engines: {node: '>=18.0.0'}
+
+  '@smithy/types@4.20.0':
+    resolution: {integrity: sha512-lCA6QG22dPk9ecHbv91jDQZsmtPUjdS1aE2Il6NNPqe7DrYc0dZQi6DhcESk2KYXH2sp5xbAcGdYMZDFnuzA2A==}
+    engines: {node: '>=18.0.0'}
+
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
 
+  '@types/chai@5.2.3':
+    resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
+
   '@types/connect@3.4.38':
     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
+
+  '@types/deep-eql@4.0.2':
+    resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
+
+  '@types/estree@1.0.11':
+    resolution: {integrity: sha512-YBdNe5JcjYR0sPhJW1QIeRCmI11YhYvaRuGCs9+WCeTTb+Yhb2BE2XMe5/wAqF10FK5g3+q1PDhQABfT7aX0gg==}
 
   '@types/express-serve-static-core@5.1.3':
     resolution: {integrity: sha512-dPfW8NFiOF4wOHc7+N/QSxlY9cfSsenewGbAz8C8U/MULPd/YZ27LvJUIlzaXie7e6Ove9YunJGgC9tbHD2cKw==}
@@ -1946,135 +2103,143 @@ packages:
     resolution: {integrity: sha512-8mam4H1NHLtu7nmtalF7eyBH14QyOASmcxHhSfEoRyr0nP/YdoesEtU+uSRvMe96TW/HPTtkoKqQLl53N7UXMQ==}
 
   '@univerjs-pro/bases-dashboard-ui@1.6.2':
-    resolution: {integrity: sha512-3jUDmZNa0sckIZ4xwfMhdf/v3HFgQfuVRNqdMoAc1BLhgntnjtcuAWDuMB/aG3VcJmOcJoAVwlKP56tYju4sxA==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-dashboard-ui/-/bases-dashboard-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-3jUDmZNa0sckIZ4xwfMhdf/v3HFgQfuVRNqdMoAc1BLhgntnjtcuAWDuMB/aG3VcJmOcJoAVwlKP56tYju4sxA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases-dashboard@1.6.2':
-    resolution: {integrity: sha512-tZUDrbmZ+uLDbudk3ivuapQWr9+ys9VqnllK1fvQDyQtq/vyfDcoDTt7RH2u6FB07Bm3RwEQZRoFwYtZaQSidQ==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-dashboard/-/bases-dashboard-1.6.2.tgz}
+    resolution: {integrity: sha512-tZUDrbmZ+uLDbudk3ivuapQWr9+ys9VqnllK1fvQDyQtq/vyfDcoDTt7RH2u6FB07Bm3RwEQZRoFwYtZaQSidQ==}
 
   '@univerjs-pro/bases-exchange-client@1.6.2':
-    resolution: {integrity: sha512-/5HT6/1eGC5cgY3LsPqUW7nXreqT8etORNvi27Y6bK7NdbndAg/DntS9vWXvgks2aOMdfdBdqg+QMWuY9K1npg==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-exchange-client/-/bases-exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-/5HT6/1eGC5cgY3LsPqUW7nXreqT8etORNvi27Y6bK7NdbndAg/DntS9vWXvgks2aOMdfdBdqg+QMWuY9K1npg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs-pro/bases-history-ui@1.6.2':
-    resolution: {integrity: sha512-wbFvHefzv9HCHObpmuzXeSWF1v9YIkA9dRqMNVSAS6TxFOWGEYrDH13mSwXKQz8VN1QyuQ5Pq48AfoEIPmVNKQ==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-history-ui/-/bases-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-wbFvHefzv9HCHObpmuzXeSWF1v9YIkA9dRqMNVSAS6TxFOWGEYrDH13mSwXKQz8VN1QyuQ5Pq48AfoEIPmVNKQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases-history@1.6.2':
-    resolution: {integrity: sha512-euBEgWMSHX/3Fp3GggvPYUNcNboKj7ZuKhUK+c9K/FkTM1B9p3pE7BgHD0NU8VWDbPVkFb09auP/AUw928mIKg==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-history/-/bases-history-1.6.2.tgz}
+    resolution: {integrity: sha512-euBEgWMSHX/3Fp3GggvPYUNcNboKj7ZuKhUK+c9K/FkTM1B9p3pE7BgHD0NU8VWDbPVkFb09auP/AUw928mIKg==}
 
   '@univerjs-pro/bases-thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-KQtH+EPPmBZ2N5XfRO95PYXbgN5esH9YKyWI/BmOfRK0UFe47bOvO1/wz1fN7bwOApxCBbcxCcjYhO1aZULKkg==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-thread-comment-ui/-/bases-thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-KQtH+EPPmBZ2N5XfRO95PYXbgN5esH9YKyWI/BmOfRK0UFe47bOvO1/wz1fN7bwOApxCBbcxCcjYhO1aZULKkg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases-thread-comment@1.6.2':
-    resolution: {integrity: sha512-EnAfQs8xVSNtXaHk++G3Gk4FYAT/M/r3KMVfogq+lkOAzTfMstwN/u6z/WOSxgZOBO/r9wLJpbgXELiGBrxF7Q==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-thread-comment/-/bases-thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-EnAfQs8xVSNtXaHk++G3Gk4FYAT/M/r3KMVfogq+lkOAzTfMstwN/u6z/WOSxgZOBO/r9wLJpbgXELiGBrxF7Q==}
 
   '@univerjs-pro/bases-ui@1.6.2':
-    resolution: {integrity: sha512-2GscjdUpE6r3s7cTQ6uHhuDckzqiNb960hSgESeUacz3vnljef5UmYKCwRluUjzBcU0kfoAsASUqhRgkQc4Lmw==, tarball: https://registry.npmjs.org/@univerjs-pro/bases-ui/-/bases-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-2GscjdUpE6r3s7cTQ6uHhuDckzqiNb960hSgESeUacz3vnljef5UmYKCwRluUjzBcU0kfoAsASUqhRgkQc4Lmw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/bases@1.6.2':
-    resolution: {integrity: sha512-EF+vRZ7b9z3u3VKLm6oAyroqve4oT3cksWBkY8q23WIvDmt1jZ8aQl9JfM63mwsS0DCkWn2JjwHowBO0ni3jnA==, tarball: https://registry.npmjs.org/@univerjs-pro/bases/-/bases-1.6.2.tgz}
+    resolution: {integrity: sha512-EF+vRZ7b9z3u3VKLm6oAyroqve4oT3cksWBkY8q23WIvDmt1jZ8aQl9JfM63mwsS0DCkWn2JjwHowBO0ni3jnA==}
 
   '@univerjs-pro/boards-chart-ui@1.6.2':
-    resolution: {integrity: sha512-85aCOPE16UNnVkO+b6AdR/BNeKkX4jkCmqk1bikK0KJbCJj4rznT7aimukg5U0Wl8GU2tR59RYV/qZANiZE0Hg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-chart-ui/-/boards-chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-85aCOPE16UNnVkO+b6AdR/BNeKkX4jkCmqk1bikK0KJbCJj4rznT7aimukg5U0Wl8GU2tR59RYV/qZANiZE0Hg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-chart@1.6.2':
-    resolution: {integrity: sha512-IUlVW0+80RZWizcxzl8mi2kaVLUK3+7W4PEzH+L67o7DSwvZkBDHt8cyK29ptdgAW/YxqUWcrDLWZL+6W2qxpg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-chart/-/boards-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-IUlVW0+80RZWizcxzl8mi2kaVLUK3+7W4PEzH+L67o7DSwvZkBDHt8cyK29ptdgAW/YxqUWcrDLWZL+6W2qxpg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-history-ui@1.6.2':
-    resolution: {integrity: sha512-Xg45vTUOnZkrod/9fxUq3ZZgeHm1hX7XZ7EJn8Iw2Zg9Y2Q9PpjgPXDrNw78FtpDmoBrFzktJaxwjqfG/aDnTQ==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-history-ui/-/boards-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-Xg45vTUOnZkrod/9fxUq3ZZgeHm1hX7XZ7EJn8Iw2Zg9Y2Q9PpjgPXDrNw78FtpDmoBrFzktJaxwjqfG/aDnTQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-history@1.6.2':
-    resolution: {integrity: sha512-9pdZ+kXGrWumjMgnQ9aZilQWb6IJpC7dzK1mH2m/x/v9ckNmKsYbboCOKkubvdfRDGS6gATESp5n1qNwHy571g==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-history/-/boards-history-1.6.2.tgz}
+    resolution: {integrity: sha512-9pdZ+kXGrWumjMgnQ9aZilQWb6IJpC7dzK1mH2m/x/v9ckNmKsYbboCOKkubvdfRDGS6gATESp5n1qNwHy571g==}
 
   '@univerjs-pro/boards-latex-ui@1.6.2':
-    resolution: {integrity: sha512-fU8SCkvBmKEV6Y4ZHBxOJtfKegjDjWF0oO4kbgQjr/2iRoUMjunj3zsK7kbcml3A5WdRH3Z9QmkhbS22a20xkQ==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-latex-ui/-/boards-latex-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-fU8SCkvBmKEV6Y4ZHBxOJtfKegjDjWF0oO4kbgQjr/2iRoUMjunj3zsK7kbcml3A5WdRH3Z9QmkhbS22a20xkQ==}
 
   '@univerjs-pro/boards-mind-ui@1.6.2':
-    resolution: {integrity: sha512-NF/GEdAQorlpbIJ3rLDMuULJz9GJK0pPurz4GZ4n9GkeWR4xOJK672aFObRIz9yt9YMXOYiPbHrVKagitn/gWA==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-mind-ui/-/boards-mind-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-NF/GEdAQorlpbIJ3rLDMuULJz9GJK0pPurz4GZ4n9GkeWR4xOJK672aFObRIz9yt9YMXOYiPbHrVKagitn/gWA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-mind@1.6.2':
-    resolution: {integrity: sha512-qrBzWlaOIw6aPvck/yg4Vnlx+6TCtfpAoEYdeCPbNrrCRNxyr7qDsrCs9zHs42PNN0qH19ODcXTgG/c0jELrPA==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-mind/-/boards-mind-1.6.2.tgz}
+    resolution: {integrity: sha512-qrBzWlaOIw6aPvck/yg4Vnlx+6TCtfpAoEYdeCPbNrrCRNxyr7qDsrCs9zHs42PNN0qH19ODcXTgG/c0jELrPA==}
 
   '@univerjs-pro/boards-print@1.6.2':
-    resolution: {integrity: sha512-7Iqv1UYf6SzmnNK1L3ajH1Pe/Ly8wrK8UOy5nep6f3bK2AzKgpThLXvxldGFW4eOhS1lDQ+sZmsSciV/WP9ykA==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-print/-/boards-print-1.6.2.tgz}
+    resolution: {integrity: sha512-7Iqv1UYf6SzmnNK1L3ajH1Pe/Ly8wrK8UOy5nep6f3bK2AzKgpThLXvxldGFW4eOhS1lDQ+sZmsSciV/WP9ykA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-table-ui@1.6.2':
-    resolution: {integrity: sha512-LVR1wNFDKAUfhJrrnlTaI39BtBlpbzq7g10kIkjd4en2+d66qVsHxJqoTSoUr2l0fcy5lPSfsCjjwwfvfxoCpg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-table-ui/-/boards-table-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-LVR1wNFDKAUfhJrrnlTaI39BtBlpbzq7g10kIkjd4en2+d66qVsHxJqoTSoUr2l0fcy5lPSfsCjjwwfvfxoCpg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs-pro/boards-table@1.6.2':
-    resolution: {integrity: sha512-apurtilt2HDoX6Tw5cazdH1cPksZHQwe2mU7k3bXe/TpZ3pDVGC6j72rjT6o1hGmho44fUGCn/+c5ZD9ZuO14g==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-table/-/boards-table-1.6.2.tgz}
+    resolution: {integrity: sha512-apurtilt2HDoX6Tw5cazdH1cPksZHQwe2mU7k3bXe/TpZ3pDVGC6j72rjT6o1hGmho44fUGCn/+c5ZD9ZuO14g==}
 
   '@univerjs-pro/boards-thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-QJUJKt7H1q17wVRNdflc3y9b0LkyF8gW8am1J4fn4zs2MQHB1lkHAeEBzXjWo+VPgkLCnpyVbYRVRG7dt0VgFg==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-thread-comment-ui/-/boards-thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-QJUJKt7H1q17wVRNdflc3y9b0LkyF8gW8am1J4fn4zs2MQHB1lkHAeEBzXjWo+VPgkLCnpyVbYRVRG7dt0VgFg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards-thread-comment@1.6.2':
-    resolution: {integrity: sha512-4udzEh2Znm7IA9AISZeva3Lxx9pPo1M2uZ5cTtf8PzIEtb1tTi3S7KklwMSqypG3hOyPkMAqzmrOdQlqd5ZyqA==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-thread-comment/-/boards-thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-4udzEh2Znm7IA9AISZeva3Lxx9pPo1M2uZ5cTtf8PzIEtb1tTi3S7KklwMSqypG3hOyPkMAqzmrOdQlqd5ZyqA==}
 
   '@univerjs-pro/boards-ui@1.6.2':
-    resolution: {integrity: sha512-mB526k0bAiojC1tBAVfH/TQS2gb7Ay3xvNXWLs4bH7Zv5TE6khAR6+3L9RZcosuQGfbX0YJGr2cEz+c9YHDsyw==, tarball: https://registry.npmjs.org/@univerjs-pro/boards-ui/-/boards-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-mB526k0bAiojC1tBAVfH/TQS2gb7Ay3xvNXWLs4bH7Zv5TE6khAR6+3L9RZcosuQGfbX0YJGr2cEz+c9YHDsyw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/boards@1.6.2':
-    resolution: {integrity: sha512-wOWRMl3aAWF1wzTqoiWr9XMHwLCdNAjWvm+q7LpQ0iqffnlblqRlyOUjs8wNuaqYGlDW+CjbLBP0oVWwhTT13A==, tarball: https://registry.npmjs.org/@univerjs-pro/boards/-/boards-1.6.2.tgz}
+    resolution: {integrity: sha512-wOWRMl3aAWF1wzTqoiWr9XMHwLCdNAjWvm+q7LpQ0iqffnlblqRlyOUjs8wNuaqYGlDW+CjbLBP0oVWwhTT13A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/chart-ui@1.6.2':
-    resolution: {integrity: sha512-tmFPqjJuHVskGJ1bhEbQT/IppOaHMwPNiXkhLUGzTxmlwn3hRsUURP3w9yGzIMijMV51xdGPBT5sITJkLP1UBw==, tarball: https://registry.npmjs.org/@univerjs-pro/chart-ui/-/chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-tmFPqjJuHVskGJ1bhEbQT/IppOaHMwPNiXkhLUGzTxmlwn3hRsUURP3w9yGzIMijMV51xdGPBT5sITJkLP1UBw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-client-ui@1.6.2':
-    resolution: {integrity: sha512-+UTygg3z9W25rwfloO2JrZ8CB8afpp8TluABV1HdwZULh93uaQeJL1ssgEnBMym3QGca7auSU74Aw9Fu0wDg/w==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-client-ui/-/collaboration-client-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-+UTygg3z9W25rwfloO2JrZ8CB8afpp8TluABV1HdwZULh93uaQeJL1ssgEnBMym3QGca7auSU74Aw9Fu0wDg/w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-client@1.6.2':
-    resolution: {integrity: sha512-U+wuKqDN7Oiie4bJ/B7kFz3B1CaT8Vukd5Bji5zjdtRUSnDRM+WjA1er0dN1S5FNPmbpXdFYP/t9k6uDD8UWbg==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration-client/-/collaboration-client-1.6.2.tgz}
+    resolution: {integrity: sha512-U+wuKqDN7Oiie4bJ/B7kFz3B1CaT8Vukd5Bji5zjdtRUSnDRM+WjA1er0dN1S5FNPmbpXdFYP/t9k6uDD8UWbg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/collaboration-cluster-redis@1.6.2':
     resolution: {integrity: sha512-EM6/BPTlq6xDwycJhvB0xvv5NaNEny0ZI6gg/GsNvzcFLtYX/raK0MLSOv+/VNKyU5uEIOM6ihmwF8FSrLnbAQ==}
     engines: {node: '>=22'}
+
+  '@univerjs-pro/collaboration-comment-database-postgres@1.6.2':
+    resolution: {integrity: sha512-PCMDizcCnN8lPlLrZc2rT2AxojtT6N4fnQlvg8vM65dM9OO2uEjW2psr1wQwI3PuSFyy4SHDP3Zjnb1qxxxXXQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-comment-service': 1.6.2
+      '@univerjs/protocol': 1.6.2
+      pg: ^8.11.0
 
   '@univerjs-pro/collaboration-comment-database-sqlite@1.6.2':
     resolution: {integrity: sha512-/Zeqn2M2vIUnORC2cPmG+7sYFqFii/kV8KVvOPWzEgG0TBknwgs8T5A+h1r7BppY7pYhMcFqD2gmEyWQmuBUtw==}
@@ -2095,6 +2260,15 @@ packages:
     peerDependencies:
       '@univerjs-pro/collaboration-service': 1.6.2
       '@univerjs/protocol': 1.6.2
+
+  '@univerjs-pro/collaboration-database-postgres-s3@1.6.2':
+    resolution: {integrity: sha512-OUjnzZOLJxzs88Dr65aLPfR6sBrE1F8kghxgurxnjlQwSCe3IRS64Gx0+7dRr0GvElDL6UFyEz7zPpw8BJeOOw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@aws-sdk/client-s3': ^3.1161.0
+      '@univerjs-pro/collaboration-service': 1.6.2
+      '@univerjs/protocol': 1.6.2
+      pg: ^8.11.0
 
   '@univerjs-pro/collaboration-database-postgres@1.6.2':
     resolution: {integrity: sha512-2TdkP79A6MJnPcN5vZVhsFSWRJ6lPJYtZzXjJ8KGJN+rKVzLGW5PP8pqm+x9I8yZAvltR5EnhKXb2xHxILwWug==}
@@ -2138,6 +2312,13 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       '@univerjs-pro/collaboration-file-service': 1.6.2
+
+  '@univerjs-pro/collaboration-file-database-postgres@1.6.2':
+    resolution: {integrity: sha512-eYTsidnbr8ECBHB+y1sNaNkXnrY+ETcLfAUGvUdcmxRg9yeVgtYjMm+ixb4Z4Jtabz2majF4v2i6+j2+wL8VpA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@univerjs-pro/collaboration-file-service': 1.6.2
+      pg: ^8.11.0
 
   '@univerjs-pro/collaboration-file-database-sqlite@1.6.2':
     resolution: {integrity: sha512-EMcYtiCRmGYca69zR9nir6RvegkLts6m3/EQu58BZLSH3t/5KnhVKIukVhfRlzf2r1PkgxVUvsmoY3f3/AijHA==}
@@ -2191,149 +2372,149 @@ packages:
     resolution: {integrity: sha512-NEErRdHvcgdMMnLMq7vqG8Gb/rAGOm8dWgByAfgYRPiXyBZph+w/y4GsAR0qoS/NcVhyhyMJgd2XaWlfzAKfZA==}
 
   '@univerjs-pro/collaboration@1.6.2':
-    resolution: {integrity: sha512-OgwH1JwQVDVDnySkwaYVqM+TieYJkBLXRHgMxRHT9CWggGOrMv/DM5XJsv4hOAv1tOjMuvYkLq4mDECBES4ODw==, tarball: https://registry.npmjs.org/@univerjs-pro/collaboration/-/collaboration-1.6.2.tgz}
+    resolution: {integrity: sha512-OgwH1JwQVDVDnySkwaYVqM+TieYJkBLXRHgMxRHT9CWggGOrMv/DM5XJsv4hOAv1tOjMuvYkLq4mDECBES4ODw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-callout-ui@1.6.2':
-    resolution: {integrity: sha512-JNb4J84E2u3N8ke+TquvONdXmRxxcLnTHYtB82E7sw5Q3LOM2H/VMAkNRsB1Uq5RDI9fn8Da+D2fKyMVUvc1XQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-callout-ui/-/docs-callout-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-JNb4J84E2u3N8ke+TquvONdXmRxxcLnTHYtB82E7sw5Q3LOM2H/VMAkNRsB1Uq5RDI9fn8Da+D2fKyMVUvc1XQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-callout@1.6.2':
-    resolution: {integrity: sha512-M9X68JnxxM5PDRgqTdMV+reEkZm13gY7KTPjiCu41/Gi4Jvfe2tRfclkU5/58niTo04aH0u4TJ+wvulj33OoSQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-callout/-/docs-callout-1.6.2.tgz}
+    resolution: {integrity: sha512-M9X68JnxxM5PDRgqTdMV+reEkZm13gY7KTPjiCu41/Gi4Jvfe2tRfclkU5/58niTo04aH0u4TJ+wvulj33OoSQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-chart-ui@1.6.2':
-    resolution: {integrity: sha512-rPxm0OtHGl7hcC+DjDsdOjxYoOCRi6LhCL3cWupDOzRCytxWKPG9dWcBFzIyCGsGUr1aXD3832YzrfPhBivo6g==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-chart-ui/-/docs-chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-rPxm0OtHGl7hcC+DjDsdOjxYoOCRi6LhCL3cWupDOzRCytxWKPG9dWcBFzIyCGsGUr1aXD3832YzrfPhBivo6g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-chart@1.6.2':
-    resolution: {integrity: sha512-aeK3Iq7rI4obh2AXx/JzINKYMO2yQ82+wl6bZpEgLQBlcaFVictidGMvrSwD/xETLJqX+JW/Tr3tSOukG7tVeg==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-chart/-/docs-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-aeK3Iq7rI4obh2AXx/JzINKYMO2yQ82+wl6bZpEgLQBlcaFVictidGMvrSwD/xETLJqX+JW/Tr3tSOukG7tVeg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-code-ui@1.6.2':
-    resolution: {integrity: sha512-eyMNwqOQ6t+NiMbO1XYvZH436euU4GGp3C+kHemh1/hESHowAzi3nVRl4toOj36QTiqKDWcZsQGGQheJGHUaQQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-code-ui/-/docs-code-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-eyMNwqOQ6t+NiMbO1XYvZH436euU4GGp3C+kHemh1/hESHowAzi3nVRl4toOj36QTiqKDWcZsQGGQheJGHUaQQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-code@1.6.2':
-    resolution: {integrity: sha512-Dad62PoMTeI8S+xxOz8yDTCU/xdTb84sBu+XkZpOHubIvsyfV+ZVqPrRULghqz2fvbricg+Neluy9kjQP43Vyw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-code/-/docs-code-1.6.2.tgz}
+    resolution: {integrity: sha512-Dad62PoMTeI8S+xxOz8yDTCU/xdTb84sBu+XkZpOHubIvsyfV+ZVqPrRULghqz2fvbricg+Neluy9kjQP43Vyw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-column-ui@1.6.2':
-    resolution: {integrity: sha512-+O1dUs4R94fA7cu2lROCz2b/O9TCgnQYGQI3z0lBYkJQ5nWBaJMaIX5e1p+bv29pQCHuWD9lxHb7eZ1+I04OLw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-column-ui/-/docs-column-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-+O1dUs4R94fA7cu2lROCz2b/O9TCgnQYGQI3z0lBYkJQ5nWBaJMaIX5e1p+bv29pQCHuWD9lxHb7eZ1+I04OLw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-column@1.6.2':
-    resolution: {integrity: sha512-9g4SnshVVGnrEfBXEDEQVfxPiZ88FwLqEwyLwI2maanY3yePn14TVAcWHLN+jr3kZ9To3bMKk6H7SgZQcSV5cQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-column/-/docs-column-1.6.2.tgz}
+    resolution: {integrity: sha512-9g4SnshVVGnrEfBXEDEQVfxPiZ88FwLqEwyLwI2maanY3yePn14TVAcWHLN+jr3kZ9To3bMKk6H7SgZQcSV5cQ==}
 
   '@univerjs-pro/docs-exchange-client@1.6.2':
-    resolution: {integrity: sha512-kh98/KypUvfL+fggineBXG8L/9D34f3lTW9Gq2H2MD9CVZAtcdEGPwg8nag84woGRtWTdHoE9r4PNzvb+8Gg6g==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-exchange-client/-/docs-exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-kh98/KypUvfL+fggineBXG8L/9D34f3lTW9Gq2H2MD9CVZAtcdEGPwg8nag84woGRtWTdHoE9r4PNzvb+8Gg6g==}
 
   '@univerjs-pro/docs-formula-ui@1.6.2':
-    resolution: {integrity: sha512-BRKmgLHWweor73VfuBxOLm0fW4apdKnu48fNTsjdKR6rSeuDk6vWdtdbVd2mv80i/XnocflS4od4Mf3XE/65qQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-formula-ui/-/docs-formula-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-BRKmgLHWweor73VfuBxOLm0fW4apdKnu48fNTsjdKR6rSeuDk6vWdtdbVd2mv80i/XnocflS4od4Mf3XE/65qQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-formula@1.6.2':
-    resolution: {integrity: sha512-1AMjTfUJRkIklV4ZuQeQI4jsdR7fvGB6E+/7EA1vJXKZ4RKWxV6O8nrA9Kqqa2jpFCyWA7xlWKLrDU3pq83fGA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-formula/-/docs-formula-1.6.2.tgz}
+    resolution: {integrity: sha512-1AMjTfUJRkIklV4ZuQeQI4jsdR7fvGB6E+/7EA1vJXKZ4RKWxV6O8nrA9Kqqa2jpFCyWA7xlWKLrDU3pq83fGA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-history-ui@1.6.2':
-    resolution: {integrity: sha512-gL3lcci2tEOkPIrMMDcSyYahOApE6TbMzVCL8RnpoF5o24MRsqQOvXWYBPjLg9PzknVE8INe+tGdGOlA7mGleA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-history-ui/-/docs-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-gL3lcci2tEOkPIrMMDcSyYahOApE6TbMzVCL8RnpoF5o24MRsqQOvXWYBPjLg9PzknVE8INe+tGdGOlA7mGleA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-history@1.6.2':
-    resolution: {integrity: sha512-Zs9ssxj4dKZph9ECctc/ZA/5dquwPosS2gjPx5hrQEI5GWjsBNV/8Lx+1OfZQEtFEibRbdB0Uz3P7olsYsKdqA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-history/-/docs-history-1.6.2.tgz}
+    resolution: {integrity: sha512-Zs9ssxj4dKZph9ECctc/ZA/5dquwPosS2gjPx5hrQEI5GWjsBNV/8Lx+1OfZQEtFEibRbdB0Uz3P7olsYsKdqA==}
 
   '@univerjs-pro/docs-latex-ui@1.6.2':
-    resolution: {integrity: sha512-Vx1s2Li7mgW1850UuPgzBEG8Evi1Un/my05td+XF32Q7RcY920oB8hT6KnQdtEELuqX9g8Rx6TfeCx0HAsfK4Q==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-latex-ui/-/docs-latex-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-Vx1s2Li7mgW1850UuPgzBEG8Evi1Un/my05td+XF32Q7RcY920oB8hT6KnQdtEELuqX9g8Rx6TfeCx0HAsfK4Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-latex@1.6.2':
-    resolution: {integrity: sha512-ozuyCFn0zX/xpVBeHyGFOkFsmaxXPEM0HMskkR0B+gajANMUYIc5U9Y/fxpxXwKXpfHSDUz28aUgo9tVbr2JJw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-latex/-/docs-latex-1.6.2.tgz}
+    resolution: {integrity: sha512-ozuyCFn0zX/xpVBeHyGFOkFsmaxXPEM0HMskkR0B+gajANMUYIc5U9Y/fxpxXwKXpfHSDUz28aUgo9tVbr2JJw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-list-ui@1.6.2':
-    resolution: {integrity: sha512-hAqKYGrQHtiYq2jgdJu4bqtkYih4hAkRogUJUlBBnPPh3OSlEH+5EtkBPZfFuSnSszR5esBRUz0lybUCQ/keVA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-list-ui/-/docs-list-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-hAqKYGrQHtiYq2jgdJu4bqtkYih4hAkRogUJUlBBnPPh3OSlEH+5EtkBPZfFuSnSszR5esBRUz0lybUCQ/keVA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-list@1.6.2':
-    resolution: {integrity: sha512-sZNYJoTKiXWzgxiIU506gWnGBxOP3RMDlK/FzJ8/Okp13XkEsJVLK9G0zym49it4eVNSvJAMo+yK+puE+6mSpA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-list/-/docs-list-1.6.2.tgz}
+    resolution: {integrity: sha512-sZNYJoTKiXWzgxiIU506gWnGBxOP3RMDlK/FzJ8/Okp13XkEsJVLK9G0zym49it4eVNSvJAMo+yK+puE+6mSpA==}
 
   '@univerjs-pro/docs-print@1.6.2':
-    resolution: {integrity: sha512-9YKqwd9Bk/RxcJnEms+/zZJhoSRxkZWuSmPCQDAPLIahuVUWmYZCeOr0ZUBi5cmFX+59STZY0MPQbVskOISGCw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-print/-/docs-print-1.6.2.tgz}
+    resolution: {integrity: sha512-9YKqwd9Bk/RxcJnEms+/zZJhoSRxkZWuSmPCQDAPLIahuVUWmYZCeOr0ZUBi5cmFX+59STZY0MPQbVskOISGCw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-quote-ui@1.6.2':
-    resolution: {integrity: sha512-1Xl/y78kIKZIHS01kjM7W1+1fkgPgEqruF1g8Em6Uc5hX0Qh3MwK61nICLndqPSES/9k8OozU4R/bsjZgjKmtw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-quote-ui/-/docs-quote-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-1Xl/y78kIKZIHS01kjM7W1+1fkgPgEqruF1g8Em6Uc5hX0Qh3MwK61nICLndqPSES/9k8OozU4R/bsjZgjKmtw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-quote@1.6.2':
-    resolution: {integrity: sha512-ScgJaNzDnjYCalls7w1UUrARwcOSyMD0hx1ZFZYbjTv+uBNlKVg5bYY4WEErvHkXEBXcinPVWO+Ns5XJjVStoA==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-quote/-/docs-quote-1.6.2.tgz}
+    resolution: {integrity: sha512-ScgJaNzDnjYCalls7w1UUrARwcOSyMD0hx1ZFZYbjTv+uBNlKVg5bYY4WEErvHkXEBXcinPVWO+Ns5XJjVStoA==}
 
   '@univerjs-pro/docs-shape-ui@1.6.2':
-    resolution: {integrity: sha512-BRTY7OvZ7hJ46uBAFpYzJ5NYzOS5X11T+emfaw7fLOdprlQ1LqJe/vYNcIy8I12F3JFzfCpxEVj18OKCmEnS/g==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-shape-ui/-/docs-shape-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-BRTY7OvZ7hJ46uBAFpYzJ5NYzOS5X11T+emfaw7fLOdprlQ1LqJe/vYNcIy8I12F3JFzfCpxEVj18OKCmEnS/g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-shape@1.6.2':
-    resolution: {integrity: sha512-v6Sgo2ODxyGFCpaguVErxzJoQMMDW6DLuRd9XHW1EQdaEDA8HczeXCd7mYxfw/HgkpdZRw9/aMM2G/0s/kCDMQ==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-shape/-/docs-shape-1.6.2.tgz}
+    resolution: {integrity: sha512-v6Sgo2ODxyGFCpaguVErxzJoQMMDW6DLuRd9XHW1EQdaEDA8HczeXCd7mYxfw/HgkpdZRw9/aMM2G/0s/kCDMQ==}
 
   '@univerjs-pro/docs-table-ui@1.6.2':
-    resolution: {integrity: sha512-TD2qnsJbpZ1Lyy+V/CDMbLZEH6INg8Idahv3kcn23C0q1+YOU8d7HG1Jr0ooImxQja6l4t7tlnNOumzUspHNbw==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-table-ui/-/docs-table-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-TD2qnsJbpZ1Lyy+V/CDMbLZEH6INg8Idahv3kcn23C0q1+YOU8d7HG1Jr0ooImxQja6l4t7tlnNOumzUspHNbw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/docs-table@1.6.2':
-    resolution: {integrity: sha512-6AAIJZQYDZyot8SJHKQJWBguPObQeJybW444QRmKq3pXSXj0fxkJWGryTQigCjtBp2wUtXB7FiaR0q1ldE5pNg==, tarball: https://registry.npmjs.org/@univerjs-pro/docs-table/-/docs-table-1.6.2.tgz}
+    resolution: {integrity: sha512-6AAIJZQYDZyot8SJHKQJWBguPObQeJybW444QRmKq3pXSXj0fxkJWGryTQigCjtBp2wUtXB7FiaR0q1ldE5pNg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/edit-history-ui@1.6.2':
-    resolution: {integrity: sha512-sEvPpsw0t4vGMuga2CB7qyyNJPlRDpN5VNfuHqRzSWK8KOlED8fjtbPgLfocT+cB7wMUjQolO5svPXewC0i+RA==, tarball: https://registry.npmjs.org/@univerjs-pro/edit-history-ui/-/edit-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-sEvPpsw0t4vGMuga2CB7qyyNJPlRDpN5VNfuHqRzSWK8KOlED8fjtbPgLfocT+cB7wMUjQolO5svPXewC0i+RA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/edit-history@1.6.2':
-    resolution: {integrity: sha512-FaocXt7Um97K5NZ3/cKw8F7eH08w1p737Kn+YmxvI32hyot2ILYaYWBRpKGX0AynnvH9e8V5Mzj9tZ4Ysu0GOw==, tarball: https://registry.npmjs.org/@univerjs-pro/edit-history/-/edit-history-1.6.2.tgz}
+    resolution: {integrity: sha512-FaocXt7Um97K5NZ3/cKw8F7eH08w1p737Kn+YmxvI32hyot2ILYaYWBRpKGX0AynnvH9e8V5Mzj9tZ4Ysu0GOw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/embed@1.6.2':
-    resolution: {integrity: sha512-fkIriRCIDH3V0ISQiLeC+lZPfgFXhVb+FDCYMWTApFmDecHwU12VnQzbr6luFXcXTIg0RE/qLQAWicM+WxMoVA==, tarball: https://registry.npmjs.org/@univerjs-pro/embed/-/embed-1.6.2.tgz}
+    resolution: {integrity: sha512-fkIriRCIDH3V0ISQiLeC+lZPfgFXhVb+FDCYMWTApFmDecHwU12VnQzbr6luFXcXTIg0RE/qLQAWicM+WxMoVA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-chart@1.6.2':
-    resolution: {integrity: sha512-dMn050D5gB0G/xVa2cZ2GzlZFcEnVbCz4nvtnFZE6QAL6ofPv4ejmGtqPmOPrqo/GRLTAg5kE3cnP346LTH07A==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-chart/-/engine-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-dMn050D5gB0G/xVa2cZ2GzlZFcEnVbCz4nvtnFZE6QAL6ofPv4ejmGtqPmOPrqo/GRLTAg5kE3cnP346LTH07A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
@@ -2385,16 +2566,16 @@ packages:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/engine-formula@1.6.2':
-    resolution: {integrity: sha512-IEbxU0sIh8nbNr+12pMFBhI36+E+x6udIfQSy6rOCxtB/kWlpvRZkpJTRkvf/qMvS2AcL6zYkuPviIATkMe4XA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-formula/-/engine-formula-1.6.2.tgz}
+    resolution: {integrity: sha512-IEbxU0sIh8nbNr+12pMFBhI36+E+x6udIfQSy6rOCxtB/kWlpvRZkpJTRkvf/qMvS2AcL6zYkuPviIATkMe4XA==}
 
   '@univerjs-pro/engine-pivot@1.6.2':
-    resolution: {integrity: sha512-Mht49nu04e1srRNKTZ1cdtPWfGyxVFNDSgWPP/bv/qCn8ODzjYVdOIEm5Y5MK8Y/CWZchZEzQDC1691PXwTGGA==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-pivot/-/engine-pivot-1.6.2.tgz}
+    resolution: {integrity: sha512-Mht49nu04e1srRNKTZ1cdtPWfGyxVFNDSgWPP/bv/qCn8ODzjYVdOIEm5Y5MK8Y/CWZchZEzQDC1691PXwTGGA==}
 
   '@univerjs-pro/engine-shape@1.6.2':
-    resolution: {integrity: sha512-tgnTDjXxclm+SBVqJkLSZddD1r1rhoivigreL3+oz2mdZdaZYIZvhrjcpWZHxKuRD6E+PGakq4yfGYQ0LZw+Nw==, tarball: https://registry.npmjs.org/@univerjs-pro/engine-shape/-/engine-shape-1.6.2.tgz}
+    resolution: {integrity: sha512-tgnTDjXxclm+SBVqJkLSZddD1r1rhoivigreL3+oz2mdZdaZYIZvhrjcpWZHxKuRD6E+PGakq4yfGYQ0LZw+Nw==}
 
   '@univerjs-pro/exchange-client@1.6.2':
-    resolution: {integrity: sha512-LPLBy8a7q07c9IGHz1DMXO4O4GY6Xq4SChoareecRd6izvE4qxzpEhm9JSyvzNQ+8Hc0YzNWCLsj8kRXm8s63w==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-client/-/exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-LPLBy8a7q07c9IGHz1DMXO4O4GY6Xq4SChoareecRd6izvE4qxzpEhm9JSyvzNQ+8Hc0YzNWCLsj8kRXm8s63w==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
@@ -2496,605 +2677,634 @@ packages:
     os: [win32]
 
   '@univerjs-pro/exchange-pdf-node-binding@1.2.0':
-    resolution: {integrity: sha512-mUBlKL2Z2R7PNo88/JQDeC6BAsLVJvLkrPn2rU7bNl4L85r10KJ5A8WekeLKco35jLfOlTjD8ZkEpbRnH5yTsA==, tarball: https://registry.npmjs.org/@univerjs-pro/exchange-pdf-node-binding/-/exchange-pdf-node-binding-1.2.0.tgz}
+    resolution: {integrity: sha512-mUBlKL2Z2R7PNo88/JQDeC6BAsLVJvLkrPn2rU7bNl4L85r10KJ5A8WekeLKco35jLfOlTjD8ZkEpbRnH5yTsA==}
     engines: {node: '>=20'}
 
   '@univerjs-pro/ink-ui@1.6.2':
-    resolution: {integrity: sha512-HCWx62dbe62EFZ9w5BgzbCgTXr3IAQm2eBFRgOBlVcNRNhb+O3vKdClC1h/xRZz7+ydyhwad0gnAyuoEQDkckw==, tarball: https://registry.npmjs.org/@univerjs-pro/ink-ui/-/ink-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-HCWx62dbe62EFZ9w5BgzbCgTXr3IAQm2eBFRgOBlVcNRNhb+O3vKdClC1h/xRZz7+ydyhwad0gnAyuoEQDkckw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/ink@1.6.2':
-    resolution: {integrity: sha512-pEJsh5fGTsSi5syxMTiN9CnlbjtZiqT0AtGEEZXZjMe8W9swHjM0x/FEZie/SeHTf14fW6x3ucPerypEO5MgYQ==, tarball: https://registry.npmjs.org/@univerjs-pro/ink/-/ink-1.6.2.tgz}
+    resolution: {integrity: sha512-pEJsh5fGTsSi5syxMTiN9CnlbjtZiqT0AtGEEZXZjMe8W9swHjM0x/FEZie/SeHTf14fW6x3ucPerypEO5MgYQ==}
 
   '@univerjs-pro/license@1.6.2':
-    resolution: {integrity: sha512-MXsCPdZd4Eq/eifyqoIcSb+d5vf1/lbiGAQg1+tR/z63Xc+A9zxZk+XjhId509mkVwvlJDgEUFxa76EEN83YpQ==, tarball: https://registry.npmjs.org/@univerjs-pro/license/-/license-1.6.2.tgz}
+    resolution: {integrity: sha512-MXsCPdZd4Eq/eifyqoIcSb+d5vf1/lbiGAQg1+tR/z63Xc+A9zxZk+XjhId509mkVwvlJDgEUFxa76EEN83YpQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/pdfs-editor@1.6.2':
-    resolution: {integrity: sha512-GRuk1E27KB++JH3X38cG2VqWuTXtTEikUT1Nxfutp170fkMkm33Dd+YQYlZ3N+d9pEFWyyPUhXCpyGe0BWxT0g==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-editor/-/pdfs-editor-1.6.2.tgz}
+    resolution: {integrity: sha512-GRuk1E27KB++JH3X38cG2VqWuTXtTEikUT1Nxfutp170fkMkm33Dd+YQYlZ3N+d9pEFWyyPUhXCpyGe0BWxT0g==}
 
   '@univerjs-pro/pdfs-exchange-client@1.6.2':
-    resolution: {integrity: sha512-ioVRYP01Dus44gtSNgxy5S9/FydzmLfXF1Pmg3DeDed0QE1YpaKixPVvuxpDYuLUQEwxWr5a27fwbPEDKaYm3Q==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-exchange-client/-/pdfs-exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-ioVRYP01Dus44gtSNgxy5S9/FydzmLfXF1Pmg3DeDed0QE1YpaKixPVvuxpDYuLUQEwxWr5a27fwbPEDKaYm3Q==}
 
   '@univerjs-pro/pdfs-print@1.6.2':
-    resolution: {integrity: sha512-o9e2yYEDlS+diBdypCqI/MD0+73Fl0OxcDReZlGbXUs9l0QxXxxkVHwaTsJ4BERnvcbtGlOWR/U/7klA8GhGfw==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-print/-/pdfs-print-1.6.2.tgz}
+    resolution: {integrity: sha512-o9e2yYEDlS+diBdypCqI/MD0+73Fl0OxcDReZlGbXUs9l0QxXxxkVHwaTsJ4BERnvcbtGlOWR/U/7klA8GhGfw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/pdfs-ui@1.6.2':
-    resolution: {integrity: sha512-le7PClSQbGShZaUsp4FM7iM03NJrUqJZ6lhoguetllqtepirCG22Q8muwGU8R7ngy+84AVGQVRLvVDU54drrEQ==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs-ui/-/pdfs-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-le7PClSQbGShZaUsp4FM7iM03NJrUqJZ6lhoguetllqtepirCG22Q8muwGU8R7ngy+84AVGQVRLvVDU54drrEQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/pdfs@1.6.2':
-    resolution: {integrity: sha512-aCY03oVffKIPDsOsv37So4XFyBQwsTJea9qimTpl3lKpdreg1QvLZrFKfz9rITC4knzE8Cs+9TdIP/DHLF3kxQ==, tarball: https://registry.npmjs.org/@univerjs-pro/pdfs/-/pdfs-1.6.2.tgz}
+    resolution: {integrity: sha512-aCY03oVffKIPDsOsv37So4XFyBQwsTJea9qimTpl3lKpdreg1QvLZrFKfz9rITC4knzE8Cs+9TdIP/DHLF3kxQ==}
 
   '@univerjs-pro/pivot-cache@1.6.2':
-    resolution: {integrity: sha512-on58Jc1ER4QQpSREAXp0GamtD86vrJcMYzf2XHSvoB5ZvVEV5FKqlRMWAIp1Ovf6m1y6crqjCqli3ADh5yXmGw==, tarball: https://registry.npmjs.org/@univerjs-pro/pivot-cache/-/pivot-cache-1.6.2.tgz}
+    resolution: {integrity: sha512-on58Jc1ER4QQpSREAXp0GamtD86vrJcMYzf2XHSvoB5ZvVEV5FKqlRMWAIp1Ovf6m1y6crqjCqli3ADh5yXmGw==}
     peerDependencies:
       '@univerjs-pro/engine-pivot': 1.6.2
       '@univerjs-pro/resources': 1.6.2
 
   '@univerjs-pro/pivot-chart@1.6.2':
-    resolution: {integrity: sha512-fEx3S34c5Wp6+/KLOuex3V2dHXbZshu+XRZ2B0QEXPbyyRwiQ4NSsXt0a3wDT7VdpZxhxQgcJajMNV6nwMJHxA==, tarball: https://registry.npmjs.org/@univerjs-pro/pivot-chart/-/pivot-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-fEx3S34c5Wp6+/KLOuex3V2dHXbZshu+XRZ2B0QEXPbyyRwiQ4NSsXt0a3wDT7VdpZxhxQgcJajMNV6nwMJHxA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/print@1.6.2':
-    resolution: {integrity: sha512-bSGO5YBzazGX1sSnLMND9XMA+nLdYfYgcUjs3cPEYFlq0LDQmE3LQCiP/1G+bszwRr8lQuvYT1aWlP3cD1ETgA==, tarball: https://registry.npmjs.org/@univerjs-pro/print/-/print-1.6.2.tgz}
+    resolution: {integrity: sha512-bSGO5YBzazGX1sSnLMND9XMA+nLdYfYgcUjs3cPEYFlq0LDQmE3LQCiP/1G+bszwRr8lQuvYT1aWlP3cD1ETgA==}
 
   '@univerjs-pro/resources@1.6.2':
-    resolution: {integrity: sha512-jLHDHrYhI+zzQ86VThcpGEtUWIuysNqamHhgc0xTQ687VdPc+A5qGDj1H3ZiAJbR7pYxIqQbn9UsSRoxI/t4+Q==, tarball: https://registry.npmjs.org/@univerjs-pro/resources/-/resources-1.6.2.tgz}
+    resolution: {integrity: sha512-jLHDHrYhI+zzQ86VThcpGEtUWIuysNqamHhgc0xTQ687VdPc+A5qGDj1H3ZiAJbR7pYxIqQbn9UsSRoxI/t4+Q==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/shape-editor-ui@1.6.2':
-    resolution: {integrity: sha512-nmZP61NbDnGM1bHFl8fXd/R+gX7HzOXVWbbGSAYYfIJRsn9EWw3j8DGOi8DmG8u1RM0MV7zDV/RcKmrWq4EYrA==, tarball: https://registry.npmjs.org/@univerjs-pro/shape-editor-ui/-/shape-editor-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-nmZP61NbDnGM1bHFl8fXd/R+gX7HzOXVWbbGSAYYfIJRsn9EWw3j8DGOi8DmG8u1RM0MV7zDV/RcKmrWq4EYrA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/shape-editor@1.6.2':
-    resolution: {integrity: sha512-WgRVhQObgcrOofq7294JlyRvJWAxw+o1hkxW9feSrjMELpJo6yXCMTuL8jUXYnjKrpO5VEwHFOr8kAR5/XMMKg==, tarball: https://registry.npmjs.org/@univerjs-pro/shape-editor/-/shape-editor-1.6.2.tgz}
+    resolution: {integrity: sha512-WgRVhQObgcrOofq7294JlyRvJWAxw+o1hkxW9feSrjMELpJo6yXCMTuL8jUXYnjKrpO5VEwHFOr8kAR5/XMMKg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-chart-ui@1.6.2':
-    resolution: {integrity: sha512-k2qQLzT2AvL6BIAYecF8HJPZ24M2eBTwgqAVuC80G5CGtYFEXgEnVA5drvLxWqekPf3qGtcc27InSKEUfqy99Q==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-chart-ui/-/sheets-chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-k2qQLzT2AvL6BIAYecF8HJPZ24M2eBTwgqAVuC80G5CGtYFEXgEnVA5drvLxWqekPf3qGtcc27InSKEUfqy99Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-chart@1.6.2':
-    resolution: {integrity: sha512-dnlkjN/j6C3FIqP7I0Rg2UfOJMuymkk2CuFDQzFEtLjMS4qlM5/thj1bOr3vIS3VH79TOrlFjyH//3oGjSuU2Q==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-chart/-/sheets-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-dnlkjN/j6C3FIqP7I0Rg2UfOJMuymkk2CuFDQzFEtLjMS4qlM5/thj1bOr3vIS3VH79TOrlFjyH//3oGjSuU2Q==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-exchange-client@1.6.2':
-    resolution: {integrity: sha512-2Z6/136i78sAhLC3Qbrn0f0cGrVc1IsyEivUunBAKeQk4VDBQkB4B780KXoDtgOGBhGnkXV+lckSx93otsVVBw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-exchange-client/-/sheets-exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-2Z6/136i78sAhLC3Qbrn0f0cGrVc1IsyEivUunBAKeQk4VDBQkB4B780KXoDtgOGBhGnkXV+lckSx93otsVVBw==}
 
   '@univerjs-pro/sheets-history-ui@1.6.2':
-    resolution: {integrity: sha512-ugoLYy8pGZnFChf9lopJ3S24uAljo0fVNF6y5CjvItikIW2REu59CA1j78pSKToAsGFET/KLyl/ikwfd+0yV2g==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-history-ui/-/sheets-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-ugoLYy8pGZnFChf9lopJ3S24uAljo0fVNF6y5CjvItikIW2REu59CA1j78pSKToAsGFET/KLyl/ikwfd+0yV2g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-history@1.6.2':
-    resolution: {integrity: sha512-2qU90IwZ4EBhtjRGWxqLM2Ib5e3U5iliOaZA7DPUz1DAeCOSzZ+4s4EODvCK5aEP8P6GDFSBXdRaCJiIIGTyOw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-history/-/sheets-history-1.6.2.tgz}
+    resolution: {integrity: sha512-2qU90IwZ4EBhtjRGWxqLM2Ib5e3U5iliOaZA7DPUz1DAeCOSzZ+4s4EODvCK5aEP8P6GDFSBXdRaCJiIIGTyOw==}
 
   '@univerjs-pro/sheets-outline-ui@1.6.2':
-    resolution: {integrity: sha512-g9+IX396/FOuXG6Ne89gCeGhXlrUti7MU3pl3rZuDT6ghtOVF48BNOhhWC4ITZxBN9SSaqX4UbaOq0Yk41GcLQ==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-outline-ui/-/sheets-outline-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-g9+IX396/FOuXG6Ne89gCeGhXlrUti7MU3pl3rZuDT6ghtOVF48BNOhhWC4ITZxBN9SSaqX4UbaOq0Yk41GcLQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-outline@1.6.2':
-    resolution: {integrity: sha512-1gJGfCsuFzwRyCC88WQX3gg1FkJlXYlHyS2Tr4bKj0wMsMmlRcZYgQLJ4R0Kq+T3vZLWprCeU/gqEEeKJ9RLnA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-outline/-/sheets-outline-1.6.2.tgz}
+    resolution: {integrity: sha512-1gJGfCsuFzwRyCC88WQX3gg1FkJlXYlHyS2Tr4bKj0wMsMmlRcZYgQLJ4R0Kq+T3vZLWprCeU/gqEEeKJ9RLnA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-chart-ui@1.6.2':
-    resolution: {integrity: sha512-Ga4L2NMlk0sqBxxwZAkZvKyAUnij+twfNo+a1cXFghFv2HDuXLw9Xs01kJXf4UdyYZoVhlW1nQnzkRnTf7vdtA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-chart-ui/-/sheets-pivot-chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-Ga4L2NMlk0sqBxxwZAkZvKyAUnij+twfNo+a1cXFghFv2HDuXLw9Xs01kJXf4UdyYZoVhlW1nQnzkRnTf7vdtA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-chart@1.6.2':
-    resolution: {integrity: sha512-0ie4Kj8qg5eirQZDa8+S/WHX1JdPJhs9u/+WXY8yX8c1+Z4CdoNSGwxiXEos4kkZcZAs1RlGoeBYU2Q7w1it9g==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-chart/-/sheets-pivot-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-0ie4Kj8qg5eirQZDa8+S/WHX1JdPJhs9u/+WXY8yX8c1+Z4CdoNSGwxiXEos4kkZcZAs1RlGoeBYU2Q7w1it9g==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot-ui@1.6.2':
-    resolution: {integrity: sha512-+ChJG8KzGpfjRqO/5jSeKvr70KbW82OoBT9cdKVFl0hDvIzxBsI7WyrWNfjBC1nefhDkJY4lzFtdxPIMGGgBiA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot-ui/-/sheets-pivot-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-+ChJG8KzGpfjRqO/5jSeKvr70KbW82OoBT9cdKVFl0hDvIzxBsI7WyrWNfjBC1nefhDkJY4lzFtdxPIMGGgBiA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-pivot@1.6.2':
-    resolution: {integrity: sha512-gw0Q+rc8oBg+7bLssTxJg3Z5GUNw4pAZUdk3Z73vYjn9/Fpw2DbM+sY7vETDHiod3b/dz1azKYAoibu9tni9kg==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-pivot/-/sheets-pivot-1.6.2.tgz}
+    resolution: {integrity: sha512-gw0Q+rc8oBg+7bLssTxJg3Z5GUNw4pAZUdk3Z73vYjn9/Fpw2DbM+sY7vETDHiod3b/dz1azKYAoibu9tni9kg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-print@1.6.2':
-    resolution: {integrity: sha512-CthQ9jiZD2zknikQsSg8aqqRVx+yqvCm3/E2GbeM79kNmYiKBIyEMoln/5fHUjBfOqNxYfFjnMNTysehv01gXQ==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-print/-/sheets-print-1.6.2.tgz}
+    resolution: {integrity: sha512-CthQ9jiZD2zknikQsSg8aqqRVx+yqvCm3/E2GbeM79kNmYiKBIyEMoln/5fHUjBfOqNxYfFjnMNTysehv01gXQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-shape-ui@1.6.2':
-    resolution: {integrity: sha512-8htmHMn3SREP0EM/MpVdvKAfb4TYrODvBnQYxVktlOocVEBpvU8WNDIkOv2y4aqsvILly3KGEowuOByguVVPdw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-shape-ui/-/sheets-shape-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-8htmHMn3SREP0EM/MpVdvKAfb4TYrODvBnQYxVktlOocVEBpvU8WNDIkOv2y4aqsvILly3KGEowuOByguVVPdw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-shape@1.6.2':
-    resolution: {integrity: sha512-6pkmgqVPJ8OgzGIhZMmO94sWjl387asdzbd6ggAf1L6oTNunJKzlrE7bKa1C+XAVQVyt0dXZU1NjAE0Aqpeqng==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-shape/-/sheets-shape-1.6.2.tgz}
+    resolution: {integrity: sha512-6pkmgqVPJ8OgzGIhZMmO94sWjl387asdzbd6ggAf1L6oTNunJKzlrE7bKa1C+XAVQVyt0dXZU1NjAE0Aqpeqng==}
 
   '@univerjs-pro/sheets-slicer-ui@1.6.2':
-    resolution: {integrity: sha512-qmm7P34xdlKLWdDCcKIHTbQlYO4AtZd7/4yWhLnw8vpQP8KvdeTK3swcgzIxO6raZxBn9hqv0uBEbqc85zt23g==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-slicer-ui/-/sheets-slicer-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-qmm7P34xdlKLWdDCcKIHTbQlYO4AtZd7/4yWhLnw8vpQP8KvdeTK3swcgzIxO6raZxBn9hqv0uBEbqc85zt23g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-slicer@1.6.2':
-    resolution: {integrity: sha512-/Q5OEcIF82RKKEEiM9q5S/lFUiOm5+zuNwPBHtGrUOHtVSCXf2xOrRQUNmn37/cztfjzMn3DUDvtxTuEKnnTBQ==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-slicer/-/sheets-slicer-1.6.2.tgz}
+    resolution: {integrity: sha512-/Q5OEcIF82RKKEEiM9q5S/lFUiOm5+zuNwPBHtGrUOHtVSCXf2xOrRQUNmn37/cztfjzMn3DUDvtxTuEKnnTBQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-sparkline-ui@1.6.2':
-    resolution: {integrity: sha512-CPujdow/SyTCgFZ5C4RFl7eY9WLjiyQUVZQMj+mlknNETsbdcWSJoHupXitAgYd8ybFlhwqZqBDmn3GRrd++vw==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-sparkline-ui/-/sheets-sparkline-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-CPujdow/SyTCgFZ5C4RFl7eY9WLjiyQUVZQMj+mlknNETsbdcWSJoHupXitAgYd8ybFlhwqZqBDmn3GRrd++vw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/sheets-sparkline@1.6.2':
-    resolution: {integrity: sha512-/jcxyDspUqyfrLcsbO2S3ujvu7Gg6bjIr8YwQYookT74FkCKWC3WFUb1077h5N+3UsNzuBr5gb7b+cA5xUVYiA==, tarball: https://registry.npmjs.org/@univerjs-pro/sheets-sparkline/-/sheets-sparkline-1.6.2.tgz}
+    resolution: {integrity: sha512-/jcxyDspUqyfrLcsbO2S3ujvu7Gg6bjIr8YwQYookT74FkCKWC3WFUb1077h5N+3UsNzuBr5gb7b+cA5xUVYiA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slicer@1.6.2':
-    resolution: {integrity: sha512-6R6GaSSPpsU4s5rvym+hnpNv6c5I7W+Az9Cw9JL+pVhNcMOiVREWESlYY4oieblXwd0aa5Bp+8pVFIqFvRv2LA==, tarball: https://registry.npmjs.org/@univerjs-pro/slicer/-/slicer-1.6.2.tgz}
+    resolution: {integrity: sha512-6R6GaSSPpsU4s5rvym+hnpNv6c5I7W+Az9Cw9JL+pVhNcMOiVREWESlYY4oieblXwd0aa5Bp+8pVFIqFvRv2LA==}
 
   '@univerjs-pro/slides-chart-ui@1.6.2':
-    resolution: {integrity: sha512-ACiKrGsUElqhwlMsBXCWcwXHCy3cxBUP+WPbI7v8ezqpW1AlcuRJEOLlLgFnum2nr7H/4REiBir8aPc0zvrY8Q==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-chart-ui/-/slides-chart-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-ACiKrGsUElqhwlMsBXCWcwXHCy3cxBUP+WPbI7v8ezqpW1AlcuRJEOLlLgFnum2nr7H/4REiBir8aPc0zvrY8Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-chart@1.6.2':
-    resolution: {integrity: sha512-G50ZXAbo0xez1mqyU8RqwrGMETWhNrx6U0vlgnlAmw27hNv25GaC59HV3RrbzTAznB8rTsjhg0a7uEJ4Hy30cA==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-chart/-/slides-chart-1.6.2.tgz}
+    resolution: {integrity: sha512-G50ZXAbo0xez1mqyU8RqwrGMETWhNrx6U0vlgnlAmw27hNv25GaC59HV3RrbzTAznB8rTsjhg0a7uEJ4Hy30cA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-exchange-client@1.6.2':
-    resolution: {integrity: sha512-BByCm40BvjS1OHsHbRlOfR6uRLLZ43FyI7EI9c9TqGOr6HuJgplIkBd7ualvhqMxawowbAoLDIyAFG35dDBYCQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-exchange-client/-/slides-exchange-client-1.6.2.tgz}
+    resolution: {integrity: sha512-BByCm40BvjS1OHsHbRlOfR6uRLLZ43FyI7EI9c9TqGOr6HuJgplIkBd7ualvhqMxawowbAoLDIyAFG35dDBYCQ==}
 
   '@univerjs-pro/slides-history-ui@1.6.2':
-    resolution: {integrity: sha512-jahs3qiylTHUZrgtQrMsRTHIBqk9LdWOHqN9Pd4WIt0U+e3cK2zfOer7OTkOvx2Fjtop67S6I48MsTOZVWkhEw==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-history-ui/-/slides-history-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-jahs3qiylTHUZrgtQrMsRTHIBqk9LdWOHqN9Pd4WIt0U+e3cK2zfOer7OTkOvx2Fjtop67S6I48MsTOZVWkhEw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-history@1.6.2':
-    resolution: {integrity: sha512-PKdfvzNFxaMyUKeKkwbmMb8lG23wIGRtZL74ahc2MdKRVG/CIloMozz3p+zmVjQariILZk3bo62XIK9ZklQ5kg==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-history/-/slides-history-1.6.2.tgz}
+    resolution: {integrity: sha512-PKdfvzNFxaMyUKeKkwbmMb8lG23wIGRtZL74ahc2MdKRVG/CIloMozz3p+zmVjQariILZk3bo62XIK9ZklQ5kg==}
 
   '@univerjs-pro/slides-print@1.6.2':
-    resolution: {integrity: sha512-HSlJAF509uxieJVFpOUPwOgsghFpSfU5FmpaVUZH05tCh2DX5q0xmnKK9amyiGA/k02Cz6sOG4Njtz8//iMX5g==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-print/-/slides-print-1.6.2.tgz}
+    resolution: {integrity: sha512-HSlJAF509uxieJVFpOUPwOgsghFpSfU5FmpaVUZH05tCh2DX5q0xmnKK9amyiGA/k02Cz6sOG4Njtz8//iMX5g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-table-ui@1.6.2':
-    resolution: {integrity: sha512-FPYimJMQU5UykFG/HD6PfyXjhs8LNv74pd3RiKfY7ZNcAuMqBNLwp775I9bA3OUvdkXXBzCKu85SnpNnnXxiNQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-table-ui/-/slides-table-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-FPYimJMQU5UykFG/HD6PfyXjhs8LNv74pd3RiKfY7ZNcAuMqBNLwp775I9bA3OUvdkXXBzCKu85SnpNnnXxiNQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs-pro/slides-table@1.6.2':
-    resolution: {integrity: sha512-k6/SJcG2V+JR2AIHZb3c6Dl+/nhOfMMkFcpiGGYTgIsF4e6Fx37mVYyVPL16Ifw/4m7lxHP+qaYkgbRZLl3Cnw==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-table/-/slides-table-1.6.2.tgz}
+    resolution: {integrity: sha512-k6/SJcG2V+JR2AIHZb3c6Dl+/nhOfMMkFcpiGGYTgIsF4e6Fx37mVYyVPL16Ifw/4m7lxHP+qaYkgbRZLl3Cnw==}
 
   '@univerjs-pro/slides-thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-NL5oVSWoBMZ8McDrmtdHHztPCFudST8LBUDhJInGSGsm2g7PV38e9mB3e/+az7S2AjKethYk9LHFV6Gdx7xNKw==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-thread-comment-ui/-/slides-thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-NL5oVSWoBMZ8McDrmtdHHztPCFudST8LBUDhJInGSGsm2g7PV38e9mB3e/+az7S2AjKethYk9LHFV6Gdx7xNKw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides-thread-comment@1.6.2':
-    resolution: {integrity: sha512-qDqrdv30RgsMjKxNTCxvPROkC5+EHHzXMOZL43S59qBpeMjiBGd5ILxIEIMfNH7iisyagoXm/DdWbzKzN2yATQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-thread-comment/-/slides-thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-qDqrdv30RgsMjKxNTCxvPROkC5+EHHzXMOZL43S59qBpeMjiBGd5ILxIEIMfNH7iisyagoXm/DdWbzKzN2yATQ==}
 
   '@univerjs-pro/slides-ui@1.6.2':
-    resolution: {integrity: sha512-bVb3tyVZS+0hzh2tyYZZRkCSmykoo6na957zaW6V+E0zZROhYLbh6UqilclTQnRIFquNyKZW2w/sEyGvoAQGyQ==, tarball: https://registry.npmjs.org/@univerjs-pro/slides-ui/-/slides-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-bVb3tyVZS+0hzh2tyYZZRkCSmykoo6na957zaW6V+E0zZROhYLbh6UqilclTQnRIFquNyKZW2w/sEyGvoAQGyQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/slides@1.6.2':
-    resolution: {integrity: sha512-74w/YhTGhCJ29BDBD8K2YudGX7MVN8w2MtQtywJ1K+dnOHWFr+UOm9BVYgEA4oR+DYHs2f1KTEaqYyvbUu/Pjg==, tarball: https://registry.npmjs.org/@univerjs-pro/slides/-/slides-1.6.2.tgz}
+    resolution: {integrity: sha512-74w/YhTGhCJ29BDBD8K2YudGX7MVN8w2MtQtywJ1K+dnOHWFr+UOm9BVYgEA4oR+DYHs2f1KTEaqYyvbUu/Pjg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/thread-comment-datasource@1.6.2':
-    resolution: {integrity: sha512-hYidr6s56nUJ1ekYrFcuk3isJitl1CbpgUbLr4ezOr99KTdlgfwPT7yJSJSkdw/mdsE+gZqxftjg4tvdYoQnJg==, tarball: https://registry.npmjs.org/@univerjs-pro/thread-comment-datasource/-/thread-comment-datasource-1.6.2.tgz}
+    resolution: {integrity: sha512-hYidr6s56nUJ1ekYrFcuk3isJitl1CbpgUbLr4ezOr99KTdlgfwPT7yJSJSkdw/mdsE+gZqxftjg4tvdYoQnJg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs-pro/thread-comment-resource@1.6.2':
-    resolution: {integrity: sha512-o2Q4kcVohNQgq0FZyByKlN6g+dgHSzIdq/q+pF28llLAWSSiSsgrKfdxHcIfIgNf2EFLctRKSkr8D6IA4WVKVQ==, tarball: https://registry.npmjs.org/@univerjs-pro/thread-comment-resource/-/thread-comment-resource-1.6.2.tgz}
+    resolution: {integrity: sha512-o2Q4kcVohNQgq0FZyByKlN6g+dgHSzIdq/q+pF28llLAWSSiSsgrKfdxHcIfIgNf2EFLctRKSkr8D6IA4WVKVQ==}
 
   '@univerjs/core@1.6.2':
-    resolution: {integrity: sha512-lLowEA/BQkYpy3HQWKzOIIts/1ISkYooOxZLBFz5iup0w12Dq/R3HjlaLZ+A+KgHoqMvTVAKI18lByG7mUjGnQ==, tarball: https://registry.npmjs.org/@univerjs/core/-/core-1.6.2.tgz}
+    resolution: {integrity: sha512-lLowEA/BQkYpy3HQWKzOIIts/1ISkYooOxZLBFz5iup0w12Dq/R3HjlaLZ+A+KgHoqMvTVAKI18lByG7mUjGnQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/data-validation@1.6.2':
-    resolution: {integrity: sha512-c7xuYslzvQhfa33tnoKVmVBVUeg0aKUCdRzinFcWdq9Oid68KmcW09veZIDf9ttmgq1XK01D+CTSUNJA20woKg==, tarball: https://registry.npmjs.org/@univerjs/data-validation/-/data-validation-1.6.2.tgz}
+    resolution: {integrity: sha512-c7xuYslzvQhfa33tnoKVmVBVUeg0aKUCdRzinFcWdq9Oid68KmcW09veZIDf9ttmgq1XK01D+CTSUNJA20woKg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/design@1.6.2':
-    resolution: {integrity: sha512-nVs9puMDIuH+AWxfQbwUb7QxkuySZcQXSAH+BdcyQXr7C4ySUeFcjiujeQO8EAXDJ/Isjq1MkSrySObAlH2hJg==, tarball: https://registry.npmjs.org/@univerjs/design/-/design-1.6.2.tgz}
+    resolution: {integrity: sha512-nVs9puMDIuH+AWxfQbwUb7QxkuySZcQXSAH+BdcyQXr7C4ySUeFcjiujeQO8EAXDJ/Isjq1MkSrySObAlH2hJg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   '@univerjs/docs-drawing-ui@1.6.2':
-    resolution: {integrity: sha512-AgyCzreyPaWEkAOQqT1BLZ9qaCXVmKtIAkU5aG5/afSl6LYymTr/0eZ1gb1O/vYAxPJ1I0Xj1giND4uRnc7fVw==, tarball: https://registry.npmjs.org/@univerjs/docs-drawing-ui/-/docs-drawing-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-AgyCzreyPaWEkAOQqT1BLZ9qaCXVmKtIAkU5aG5/afSl6LYymTr/0eZ1gb1O/vYAxPJ1I0Xj1giND4uRnc7fVw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs-drawing@1.6.2':
-    resolution: {integrity: sha512-BURzvzDIKcaDO2Rcfi8bYH844nMRqjw7N+YfSwwKytg/NOsqzv7rc310ZSpLxPRZ0Ldcl0PPyyZ+Bl/RL8P75g==, tarball: https://registry.npmjs.org/@univerjs/docs-drawing/-/docs-drawing-1.6.2.tgz}
+    resolution: {integrity: sha512-BURzvzDIKcaDO2Rcfi8bYH844nMRqjw7N+YfSwwKytg/NOsqzv7rc310ZSpLxPRZ0Ldcl0PPyyZ+Bl/RL8P75g==}
 
   '@univerjs/docs-hyper-link-ui@1.6.2':
-    resolution: {integrity: sha512-/Zvoe/xmjjxbIwhsKwURL0yY1A36OtD3ny1+r0OK0XQDuz/sGPENNzllbyHVosDy0FcqiZngYwVFdoalOcmP0g==, tarball: https://registry.npmjs.org/@univerjs/docs-hyper-link-ui/-/docs-hyper-link-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-/Zvoe/xmjjxbIwhsKwURL0yY1A36OtD3ny1+r0OK0XQDuz/sGPENNzllbyHVosDy0FcqiZngYwVFdoalOcmP0g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs-hyper-link@1.6.2':
-    resolution: {integrity: sha512-a+ldr8eAlYSAU9KcJ04eYgdYP8Ax14MPOTNw7e3ZrQCodLt1dnLl87pG7WilM8H5zDkf7fgNsSYXhLI8n4+5/A==, tarball: https://registry.npmjs.org/@univerjs/docs-hyper-link/-/docs-hyper-link-1.6.2.tgz}
+    resolution: {integrity: sha512-a+ldr8eAlYSAU9KcJ04eYgdYP8Ax14MPOTNw7e3ZrQCodLt1dnLl87pG7WilM8H5zDkf7fgNsSYXhLI8n4+5/A==}
 
   '@univerjs/docs-thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-BaBPXUiUtKZh846LCB3WtKMWcY891kf5qamPJohJKAhlkZ2vmU3Ncx6zPyir7Hd4MLN/wEcweHGOAd8R49Nqqw==, tarball: https://registry.npmjs.org/@univerjs/docs-thread-comment-ui/-/docs-thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-BaBPXUiUtKZh846LCB3WtKMWcY891kf5qamPJohJKAhlkZ2vmU3Ncx6zPyir7Hd4MLN/wEcweHGOAd8R49Nqqw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs-thread-comment@1.6.2':
-    resolution: {integrity: sha512-wb7x4xVixlH38U9MwvrRmAg9cOUr6ec8clhBbJ1p5v1MXvLFH3Kues0QL+RvVSUbAhrr0xRO7ztYhyDioY6MOg==, tarball: https://registry.npmjs.org/@univerjs/docs-thread-comment/-/docs-thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-wb7x4xVixlH38U9MwvrRmAg9cOUr6ec8clhBbJ1p5v1MXvLFH3Kues0QL+RvVSUbAhrr0xRO7ztYhyDioY6MOg==}
 
   '@univerjs/docs-ui@1.6.2':
-    resolution: {integrity: sha512-dyb2jxGzBNTk7O8O/96HvNqA/8DbN22O/az2YWzrncU4DuGGhzwLwDffkzcGKmlEuZpOP2MJdF3k53p0I2Z5dw==, tarball: https://registry.npmjs.org/@univerjs/docs-ui/-/docs-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-dyb2jxGzBNTk7O8O/96HvNqA/8DbN22O/az2YWzrncU4DuGGhzwLwDffkzcGKmlEuZpOP2MJdF3k53p0I2Z5dw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/docs@1.6.2':
-    resolution: {integrity: sha512-fRX+zRoEVJIwCqd8YlxdxHnXlB2LLa0BJroETgjclqkbkLFipeREFbNZ/fQLD3+X7ibRhPLBAfyO6uBglIhGlQ==, tarball: https://registry.npmjs.org/@univerjs/docs/-/docs-1.6.2.tgz}
+    resolution: {integrity: sha512-fRX+zRoEVJIwCqd8YlxdxHnXlB2LLa0BJroETgjclqkbkLFipeREFbNZ/fQLD3+X7ibRhPLBAfyO6uBglIhGlQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/drawing-ui@1.6.2':
-    resolution: {integrity: sha512-6PgpxtQbnkmWsdvGKMOcZSIctXN+UyG4J9z1haeN+sI6O/J5HdysXFtZdw4u92yU2l74kZiPWZy9dMb7B5dCpw==, tarball: https://registry.npmjs.org/@univerjs/drawing-ui/-/drawing-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-6PgpxtQbnkmWsdvGKMOcZSIctXN+UyG4J9z1haeN+sI6O/J5HdysXFtZdw4u92yU2l74kZiPWZy9dMb7B5dCpw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/drawing@1.6.2':
-    resolution: {integrity: sha512-y+sbBrTTdBzYKahi4Zr9NgLvhL7CFku9o0uq+wCiSLPEFHKBPBYV8KjLJuP3OBQeZcKqNjmVI80tfdlQHISVBw==, tarball: https://registry.npmjs.org/@univerjs/drawing/-/drawing-1.6.2.tgz}
+    resolution: {integrity: sha512-y+sbBrTTdBzYKahi4Zr9NgLvhL7CFku9o0uq+wCiSLPEFHKBPBYV8KjLJuP3OBQeZcKqNjmVI80tfdlQHISVBw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/engine-formula@1.6.2':
-    resolution: {integrity: sha512-CMsb1sEHIsOps1pGVg3YPhMHfpJl/i/asSXb9TUsMt+tF0QCuexPr6zrqPNmx58XCUTG+Q81VYYmUOWpbiJKPw==, tarball: https://registry.npmjs.org/@univerjs/engine-formula/-/engine-formula-1.6.2.tgz}
+    resolution: {integrity: sha512-CMsb1sEHIsOps1pGVg3YPhMHfpJl/i/asSXb9TUsMt+tF0QCuexPr6zrqPNmx58XCUTG+Q81VYYmUOWpbiJKPw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/engine-render@1.6.2':
-    resolution: {integrity: sha512-kX4bc3zp9p5SP+oKpixZ6nGM1GNVutRAmWTGwu9ofKLcfQ5Rc1+eqoU+6KzWqA44wTys734Hz63XGn9ojmFzrA==, tarball: https://registry.npmjs.org/@univerjs/engine-render/-/engine-render-1.6.2.tgz}
+    resolution: {integrity: sha512-kX4bc3zp9p5SP+oKpixZ6nGM1GNVutRAmWTGwu9ofKLcfQ5Rc1+eqoU+6KzWqA44wTys734Hz63XGn9ojmFzrA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/find-replace@1.6.2':
-    resolution: {integrity: sha512-hCdBQ+3U487GQv3em8nAUmBcDcyaDFaEfwvaLRwZoJW80prbPqjc8Ef2H5NnfGnV2cxS2mvE8jNZv8qUgBFviA==, tarball: https://registry.npmjs.org/@univerjs/find-replace/-/find-replace-1.6.2.tgz}
+    resolution: {integrity: sha512-hCdBQ+3U487GQv3em8nAUmBcDcyaDFaEfwvaLRwZoJW80prbPqjc8Ef2H5NnfGnV2cxS2mvE8jNZv8qUgBFviA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/icons-svg@1.50.0':
-    resolution: {integrity: sha512-3PiGTVNOK82qYgJ+NvUUPJd+vZA7sdfDMyFdA3AckWwa8W18TYj3vg+NfSRCisu0lncABXDOHutWuUaKXETXHw==, tarball: https://registry.npmjs.org/@univerjs/icons-svg/-/icons-svg-1.50.0.tgz}
+    resolution: {integrity: sha512-3PiGTVNOK82qYgJ+NvUUPJd+vZA7sdfDMyFdA3AckWwa8W18TYj3vg+NfSRCisu0lncABXDOHutWuUaKXETXHw==}
 
   '@univerjs/icons@1.47.0':
-    resolution: {integrity: sha512-c7ujagbPpufqoFYpUZhOlLcSLjWJsR/U/DfW7lfSJcA2Ud5EV2oQNwmIVdOyupcmdTKWd2PP8Rg9TQknz8FpPg==, tarball: https://registry.npmjs.org/@univerjs/icons/-/icons-1.47.0.tgz}
+    resolution: {integrity: sha512-c7ujagbPpufqoFYpUZhOlLcSLjWJsR/U/DfW7lfSJcA2Ud5EV2oQNwmIVdOyupcmdTKWd2PP8Rg9TQknz8FpPg==}
     peerDependencies:
       react: '*'
       react-dom: '*'
 
   '@univerjs/icons@1.50.0':
-    resolution: {integrity: sha512-U4tzO8UmqpXgsD0q/UwCT1IxPeT8LWNbPxAtD/mzm1XaLMhwfGrVwbGudk86hCiMHxR1B1BGo2RQojbI95Y2jg==, tarball: https://registry.npmjs.org/@univerjs/icons/-/icons-1.50.0.tgz}
+    resolution: {integrity: sha512-U4tzO8UmqpXgsD0q/UwCT1IxPeT8LWNbPxAtD/mzm1XaLMhwfGrVwbGudk86hCiMHxR1B1BGo2RQojbI95Y2jg==}
     peerDependencies:
       react: '*'
       react-dom: '*'
 
   '@univerjs/network@1.6.2':
-    resolution: {integrity: sha512-WsBoDndWZiLXxHKSffi9GR2NsCFOMrYSNPUjC677/f1eavVS69aDwNGFD2LkRDqValbyYvxQR9JKOcq3zxUJkA==, tarball: https://registry.npmjs.org/@univerjs/network/-/network-1.6.2.tgz}
+    resolution: {integrity: sha512-WsBoDndWZiLXxHKSffi9GR2NsCFOMrYSNPUjC677/f1eavVS69aDwNGFD2LkRDqValbyYvxQR9JKOcq3zxUJkA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-core@1.6.2':
-    resolution: {integrity: sha512-opvQpD/QqQ6jIsxPoH7Mmpb4Tk7rzvyrUOOWxAJgsQU7uzc9mlTZUnQREqCRDIG4bY+v14ia8q6UtTPWnyClcQ==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-core/-/preset-docs-core-1.6.2.tgz}
+    resolution: {integrity: sha512-opvQpD/QqQ6jIsxPoH7Mmpb4Tk7rzvyrUOOWxAJgsQU7uzc9mlTZUnQREqCRDIG4bY+v14ia8q6UtTPWnyClcQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-drawing@1.6.2':
-    resolution: {integrity: sha512-SjQ+Oygdo13Kx7pvS2PfRPLfHROusjZf/NLl/sl/ecgOk2as1p4jfddiIB7F7+21Rzl72kPMFM+5P8NodsB78g==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-drawing/-/preset-docs-drawing-1.6.2.tgz}
+    resolution: {integrity: sha512-SjQ+Oygdo13Kx7pvS2PfRPLfHROusjZf/NLl/sl/ecgOk2as1p4jfddiIB7F7+21Rzl72kPMFM+5P8NodsB78g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-docs-hyper-link@1.6.2':
-    resolution: {integrity: sha512-wbyF0Y7FBvOso1Qn9wOH4cHBIVhzIgy6aAgk4+fCIKn87hZffxI5DG4Uk9z5O1i1L556v1690asfCHTwB1w16Q==, tarball: https://registry.npmjs.org/@univerjs/preset-docs-hyper-link/-/preset-docs-hyper-link-1.6.2.tgz}
+    resolution: {integrity: sha512-wbyF0Y7FBvOso1Qn9wOH4cHBIVhzIgy6aAgk4+fCIKn87hZffxI5DG4Uk9z5O1i1L556v1690asfCHTwB1w16Q==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-advanced@1.6.2':
-    resolution: {integrity: sha512-C7SnOHrOF2L3f8AXqlOnPHMivgmHgi2reHCKeAdDHDhGZKql7YaHfNtcICAl8Bu2QyyZ8A3mY0ZGgc6OtRbmvg==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-advanced/-/preset-sheets-advanced-1.6.2.tgz}
+    resolution: {integrity: sha512-C7SnOHrOF2L3f8AXqlOnPHMivgmHgi2reHCKeAdDHDhGZKql7YaHfNtcICAl8Bu2QyyZ8A3mY0ZGgc6OtRbmvg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-conditional-formatting@1.6.2':
-    resolution: {integrity: sha512-0H2DmL+j+rPq0H7O0WUWaOdEEQp1Ng5rP/pc1c7Q6k8XWP0/gXk7+Ot3sQUnqFMMiYeGz4fxjiZK1oJxN/D8fA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-conditional-formatting/-/preset-sheets-conditional-formatting-1.6.2.tgz}
+    resolution: {integrity: sha512-0H2DmL+j+rPq0H7O0WUWaOdEEQp1Ng5rP/pc1c7Q6k8XWP0/gXk7+Ot3sQUnqFMMiYeGz4fxjiZK1oJxN/D8fA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-core@1.6.2':
-    resolution: {integrity: sha512-+LGCZP/oSpZ7ZhZJ2Si0Kthwc5EXJ8TFEZZ8G/toxOUwcHWxOYRSZ1Rx1EyL8RVFf5Hz7KYYK2YSKx2/L5Mi3g==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-core/-/preset-sheets-core-1.6.2.tgz}
+    resolution: {integrity: sha512-+LGCZP/oSpZ7ZhZJ2Si0Kthwc5EXJ8TFEZZ8G/toxOUwcHWxOYRSZ1Rx1EyL8RVFf5Hz7KYYK2YSKx2/L5Mi3g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-data-validation@1.6.2':
-    resolution: {integrity: sha512-9Y3/jyA++KetcFlikWM8qD9MpAYxTACf4MtK7jQe2ETrhjeyW1v61nquA4Hbq4QiEeouYO7oAVRdi4U6j1epmw==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-data-validation/-/preset-sheets-data-validation-1.6.2.tgz}
+    resolution: {integrity: sha512-9Y3/jyA++KetcFlikWM8qD9MpAYxTACf4MtK7jQe2ETrhjeyW1v61nquA4Hbq4QiEeouYO7oAVRdi4U6j1epmw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-drawing@1.6.2':
-    resolution: {integrity: sha512-qMd7tkyzd6zVJqQEXmD00BsyGFGonLZ0MD0q2TiMjmu8OJngbN76a/+0jnwVbV9H8vrPw/UmNdHOo4NnfrSYqA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-drawing/-/preset-sheets-drawing-1.6.2.tgz}
+    resolution: {integrity: sha512-qMd7tkyzd6zVJqQEXmD00BsyGFGonLZ0MD0q2TiMjmu8OJngbN76a/+0jnwVbV9H8vrPw/UmNdHOo4NnfrSYqA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-filter@1.6.2':
-    resolution: {integrity: sha512-qrVGZGOnxiivByyn7BlmTMW4pqNBzEhQiaGl8XV/m4NMimiKBuW5lxdFtv+HgO3mfxslpaNnFhjE5RFUwHv3Dg==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-filter/-/preset-sheets-filter-1.6.2.tgz}
+    resolution: {integrity: sha512-qrVGZGOnxiivByyn7BlmTMW4pqNBzEhQiaGl8XV/m4NMimiKBuW5lxdFtv+HgO3mfxslpaNnFhjE5RFUwHv3Dg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-find-replace@1.6.2':
-    resolution: {integrity: sha512-37aviFCrxoO/jcpFeywx44B9cKkLETEDWBdqBsiWt7W/TjpWX70D+MUf4w7nXTpMHTxLykdzquUJJR7JFW/uLA==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-find-replace/-/preset-sheets-find-replace-1.6.2.tgz}
+    resolution: {integrity: sha512-37aviFCrxoO/jcpFeywx44B9cKkLETEDWBdqBsiWt7W/TjpWX70D+MUf4w7nXTpMHTxLykdzquUJJR7JFW/uLA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-hyper-link@1.6.2':
-    resolution: {integrity: sha512-oV3LsQOlrNMIggotq86Crv87/1XnH7GrGmjrQRN6Qpx9W/Ec9u6VnZTIxR84nFnBphLdAZwtXFb2QBHJSIeRgw==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-hyper-link/-/preset-sheets-hyper-link-1.6.2.tgz}
+    resolution: {integrity: sha512-oV3LsQOlrNMIggotq86Crv87/1XnH7GrGmjrQRN6Qpx9W/Ec9u6VnZTIxR84nFnBphLdAZwtXFb2QBHJSIeRgw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-note@1.6.2':
-    resolution: {integrity: sha512-J+HYAw8veq81Ootnx56HbyfP+TtbMHNwZcMu8j6WP/3fWVtvOXcYsZLlUbnGrRYflMSj6kP44kuKnr102SvzgQ==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-note/-/preset-sheets-note-1.6.2.tgz}
+    resolution: {integrity: sha512-J+HYAw8veq81Ootnx56HbyfP+TtbMHNwZcMu8j6WP/3fWVtvOXcYsZLlUbnGrRYflMSj6kP44kuKnr102SvzgQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-sort@1.6.2':
-    resolution: {integrity: sha512-2J3O7JOJERVHqBRMlAjrGCyQ3RAfglHRFsxyTLH1pS25wXzhDue0BezPcfAXm7bjGYGDoAdIjYuOBd2vYSywtQ==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-sort/-/preset-sheets-sort-1.6.2.tgz}
+    resolution: {integrity: sha512-2J3O7JOJERVHqBRMlAjrGCyQ3RAfglHRFsxyTLH1pS25wXzhDue0BezPcfAXm7bjGYGDoAdIjYuOBd2vYSywtQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/preset-sheets-table@1.6.2':
-    resolution: {integrity: sha512-yiWkAtpfDJ4jBGa3DUgMs1SB0wc7Ym2aKMMeFJhYX75MrogW1pk34st1k/UJgTlY9RiNQjWbAqCWkk8+gnOIAQ==, tarball: https://registry.npmjs.org/@univerjs/preset-sheets-table/-/preset-sheets-table-1.6.2.tgz}
+    resolution: {integrity: sha512-yiWkAtpfDJ4jBGa3DUgMs1SB0wc7Ym2aKMMeFJhYX75MrogW1pk34st1k/UJgTlY9RiNQjWbAqCWkk8+gnOIAQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/presets@1.6.2':
-    resolution: {integrity: sha512-Gpk8qYY1XUHyp4QVeLwbpiksUoCwQw5+nztt3MafVrpbbeWWtfXZpxfetvgNR1B0y48GKdKjCstzQfFDuwOLmQ==, tarball: https://registry.npmjs.org/@univerjs/presets/-/presets-1.6.2.tgz}
+    resolution: {integrity: sha512-Gpk8qYY1XUHyp4QVeLwbpiksUoCwQw5+nztt3MafVrpbbeWWtfXZpxfetvgNR1B0y48GKdKjCstzQfFDuwOLmQ==}
 
   '@univerjs/protocol@1.6.2':
-    resolution: {integrity: sha512-7KEmPvaLKnowFxUf/f1rrdBnGmgKTkpcLQXj6kUrVEyU3o+/mFnJiqVV7tLSbO7b9vooj9JJnlOKn+m+cFhwCA==, tarball: https://registry.npmjs.org/@univerjs/protocol/-/protocol-1.6.2.tgz}
+    resolution: {integrity: sha512-7KEmPvaLKnowFxUf/f1rrdBnGmgKTkpcLQXj6kUrVEyU3o+/mFnJiqVV7tLSbO7b9vooj9JJnlOKn+m+cFhwCA==}
 
   '@univerjs/rpc@1.6.2':
-    resolution: {integrity: sha512-6Ex/7bfKmsXzab1TYi+ZUYPUrwrRPqUy6aCKO3mafb/pr+vXtzjBrbHxcyXzQbiVuykPi+ifY5HUAiIGSmEDpg==, tarball: https://registry.npmjs.org/@univerjs/rpc/-/rpc-1.6.2.tgz}
+    resolution: {integrity: sha512-6Ex/7bfKmsXzab1TYi+ZUYPUrwrRPqUy6aCKO3mafb/pr+vXtzjBrbHxcyXzQbiVuykPi+ifY5HUAiIGSmEDpg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-conditional-formatting-ui@1.6.2':
-    resolution: {integrity: sha512-MXJ3ewETBRZiBWKkg0Qn4JUdcuCiV5F1efl55bGpHJ+qMwI17s/Zt3MHv/ohFR3jvgKD1gBQKo3XWKKPdcX+pQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-conditional-formatting-ui/-/sheets-conditional-formatting-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-MXJ3ewETBRZiBWKkg0Qn4JUdcuCiV5F1efl55bGpHJ+qMwI17s/Zt3MHv/ohFR3jvgKD1gBQKo3XWKKPdcX+pQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-conditional-formatting@1.6.2':
-    resolution: {integrity: sha512-Kar+LpSDKiAowarj/I6yVsdIpE23NO85XJeHB7SLmYwOKHdVkRlccgXlNrk7SSxzoJ2wBp0fRma4UXtdRaRG3g==, tarball: https://registry.npmjs.org/@univerjs/sheets-conditional-formatting/-/sheets-conditional-formatting-1.6.2.tgz}
+    resolution: {integrity: sha512-Kar+LpSDKiAowarj/I6yVsdIpE23NO85XJeHB7SLmYwOKHdVkRlccgXlNrk7SSxzoJ2wBp0fRma4UXtdRaRG3g==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-data-validation-ui@1.6.2':
-    resolution: {integrity: sha512-1ZVrFekJ1KC4PEQFm4HrDoi2udHybi44xS28LrhHpsnw8DsRog4lJMQFrmxEzSc87fa9Ipu5P/VRPJJ2iaafMA==, tarball: https://registry.npmjs.org/@univerjs/sheets-data-validation-ui/-/sheets-data-validation-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-1ZVrFekJ1KC4PEQFm4HrDoi2udHybi44xS28LrhHpsnw8DsRog4lJMQFrmxEzSc87fa9Ipu5P/VRPJJ2iaafMA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-data-validation@1.6.2':
-    resolution: {integrity: sha512-t4tWCVxsFg5sueX3VttU5P3DwxVu7DEmaoVIqJyXeEiZ/e5RIp7PqDl5NroSsXLnVvL3FhW2f2IHq7bnvpI7Ow==, tarball: https://registry.npmjs.org/@univerjs/sheets-data-validation/-/sheets-data-validation-1.6.2.tgz}
+    resolution: {integrity: sha512-t4tWCVxsFg5sueX3VttU5P3DwxVu7DEmaoVIqJyXeEiZ/e5RIp7PqDl5NroSsXLnVvL3FhW2f2IHq7bnvpI7Ow==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-drawing-ui@1.6.2':
-    resolution: {integrity: sha512-iQwOUERUNQGCuM1dAsw6Mp/2hKmB+sPNUOUJZGXhGAEJas7EBlBmPqw54zLTXGkcLVVT2KsIHNLz/SGaWWKQvw==, tarball: https://registry.npmjs.org/@univerjs/sheets-drawing-ui/-/sheets-drawing-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-iQwOUERUNQGCuM1dAsw6Mp/2hKmB+sPNUOUJZGXhGAEJas7EBlBmPqw54zLTXGkcLVVT2KsIHNLz/SGaWWKQvw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-drawing@1.6.2':
-    resolution: {integrity: sha512-t/mqNxWgcEYDIXiFx+ZJUhuO+mhSdZ6rWLS5yO+YXkVexivtlRAkZn981s3rH9clobCisBLHBzlpxqh956B1lg==, tarball: https://registry.npmjs.org/@univerjs/sheets-drawing/-/sheets-drawing-1.6.2.tgz}
+    resolution: {integrity: sha512-t/mqNxWgcEYDIXiFx+ZJUhuO+mhSdZ6rWLS5yO+YXkVexivtlRAkZn981s3rH9clobCisBLHBzlpxqh956B1lg==}
 
   '@univerjs/sheets-filter-ui@1.6.2':
-    resolution: {integrity: sha512-6snmJ2r4/H3FJkIwPtXKB7W/SlWC99+X4naEcTXKCOr9G0hYKOLymfbNY7J75ikYWpWiGbAXUEiILcred0ZMRw==, tarball: https://registry.npmjs.org/@univerjs/sheets-filter-ui/-/sheets-filter-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-6snmJ2r4/H3FJkIwPtXKB7W/SlWC99+X4naEcTXKCOr9G0hYKOLymfbNY7J75ikYWpWiGbAXUEiILcred0ZMRw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-filter@1.6.2':
-    resolution: {integrity: sha512-G0OiYgpZQpbEQiPqEdR9DhNAlB00gsdvLTQDQAR708Np4UaBEN7RyTC/REZSql+obPWPSVauuqyibuDS5VlNJQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-filter/-/sheets-filter-1.6.2.tgz}
+    resolution: {integrity: sha512-G0OiYgpZQpbEQiPqEdR9DhNAlB00gsdvLTQDQAR708Np4UaBEN7RyTC/REZSql+obPWPSVauuqyibuDS5VlNJQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-find-replace@1.6.2':
-    resolution: {integrity: sha512-/rW7fPEb4DO9fM2S1h310vQ99ddPblQzWdK8qEVDT5i9A8UllMuew4ED8xGq7gWTCdODZ78rTWwiiscj85MK0Q==, tarball: https://registry.npmjs.org/@univerjs/sheets-find-replace/-/sheets-find-replace-1.6.2.tgz}
+    resolution: {integrity: sha512-/rW7fPEb4DO9fM2S1h310vQ99ddPblQzWdK8qEVDT5i9A8UllMuew4ED8xGq7gWTCdODZ78rTWwiiscj85MK0Q==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-formula-ui@1.6.2':
-    resolution: {integrity: sha512-/B0vt+dRMeZ9wJYFFIlQE/0rkT5AvB87ZZJSvLsEsOx6ZpIoG8vinUpNUBCworSQztr/3Nr4d0aT+2Cbi8zNjg==, tarball: https://registry.npmjs.org/@univerjs/sheets-formula-ui/-/sheets-formula-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-/B0vt+dRMeZ9wJYFFIlQE/0rkT5AvB87ZZJSvLsEsOx6ZpIoG8vinUpNUBCworSQztr/3Nr4d0aT+2Cbi8zNjg==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-formula@1.6.2':
-    resolution: {integrity: sha512-74lCo96Kdxqj+WPudjiMWZYnjWiMJat4yA28Y9CZPMDCcwHgdBaCPSmzlLwm5072nV8vUYgMradvQcIfQ7La+A==, tarball: https://registry.npmjs.org/@univerjs/sheets-formula/-/sheets-formula-1.6.2.tgz}
+    resolution: {integrity: sha512-74lCo96Kdxqj+WPudjiMWZYnjWiMJat4yA28Y9CZPMDCcwHgdBaCPSmzlLwm5072nV8vUYgMradvQcIfQ7La+A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-hyper-link-ui@1.6.2':
-    resolution: {integrity: sha512-bi0hA6SD2zh4V0WptMuGn/5ziDCJuIixdOn/QuOEQXWVH3QxboDfg7jqbD4FJrdg+QrXpTvd/9lT8njRJHCfCw==, tarball: https://registry.npmjs.org/@univerjs/sheets-hyper-link-ui/-/sheets-hyper-link-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-bi0hA6SD2zh4V0WptMuGn/5ziDCJuIixdOn/QuOEQXWVH3QxboDfg7jqbD4FJrdg+QrXpTvd/9lT8njRJHCfCw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-hyper-link@1.6.2':
-    resolution: {integrity: sha512-81b56UNuee7pxVzYDtSAxQlo8aPkh/9GtuIpoRlF1v6z90b8P7kYCGF+vd1iMQRy50tQnSWpE2uurvRqhZ+AQg==, tarball: https://registry.npmjs.org/@univerjs/sheets-hyper-link/-/sheets-hyper-link-1.6.2.tgz}
+    resolution: {integrity: sha512-81b56UNuee7pxVzYDtSAxQlo8aPkh/9GtuIpoRlF1v6z90b8P7kYCGF+vd1iMQRy50tQnSWpE2uurvRqhZ+AQg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-note-ui@1.6.2':
-    resolution: {integrity: sha512-5ERpknMaKzQg6kL7KTJmtclw1w0D6wDEV2eamCXyiUtnaysBtaISI/fop2vIy0zSfYZtGnwQTNPdOdBydd8xhw==, tarball: https://registry.npmjs.org/@univerjs/sheets-note-ui/-/sheets-note-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-5ERpknMaKzQg6kL7KTJmtclw1w0D6wDEV2eamCXyiUtnaysBtaISI/fop2vIy0zSfYZtGnwQTNPdOdBydd8xhw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-note@1.6.2':
-    resolution: {integrity: sha512-L52N57aaWAQ520IPRWoCdMWcVFhJw01En9osAWj1ZP8fs/Ct6wFvHmG8KG8dKAM3l58O6PcWQ2Y0P5WZSskR9Q==, tarball: https://registry.npmjs.org/@univerjs/sheets-note/-/sheets-note-1.6.2.tgz}
+    resolution: {integrity: sha512-L52N57aaWAQ520IPRWoCdMWcVFhJw01En9osAWj1ZP8fs/Ct6wFvHmG8KG8dKAM3l58O6PcWQ2Y0P5WZSskR9Q==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-numfmt-ui@1.6.2':
-    resolution: {integrity: sha512-C4s4vzvLU6/V/vhnk92L5RFHKuKgny2pA0jWR9ZS6QIZtY7eIWm6hAv2pnawVsNQuqOikqqHWh+ldAcTN7pHkQ==, tarball: https://registry.npmjs.org/@univerjs/sheets-numfmt-ui/-/sheets-numfmt-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-C4s4vzvLU6/V/vhnk92L5RFHKuKgny2pA0jWR9ZS6QIZtY7eIWm6hAv2pnawVsNQuqOikqqHWh+ldAcTN7pHkQ==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-numfmt@1.6.2':
-    resolution: {integrity: sha512-JvTh7PWUv2T7c6f474K0329P6P5zopklpzCBwNxSOIvZHy0Kt0Bu2FBELPlzALMrbaRL3kdK+38minN3RoYZmA==, tarball: https://registry.npmjs.org/@univerjs/sheets-numfmt/-/sheets-numfmt-1.6.2.tgz}
+    resolution: {integrity: sha512-JvTh7PWUv2T7c6f474K0329P6P5zopklpzCBwNxSOIvZHy0Kt0Bu2FBELPlzALMrbaRL3kdK+38minN3RoYZmA==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-sort-ui@1.6.2':
-    resolution: {integrity: sha512-OhcJyT/ljxRgdjTqGPsfd/NNn4jummhplnUigBseBLQCF5X5fGid12EvUfo/ANgmeGKcbGUQSZXH312sWKS0Fw==, tarball: https://registry.npmjs.org/@univerjs/sheets-sort-ui/-/sheets-sort-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-OhcJyT/ljxRgdjTqGPsfd/NNn4jummhplnUigBseBLQCF5X5fGid12EvUfo/ANgmeGKcbGUQSZXH312sWKS0Fw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-sort@1.6.2':
-    resolution: {integrity: sha512-VxSHzmMShTbRQCsf/NQvrugaSbdUAGKXhOA1yWdEZZ9eFmFXmlkw1hi78qZuDuhWHTkZbcgdZAYDMUHC1+x4dw==, tarball: https://registry.npmjs.org/@univerjs/sheets-sort/-/sheets-sort-1.6.2.tgz}
+    resolution: {integrity: sha512-VxSHzmMShTbRQCsf/NQvrugaSbdUAGKXhOA1yWdEZZ9eFmFXmlkw1hi78qZuDuhWHTkZbcgdZAYDMUHC1+x4dw==}
 
   '@univerjs/sheets-table-ui@1.6.2':
-    resolution: {integrity: sha512-12b3IL5DfjYIk0p0GJT3KdZA59wg7QTfjKYrNSExLG9kuQlWsqDg4Jq/eDXX5NfAO95bhlUlSv8N0V1+bganTw==, tarball: https://registry.npmjs.org/@univerjs/sheets-table-ui/-/sheets-table-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-12b3IL5DfjYIk0p0GJT3KdZA59wg7QTfjKYrNSExLG9kuQlWsqDg4Jq/eDXX5NfAO95bhlUlSv8N0V1+bganTw==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-table@1.6.2':
-    resolution: {integrity: sha512-1+XlLZh+Bq4iKf6wZ/vwrDEyrlnixPf31uoquHpGdAb7hn1dwU/a9U6Z88vH1LEo9vUp7Q1rYQB6fMmzt19J/A==, tarball: https://registry.npmjs.org/@univerjs/sheets-table/-/sheets-table-1.6.2.tgz}
+    resolution: {integrity: sha512-1+XlLZh+Bq4iKf6wZ/vwrDEyrlnixPf31uoquHpGdAb7hn1dwU/a9U6Z88vH1LEo9vUp7Q1rYQB6fMmzt19J/A==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-9M0qXZkLR6r4zvvnzbzLlJcqhx4wRWjYUz/Mv++cpBrI9AY4bSHP7sX01OCN8Nc2SY3V4SAZYkdJ3j0HYmWyAA==, tarball: https://registry.npmjs.org/@univerjs/sheets-thread-comment-ui/-/sheets-thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-9M0qXZkLR6r4zvvnzbzLlJcqhx4wRWjYUz/Mv++cpBrI9AY4bSHP7sX01OCN8Nc2SY3V4SAZYkdJ3j0HYmWyAA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-thread-comment@1.6.2':
-    resolution: {integrity: sha512-j4+pqzKXX/wDussKPwh/6PgMceyCDoTiCROEu+CmsiaiLiDdzqUDTrUYl+r4DXvOc/EHx23qWXiyjI34hCSfZw==, tarball: https://registry.npmjs.org/@univerjs/sheets-thread-comment/-/sheets-thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-j4+pqzKXX/wDussKPwh/6PgMceyCDoTiCROEu+CmsiaiLiDdzqUDTrUYl+r4DXvOc/EHx23qWXiyjI34hCSfZw==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets-ui@1.6.2':
-    resolution: {integrity: sha512-5IMruGDOgfY90edSKCvhrjH+dIsJiuqokKg06xQkpjlmj1vpmsTJpwWPr8whrTm27Qr31MZLGkhg0nAsPjkb3g==, tarball: https://registry.npmjs.org/@univerjs/sheets-ui/-/sheets-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-5IMruGDOgfY90edSKCvhrjH+dIsJiuqokKg06xQkpjlmj1vpmsTJpwWPr8whrTm27Qr31MZLGkhg0nAsPjkb3g==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/sheets@1.6.2':
-    resolution: {integrity: sha512-C10qUv1cUJTEJMgC/IA9do+zGq5FC6PaSgCY2DMnXCq+VTNyLkJozxxfCc8y4id9Xq36mynpQUChDQiqFOezZQ==, tarball: https://registry.npmjs.org/@univerjs/sheets/-/sheets-1.6.2.tgz}
+    resolution: {integrity: sha512-C10qUv1cUJTEJMgC/IA9do+zGq5FC6PaSgCY2DMnXCq+VTNyLkJozxxfCc8y4id9Xq36mynpQUChDQiqFOezZQ==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/telemetry@1.6.2':
-    resolution: {integrity: sha512-eCDmzdwFteUnBygX18hEKk/Y7yVuD0zjAs19z/3zwuQ3YjvuwNDsSu8YdLSvqC8o6Ki6tuHz+6DtzqB5Kjay5Q==, tarball: https://registry.npmjs.org/@univerjs/telemetry/-/telemetry-1.6.2.tgz}
+    resolution: {integrity: sha512-eCDmzdwFteUnBygX18hEKk/Y7yVuD0zjAs19z/3zwuQ3YjvuwNDsSu8YdLSvqC8o6Ki6tuHz+6DtzqB5Kjay5Q==}
 
   '@univerjs/themes@1.6.2':
-    resolution: {integrity: sha512-IIyiMmqSwtpqoTcSFNAdunjAq/ipyAEtnJOzflIuZPipXovDk+t2CJHdhF3pI2AjZtpdof0NyS1I+RThNV5Qig==, tarball: https://registry.npmjs.org/@univerjs/themes/-/themes-1.6.2.tgz}
+    resolution: {integrity: sha512-IIyiMmqSwtpqoTcSFNAdunjAq/ipyAEtnJOzflIuZPipXovDk+t2CJHdhF3pI2AjZtpdof0NyS1I+RThNV5Qig==}
 
   '@univerjs/thread-comment-ui@1.6.2':
-    resolution: {integrity: sha512-ydWKqrOtrSgwVLE2RT4J4vGiab2PoM0Lw8aa/YoIdaNqbDEl25PzMe9+XmaXbIjSmxBvIVuReDmhaTHmcnw7zA==, tarball: https://registry.npmjs.org/@univerjs/thread-comment-ui/-/thread-comment-ui-1.6.2.tgz}
+    resolution: {integrity: sha512-ydWKqrOtrSgwVLE2RT4J4vGiab2PoM0Lw8aa/YoIdaNqbDEl25PzMe9+XmaXbIjSmxBvIVuReDmhaTHmcnw7zA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
 
   '@univerjs/thread-comment@1.6.2':
-    resolution: {integrity: sha512-T+P5q6tkCnKlc40sVNkClrTb9GNo+FEIWmBxmRe5/GBJ2/11yZVZ99gxgZ2h8wyv2U9dyWLQRyaY5+VG4RO8hg==, tarball: https://registry.npmjs.org/@univerjs/thread-comment/-/thread-comment-1.6.2.tgz}
+    resolution: {integrity: sha512-T+P5q6tkCnKlc40sVNkClrTb9GNo+FEIWmBxmRe5/GBJ2/11yZVZ99gxgZ2h8wyv2U9dyWLQRyaY5+VG4RO8hg==}
     peerDependencies:
       rxjs: '>=7.0.0'
 
   '@univerjs/ui@1.6.2':
-    resolution: {integrity: sha512-YfUe55BWmNtzKDD10m0hK4tNsvC3huXEqwUa+m1e5LGkw2exSmDLWtE7CYoYGQkO3JxcScha6JnGiGR7ctFkzA==, tarball: https://registry.npmjs.org/@univerjs/ui/-/ui-1.6.2.tgz}
+    resolution: {integrity: sha512-YfUe55BWmNtzKDD10m0hK4tNsvC3huXEqwUa+m1e5LGkw2exSmDLWtE7CYoYGQkO3JxcScha6JnGiGR7ctFkzA==}
     peerDependencies:
       react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^19.0.0-rc
       rxjs: '>=7.0.0'
+
+  '@vitest/expect@4.1.12':
+    resolution: {integrity: sha512-vFlTt+YEu9WBpNjdGayNmlMVzrWPi1+sv853/7t2FU7hpO5gAFBKHzQmkCq5Xjpr+evegF2994LQT3hF3mRlqQ==}
+
+  '@vitest/mocker@4.1.12':
+    resolution: {integrity: sha512-fKShNpKZzupWZuY0z7egydvL0sqW4INEZBEExMBMAa6izlENEVHwoXgdaTCaBZ5fwlr4xf2o1wXC83n9RpO+NA==}
+    peerDependencies:
+      msw: ^2.4.9
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      msw:
+        optional: true
+      vite:
+        optional: true
+
+  '@vitest/pretty-format@4.1.12':
+    resolution: {integrity: sha512-XW9O8+Mxx4VpCtkYdMJLZQQwsVryP9wk7cPKDxtXFfwSak6yRh5+2fep/Y0XF/ElBvJHq8bcYdi6aeuai0opZA==}
+
+  '@vitest/runner@4.1.12':
+    resolution: {integrity: sha512-NKlVKCr5QnCe8jijdMnmkpHHU+WTqiLFR6G0pHji9uRjXK9xJl1k1nTw6F3pOOj2PDcsDt2GKQMI7wIsaT491w==}
+
+  '@vitest/snapshot@4.1.12':
+    resolution: {integrity: sha512-ko1y1Qgb/slzQ9mr+b89Cuqud8WG1TKtsPD8r7ZUBdvVOGt85Af2HwCqHujrhwJq95hs/9RM7fcAPg57o1vlzw==}
+
+  '@vitest/spy@4.1.12':
+    resolution: {integrity: sha512-RGq9x4JNGNTZHEJxvN0oSiJjeSCExm0n2gZKKJZHY9cX5AVA6M7VJILBT3ZJ/tJ/0J9uWT7fETV9/btoi//vSg==}
+
+  '@vitest/utils@4.1.12':
+    resolution: {integrity: sha512-Q3awXrwOfEV+qc3WmO5ONyE0yO7Q1gQ9/oyHxGLZ/pl7N3NO/ZztqQwKLuwMkV+CA1JYSIeO3gkHnRDIo4AVaA==}
 
   '@wendellhu/redi@1.1.3':
     resolution: {integrity: sha512-XjSi+q350RzOE0WCHB1tspodtdmtzdpMlscOQvlDY27IFft5Pm/nbzsBnTX5Wg5vjtLM/T3ehlJ98wXhqN9xfg==}
@@ -3120,9 +3330,16 @@ packages:
     resolution: {integrity: sha512-ik3ZgC9dY/lYVVM++OISsaYDeg1tb0VtP5uL3ouh1koGOaUMDPpbFIei4JkFimWUFPn90sbMNMXQAIVOlnYKJA==}
     engines: {node: '>=10'}
 
+  assertion-error@2.0.1:
+    resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
+    engines: {node: '>=12'}
+
   body-parser@2.3.0:
     resolution: {integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==}
     engines: {node: '>=18'}
+
+  bowser@2.15.1:
+    resolution: {integrity: sha512-ma47ABeUiTsmG4McKDtGCgQSiTCatM97Mlbn13K42N1kPSFE14oN3WFMjtyL4KubhGvQTqYheKl4Qx2bJtMXLQ==}
 
   bytes@3.1.2:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
@@ -3135,6 +3352,10 @@ packages:
   call-bound@1.0.4:
     resolution: {integrity: sha512-+ys997U96po4Kx/ABpBCqhA9EuxJaQWDQg7295H4hBphv3IZg0boBKuwYpt4YXp6MZ5AmZQnU/tyMTlRpaSejg==}
     engines: {node: '>= 0.4'}
+
+  chai@6.3.0:
+    resolution: {integrity: sha512-XWAtwJ6OHO+tj0EKCs0Y2UamnyOxseZWltU4x2U2wh8g4AigdjwvtUjvLP2tqkA/avxHEtzxNaqGq/YGNwckKg==}
+    engines: {node: '>=18'}
 
   class-variance-authority@0.7.1:
     resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
@@ -3178,6 +3399,9 @@ packages:
   content-type@2.1.0:
     resolution: {integrity: sha512-mj7UPXE0jaqaOsukNZRUEfEi2AcL7C/vwmwcHV0O97eO1E1pxBZuyjlZrx5seTaNBg1U6+o35wpa35Qfcc+7ag==}
     engines: {node: '>=18'}
+
+  convert-source-map@2.0.0:
+    resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
   cookie-signature@1.2.2:
     resolution: {integrity: sha512-D76uU73ulSXrD1UXF4KE2TMxVVwhsnCgfAyTg9k8P6KGZjlXKrOLe4dJQKI3Bxi5wjesZoFXJWElNWBjPZMbhg==}
@@ -3239,6 +3463,9 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
+  es-module-lexer@2.3.2:
+    resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
+
   es-object-atoms@1.1.2:
     resolution: {integrity: sha512-HWcBoN6NileqtSydK2FqHbS/LoDd2pqrnQHLyJzBj4kOp/ky2MWMN694xOfkK8/SnUsW2DH7EfyVlydKCsm1Zw==}
     engines: {node: '>= 0.4'}
@@ -3255,9 +3482,16 @@ packages:
   escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
 
+  estree-walker@3.0.3:
+    resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
+
   etag@1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+
+  expect-type@1.4.0:
+    resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
+    engines: {node: '>=12.0.0'}
 
   express@5.2.1:
     resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
@@ -3439,6 +3673,9 @@ packages:
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
 
+  magic-string@0.30.21:
+    resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -3478,6 +3715,10 @@ packages:
     resolution: {integrity: sha512-W67iLl4J2EXEGTbfeHCffrjDfitvLANg0UlX3wFUUSTx92KXRFegMHUVgSqE+wvhAbi4WqjGg9czysTV2Epbew==}
     engines: {node: '>= 0.4'}
 
+  obug@2.2.1:
+    resolution: {integrity: sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q==}
+    engines: {node: '>=12.20.0'}
+
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
     engines: {node: '>= 0.8'}
@@ -3501,6 +3742,9 @@ packages:
 
   path-to-regexp@8.4.2:
     resolution: {integrity: sha512-qRcuIdP69NPm4qbACK+aDogI5CBDMi1jKe0ry5rSQJz8JVLsC7jV8XpiJjGRLLol3N+R5ihGYcrPLTno6pAdBA==}
+
+  pathe@2.0.3:
+    resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
   pg-cloudflare@1.4.0:
     resolution: {integrity: sha512-Vo7z/6rrQYxpNRylp4Tlob2elzbh+N/MOQbxFVWCxS7oEx6jF53GTJFxK2WWpKuBRkmiin4Mt+xofFDjx09R0A==}
@@ -3684,6 +3928,9 @@ packages:
     resolution: {integrity: sha512-6x6dK6zJdpTzF4sQeNYxwtvBzf6Eg4GtlesS94HOvTudUeyK2WXAaIfmDgsyslYrRBeFIlsi54AYsFGUuhmvrQ==}
     engines: {node: '>= 0.4'}
 
+  siginfo@2.0.0:
+    resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
+
   sonner@2.0.8:
     resolution: {integrity: sha512-UM/ByIoFra8yzV75n1o0Puu0bw5U/9UNnDacrJNspekBewIfsQ3D6ez1nvlWpt7aTsO6rujQtifBpycwIivqlg==}
     peerDependencies:
@@ -3702,9 +3949,15 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
+  stackback@0.0.2:
+    resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
+
   statuses@2.0.2:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
+
+  std-env@4.3.0:
+    resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
 
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
@@ -3714,9 +3967,20 @@ packages:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
 
+  tinybench@2.9.0:
+    resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
+
+  tinyexec@1.4.0:
+    resolution: {integrity: sha512-PV6lIcJQh57aFeJDwx16JNHmgFRh5xguzallrDW1qe8nAghYgr5MKz2K5k7wEyV/ygZhdnIAP8+HZSarHPBCsg==}
+    engines: {node: '>=18'}
+
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
+
+  tinyrainbow@3.2.0:
+    resolution: {integrity: sha512-LgO3D9yZJjApUiuUfl9iFAwrtaX4+lok3wJIqttGoKCHlWUqHqbQpnxCf82L8FjgKsh4iGo78hqJwgL8F6To2A==}
+    engines: {node: '>=14.0.0'}
 
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
@@ -3826,6 +4090,52 @@ packages:
       yaml:
         optional: true
 
+  vitest@4.1.12:
+    resolution: {integrity: sha512-5eWdz2yb3ajxWF3C8C4TjkXl7FGm3n2E/VlazALrQHzK7nYMSGFnCZto0bbPNl77AwkOZVLk0YnBAejUu0NiWA==}
+    engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
+    hasBin: true
+    peerDependencies:
+      '@edge-runtime/vm': '*'
+      '@opentelemetry/api': ^1.9.0
+      '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
+      '@vitest/browser-playwright': 4.1.12
+      '@vitest/browser-preview': 4.1.12
+      '@vitest/browser-webdriverio': ^4.1.11
+      '@vitest/coverage-istanbul': 4.1.12
+      '@vitest/coverage-v8': 4.1.12
+      '@vitest/ui': 4.1.12
+      happy-dom: '*'
+      jsdom: '*'
+      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+    peerDependenciesMeta:
+      '@edge-runtime/vm':
+        optional: true
+      '@opentelemetry/api':
+        optional: true
+      '@types/node':
+        optional: true
+      '@vitest/browser-playwright':
+        optional: true
+      '@vitest/browser-preview':
+        optional: true
+      '@vitest/browser-webdriverio':
+        optional: true
+      '@vitest/coverage-istanbul':
+        optional: true
+      '@vitest/coverage-v8':
+        optional: true
+      '@vitest/ui':
+        optional: true
+      happy-dom:
+        optional: true
+      jsdom:
+        optional: true
+
+  why-is-node-running@2.3.0:
+    resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
+    engines: {node: '>=8'}
+    hasBin: true
+
   wrap-ansi@7.0.0:
     resolution: {integrity: sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==}
     engines: {node: '>=10'}
@@ -3862,6 +4172,171 @@ packages:
     engines: {node: '>=12'}
 
 snapshots:
+
+  '@aws-sdk/checksums@3.1002.7':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/client-s3@3.1178.0':
+    dependencies:
+      '@aws-sdk/checksums': 3.1002.7
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/credential-provider-node': 3.972.99
+      '@aws-sdk/middleware-sdk-s3': 3.972.92
+      '@aws-sdk/signature-v4-multi-region': 3.996.52
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/fetch-http-handler': 5.8.1
+      '@smithy/node-http-handler': 4.14.2
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/core@3.981.2':
+    dependencies:
+      '@aws-sdk/types': 3.975.1
+      '@aws-sdk/xml-builder': 3.972.43
+      '@aws/lambda-invoke-store': 0.3.0
+      '@smithy/core': 3.41.1
+      '@smithy/signature-v4': 5.7.5
+      '@smithy/types': 4.20.0
+      bowser: 2.15.1
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-env@3.972.86':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-http@3.972.88':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/fetch-http-handler': 5.8.1
+      '@smithy/node-http-handler': 4.14.2
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-ini@3.973.32':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/credential-provider-env': 3.972.86
+      '@aws-sdk/credential-provider-http': 3.972.88
+      '@aws-sdk/credential-provider-login': 3.972.94
+      '@aws-sdk/credential-provider-process': 3.972.86
+      '@aws-sdk/credential-provider-sso': 3.973.30
+      '@aws-sdk/credential-provider-web-identity': 3.972.92
+      '@aws-sdk/nested-clients': 3.998.5
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/credential-provider-imds': 4.5.2
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-login@3.972.94':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/nested-clients': 3.998.5
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-node@3.972.99':
+    dependencies:
+      '@aws-sdk/credential-provider-env': 3.972.86
+      '@aws-sdk/credential-provider-http': 3.972.88
+      '@aws-sdk/credential-provider-ini': 3.973.32
+      '@aws-sdk/credential-provider-process': 3.972.86
+      '@aws-sdk/credential-provider-sso': 3.973.30
+      '@aws-sdk/credential-provider-web-identity': 3.972.92
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/credential-provider-imds': 4.5.2
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-process@3.972.86':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-sso@3.973.30':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/nested-clients': 3.998.5
+      '@aws-sdk/token-providers': 3.1177.0
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/credential-provider-web-identity@3.972.92':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/nested-clients': 3.998.5
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/middleware-sdk-s3@3.972.92':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/signature-v4-multi-region': 3.996.52
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/nested-clients@3.998.5':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/signature-v4-multi-region': 3.996.52
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/fetch-http-handler': 5.8.1
+      '@smithy/node-http-handler': 4.14.2
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/signature-v4-multi-region@3.996.52':
+    dependencies:
+      '@aws-sdk/types': 3.975.1
+      '@smithy/signature-v4': 5.7.5
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/token-providers@3.1177.0':
+    dependencies:
+      '@aws-sdk/core': 3.981.2
+      '@aws-sdk/nested-clients': 3.998.5
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/types@3.975.1':
+    dependencies:
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws-sdk/xml-builder@3.972.43':
+    dependencies:
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@aws/lambda-invoke-store@0.3.0': {}
 
   '@esbuild/aix-ppc64@0.28.2':
     optional: true
@@ -3973,6 +4448,8 @@ snapshots:
       long: 5.3.2
       protobufjs: 7.6.5
       yargs: 17.7.3
+
+  '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
@@ -4417,14 +4894,58 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
+  '@smithy/core@3.41.1':
+    dependencies:
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@smithy/credential-provider-imds@4.5.2':
+    dependencies:
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@smithy/fetch-http-handler@5.8.1':
+    dependencies:
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@smithy/node-http-handler@4.14.2':
+    dependencies:
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@smithy/signature-v4@5.7.5':
+    dependencies:
+      '@smithy/core': 3.41.1
+      '@smithy/types': 4.20.0
+      tslib: 2.8.1
+
+  '@smithy/types@4.20.0':
+    dependencies:
+      tslib: 2.8.1
+
+  '@standard-schema/spec@1.1.0': {}
+
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
       '@types/node': 24.13.3
 
+  '@types/chai@5.2.3':
+    dependencies:
+      '@types/deep-eql': 4.0.2
+      assertion-error: 2.0.1
+
   '@types/connect@3.4.38':
     dependencies:
       '@types/node': 24.13.3
+
+  '@types/deep-eql@4.0.2': {}
+
+  '@types/estree@1.0.11': {}
 
   '@types/express-serve-static-core@5.1.3':
     dependencies:
@@ -4940,7 +5461,7 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@univerjs-pro/collaboration-cluster-redis@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)':
+  '@univerjs-pro/collaboration-cluster-redis@1.6.2(react@19.3.0)':
     dependencies:
       '@univerjs-pro/collaboration-endpoint': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -4950,7 +5471,13 @@ snapshots:
       - react
       - utf-8-validate
 
-  '@univerjs-pro/collaboration-comment-database-sqlite@1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)':
+  '@univerjs-pro/collaboration-comment-database-postgres@1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2)(@univerjs/protocol@1.6.2)(pg@8.23.0)':
+    dependencies:
+      '@univerjs-pro/collaboration-comment-service': 1.6.2
+      '@univerjs/protocol': 1.6.2
+      pg: 8.23.0
+
+  '@univerjs-pro/collaboration-comment-database-sqlite@1.6.2(@univerjs-pro/collaboration-comment-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)':
     dependencies:
       '@univerjs-pro/collaboration-comment-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs/protocol': 1.6.2
@@ -4969,6 +5496,14 @@ snapshots:
       - react
       - utf-8-validate
 
+  '@univerjs-pro/collaboration-comment-service@1.6.2':
+    dependencies:
+      '@univerjs-pro/collaboration-service': 1.6.2
+      '@univerjs/protocol': 1.6.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
+
   '@univerjs-pro/collaboration-comment-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)':
     dependencies:
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -4977,19 +5512,27 @@ snapshots:
       - '@univerjs-pro/resources'
       - react
 
-  '@univerjs-pro/collaboration-database-memory@1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)':
+  '@univerjs-pro/collaboration-database-memory@1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)':
     dependencies:
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs/protocol': 1.6.2
 
-  '@univerjs-pro/collaboration-database-postgres@1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)(pg@8.23.0)':
+  '@univerjs-pro/collaboration-database-postgres-s3@1.6.2(@aws-sdk/client-s3@3.1178.0)(@univerjs-pro/collaboration-service@1.6.2)(@univerjs/protocol@1.6.2)(pg@8.23.0)':
+    dependencies:
+      '@aws-sdk/client-s3': 3.1178.0
+      '@msgpack/msgpack': 3.1.3
+      '@univerjs-pro/collaboration-service': 1.6.2
+      '@univerjs/protocol': 1.6.2
+      pg: 8.23.0
+
+  '@univerjs-pro/collaboration-database-postgres@1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)(pg@8.23.0)':
     dependencies:
       '@msgpack/msgpack': 3.1.3
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs/protocol': 1.6.2
       pg: 8.23.0
 
-  '@univerjs-pro/collaboration-database-sqlite@1.6.2(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs/protocol@1.6.2)':
+  '@univerjs-pro/collaboration-database-sqlite@1.6.2(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs/protocol@1.6.2)':
     dependencies:
       '@msgpack/msgpack': 3.1.3
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -5007,15 +5550,15 @@ snapshots:
       - react
       - utf-8-validate
 
-  '@univerjs-pro/collaboration-exchange-endpoint@1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)':
+  '@univerjs-pro/collaboration-exchange-endpoint@1.6.2(@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/collaboration-transport-node@1.6.2)(@univerjs/protocol@1.6.2)':
     dependencies:
-      '@univerjs-pro/collaboration-exchange-service': 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
+      '@univerjs-pro/collaboration-exchange-service': 1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-file-service': 1.6.2(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-transport-node': 1.6.2
       '@univerjs/protocol': 1.6.2
 
-  '@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)':
+  '@univerjs-pro/collaboration-exchange-service@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(@univerjs-pro/collaboration-service@1.6.2(react@19.3.0))(@univerjs-pro/exchange-node@1.6.2(@univerjs-pro/exchange-pdf-node-binding@1.2.0)(react@19.3.0)(rxjs@7.8.2))(@univerjs/protocol@1.6.2)':
     dependencies:
       '@univerjs-pro/collaboration-file-service': 1.6.2(@univerjs/protocol@1.6.2)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -5025,6 +5568,11 @@ snapshots:
   '@univerjs-pro/collaboration-file-blob-local@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))':
     dependencies:
       '@univerjs-pro/collaboration-file-service': 1.6.2(@univerjs/protocol@1.6.2)
+
+  '@univerjs-pro/collaboration-file-database-postgres@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))(pg@8.23.0)':
+    dependencies:
+      '@univerjs-pro/collaboration-file-service': 1.6.2(@univerjs/protocol@1.6.2)
+      pg: 8.23.0
 
   '@univerjs-pro/collaboration-file-database-sqlite@1.6.2(@univerjs-pro/collaboration-file-service@1.6.2(@univerjs/protocol@1.6.2))':
     dependencies:
@@ -5043,7 +5591,7 @@ snapshots:
     dependencies:
       '@univerjs/protocol': 1.6.2
 
-  '@univerjs-pro/collaboration-history-database-sqlite@1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2))':
+  '@univerjs-pro/collaboration-history-database-sqlite@1.6.2(@univerjs-pro/collaboration-history-service@1.6.2(react@19.3.0)(rxjs@7.8.2))':
     dependencies:
       '@univerjs-pro/collaboration-history-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
       libsql: 0.5.29
@@ -5070,6 +5618,65 @@ snapshots:
       - '@univerjs-pro/resources'
       - react
       - rxjs
+
+  '@univerjs-pro/collaboration-service@1.6.2':
+    dependencies:
+      '@univerjs-pro/bases': 1.6.2(react@19.3.0)
+      '@univerjs-pro/bases-dashboard': 1.6.2(react@19.3.0)
+      '@univerjs-pro/bases-thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-mind': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/docs-callout': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-code': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-latex': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-shape': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/docs-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/embed': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-formula-rust': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.6.2(react@19.3.0)
+      '@univerjs-pro/sheets-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-outline': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot-chart': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-shape': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-slicer': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-sparkline': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-table': 1.6.2(react@19.3.0)
+      '@univerjs-pro/slides-thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/thread-comment-resource': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/data-validation': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-hyper-link': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs-thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/protocol': 1.6.2
+      '@univerjs/sheets': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-conditional-formatting': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-filter': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-hyper-link': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-note': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-sort': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
 
   '@univerjs-pro/collaboration-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)':
     dependencies:
@@ -5137,13 +5744,13 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@univerjs-pro/collaboration-worktree-client@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)':
+  '@univerjs-pro/collaboration-worktree-client@1.6.2(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@oxc-project/runtime': 0.139.0
       '@univerjs-pro/collaboration': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-client': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
-      '@univerjs-pro/collaboration-worktree-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-worktree-service': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/network': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/protocol': 1.6.2
@@ -5152,10 +5759,10 @@ snapshots:
       - react
       - rxjs
 
-  '@univerjs-pro/collaboration-worktree-database-sqlite@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)':
+  '@univerjs-pro/collaboration-worktree-database-sqlite@1.6.2(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
-      '@univerjs-pro/collaboration-worktree-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-worktree-service': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/protocol': 1.6.2
       libsql: 0.5.29
     transitivePeerDependencies:
@@ -5163,12 +5770,12 @@ snapshots:
       - react
       - rxjs
 
-  '@univerjs-pro/collaboration-worktree-endpoint@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)':
+  '@univerjs-pro/collaboration-worktree-endpoint@1.6.2(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/collaboration-endpoint': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
       '@univerjs-pro/collaboration-transport-node': 1.6.2
-      '@univerjs-pro/collaboration-worktree-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/collaboration-worktree-service': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/protocol': 1.6.2
     transitivePeerDependencies:
       - '@univerjs-pro/resources'
@@ -5177,7 +5784,7 @@ snapshots:
       - rxjs
       - utf-8-validate
 
-  '@univerjs-pro/collaboration-worktree-service@1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)':
+  '@univerjs-pro/collaboration-worktree-service@1.6.2(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/collaboration': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/collaboration-service': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
@@ -5204,6 +5811,45 @@ snapshots:
       '@univerjs-pro/sheets-pivot-chart': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/sheets-shape': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/sheets-slicer': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slides-table': 1.6.2(react@19.3.0)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/data-validation': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/docs': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/protocol': 1.6.2
+      '@univerjs/sheets': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-conditional-formatting': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-filter': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-hyper-link': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-note': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/thread-comment': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+      uuid: 14.0.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
+
+  '@univerjs-pro/collaboration@1.6.2(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/bases': 1.6.2(react@19.3.0)
+      '@univerjs-pro/boards': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-mind': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/boards-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pdfs': 1.6.2(react@19.3.0)
+      '@univerjs-pro/sheets-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-outline': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot-chart': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-shape': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-slicer': 1.6.2(rxjs@7.8.2)
       '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/slides': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/slides-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -5948,6 +6594,14 @@ snapshots:
     transitivePeerDependencies:
       - react
 
+  '@univerjs-pro/pivot-cache@1.6.2(@univerjs-pro/engine-pivot@1.6.2(rxjs@7.8.2))':
+    dependencies:
+      '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - react
+
   '@univerjs-pro/pivot-chart@1.6.2(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/engine-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -6200,6 +6854,25 @@ snapshots:
       - '@univerjs-pro/resources'
       - react
 
+  '@univerjs-pro/sheets-pivot-chart@1.6.2(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/engine-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pivot-cache': 1.6.2(@univerjs-pro/engine-pivot@1.6.2(rxjs@7.8.2))
+      '@univerjs-pro/pivot-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-chart': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot': 1.6.2(rxjs@7.8.2)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/rpc': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
+
   '@univerjs-pro/sheets-pivot-ui@1.6.2(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(rxjs@7.8.2)':
     dependencies:
       '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -6230,6 +6903,23 @@ snapshots:
       '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/pivot-cache': 1.6.2(@univerjs-pro/engine-pivot@1.6.2(react@19.3.0)(rxjs@7.8.2))(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)
+      '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-render': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/rpc': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-filter': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
+
+  '@univerjs-pro/sheets-pivot@1.6.2(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/pivot-cache': 1.6.2(@univerjs-pro/engine-pivot@1.6.2(rxjs@7.8.2))
       '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -6334,6 +7024,25 @@ snapshots:
       '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/sheets-pivot': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
       '@univerjs-pro/sheets-pivot-chart': 1.6.2(@univerjs-pro/resources@1.6.2(react@19.3.0)(rxjs@7.8.2))(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/rpc': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-conditional-formatting': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-drawing': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs/sheets-table': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+    transitivePeerDependencies:
+      - '@univerjs-pro/resources'
+      - react
+
+  '@univerjs-pro/sheets-slicer@1.6.2(rxjs@7.8.2)':
+    dependencies:
+      '@univerjs-pro/engine-pivot': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/license': 1.6.2(react@19.3.0)(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot': 1.6.2(rxjs@7.8.2)
+      '@univerjs-pro/sheets-pivot-chart': 1.6.2(rxjs@7.8.2)
       '@univerjs-pro/slicer': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/core': 1.6.2(react@19.3.0)(rxjs@7.8.2)
       '@univerjs/engine-formula': 1.6.2(react@19.3.0)(rxjs@7.8.2)
@@ -7496,6 +8205,47 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
+  '@vitest/expect@4.1.12':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      '@types/chai': 5.2.3
+      '@vitest/spy': 4.1.12
+      '@vitest/utils': 4.1.12
+      chai: 6.3.0
+      tinyrainbow: 3.2.0
+
+  '@vitest/mocker@4.1.12(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12))':
+    dependencies:
+      '@vitest/spy': 4.1.12
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12)
+
+  '@vitest/pretty-format@4.1.12':
+    dependencies:
+      tinyrainbow: 3.2.0
+
+  '@vitest/runner@4.1.12':
+    dependencies:
+      '@vitest/utils': 4.1.12
+      pathe: 2.0.3
+
+  '@vitest/snapshot@4.1.12':
+    dependencies:
+      '@vitest/pretty-format': 4.1.12
+      '@vitest/utils': 4.1.12
+      magic-string: 0.30.21
+      pathe: 2.0.3
+
+  '@vitest/spy@4.1.12': {}
+
+  '@vitest/utils@4.1.12':
+    dependencies:
+      '@vitest/pretty-format': 4.1.12
+      convert-source-map: 2.0.0
+      tinyrainbow: 3.2.0
+
   '@wendellhu/redi@1.1.3(react@19.3.0)':
     optionalDependencies:
       react: 19.3.0
@@ -7515,6 +8265,8 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
+  assertion-error@2.0.1: {}
+
   body-parser@2.3.0:
     dependencies:
       bytes: 3.1.2
@@ -7529,6 +8281,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  bowser@2.15.1: {}
+
   bytes@3.1.2: {}
 
   call-bind-apply-helpers@1.0.2:
@@ -7540,6 +8294,8 @@ snapshots:
     dependencies:
       call-bind-apply-helpers: 1.0.2
       get-intrinsic: 1.3.0
+
+  chai@6.3.0: {}
 
   class-variance-authority@0.7.1:
     dependencies:
@@ -7581,6 +8337,8 @@ snapshots:
 
   content-type@2.1.0: {}
 
+  convert-source-map@2.0.0: {}
+
   cookie-signature@1.2.2: {}
 
   cookie@0.7.2: {}
@@ -7616,6 +8374,8 @@ snapshots:
   es-define-property@1.0.1: {}
 
   es-errors@1.3.0: {}
+
+  es-module-lexer@2.3.2: {}
 
   es-object-atoms@1.1.2:
     dependencies:
@@ -7654,7 +8414,13 @@ snapshots:
 
   escape-html@1.0.3: {}
 
+  estree-walker@3.0.3:
+    dependencies:
+      '@types/estree': 1.0.11
+
   etag@1.8.1: {}
+
+  expect-type@1.4.0: {}
 
   express@5.2.1:
     dependencies:
@@ -7841,6 +8607,10 @@ snapshots:
 
   long@5.3.2: {}
 
+  magic-string@0.30.21:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.6.0
+
   math-intrinsics@1.1.0: {}
 
   media-typer@1.1.1: {}
@@ -7865,6 +8635,8 @@ snapshots:
 
   object-inspect@1.13.4: {}
 
+  obug@2.2.1: {}
+
   on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
@@ -7886,6 +8658,8 @@ snapshots:
   parseurl@1.3.3: {}
 
   path-to-regexp@8.4.2: {}
+
+  pathe@2.0.3: {}
 
   pg-cloudflare@1.4.0:
     optional: true
@@ -8120,6 +8894,8 @@ snapshots:
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
 
+  siginfo@2.0.0: {}
+
   sonner@2.0.8(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       react: 19.3.0
@@ -8131,7 +8907,11 @@ snapshots:
 
   split2@4.2.0: {}
 
+  stackback@0.0.2: {}
+
   statuses@2.0.2: {}
+
+  std-env@4.3.0: {}
 
   string-width@4.2.3:
     dependencies:
@@ -8143,10 +8923,16 @@ snapshots:
     dependencies:
       ansi-regex: 5.0.1
 
+  tinybench@2.9.0: {}
+
+  tinyexec@1.4.0: {}
+
   tinyglobby@0.2.17:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.5)
       picomatch: 4.0.5
+
+  tinyrainbow@3.2.0: {}
 
   toidentifier@1.0.1: {}
 
@@ -8199,6 +8985,19 @@ snapshots:
 
   vary@1.1.2: {}
 
+  vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12):
+    dependencies:
+      lightningcss: 1.33.0
+      picomatch: 4.0.5
+      postcss: 8.5.26
+      rolldown: 1.2.5
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 24.13.3
+      esbuild: 0.28.2
+      fsevents: 2.3.3
+      tsx: 4.23.12
+
   vite@8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(tsx@4.23.12):
     dependencies:
       lightningcss: 1.33.0
@@ -8211,6 +9010,38 @@ snapshots:
       esbuild: 0.28.2
       fsevents: 2.3.3
       tsx: 4.23.12
+
+  vitest@4.1.12(@types/node@24.13.3)(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12)):
+    dependencies:
+      '@vitest/expect': 4.1.12
+      '@vitest/mocker': 4.1.12(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12))
+      '@vitest/pretty-format': 4.1.12
+      '@vitest/runner': 4.1.12
+      '@vitest/snapshot': 4.1.12
+      '@vitest/spy': 4.1.12
+      '@vitest/utils': 4.1.12
+      es-module-lexer: 2.3.2
+      expect-type: 1.4.0
+      magic-string: 0.30.21
+      obug: 2.2.1
+      pathe: 2.0.3
+      picomatch: 4.0.5
+      std-env: 4.3.0
+      tinybench: 2.9.0
+      tinyexec: 1.4.0
+      tinyglobby: 0.2.17
+      tinyrainbow: 3.2.0
+      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)(tsx@4.23.12)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 24.13.3
+    transitivePeerDependencies:
+      - msw
+
+  why-is-node-running@2.3.0:
+    dependencies:
+      siginfo: 2.0.0
+      stackback: 0.0.2
 
   wrap-ansi@7.0.0:
     dependencies:

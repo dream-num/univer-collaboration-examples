@@ -45,10 +45,11 @@ For an upgrade to an already public version use any short-lived branch name.
 ### 2. Bump the SDK pins
 
 - Move every `@univerjs` / `@univerjs-pro` dependency in all
-  `examples/*/package.json` to the exact new version. Independently versioned
-  packages (native bindings such as `engine-formula-rust-binding` and
-  `exchange-node-binding`, plus `@univerjs/icons`) keep their own versions and
-  are only bumped when upstream changes them.
+  `examples/*/package.json` and `tools/*/package.json` to the exact new version.
+  Independently versioned packages (native bindings such as
+  `engine-formula-rust-binding` and `exchange-node-binding`, plus
+  `@univerjs/icons`) keep their own versions and are only bumped when upstream
+  changes them.
 - Update the `packageExtensions` entries in `pnpm-workspace.yaml` to the same
   version.
 
